@@ -38,22 +38,32 @@ It comes with a **Lovelace card** showing the tank and battery gauges, the key f
 
 ## Compatible integrations
 
-**Renault** ([official integration](https://www.home-assistant.io/integrations/renault/)) is supported first-class: its **mileage**, **fuel quantity**, **battery available energy** and **battery level** sensors are detected automatically.
+The odometer and the fuel and battery sensors of these integrations are **detected from their own sensor keys**, read from each integration's source code. The setup form comes prefilled; check it and change what you want.
 
-Any other vehicle integration that exposes an **odometer** plus **fuel** sensors (quantity in L or gal, or level in %) and/or **battery** sensors (energy in kWh, or level in %) works too:
+| Brand | Integration | Odometer | Fuel | Battery |
+|---|---|---|---|---|
+| Renault, Dacia, Alpine | [Renault](https://www.home-assistant.io/integrations/renault/) (official) | ✓ | litres | kWh, % |
+| Tesla | [Tesla Fleet](https://www.home-assistant.io/integrations/tesla_fleet/), [Teslemetry](https://www.home-assistant.io/integrations/teslemetry/), [Tessie](https://www.home-assistant.io/integrations/tessie/) (official) | ✓ ¹ | — | kWh ², % |
+| Kia, Hyundai, Genesis | [Kia Connect / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) (HACS) | ✓ | % | kWh, % |
+| BMW, Mini | [BMW Connected Drive](https://www.home-assistant.io/integrations/bmw_connected_drive/) (official until 2026.3), [BMW CarData](https://github.com/kvanbiesen/bmw-cardata-ha), [BavarianData](https://github.com/JustChr/BavarianData) (HACS) | ✓ | litres, % | % |
+| Mercedes-Benz, smart | [MercedesME 2020](https://github.com/ReneNulschDE/mbapi2020) (HACS) | ✓ | % | % |
+| Toyota, Lexus | [Toyota](https://github.com/pytoyoda/ha_toyota) (HACS) | ✓ | % | % |
+| Volvo | [Volvo](https://www.home-assistant.io/integrations/volvo/) (official), [Volvo Cars](https://github.com/thomasddn/ha-volvo-cars) (HACS, former) | ✓ | litres | % |
+| Polestar | [Polestar API](https://github.com/pypolestar/polestar_api) (HACS) | ✓ | — | % |
+| Volkswagen | [Volkswagen Car-Net](https://github.com/robinostlund/homeassistant-volkswagencarnet), [Volkswagen We Connect ID](https://github.com/mitch-dc/volkswagen_we_connect_id) (HACS) | ✓ | % | % |
+| Audi | [Audi connect](https://github.com/audiconnect/audi_connect_ha) (HACS) | ✓ | % | % |
+| Škoda | [MySkoda](https://github.com/skodaconnect/homeassistant-myskoda) (HACS) | ✓ | % | % |
+| SEAT, CUPRA | [SEAT Connect](https://github.com/Farfar/homeassistant-seatconnect), [CUPRA We Connect](https://github.com/daernsinstantfortress/cupra_we_connect) (HACS) | ✓ | % | % |
+| Peugeot, Citroën, DS, Opel, Fiat, Jeep, Alfa Romeo | [Stellantis Vehicles](https://github.com/andreadegiovine/homeassistant-stellantis-vehicles) (HACS) | ✓ | % | kWh, % |
+| Ford | [FordPass](https://github.com/itchannel/fordpass-ha) (HACS) | ✓ | % ³ | — |
+| Nissan | [Nissan Leaf](https://www.home-assistant.io/integrations/nissan_leaf/) (official) | — ⁴ | — | % |
+| MG | [MG SAIC](https://github.com/ad-ha/mg-saic-ha) (HACS) | ✓ | % | kWh, % |
+| BYD | [BYD Vehicle](https://github.com/jkaberg/hass-byd-vehicle) (HACS) | ✓ | % | % |
+| Any (OBD-II) | [WiCAN](https://github.com/jay-oswald/ha-wican), [OVMS](https://github.com/ovms-hass/ovms-home-assistant) (HACS) | ✓ | litres, % ⁵ | % |
 
-- Tesla / Teslemetry
-- Kia / Hyundai (Kia Connect)
-- Volkswagen
-- BMW
-- Mercedes-Benz
-- Toyota
-- Peugeot / Citroën / DS / Opel
-- Volvo, Polestar
-- Ford, Skoda
-- OBD-II dongles…
+¹ Disabled by default in Tesla Fleet and Teslemetry: enable the *Odometer* entity first. ² Teslemetry and Tessie. ³ On an electric Ford, FordPass reports the battery level there. ⁴ The Leaf integration has no odometer: pick one from another source. ⁵ WiCAN, depending on the vehicle profile.
 
-The sensors are **detected automatically**, or pick the sensors yourself during setup. A level in % needs the tank or battery capacity to be turned into litres or kWh.
+**Any other vehicle integration** works too, as long as its device has an **odometer** plus **fuel** sensors (litres or gallons, or a level in %) and/or **battery** sensors (kWh, or a level in %): they are recognised from their names, units and device classes, or picked by hand. Units are converted (miles and metres to km, US gallons to litres, Wh, kJ and MJ to kWh). A level in % needs the tank or battery capacity to be turned into litres or kWh. The setup starts from the vehicle's device, so sensors without one (Torque) cannot be used.
 
 ### Home chargers
 

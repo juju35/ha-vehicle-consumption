@@ -98,6 +98,17 @@ def _time(value: Any) -> datetime | None:
     return dt_util.parse_datetime(str(value)) if value else None
 
 
+_DISTANCE_FACTORS: dict[str | None, float] = {"mi": KM_PER_MILE, "m": 0.001}
+_ENERGY_FACTORS: dict[str | None, float] = {"Wh": 0.001, "MWh": 1000.0, "kJ": 1 / 3600, "MJ": 1 / 3.6}
+# Factor turning each source's unit into km / L / kWh (any other unit is taken as is).
+_UNIT_FACTORS: dict[str, dict[str | None, float]] = {
+    CONF_ODOMETER: _DISTANCE_FACTORS,
+    CONF_FUEL_QUANTITY: {"gal": LITERS_PER_GALLON},
+    CONF_BATTERY_ENERGY: _ENERGY_FACTORS,
+    CONF_CHARGER_ENERGY: _ENERGY_FACTORS,
+}
+
+
 @dataclass(slots=True)
 class Totals:
     """Accumulators: what a trip, a month and the whole tracking period are made of."""
@@ -347,15 +358,9 @@ class ConsumptionTracker:
         if value is None:
             return None
         unit = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
-        if key == CONF_ODOMETER and unit == "mi":
-            return value * KM_PER_MILE
-        if key == CONF_FUEL_QUANTITY and unit == "gal":
-            return value * LITERS_PER_GALLON
-        if key in (CONF_BATTERY_ENERGY, CONF_CHARGER_ENERGY) and unit == "Wh":
-            return value / 1000
-        if key == CONF_CHARGER_ENERGY and unit == "MWh":
-            return value * 1000
-        return value
+        # To km, L and kWh: Polestar's odometer can be in metres, Kia's energy left in kJ.
+        factor = _UNIT_FACTORS.get(key, {}).get(unit, 1.0)
+        return value * factor
 
     def _fuel_now(self, state: State | None = None, key: str | None = None) -> float | None:
         """Litres in the tank: the quantity sensor, else the level (%) times the tank capacity."""

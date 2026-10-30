@@ -331,6 +331,20 @@ async def test_plugin_hybrid_and_units(hass: HomeAssistant) -> None:
     assert state_of(hass, "fuel_consumption_average").state == "2.4"
 
 
+async def test_metres_and_kilojoules(hass: HomeAssistant) -> None:
+    """An odometer in metres (Polestar) and energy left in kJ (Kia / Hyundai) become km and kWh."""
+    metres = {**KM, "unit_of_measurement": "m"}
+    kilojoules = {"unit_of_measurement": "kJ", "device_class": "energy_storage"}
+    states = {ODOMETER: ("10000000", metres), BATTERY: ("180000", kilojoules)}  # 10 000 km, 50 kWh
+    await setup_vehicle(hass, {CONF_ODOMETER: ODOMETER, CONF_BATTERY_ENERGY: BATTERY}, states=states)
+    assert _attrs(hass)["odometer"] == 10000 and _attrs(hass)["battery_energy"] == 50
+
+    await _set(hass, ODOMETER, 10100000, metres)  # 100 km
+    await _set(hass, BATTERY, 122400, kilojoules)  # 34 kWh: 16 kWh used
+    total = _attrs(hass)["total"]
+    assert total["distance"] == 100 and total["energy"] == 16 and total["energy_consumption"] == 16.0
+
+
 async def test_restart_safe(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
     """Everything survives a reload, and what changed while unloaded is caught up."""
     entry = await setup_vehicle(hass, {CONF_ODOMETER: ODOMETER, CONF_FUEL_QUANTITY: FUEL, CONF_FUEL_PRICE: 2.0})
