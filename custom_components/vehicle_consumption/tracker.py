@@ -8,6 +8,10 @@ The tracker only sees levels (litres or kWh in the tank / battery) and the odome
 Distance is the odometer delta. A trip starts when the odometer moves and ends `trip_gap` minutes after it last
 moved; a trip, a month and the total are deltas of the same accumulators (distance, fuel, energy, cost).
 Cost is counted when the fuel / energy is consumed, at the price of that moment.
+
+With a home charger energy counter, home charges are measured at the charger (losses included): a session is the
+counter going up, until it has not moved for `CHARGER_SESSION_GAP`; a battery rise while the counter moves is that
+session, not another charge. Battery rises while the charger is idle stay charges of their own (away from home).
 """
 
 from __future__ import annotations
@@ -25,10 +29,13 @@ from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
 from .const import (
+    CHARGER_OVERLAP,
+    CHARGER_SESSION_GAP,
     CONF_BATTERY_CAPACITY,
     CONF_BATTERY_ENERGY,
     CONF_BATTERY_LEVEL,
     CONF_CHARGE_THRESHOLD,
+    CONF_CHARGER_ENERGY,
     CONF_ELECTRICITY_PRICE,
     CONF_ELECTRICITY_PRICE_ENTITY,
     CONF_FUEL_LEVEL,
@@ -45,6 +52,7 @@ from .const import (
     KIND_ELECTRIC,
     KIND_FUEL,
     KIND_PLUGIN_HYBRID,
+    MAX_CHARGER_STEP,
     MAX_EVENTS,
     MAX_MONTHS,
     MAX_ODOMETER_JUMP,
@@ -66,6 +74,8 @@ MERGE_WINDOW = timedelta(hours=12)
 
 FUEL = "fuel"
 ENERGY = "energy"
+SOURCE_AUTO = "auto"
+SOURCE_CHARGER = "charger"
 
 
 def _float(value: Any) -> float | None:
@@ -82,6 +92,10 @@ def _round(value: float | None, digits: int) -> float | None:
 
 def _iso(value: datetime | None) -> str | None:
     return value.isoformat() if value else None
+
+
+def _time(value: Any) -> datetime | None:
+    return dt_util.parse_datetime(str(value)) if value else None
 
 
 @dataclass(slots=True)
@@ -152,7 +166,7 @@ class Trip:
 
 @dataclass(slots=True)
 class Refill:
-    """A refuel (litres) or a charge (kWh), detected from the sensors (`auto`) or logged by hand (`manual`)."""
+    """A refuel (litres) or a charge (kWh): from the levels (`auto`), the home charger (`charger`) or by hand."""
 
     time: datetime
     amount: float
@@ -160,6 +174,7 @@ class Refill:
     price: float | None
     odometer: float | None
     source: str
+    start: datetime | None = None  # start of a home charger session
 
     def summary(self, unit_key: str) -> dict[str, Any]:
         return {
@@ -172,7 +187,7 @@ class Refill:
         }
 
     def dump(self) -> dict[str, Any]:
-        return {**asdict(self), "time": self.time.isoformat()}
+        return {**asdict(self), "time": self.time.isoformat(), "start": _iso(self.start)}
 
     @classmethod
     def load(cls, data: dict[str, Any]) -> Refill | None:
@@ -186,7 +201,8 @@ class Refill:
             cost=_float(data.get("cost")),
             price=_float(data.get("price")),
             odometer=_float(data.get("odometer")),
-            source=str(data.get("source") or "auto"),
+            source=str(data.get("source") or SOURCE_AUTO),
+            start=_time(data.get("start")),
         )
 
 
@@ -198,6 +214,35 @@ class _Level:
     events: list[Refill] = field(default_factory=list)  # newest first
     # Something was consumed since the last automatic event: a new rise is then a new event, not more of the last.
     consumed_since_event: bool = True
+    seen: datetime | None = None  # last reading: a rise happened between it and the next one
+
+
+@dataclass(slots=True)
+class _Charger:
+    """Home charger energy counter: last reading and the current (or last) session."""
+
+    last: float | None = None  # kWh
+    last_move: datetime | None = None  # last time the counter went up
+    session_start: datetime | None = None  # None: no session open
+    session_amount: float = 0.0  # kWh delivered by the open session
+
+    def dump(self) -> dict[str, Any]:
+        return {
+            "last": self.last,
+            "last_move": _iso(self.last_move),
+            "session_start": _iso(self.session_start),
+            "session_amount": self.session_amount,
+        }
+
+    @classmethod
+    def load(cls, data: dict[str, Any] | None) -> _Charger:
+        data = data or {}
+        return cls(
+            last=_float(data.get("last")),
+            last_move=_time(data.get("last_move")),
+            session_start=_time(data.get("session_start")),
+            session_amount=_float(data.get("session_amount")) or 0.0,
+        )
 
 
 class ConsumptionTracker:
@@ -222,6 +267,9 @@ class ConsumptionTracker:
 
         self.tracks_fuel = CONF_FUEL_QUANTITY in self.sensors or CONF_FUEL_LEVEL in self.sensors
         self.tracks_energy = CONF_BATTERY_ENERGY in self.sensors or CONF_BATTERY_LEVEL in self.sensors
+        # Only with a battery, and read first: a battery rise is then checked against an up-to-date counter.
+        if self.tracks_energy and isinstance(charger := options.get(CONF_CHARGER_ENERGY), str) and charger:
+            self.sensors = {CONF_CHARGER_ENERGY: charger, **self.sensors}
 
         self._store: Store[dict[str, Any]] = Store(hass, STORAGE_VERSION, STORAGE_KEY.format(entry_id=entry_id))
         self._listeners: list[CALLBACK_TYPE] = []
@@ -237,6 +285,7 @@ class ConsumptionTracker:
         self.trips: list[Trip] = []  # finished trips, newest first
         self.odometer: float | None = None
         self._levels = {FUEL: _Level(), ENERGY: _Level()}
+        self._charger = _Charger()
 
     # ── Listeners ───────────────────────────────────────────────────────────
 
@@ -302,8 +351,10 @@ class ConsumptionTracker:
             return value * KM_PER_MILE
         if key == CONF_FUEL_QUANTITY and unit == "gal":
             return value * LITERS_PER_GALLON
-        if key == CONF_BATTERY_ENERGY and unit == "Wh":
+        if key in (CONF_BATTERY_ENERGY, CONF_CHARGER_ENERGY) and unit == "Wh":
             return value / 1000
+        if key == CONF_CHARGER_ENERGY and unit == "MWh":
+            return value * 1000
         return value
 
     def _fuel_now(self, state: State | None = None, key: str | None = None) -> float | None:
@@ -377,6 +428,8 @@ class ConsumptionTracker:
 
     def _process_level(self, kind: str, value: float, now: datetime) -> bool:
         level = self._levels[kind]
+        rise_start = level.seen or now
+        level.seen = now
         if level.ref is None:
             level.ref = value
             return True
@@ -396,8 +449,12 @@ class ConsumptionTracker:
             return False  # noise: the reference stays
         amount = value - level.ref
         level.ref = value
+        if kind == ENERGY and self._charger_moved_since(rise_start - CHARGER_OVERLAP):
+            # Charged at home: the charger's session has it (losses included), not counted twice.
+            level.consumed_since_event = True
+            return True
         price = self.fuel_price if kind == FUEL else self.electricity_price
-        last = next((e for e in level.events if e.source == "auto"), None)
+        last = next((e for e in level.events if e.source == SOURCE_AUTO), None)
         if (
             last is not None
             and not level.consumed_since_event
@@ -418,15 +475,71 @@ class ConsumptionTracker:
                     cost=None if price is None else amount * price,
                     price=price,
                     odometer=self.odometer,
-                    source="auto",
+                    source=SOURCE_AUTO,
                 ),
             )
             del level.events[MAX_EVENTS:]
         level.consumed_since_event = False
         return True
 
+    def _charger_moved_since(self, since: datetime) -> bool:
+        moved = self._charger.last_move
+        return CONF_CHARGER_ENERGY in self.sensors and moved is not None and moved >= since
+
+    def _process_charger(self, value: float, now: datetime) -> bool:
+        """A home charger counter reading: the counter going up is a home charge session."""
+        charger = self._charger
+        if charger.last is None:
+            charger.last = value
+            return True
+        if value == charger.last:
+            return False
+        if value < charger.last:
+            # A session counter back to 0: a new session, counted from 0.
+            delta = value
+            charger.session_start = None
+        else:
+            delta = value - charger.last
+            self._close_charger_session(now)
+        charger.last = value
+        if delta <= 0 or delta > MAX_CHARGER_STEP:
+            return True  # back to 0, or a glitch / replaced meter: the reading becomes the reference, nothing counted
+        if charger.session_start is None:
+            charger.session_start = now
+            charger.session_amount = 0.0
+        charger.session_amount += delta
+        charger.last_move = now
+        events = self._levels[ENERGY].events
+        # Battery rises of this session already recorded (the car reported before the charger): the session has them.
+        events[:] = [e for e in events if e.source != SOURCE_AUTO or e.time < charger.session_start - CHARGER_OVERLAP]
+        amount = charger.session_amount
+        if amount < self.charge_threshold:
+            return True  # not a charge yet, as for a battery rise under the threshold
+        price = self.electricity_price
+        cost = None if price is None else amount * price
+        session = next((e for e in events if e.source == SOURCE_CHARGER and e.start == charger.session_start), None)
+        if session is None:
+            events.append(Refill(now, amount, cost, price, self.odometer, SOURCE_CHARGER, charger.session_start))
+        else:
+            session.time, session.amount, session.cost, session.price = now, amount, cost, price
+        events.sort(key=lambda e: e.time, reverse=True)
+        del events[MAX_EVENTS:]
+        return True
+
+    def _close_charger_session(self, now: datetime) -> bool:
+        """End the open home charge session once the counter has not moved for `CHARGER_SESSION_GAP`."""
+        charger = self._charger
+        if charger.session_start is None or (charger.last_move and now - charger.last_move < CHARGER_SESSION_GAP):
+            return False
+        charger.session_start = None
+        charger.session_amount = 0.0
+        return True
+
     def _process(self, key: str, state: State | None, now: datetime) -> bool:
         """Apply one sensor reading; True when something changed."""
+        if key == CONF_CHARGER_ENERGY:
+            value = self._reading(key, state)
+            return value is not None and self._process_charger(value, now)
         if key == CONF_ODOMETER:
             value = self._reading(key, state)
             return value is not None and self._process_odometer(value, now)
@@ -474,13 +587,14 @@ class ConsumptionTracker:
 
         @callback
         def tick(now: datetime) -> None:
-            month = self.month_totals()[0]
-            if self._end_trip_if_stopped(now):
+            month = self._shown_month
+            self._shown_month = self.month_totals()[0]
+            ended = self._end_trip_if_stopped(now)
+            if self._close_charger_session(now) or ended:
                 self._changed()
             elif month != self._shown_month:
                 # A new month starts at zero even when the car stays parked.
                 self._notify_listeners()
-            self._shown_month = month
 
         unsubs = [
             async_track_state_change_event(self.hass, sorted(set(by_entity) | prices), changed),
@@ -559,6 +673,7 @@ class ConsumptionTracker:
                 self._reset_data(now)
         # A trip still open in the store ended while Home Assistant was stopped (once the gap has passed).
         updated = self._end_trip_if_stopped(now)
+        updated |= self._close_charger_session(now)
         if self._read_current(now) or updated or not stored:
             self._store.async_delay_save(self._dump, SAVE_DELAY)
 
@@ -578,7 +693,9 @@ class ConsumptionTracker:
                 ref=_float(raw.get("ref")),
                 events=[e for d in raw.get("events") or [] if (e := Refill.load(d))],
                 consumed_since_event=bool(raw.get("consumed_since_event", True)),
+                seen=_time(raw.get("seen")),
             )
+        self._charger = _Charger.load(data.get("charger"))
 
     def _dump(self) -> dict[str, Any]:
         return {
@@ -593,9 +710,11 @@ class ConsumptionTracker:
                     "ref": level.ref,
                     "events": [e.dump() for e in level.events],
                     "consumed_since_event": level.consumed_since_event,
+                    "seen": _iso(level.seen),
                 }
                 for kind, level in self._levels.items()
             },
+            "charger": self._charger.dump(),
         }
 
     async def async_save(self) -> None:

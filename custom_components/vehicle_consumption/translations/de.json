@@ -23,7 +23,8 @@
           "battery_energy": "Batterieenergie",
           "battery_level": "Batteriestand",
           "tank_capacity": "Tankinhalt",
-          "battery_capacity": "Nutzbare Batteriekapazität"
+          "battery_capacity": "Nutzbare Batteriekapazität",
+          "charger_energy": "Energie der Wallbox"
         },
         "data_description": {
           "odometer": "Gesamtfahrleistung des Fahrzeugs (km oder mi).",
@@ -32,7 +33,8 @@
           "battery_energy": "Verbleibende Energie der Antriebsbatterie (kWh oder Wh).",
           "battery_level": "Ladezustand der Antriebsbatterie (%). Benötigt die Batteriekapazität, wenn kein Sensor für die Batterieenergie vorhanden ist.",
           "tank_capacity": "Rechnet den Kraftstoffstand in Liter um.",
-          "battery_capacity": "Rechnet den Batteriestand in kWh um."
+          "battery_capacity": "Rechnet den Batteriestand in kWh um.",
+          "charger_energy": "Energiezähler Ihrer Wallbox zu Hause (evcc, Wallbox, Easee, Zaptec, Ohme…): Ladevorgänge zu Hause werden an der Wallbox gemessen, Ladeverluste inbegriffen. Erfordert einen Batteriesensor."
         }
       },
       "prices": {
@@ -55,7 +57,8 @@
     "error": {
       "no_energy_sensor": "Wähle mindestens einen Kraftstoff- oder Batteriesensor.",
       "tank_capacity_required": "Für den Kraftstoffstand wird der Tankinhalt benötigt.",
-      "battery_capacity_required": "Für den Batteriestand wird die Batteriekapazität benötigt."
+      "battery_capacity_required": "Für den Batteriestand wird die Batteriekapazität benötigt.",
+      "charger_needs_battery": "Ein Wallbox-Zähler erfordert einen Sensor für Batterieenergie oder -ladestand."
     },
     "abort": {
       "already_configured": "Dieses Fahrzeug ist bereits eingerichtet."
@@ -73,7 +76,8 @@
           "battery_energy": "Batterieenergie",
           "battery_level": "Batteriestand",
           "tank_capacity": "Tankinhalt",
-          "battery_capacity": "Nutzbare Batteriekapazität"
+          "battery_capacity": "Nutzbare Batteriekapazität",
+          "charger_energy": "Energie der Wallbox"
         },
         "data_description": {
           "odometer": "Gesamtfahrleistung des Fahrzeugs (km oder mi).",
@@ -82,7 +86,8 @@
           "battery_energy": "Verbleibende Energie der Antriebsbatterie (kWh oder Wh).",
           "battery_level": "Ladezustand der Antriebsbatterie (%). Benötigt die Batteriekapazität, wenn kein Sensor für die Batterieenergie vorhanden ist.",
           "tank_capacity": "Rechnet den Kraftstoffstand in Liter um.",
-          "battery_capacity": "Rechnet den Batteriestand in kWh um."
+          "battery_capacity": "Rechnet den Batteriestand in kWh um.",
+          "charger_energy": "Energiezähler Ihrer Wallbox zu Hause (evcc, Wallbox, Easee, Zaptec, Ohme…): Ladevorgänge zu Hause werden an der Wallbox gemessen, Ladeverluste inbegriffen. Erfordert einen Batteriesensor."
         }
       },
       "prices": {
@@ -111,7 +116,8 @@
     "error": {
       "no_energy_sensor": "Wähle mindestens einen Kraftstoff- oder Batteriesensor.",
       "tank_capacity_required": "Für den Kraftstoffstand wird der Tankinhalt benötigt.",
-      "battery_capacity_required": "Für den Batteriestand wird die Batteriekapazität benötigt."
+      "battery_capacity_required": "Für den Batteriestand wird die Batteriekapazität benötigt.",
+      "charger_needs_battery": "Ein Wallbox-Zähler erfordert einen Sensor für Batterieenergie oder -ladestand."
     }
   },
   "entity": {
@@ -186,7 +192,8 @@
             "name": "Quelle",
             "state": {
               "auto": "Erkannt",
-              "manual": "Manuell"
+              "manual": "Manuell",
+              "charger": "Wallbox zu Hause"
             }
           }
         }

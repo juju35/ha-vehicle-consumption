@@ -28,6 +28,7 @@ const VC_I18N = {
     no_refuels: 'No refuel yet',
     no_charges: 'No charge yet',
     manual: 'Logged by hand',
+    charger: 'Home charger',
     chart_consumption: 'Consumption',
     chart_distance: 'Distance',
     chart_cost: 'Cost',
@@ -78,6 +79,7 @@ const VC_I18N = {
     no_refuels: 'Aucun plein pour l’instant',
     no_charges: 'Aucune recharge pour l’instant',
     manual: 'Saisi à la main',
+    charger: 'Borne à domicile',
     chart_consumption: 'Consommation',
     chart_distance: 'Distance',
     chart_cost: 'Coût',
@@ -128,6 +130,7 @@ const VC_I18N = {
     no_refuels: 'Noch kein Tankvorgang',
     no_charges: 'Noch kein Ladevorgang',
     manual: 'Von Hand erfasst',
+    charger: 'Wallbox zu Hause',
     chart_consumption: 'Verbrauch',
     chart_distance: 'Strecke',
     chart_cost: 'Kosten',
@@ -178,6 +181,7 @@ const VC_I18N = {
     no_refuels: 'Aún no hay repostajes',
     no_charges: 'Aún no hay cargas',
     manual: 'Registrado a mano',
+    charger: 'Cargador doméstico',
     chart_consumption: 'Consumo',
     chart_distance: 'Distancia',
     chart_cost: 'Coste',
@@ -638,7 +642,8 @@ class VehicleConsumptionCard extends HTMLElement {
       const t = vcTracks(kind);
       const events = (list, key, unit) =>
         (Array.isArray(list) ? list : []).slice(0, VC_ROWS).map((e) => {
-          const sub = [vcFinite(e.odometer) ? `${f.num(e.odometer, 0)} km` : '', e.source === 'manual' ? this._t('manual') : '']
+          const from = e.source === 'manual' || e.source === 'charger' ? this._t(e.source) : '';
+          const sub = [vcFinite(e.odometer) ? `${f.num(e.odometer, 0)} km` : '', from]
             .filter(Boolean)
             .join(' · ');
           return this._row(f.date(e.time), sub || VC_DASH, vcFinite(e[key]) ? `${f.num(e[key], 1)} ${unit}` : VC_DASH, f.money(e.cost), e.source === 'manual');

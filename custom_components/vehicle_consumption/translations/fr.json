@@ -23,7 +23,8 @@
           "battery_energy": "Énergie de la batterie",
           "battery_level": "Niveau de la batterie",
           "tank_capacity": "Capacité du réservoir",
-          "battery_capacity": "Capacité utile de la batterie"
+          "battery_capacity": "Capacité utile de la batterie",
+          "charger_energy": "Énergie de la borne de recharge"
         },
         "data_description": {
           "odometer": "Kilométrage total du véhicule (km ou mi).",
@@ -32,7 +33,8 @@
           "battery_energy": "Énergie restante dans la batterie de traction (kWh ou Wh).",
           "battery_level": "État de charge de la batterie de traction (%). Nécessite la capacité de la batterie en l'absence de capteur d'énergie.",
           "tank_capacity": "Convertit le niveau de carburant en litres.",
-          "battery_capacity": "Convertit le niveau de batterie en kWh."
+          "battery_capacity": "Convertit le niveau de batterie en kWh.",
+          "charger_energy": "Compteur d’énergie de votre borne à domicile (evcc, Wallbox, Easee, Zaptec, Ohme…) : les recharges à domicile sont mesurées à la borne, pertes comprises. Nécessite un capteur de batterie."
         }
       },
       "prices": {
@@ -55,7 +57,8 @@
     "error": {
       "no_energy_sensor": "Choisissez au moins un capteur de carburant ou de batterie.",
       "tank_capacity_required": "La capacité du réservoir est nécessaire pour utiliser le niveau de carburant.",
-      "battery_capacity_required": "La capacité de la batterie est nécessaire pour utiliser le niveau de batterie."
+      "battery_capacity_required": "La capacité de la batterie est nécessaire pour utiliser le niveau de batterie.",
+      "charger_needs_battery": "Le compteur d’une borne de recharge nécessite un capteur d’énergie ou de niveau de batterie."
     },
     "abort": {
       "already_configured": "Ce véhicule est déjà configuré."
@@ -73,7 +76,8 @@
           "battery_energy": "Énergie de la batterie",
           "battery_level": "Niveau de la batterie",
           "tank_capacity": "Capacité du réservoir",
-          "battery_capacity": "Capacité utile de la batterie"
+          "battery_capacity": "Capacité utile de la batterie",
+          "charger_energy": "Énergie de la borne de recharge"
         },
         "data_description": {
           "odometer": "Kilométrage total du véhicule (km ou mi).",
@@ -82,7 +86,8 @@
           "battery_energy": "Énergie restante dans la batterie de traction (kWh ou Wh).",
           "battery_level": "État de charge de la batterie de traction (%). Nécessite la capacité de la batterie en l'absence de capteur d'énergie.",
           "tank_capacity": "Convertit le niveau de carburant en litres.",
-          "battery_capacity": "Convertit le niveau de batterie en kWh."
+          "battery_capacity": "Convertit le niveau de batterie en kWh.",
+          "charger_energy": "Compteur d’énergie de votre borne à domicile (evcc, Wallbox, Easee, Zaptec, Ohme…) : les recharges à domicile sont mesurées à la borne, pertes comprises. Nécessite un capteur de batterie."
         }
       },
       "prices": {
@@ -111,7 +116,8 @@
     "error": {
       "no_energy_sensor": "Choisissez au moins un capteur de carburant ou de batterie.",
       "tank_capacity_required": "La capacité du réservoir est nécessaire pour utiliser le niveau de carburant.",
-      "battery_capacity_required": "La capacité de la batterie est nécessaire pour utiliser le niveau de batterie."
+      "battery_capacity_required": "La capacité de la batterie est nécessaire pour utiliser le niveau de batterie.",
+      "charger_needs_battery": "Le compteur d’une borne de recharge nécessite un capteur d’énergie ou de niveau de batterie."
     }
   },
   "entity": {
@@ -186,7 +192,8 @@
             "name": "Source",
             "state": {
               "auto": "Détectée",
-              "manual": "Manuelle"
+              "manual": "Manuelle",
+              "charger": "Borne à domicile"
             }
           }
         }

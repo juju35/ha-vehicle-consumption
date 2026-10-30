@@ -1,6 +1,7 @@
 """Config flow for Vehicle Consumption: one entry per vehicle device.
 
-Steps: `user` (the vehicle device and a name), `sensors` (prefilled by the auto-detection), `prices`.
+Steps: `user` (the vehicle device and a name), `sensors` (prefilled by the auto-detection, home charger included),
+`prices`.
 The device and the name go in the entry data, everything else in the options (changed by the options flow).
 """
 
@@ -24,11 +25,13 @@ from homeassistant.helpers.selector import (
     TextSelector,
 )
 
+from .charger import async_detect_charger
 from .const import (
     CONF_BATTERY_CAPACITY,
     CONF_BATTERY_ENERGY,
     CONF_BATTERY_LEVEL,
     CONF_CHARGE_THRESHOLD,
+    CONF_CHARGER_ENERGY,
     CONF_DEVICE_ID,
     CONF_ELECTRICITY_PRICE,
     CONF_ELECTRICITY_PRICE_ENTITY,
@@ -50,6 +53,7 @@ from .const import (
 from .detect import async_detect
 
 _SENSOR = EntitySelector(EntitySelectorConfig(domain="sensor"))
+_CHARGER = EntitySelector(EntitySelectorConfig(domain="sensor", device_class="energy"))
 _PRICE_ENTITY = EntitySelector(EntitySelectorConfig(domain=["sensor", "input_number", "number"]))
 _ENERGY_SOURCES = tuple(key for key in SENSOR_KEYS if key != CONF_ODOMETER)
 _PRICE_KEYS = (CONF_FUEL_PRICE_ENTITY, CONF_FUEL_PRICE, CONF_ELECTRICITY_PRICE_ENTITY, CONF_ELECTRICITY_PRICE)
@@ -74,6 +78,7 @@ def _sensors_schema() -> vol.Schema:
             **{vol.Optional(key): _SENSOR for key in _ENERGY_SOURCES},
             vol.Optional(CONF_TANK_CAPACITY): _number(1, 500, 0.1, "L"),
             vol.Optional(CONF_BATTERY_CAPACITY): _number(1, 300, 0.1, "kWh"),
+            vol.Optional(CONF_CHARGER_ENERGY): _CHARGER,
         }
     )
 
@@ -112,6 +117,11 @@ def _validate_sensors(user_input: dict[str, Any]) -> dict[str, str]:
         and not user_input.get(CONF_BATTERY_CAPACITY)
     ):
         errors[CONF_BATTERY_CAPACITY] = "battery_capacity_required"
+    # Home charges are matched with the battery rises: without a battery, a charger counter means nothing.
+    if user_input.get(CONF_CHARGER_ENERGY) and not (
+        user_input.get(CONF_BATTERY_ENERGY) or user_input.get(CONF_BATTERY_LEVEL)
+    ):
+        errors[CONF_CHARGER_ENERGY] = "charger_needs_battery"
     return errors
 
 
@@ -140,7 +150,9 @@ async def _sensors_step(
     """The sensors and capacities step, shared by the config and options flows: on to the prices once valid."""
     errors = _validate_sensors(user_input) if user_input is not None else {}
     if user_input is not None and not errors:
-        flow._options = _clean(user_input, (*SENSOR_KEYS, CONF_TANK_CAPACITY, CONF_BATTERY_CAPACITY))
+        flow._options = _clean(
+            user_input, (*SENSOR_KEYS, CONF_TANK_CAPACITY, CONF_BATTERY_CAPACITY, CONF_CHARGER_ENERGY)
+        )
         return await flow.async_step_prices()
     return flow.async_show_form(
         step_id=step_id,
@@ -182,9 +194,15 @@ class VehicleConsumptionConfigFlow(ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_sensors(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        detected = async_detect(self.hass, self._data[CONF_DEVICE_ID]) if user_input is None else {}
+        detected: dict[str, str] = async_detect(self.hass, self._data[CONF_DEVICE_ID]) if user_input is None else {}
+        found = len(detected)
+        # The home charger is another device: looked for in the whole registry, for a car with a battery only.
+        if (CONF_BATTERY_ENERGY in detected or CONF_BATTERY_LEVEL in detected) and (
+            charger := async_detect_charger(self.hass)
+        ):
+            detected[CONF_CHARGER_ENERGY] = charger
         return await _sensors_step(
-            self, "sensors", user_input, detected, {"name": self._data[CONF_NAME], "found": str(len(detected))}
+            self, "sensors", user_input, detected, {"name": self._data[CONF_NAME], "found": str(found)}
         )
 
     async def async_step_prices(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:

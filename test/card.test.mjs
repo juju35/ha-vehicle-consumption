@@ -243,6 +243,21 @@ test('electric: one battery gauge, kWh/100 km, charges section only', () => {
   assert.doesNotMatch(out, /data-section="refuels"/);
 });
 
+test('charges: home charger sessions are labelled, auto ones are not', () => {
+  const card = makeCard();
+  const charges = [
+    { time: '2026-10-30T07:00:00+01:00', odometer: 21050, energy: 32.4, cost: 8.1, source: 'charger' },
+    { time: '2026-10-29T22:00:00+01:00', odometer: 21000, energy: 30.5, cost: 7.6, source: 'auto' },
+  ];
+  card.hass = hassWith({ ...evAttrs(), charges });
+  card._toggle('charges');
+  card._render();
+  const out = html(card);
+  assert.match(out, /21,050 km · Home charger/);
+  assert.equal(out.match(/Home charger/g).length, 1);
+  assert.match(out, /32.4 kWh/);
+});
+
 test('plugin hybrid: two gauges, both consumptions in the tiles, refuels and charges', () => {
   const card = makeCard();
   card.hass = hassWith(

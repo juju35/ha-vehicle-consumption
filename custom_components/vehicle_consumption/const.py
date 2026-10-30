@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Final
 
 DOMAIN: Final = "vehicle_consumption"
@@ -18,6 +19,9 @@ CONF_FUEL_LEVEL: Final = "fuel_level"
 CONF_BATTERY_ENERGY: Final = "battery_energy"
 CONF_BATTERY_LEVEL: Final = "battery_level"
 SENSOR_KEYS: Final = (CONF_ODOMETER, CONF_FUEL_QUANTITY, CONF_FUEL_LEVEL, CONF_BATTERY_ENERGY, CONF_BATTERY_LEVEL)
+
+# Energy counter of a home charger (total or per session, kWh): home charges are measured at the charger.
+CONF_CHARGER_ENERGY: Final = "charger_energy"
 
 # Capacities, to turn a level (%) into litres / kWh
 CONF_TANK_CAPACITY: Final = "tank_capacity"
@@ -40,6 +44,14 @@ DEFAULT_TRIP_GAP: Final = 30
 DEFAULT_REFUEL_THRESHOLD: Final = 3.0
 # A battery rise of at least this many kWh is a charge; smaller rises are noise (temperature, recalibration).
 DEFAULT_CHARGE_THRESHOLD: Final = 1.0
+
+# A home charge session ends after this long without the charger counter going up.
+CHARGER_SESSION_GAP: Final = timedelta(minutes=30)
+# A battery rise is the charger's session (not counted again) when the counter moved this close to it.
+CHARGER_OVERLAP: Final = timedelta(minutes=10)
+
+# A charger counter step above this (kWh) is a glitch or a replaced meter, not a charge: not counted.
+MAX_CHARGER_STEP: Final = 250.0
 
 # Below this distance (km) a consumption figure means nothing (a few hundred metres, one litre): None.
 MIN_DISTANCE: Final = 5.0

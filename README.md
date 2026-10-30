@@ -55,6 +55,18 @@ Any other vehicle integration that exposes an **odometer** plus **fuel** sensors
 
 The sensors are **detected automatically**, or pick the sensors yourself during setup. A level in % needs the tank or battery capacity to be turned into litres or kWh.
 
+### Home chargers
+
+For an electric or plug-in hybrid car, the energy counter of your home charger is found automatically (it is another device) and measures home charges at the charger, losses included:
+
+- **evcc** ([HACS `evcc_intg`](https://github.com/marq24/ha-evcc)): *Charged (Total)* of the loadpoint, else *Session energy* / *Charge energy*
+- **Easee** ([HACS](https://github.com/fondberg/easee_hass)): *Lifetime energy*, else *Session energy*
+- **Zaptec** ([HACS](https://github.com/custom-components/zaptec)): *Energy meter*, else *Session total charge*
+- **Wallbox** ([official integration](https://www.home-assistant.io/integrations/wallbox/)): *Added energy*
+- **Ohme** ([official integration](https://www.home-assistant.io/integrations/ohme/)): *Energy* (Home Assistant before 2026.7)
+
+Any other energy sensor (kWh or Wh) that counts what the charger delivers works too, picked by hand: a total counter or a session counter that goes back to 0.
+
 ## Prerequisites
 
 - Home Assistant 2024.12 or newer
@@ -102,6 +114,7 @@ Everything can be changed later with **Configure**, which also holds the trip an
 | Battery level | Detected | Battery level in % (needs the battery capacity) |
 | Tank capacity | — | Litres, to turn a fuel level in % into litres |
 | Usable battery capacity | — | Usable kWh, to turn a battery level in % into kWh |
+| Charger energy | Detected | Energy counter of your home charger (total or per session, kWh); needs a battery sensor. Home charges are measured at the charger, losses included |
 | Fuel price sensor | — | Sensor giving the price per litre (wins over the fixed price) |
 | Fixed fuel price | — | Price per litre, when there is no price sensor |
 | Electricity price sensor | — | Sensor giving the price per kWh (wins over the fixed price) |
@@ -127,7 +140,7 @@ One device per vehicle; the entities only exist when they make sense for it (`fu
 | `sensor.my_car_cost_this_month` | Cost of the fuel and energy used this month |
 | `sensor.my_car_cost_per_km` | Cost per kilometre, on average |
 | `sensor.my_car_last_refuel` | Time of the last refuel; attributes `liters`, `cost`, `odometer`, `source` (`auto` or `manual`) |
-| `sensor.my_car_last_charge` | Time of the last charge; attributes `energy`, `cost`, `odometer`, `source` |
+| `sensor.my_car_last_charge` | Time of the last charge; attributes `energy`, `cost`, `odometer`, `source` (`auto`, `charger` or `manual`) |
 
 ### Actions
 
@@ -239,6 +252,7 @@ Recent trips and refuels unfolded:
 Vehicle Consumption follows the levels reported by the car rather than asking you to log every refuel.
 
 - **Reference level**: for fuel (L) and energy (kWh), it keeps a reference level. When a reading goes **down**, the difference is counted as used and the reference follows. When it goes **up by at least the threshold** (3 L / 1 kWh by default), it is a **refuel or a charge**: the amount added is recorded, with its cost at the current price. A **smaller rise** is sensor noise (a tank sloshing, a battery warming up) and is ignored. `unknown` and `unavailable` readings are skipped. A level in % is turned into litres or kWh with the capacity you set.
+- **Home charger**: with a charger energy counter, a **home charge** is the counter going up, until it has not moved for 30 minutes. Its amount is what the counter delivered (losses included; a session counter going back to 0 starts a new session) and its cost that amount × the electricity price; it is listed as *Home charger*. A battery rise while the counter moves is that session, never counted twice; a battery rise while the charger is idle is a charge away from home, recorded as before. The energy used still comes from the battery going down.
 - **Distance**: every rise of the odometer is added up (a jump over 2000 km is ignored as a glitch).
 - **Trips**: a trip starts when the odometer moves and ends after the **trip gap** (30 minutes by default) without moving. Its distance, fuel, energy and cost are what was counted between its start and its end.
 - **Prices**: the fuel price per litre and the electricity price per kWh come from a **sensor** (such as the station prices of [ha-carburants-france](https://github.com/juju35/ha-carburants-france), or your electricity tariff) or a **fixed** value; a sensor wins over the fixed price. Without a price, cost stays empty.
