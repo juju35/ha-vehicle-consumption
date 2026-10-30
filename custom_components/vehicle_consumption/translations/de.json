@@ -1,0 +1,235 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vehicle Consumption",
+        "description": "Wähle das Fahrzeug: Seine Sensoren für Kilometerstand, Kraftstoff und Batterie werden auf diesem Gerät gesucht.",
+        "data": {
+          "device_id": "Fahrzeug",
+          "name": "Name"
+        },
+        "data_description": {
+          "device_id": "Gerät der Fahrzeugintegration (Renault, Tesla, Kia, Volkswagen, OBD-Adapter …).",
+          "name": "Wird auf der Karte und bei den Entitäten angezeigt. Leer lassen, um den Gerätenamen zu verwenden."
+        }
+      },
+      "sensors": {
+        "title": "Sensoren von {name}",
+        "description": "{found} Sensoren wurden automatisch gefunden: Bitte prüfen. Der Kilometerzähler ist erforderlich, dazu mindestens ein Kraftstoff- oder Batteriesensor.",
+        "data": {
+          "odometer": "Kilometerzähler",
+          "fuel_quantity": "Kraftstoffmenge",
+          "fuel_level": "Kraftstoffstand",
+          "battery_energy": "Batterieenergie",
+          "battery_level": "Batteriestand",
+          "tank_capacity": "Tankinhalt",
+          "battery_capacity": "Nutzbare Batteriekapazität"
+        },
+        "data_description": {
+          "odometer": "Gesamtfahrleistung des Fahrzeugs (km oder mi).",
+          "fuel_quantity": "Kraftstoff im Tank (L oder gal).",
+          "fuel_level": "Kraftstoff im Tank (%). Benötigt den Tankinhalt, wenn kein Sensor für die Kraftstoffmenge vorhanden ist.",
+          "battery_energy": "Verbleibende Energie der Antriebsbatterie (kWh oder Wh).",
+          "battery_level": "Ladezustand der Antriebsbatterie (%). Benötigt die Batteriekapazität, wenn kein Sensor für die Batterieenergie vorhanden ist.",
+          "tank_capacity": "Rechnet den Kraftstoffstand in Liter um.",
+          "battery_capacity": "Rechnet den Batteriestand in kWh um."
+        }
+      },
+      "prices": {
+        "title": "Preise für {name}",
+        "description": "Damit werden die Kosten jeder Fahrt und jedes Monats berechnet. Ein Preissensor (Tankstelle, Stromtarif) hat Vorrang vor dem Festpreis; ohne beides werden keine Kosten angezeigt.",
+        "data": {
+          "fuel_price_entity": "Kraftstoffpreis-Sensor",
+          "fuel_price": "Fester Kraftstoffpreis",
+          "electricity_price_entity": "Strompreis-Sensor",
+          "electricity_price": "Fester Strompreis"
+        },
+        "data_description": {
+          "fuel_price_entity": "Preis pro Liter (oder Gallone), der den Tankstellenpreisen folgt.",
+          "fuel_price": "Preis pro Liter, verwendet ohne Preissensor oder wenn dieser nicht verfügbar ist.",
+          "electricity_price_entity": "Preis pro kWh deines Tarifs.",
+          "electricity_price": "Preis pro kWh, verwendet ohne Preissensor oder wenn dieser nicht verfügbar ist."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Wähle mindestens einen Kraftstoff- oder Batteriesensor.",
+      "tank_capacity_required": "Für den Kraftstoffstand wird der Tankinhalt benötigt.",
+      "battery_capacity_required": "Für den Batteriestand wird die Batteriekapazität benötigt."
+    },
+    "abort": {
+      "already_configured": "Dieses Fahrzeug ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Fahrzeugsensoren",
+        "description": "Der Kilometerzähler ist erforderlich, dazu mindestens ein Kraftstoff- oder Batteriesensor.",
+        "data": {
+          "odometer": "Kilometerzähler",
+          "fuel_quantity": "Kraftstoffmenge",
+          "fuel_level": "Kraftstoffstand",
+          "battery_energy": "Batterieenergie",
+          "battery_level": "Batteriestand",
+          "tank_capacity": "Tankinhalt",
+          "battery_capacity": "Nutzbare Batteriekapazität"
+        },
+        "data_description": {
+          "odometer": "Gesamtfahrleistung des Fahrzeugs (km oder mi).",
+          "fuel_quantity": "Kraftstoff im Tank (L oder gal).",
+          "fuel_level": "Kraftstoff im Tank (%). Benötigt den Tankinhalt, wenn kein Sensor für die Kraftstoffmenge vorhanden ist.",
+          "battery_energy": "Verbleibende Energie der Antriebsbatterie (kWh oder Wh).",
+          "battery_level": "Ladezustand der Antriebsbatterie (%). Benötigt die Batteriekapazität, wenn kein Sensor für die Batterieenergie vorhanden ist.",
+          "tank_capacity": "Rechnet den Kraftstoffstand in Liter um.",
+          "battery_capacity": "Rechnet den Batteriestand in kWh um."
+        }
+      },
+      "prices": {
+        "title": "Preise und Erkennung",
+        "description": "Ein Preissensor hat Vorrang vor dem Festpreis. Die Schwellenwerte unterscheiden ein Tanken oder Laden vom Rauschen der Sensoren.",
+        "data": {
+          "fuel_price_entity": "Kraftstoffpreis-Sensor",
+          "fuel_price": "Fester Kraftstoffpreis",
+          "electricity_price_entity": "Strompreis-Sensor",
+          "electricity_price": "Fester Strompreis",
+          "trip_gap": "Fahrtende nach",
+          "refuel_threshold": "Schwelle für Tanken",
+          "charge_threshold": "Schwelle für Laden"
+        },
+        "data_description": {
+          "fuel_price_entity": "Preis pro Liter (oder Gallone), der den Tankstellenpreisen folgt.",
+          "fuel_price": "Preis pro Liter, verwendet ohne Preissensor oder wenn dieser nicht verfügbar ist.",
+          "electricity_price_entity": "Preis pro kWh deines Tarifs.",
+          "electricity_price": "Preis pro kWh, verwendet ohne Preissensor oder wenn dieser nicht verfügbar ist.",
+          "trip_gap": "Eine Fahrt endet, wenn sich der Kilometerzähler so lange nicht bewegt hat.",
+          "refuel_threshold": "Ein Anstieg des Kraftstoffs um mindestens diese Menge gilt als Tanken; kleinere Anstiege werden ignoriert.",
+          "charge_threshold": "Ein Anstieg der Batterie um mindestens diese Menge gilt als Laden; kleinere Anstiege werden ignoriert."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Wähle mindestens einen Kraftstoff- oder Batteriesensor.",
+      "tank_capacity_required": "Für den Kraftstoffstand wird der Tankinhalt benötigt.",
+      "battery_capacity_required": "Für den Batteriestand wird die Batteriekapazität benötigt."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "consumption": {
+        "name": "Verbrauch",
+        "state_attributes": {
+          "vehicle": { "name": "Fahrzeug" },
+          "entry_id": { "name": "Eintrags-ID" },
+          "kind": {
+            "name": "Antrieb",
+            "state": {
+              "fuel": "Verbrenner",
+              "electric": "Elektrisch",
+              "plugin_hybrid": "Plug-in-Hybrid"
+            }
+          },
+          "currency": { "name": "Währung" },
+          "odometer": { "name": "Kilometerzähler" },
+          "fuel_quantity": { "name": "Kraftstoffmenge" },
+          "fuel_level": { "name": "Kraftstoffstand" },
+          "tank_capacity": { "name": "Tankinhalt" },
+          "battery_energy": { "name": "Batterieenergie" },
+          "battery_level": { "name": "Batteriestand" },
+          "battery_capacity": { "name": "Batteriekapazität" },
+          "fuel_price": { "name": "Kraftstoffpreis" },
+          "electricity_price": { "name": "Strompreis" },
+          "driving": { "name": "Unterwegs" },
+          "trip": { "name": "Fahrt" },
+          "month": { "name": "Monat" },
+          "total": { "name": "Gesamt" },
+          "months": { "name": "Monate" },
+          "trips": { "name": "Fahrten" },
+          "refuels": { "name": "Tankvorgänge" },
+          "charges": { "name": "Ladevorgänge" }
+        }
+      },
+      "fuel_consumption_trip": { "name": "Kraftstoffverbrauch der Fahrt" },
+      "fuel_consumption_month": { "name": "Kraftstoffverbrauch des Monats" },
+      "fuel_consumption_average": { "name": "Durchschnittlicher Kraftstoffverbrauch" },
+      "energy_consumption_trip": { "name": "Energieverbrauch der Fahrt" },
+      "energy_consumption_month": { "name": "Energieverbrauch des Monats" },
+      "energy_consumption_average": { "name": "Durchschnittlicher Energieverbrauch" },
+      "distance_trip": { "name": "Fahrtstrecke" },
+      "distance_month": { "name": "Strecke diesen Monat" },
+      "fuel_used_month": { "name": "Kraftstoff diesen Monat" },
+      "energy_used_month": { "name": "Energie diesen Monat" },
+      "cost_month": { "name": "Kosten diesen Monat" },
+      "cost_per_km": { "name": "Kosten pro km" },
+      "last_refuel": {
+        "name": "Letztes Tanken",
+        "state_attributes": {
+          "liters": { "name": "Liter" },
+          "cost": { "name": "Kosten" },
+          "odometer": { "name": "Kilometerzähler" },
+          "source": {
+            "name": "Quelle",
+            "state": {
+              "auto": "Erkannt",
+              "manual": "Manuell"
+            }
+          }
+        }
+      },
+      "last_charge": {
+        "name": "Letzter Ladevorgang",
+        "state_attributes": {
+          "energy": { "name": "Energie" },
+          "cost": { "name": "Kosten" },
+          "odometer": { "name": "Kilometerzähler" },
+          "source": {
+            "name": "Quelle",
+            "state": {
+              "auto": "Erkannt",
+              "manual": "Manuell"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "add_refuel": {
+      "name": "Tanken hinzufügen",
+      "description": "Erfasst einen Tankvorgang manuell. Er wird mit den erkannten aufgeführt; der Verbrauch wird weiterhin aus den Sensoren berechnet.",
+      "fields": {
+        "config_entry_id": { "name": "Fahrzeug", "description": "Das getankte Fahrzeug." },
+        "liters": { "name": "Liter", "description": "Getankter Kraftstoff." },
+        "cost": { "name": "Gesamtkosten", "description": "Bezahlter Betrag. Wird aus dem Preis berechnet, wenn er fehlt." },
+        "price": { "name": "Preis pro Liter", "description": "Wird aus den Gesamtkosten berechnet, wenn er fehlt; der aktuelle Preis, wenn beide fehlen." },
+        "odometer": { "name": "Kilometerzähler", "description": "Kilometerstand (km). Der letzte bekannte Stand, wenn er fehlt." }
+      }
+    },
+    "add_charge": {
+      "name": "Ladevorgang hinzufügen",
+      "description": "Erfasst einen Ladevorgang manuell. Er wird mit den erkannten aufgeführt; der Verbrauch wird weiterhin aus den Sensoren berechnet.",
+      "fields": {
+        "config_entry_id": { "name": "Fahrzeug", "description": "Das geladene Fahrzeug." },
+        "energy": { "name": "Energie", "description": "Geladene Energie (kWh)." },
+        "cost": { "name": "Gesamtkosten", "description": "Bezahlter Betrag. Wird aus dem Preis berechnet, wenn er fehlt." },
+        "price": { "name": "Preis pro kWh", "description": "Wird aus den Gesamtkosten berechnet, wenn er fehlt; der aktuelle Preis, wenn beide fehlen." },
+        "odometer": { "name": "Kilometerzähler", "description": "Kilometerstand (km). Der letzte bekannte Stand, wenn er fehlt." }
+      }
+    },
+    "reset_statistics": {
+      "name": "Statistiken zurücksetzen",
+      "description": "Löscht Fahrten, Monate, Tank- und Ladevorgänge sowie die Summen des Fahrzeugs; die Erfassung beginnt neu bei den aktuellen Werten.",
+      "fields": {
+        "config_entry_id": { "name": "Fahrzeug", "description": "Das Fahrzeug, dessen Statistiken gelöscht werden." }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Kein Vehicle-Consumption-Eintrag mit der ID {entry_id}."
+    },
+    "not_loaded": {
+      "message": "Vehicle Consumption für {name} ist nicht geladen."
+    }
+  }
+}

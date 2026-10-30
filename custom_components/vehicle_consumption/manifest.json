@@ -1,0 +1,14 @@
+{
+  "domain": "vehicle_consumption",
+  "name": "Vehicle Consumption",
+  "after_dependencies": ["recorder"],
+  "codeowners": ["@juju35"],
+  "config_flow": true,
+  "dependencies": ["frontend", "http", "lovelace"],
+  "documentation": "https://github.com/juju35/ha-vehicle-consumption",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/juju35/ha-vehicle-consumption/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

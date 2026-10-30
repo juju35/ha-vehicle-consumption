@@ -1,0 +1,235 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vehicle Consumption",
+        "description": "Choisissez le véhicule : ses capteurs de kilométrage, de carburant et de batterie sont recherchés sur cet appareil.",
+        "data": {
+          "device_id": "Véhicule",
+          "name": "Nom"
+        },
+        "data_description": {
+          "device_id": "Appareil de l'intégration du véhicule (Renault, Tesla, Kia, Volkswagen, boîtier OBD…).",
+          "name": "Affiché sur la carte et les entités. Laissez vide pour reprendre le nom de l'appareil."
+        }
+      },
+      "sensors": {
+        "title": "Capteurs de {name}",
+        "description": "{found} capteurs ont été trouvés automatiquement : vérifiez-les. Le compteur kilométrique est obligatoire, ainsi qu'au moins un capteur de carburant ou de batterie.",
+        "data": {
+          "odometer": "Compteur kilométrique",
+          "fuel_quantity": "Quantité de carburant",
+          "fuel_level": "Niveau de carburant",
+          "battery_energy": "Énergie de la batterie",
+          "battery_level": "Niveau de la batterie",
+          "tank_capacity": "Capacité du réservoir",
+          "battery_capacity": "Capacité utile de la batterie"
+        },
+        "data_description": {
+          "odometer": "Kilométrage total du véhicule (km ou mi).",
+          "fuel_quantity": "Carburant restant dans le réservoir (L ou gal).",
+          "fuel_level": "Carburant restant dans le réservoir (%). Nécessite la capacité du réservoir en l'absence de capteur de quantité.",
+          "battery_energy": "Énergie restante dans la batterie de traction (kWh ou Wh).",
+          "battery_level": "État de charge de la batterie de traction (%). Nécessite la capacité de la batterie en l'absence de capteur d'énergie.",
+          "tank_capacity": "Convertit le niveau de carburant en litres.",
+          "battery_capacity": "Convertit le niveau de batterie en kWh."
+        }
+      },
+      "prices": {
+        "title": "Prix pour {name}",
+        "description": "Sert à calculer le coût de chaque trajet et de chaque mois. Un capteur de prix (station-service, tarif d'électricité) l'emporte sur le prix fixe ; sans l'un ni l'autre, les coûts ne sont pas affichés.",
+        "data": {
+          "fuel_price_entity": "Capteur du prix du carburant",
+          "fuel_price": "Prix fixe du carburant",
+          "electricity_price_entity": "Capteur du prix de l'électricité",
+          "electricity_price": "Prix fixe de l'électricité"
+        },
+        "data_description": {
+          "fuel_price_entity": "Prix au litre (ou au gallon) qui suit les prix des stations.",
+          "fuel_price": "Prix au litre, utilisé sans capteur de prix ou quand celui-ci est indisponible.",
+          "electricity_price_entity": "Prix du kWh de votre tarif.",
+          "electricity_price": "Prix du kWh, utilisé sans capteur de prix ou quand celui-ci est indisponible."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Choisissez au moins un capteur de carburant ou de batterie.",
+      "tank_capacity_required": "La capacité du réservoir est nécessaire pour utiliser le niveau de carburant.",
+      "battery_capacity_required": "La capacité de la batterie est nécessaire pour utiliser le niveau de batterie."
+    },
+    "abort": {
+      "already_configured": "Ce véhicule est déjà configuré."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Capteurs du véhicule",
+        "description": "Le compteur kilométrique est obligatoire, ainsi qu'au moins un capteur de carburant ou de batterie.",
+        "data": {
+          "odometer": "Compteur kilométrique",
+          "fuel_quantity": "Quantité de carburant",
+          "fuel_level": "Niveau de carburant",
+          "battery_energy": "Énergie de la batterie",
+          "battery_level": "Niveau de la batterie",
+          "tank_capacity": "Capacité du réservoir",
+          "battery_capacity": "Capacité utile de la batterie"
+        },
+        "data_description": {
+          "odometer": "Kilométrage total du véhicule (km ou mi).",
+          "fuel_quantity": "Carburant restant dans le réservoir (L ou gal).",
+          "fuel_level": "Carburant restant dans le réservoir (%). Nécessite la capacité du réservoir en l'absence de capteur de quantité.",
+          "battery_energy": "Énergie restante dans la batterie de traction (kWh ou Wh).",
+          "battery_level": "État de charge de la batterie de traction (%). Nécessite la capacité de la batterie en l'absence de capteur d'énergie.",
+          "tank_capacity": "Convertit le niveau de carburant en litres.",
+          "battery_capacity": "Convertit le niveau de batterie en kWh."
+        }
+      },
+      "prices": {
+        "title": "Prix et détection",
+        "description": "Un capteur de prix l'emporte sur le prix fixe. Les seuils distinguent un plein ou une recharge du bruit des capteurs.",
+        "data": {
+          "fuel_price_entity": "Capteur du prix du carburant",
+          "fuel_price": "Prix fixe du carburant",
+          "electricity_price_entity": "Capteur du prix de l'électricité",
+          "electricity_price": "Prix fixe de l'électricité",
+          "trip_gap": "Fin de trajet après",
+          "refuel_threshold": "Seuil de plein",
+          "charge_threshold": "Seuil de recharge"
+        },
+        "data_description": {
+          "fuel_price_entity": "Prix au litre (ou au gallon) qui suit les prix des stations.",
+          "fuel_price": "Prix au litre, utilisé sans capteur de prix ou quand celui-ci est indisponible.",
+          "electricity_price_entity": "Prix du kWh de votre tarif.",
+          "electricity_price": "Prix du kWh, utilisé sans capteur de prix ou quand celui-ci est indisponible.",
+          "trip_gap": "Un trajet se termine quand le compteur kilométrique n'a pas bougé pendant cette durée.",
+          "refuel_threshold": "Une hausse du carburant d'au moins cette quantité est un plein ; les hausses plus faibles sont ignorées.",
+          "charge_threshold": "Une hausse de la batterie d'au moins cette quantité est une recharge ; les hausses plus faibles sont ignorées."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Choisissez au moins un capteur de carburant ou de batterie.",
+      "tank_capacity_required": "La capacité du réservoir est nécessaire pour utiliser le niveau de carburant.",
+      "battery_capacity_required": "La capacité de la batterie est nécessaire pour utiliser le niveau de batterie."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "consumption": {
+        "name": "Consommation",
+        "state_attributes": {
+          "vehicle": { "name": "Véhicule" },
+          "entry_id": { "name": "ID de l'entrée" },
+          "kind": {
+            "name": "Énergie",
+            "state": {
+              "fuel": "Thermique",
+              "electric": "Électrique",
+              "plugin_hybrid": "Hybride rechargeable"
+            }
+          },
+          "currency": { "name": "Devise" },
+          "odometer": { "name": "Compteur kilométrique" },
+          "fuel_quantity": { "name": "Quantité de carburant" },
+          "fuel_level": { "name": "Niveau de carburant" },
+          "tank_capacity": { "name": "Capacité du réservoir" },
+          "battery_energy": { "name": "Énergie de la batterie" },
+          "battery_level": { "name": "Niveau de la batterie" },
+          "battery_capacity": { "name": "Capacité de la batterie" },
+          "fuel_price": { "name": "Prix du carburant" },
+          "electricity_price": { "name": "Prix de l'électricité" },
+          "driving": { "name": "En route" },
+          "trip": { "name": "Trajet" },
+          "month": { "name": "Mois" },
+          "total": { "name": "Total" },
+          "months": { "name": "Mois" },
+          "trips": { "name": "Trajets" },
+          "refuels": { "name": "Pleins" },
+          "charges": { "name": "Recharges" }
+        }
+      },
+      "fuel_consumption_trip": { "name": "Consommation de carburant du trajet" },
+      "fuel_consumption_month": { "name": "Consommation de carburant du mois" },
+      "fuel_consumption_average": { "name": "Consommation moyenne de carburant" },
+      "energy_consumption_trip": { "name": "Consommation d'énergie du trajet" },
+      "energy_consumption_month": { "name": "Consommation d'énergie du mois" },
+      "energy_consumption_average": { "name": "Consommation moyenne d'énergie" },
+      "distance_trip": { "name": "Distance du trajet" },
+      "distance_month": { "name": "Distance du mois" },
+      "fuel_used_month": { "name": "Carburant consommé ce mois-ci" },
+      "energy_used_month": { "name": "Énergie consommée ce mois-ci" },
+      "cost_month": { "name": "Coût du mois" },
+      "cost_per_km": { "name": "Coût au km" },
+      "last_refuel": {
+        "name": "Dernier plein",
+        "state_attributes": {
+          "liters": { "name": "Litres" },
+          "cost": { "name": "Coût" },
+          "odometer": { "name": "Compteur kilométrique" },
+          "source": {
+            "name": "Source",
+            "state": {
+              "auto": "Détecté",
+              "manual": "Manuel"
+            }
+          }
+        }
+      },
+      "last_charge": {
+        "name": "Dernière recharge",
+        "state_attributes": {
+          "energy": { "name": "Énergie" },
+          "cost": { "name": "Coût" },
+          "odometer": { "name": "Compteur kilométrique" },
+          "source": {
+            "name": "Source",
+            "state": {
+              "auto": "Détectée",
+              "manual": "Manuelle"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "add_refuel": {
+      "name": "Ajouter un plein",
+      "description": "Enregistre un plein à la main. Il est listé avec les pleins détectés ; la consommation reste calculée à partir des capteurs.",
+      "fields": {
+        "config_entry_id": { "name": "Véhicule", "description": "Le véhicule qui a fait le plein." },
+        "liters": { "name": "Litres", "description": "Carburant ajouté." },
+        "cost": { "name": "Coût total", "description": "Montant payé. Calculé à partir du prix s'il est omis." },
+        "price": { "name": "Prix au litre", "description": "Calculé à partir du coût total s'il est omis ; prix actuel si les deux le sont." },
+        "odometer": { "name": "Compteur kilométrique", "description": "Kilométrage (km). Dernier relevé connu s'il est omis." }
+      }
+    },
+    "add_charge": {
+      "name": "Ajouter une recharge",
+      "description": "Enregistre une recharge à la main. Elle est listée avec les recharges détectées ; la consommation reste calculée à partir des capteurs.",
+      "fields": {
+        "config_entry_id": { "name": "Véhicule", "description": "Le véhicule qui a été rechargé." },
+        "energy": { "name": "Énergie", "description": "Énergie ajoutée (kWh)." },
+        "cost": { "name": "Coût total", "description": "Montant payé. Calculé à partir du prix s'il est omis." },
+        "price": { "name": "Prix du kWh", "description": "Calculé à partir du coût total s'il est omis ; prix actuel si les deux le sont." },
+        "odometer": { "name": "Compteur kilométrique", "description": "Kilométrage (km). Dernier relevé connu s'il est omis." }
+      }
+    },
+    "reset_statistics": {
+      "name": "Réinitialiser les statistiques",
+      "description": "Efface les trajets, les mois, les pleins, les recharges et les totaux du véhicule ; le suivi repart des relevés actuels.",
+      "fields": {
+        "config_entry_id": { "name": "Véhicule", "description": "Le véhicule dont les statistiques sont effacées." }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Aucune entrée Vehicle Consumption avec l'ID {entry_id}."
+    },
+    "not_loaded": {
+      "message": "Vehicle Consumption pour {name} n'est pas chargé."
+    }
+  }
+}
