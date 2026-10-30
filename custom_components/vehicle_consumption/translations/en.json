@@ -1,0 +1,242 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vehicle Consumption",
+        "description": "Choose the vehicle: its odometer, fuel and battery sensors are looked for on this device.",
+        "data": {
+          "device_id": "Vehicle",
+          "name": "Name"
+        },
+        "data_description": {
+          "device_id": "Device of the vehicle's integration (Renault, Tesla, Kia, Volkswagen, OBD dongle…).",
+          "name": "Shown on the card and the entities. Leave empty to use the device name."
+        }
+      },
+      "sensors": {
+        "title": "Sensors of {name}",
+        "description": "{found} sensors were found automatically: check them. The odometer is required, plus at least one fuel or battery sensor.",
+        "data": {
+          "odometer": "Odometer",
+          "fuel_quantity": "Fuel quantity",
+          "fuel_level": "Fuel level",
+          "battery_energy": "Battery energy",
+          "battery_level": "Battery level",
+          "tank_capacity": "Tank capacity",
+          "battery_capacity": "Usable battery capacity",
+          "charger_energy": "Home charger energy"
+        },
+        "data_description": {
+          "odometer": "Total distance of the vehicle (km or mi).",
+          "fuel_quantity": "Fuel left in the tank (L or gal).",
+          "fuel_level": "Fuel left in the tank (%). Needs the tank capacity when there is no fuel quantity sensor.",
+          "battery_energy": "Energy left in the traction battery (kWh or Wh).",
+          "battery_level": "State of charge of the traction battery (%). Needs the battery capacity when there is no battery energy sensor.",
+          "tank_capacity": "Turns the fuel level into litres.",
+          "battery_capacity": "Turns the battery level into kWh.",
+          "charger_energy": "Energy counter of your home charger (evcc, Wallbox, Easee, Zaptec, Ohme…): home charges are measured at the charger, losses included. Needs a battery sensor."
+        }
+      },
+      "prices": {
+        "title": "Prices for {name}",
+        "description": "Used to work out the cost of each trip and month. A price sensor (fuel station, electricity tariff) wins over the fixed price; without either, costs are not shown.",
+        "data": {
+          "fuel_price_entity": "Fuel price sensor",
+          "fuel_price": "Fixed fuel price",
+          "electricity_price_entity": "Electricity price sensor",
+          "electricity_price": "Fixed electricity price"
+        },
+        "data_description": {
+          "fuel_price_entity": "Price per litre (or per gallon) that follows the station prices.",
+          "fuel_price": "Price per litre, used when there is no price sensor or it is unavailable.",
+          "electricity_price_entity": "Price per kWh of your tariff.",
+          "electricity_price": "Price per kWh, used when there is no price sensor or it is unavailable."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Choose at least one fuel or battery sensor.",
+      "tank_capacity_required": "The tank capacity is needed to use the fuel level.",
+      "battery_capacity_required": "The battery capacity is needed to use the battery level.",
+      "charger_needs_battery": "A home charger counter needs a battery energy or level sensor."
+    },
+    "abort": {
+      "already_configured": "This vehicle is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Vehicle sensors",
+        "description": "The odometer is required, plus at least one fuel or battery sensor.",
+        "data": {
+          "odometer": "Odometer",
+          "fuel_quantity": "Fuel quantity",
+          "fuel_level": "Fuel level",
+          "battery_energy": "Battery energy",
+          "battery_level": "Battery level",
+          "tank_capacity": "Tank capacity",
+          "battery_capacity": "Usable battery capacity",
+          "charger_energy": "Home charger energy"
+        },
+        "data_description": {
+          "odometer": "Total distance of the vehicle (km or mi).",
+          "fuel_quantity": "Fuel left in the tank (L or gal).",
+          "fuel_level": "Fuel left in the tank (%). Needs the tank capacity when there is no fuel quantity sensor.",
+          "battery_energy": "Energy left in the traction battery (kWh or Wh).",
+          "battery_level": "State of charge of the traction battery (%). Needs the battery capacity when there is no battery energy sensor.",
+          "tank_capacity": "Turns the fuel level into litres.",
+          "battery_capacity": "Turns the battery level into kWh.",
+          "charger_energy": "Energy counter of your home charger (evcc, Wallbox, Easee, Zaptec, Ohme…): home charges are measured at the charger, losses included. Needs a battery sensor."
+        }
+      },
+      "prices": {
+        "title": "Prices and detection",
+        "description": "A price sensor wins over the fixed price. The thresholds tell a refuel or a charge from sensor noise.",
+        "data": {
+          "fuel_price_entity": "Fuel price sensor",
+          "fuel_price": "Fixed fuel price",
+          "electricity_price_entity": "Electricity price sensor",
+          "electricity_price": "Fixed electricity price",
+          "trip_gap": "End of trip after",
+          "refuel_threshold": "Refuel threshold",
+          "charge_threshold": "Charge threshold"
+        },
+        "data_description": {
+          "fuel_price_entity": "Price per litre (or per gallon) that follows the station prices.",
+          "fuel_price": "Price per litre, used when there is no price sensor or it is unavailable.",
+          "electricity_price_entity": "Price per kWh of your tariff.",
+          "electricity_price": "Price per kWh, used when there is no price sensor or it is unavailable.",
+          "trip_gap": "A trip ends when the odometer has not moved for this long.",
+          "refuel_threshold": "A fuel rise of at least this much is a refuel; smaller rises are ignored.",
+          "charge_threshold": "A battery rise of at least this much is a charge; smaller rises are ignored."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Choose at least one fuel or battery sensor.",
+      "tank_capacity_required": "The tank capacity is needed to use the fuel level.",
+      "battery_capacity_required": "The battery capacity is needed to use the battery level.",
+      "charger_needs_battery": "A home charger counter needs a battery energy or level sensor."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "consumption": {
+        "name": "Consumption",
+        "state_attributes": {
+          "vehicle": { "name": "Vehicle" },
+          "entry_id": { "name": "Entry ID" },
+          "kind": {
+            "name": "Energy",
+            "state": {
+              "fuel": "Fuel",
+              "electric": "Electric",
+              "plugin_hybrid": "Plug-in hybrid"
+            }
+          },
+          "currency": { "name": "Currency" },
+          "odometer": { "name": "Odometer" },
+          "fuel_quantity": { "name": "Fuel quantity" },
+          "fuel_level": { "name": "Fuel level" },
+          "tank_capacity": { "name": "Tank capacity" },
+          "battery_energy": { "name": "Battery energy" },
+          "battery_level": { "name": "Battery level" },
+          "battery_capacity": { "name": "Battery capacity" },
+          "fuel_price": { "name": "Fuel price" },
+          "electricity_price": { "name": "Electricity price" },
+          "driving": { "name": "Driving" },
+          "trip": { "name": "Trip" },
+          "month": { "name": "Month" },
+          "total": { "name": "Total" },
+          "months": { "name": "Months" },
+          "trips": { "name": "Trips" },
+          "refuels": { "name": "Refuels" },
+          "charges": { "name": "Charges" }
+        }
+      },
+      "fuel_consumption_trip": { "name": "Fuel consumption trip" },
+      "fuel_consumption_month": { "name": "Fuel consumption this month" },
+      "fuel_consumption_average": { "name": "Average fuel consumption" },
+      "energy_consumption_trip": { "name": "Energy consumption trip" },
+      "energy_consumption_month": { "name": "Energy consumption this month" },
+      "energy_consumption_average": { "name": "Average energy consumption" },
+      "distance_trip": { "name": "Trip distance" },
+      "distance_month": { "name": "Distance this month" },
+      "fuel_used_month": { "name": "Fuel used this month" },
+      "energy_used_month": { "name": "Energy used this month" },
+      "cost_month": { "name": "Cost this month" },
+      "cost_per_km": { "name": "Cost per km" },
+      "last_refuel": {
+        "name": "Last refuel",
+        "state_attributes": {
+          "liters": { "name": "Litres" },
+          "cost": { "name": "Cost" },
+          "odometer": { "name": "Odometer" },
+          "source": {
+            "name": "Source",
+            "state": {
+              "auto": "Detected",
+              "manual": "Manual"
+            }
+          }
+        }
+      },
+      "last_charge": {
+        "name": "Last charge",
+        "state_attributes": {
+          "energy": { "name": "Energy" },
+          "cost": { "name": "Cost" },
+          "odometer": { "name": "Odometer" },
+          "source": {
+            "name": "Source",
+            "state": {
+              "auto": "Detected",
+              "manual": "Manual",
+              "charger": "Home charger"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "add_refuel": {
+      "name": "Add a refuel",
+      "description": "Logs a refuel by hand. It is listed with the detected ones; the consumption keeps coming from the sensors.",
+      "fields": {
+        "config_entry_id": { "name": "Vehicle", "description": "The vehicle that was refuelled." },
+        "liters": { "name": "Litres", "description": "Fuel added." },
+        "cost": { "name": "Total cost", "description": "Amount paid. Worked out from the price when left out." },
+        "price": { "name": "Price per litre", "description": "Worked out from the total cost when left out; the current price when both are." },
+        "odometer": { "name": "Odometer", "description": "Odometer reading (km). The last known reading when left out." }
+      }
+    },
+    "add_charge": {
+      "name": "Add a charge",
+      "description": "Logs a charge by hand. It is listed with the detected ones; the consumption keeps coming from the sensors.",
+      "fields": {
+        "config_entry_id": { "name": "Vehicle", "description": "The vehicle that was charged." },
+        "energy": { "name": "Energy", "description": "Energy added (kWh)." },
+        "cost": { "name": "Total cost", "description": "Amount paid. Worked out from the price when left out." },
+        "price": { "name": "Price per kWh", "description": "Worked out from the total cost when left out; the current price when both are." },
+        "odometer": { "name": "Odometer", "description": "Odometer reading (km). The last known reading when left out." }
+      }
+    },
+    "reset_statistics": {
+      "name": "Reset statistics",
+      "description": "Clears the trips, months, refuels, charges and totals of the vehicle; tracking starts again from the current readings.",
+      "fields": {
+        "config_entry_id": { "name": "Vehicle", "description": "The vehicle whose statistics are cleared." }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "No Vehicle Consumption entry with ID {entry_id}."
+    },
+    "not_loaded": {
+      "message": "Vehicle Consumption for {name} is not loaded."
+    }
+  }
+}

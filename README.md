@@ -38,22 +38,44 @@ It comes with a **Lovelace card** showing the tank and battery gauges, the key f
 
 ## Compatible integrations
 
-**Renault** ([official integration](https://www.home-assistant.io/integrations/renault/)) is supported first-class: its **mileage**, **fuel quantity**, **battery available energy** and **battery level** sensors are detected automatically.
+The odometer and the fuel and battery sensors of these integrations are **detected from their own sensor keys**, read from each integration's source code. The setup form comes prefilled; check it and change what you want.
 
-Any other vehicle integration that exposes an **odometer** plus **fuel** sensors (quantity in L or gal, or level in %) and/or **battery** sensors (energy in kWh, or level in %) works too:
+| Brand | Integration | Odometer | Fuel | Battery |
+|---|---|---|---|---|
+| Renault, Dacia, Alpine | [Renault](https://www.home-assistant.io/integrations/renault/) (official) | ✓ | litres | kWh, % |
+| Tesla | [Tesla Fleet](https://www.home-assistant.io/integrations/tesla_fleet/), [Teslemetry](https://www.home-assistant.io/integrations/teslemetry/), [Tessie](https://www.home-assistant.io/integrations/tessie/) (official) | ✓ ¹ | — | kWh ², % |
+| Kia, Hyundai, Genesis | [Kia Connect / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) (HACS) | ✓ | % | kWh, % |
+| BMW, Mini | [BMW Connected Drive](https://www.home-assistant.io/integrations/bmw_connected_drive/) (official until 2026.3), [BMW CarData](https://github.com/kvanbiesen/bmw-cardata-ha), [BavarianData](https://github.com/JustChr/BavarianData) (HACS) | ✓ | litres, % | % |
+| Mercedes-Benz, smart | [MercedesME 2020](https://github.com/ReneNulschDE/mbapi2020) (HACS) | ✓ | % | % |
+| Toyota, Lexus | [Toyota](https://github.com/pytoyoda/ha_toyota) (HACS) | ✓ | % | % |
+| Volvo | [Volvo](https://www.home-assistant.io/integrations/volvo/) (official), [Volvo Cars](https://github.com/thomasddn/ha-volvo-cars) (HACS, former) | ✓ | litres | % |
+| Polestar | [Polestar API](https://github.com/pypolestar/polestar_api) (HACS) | ✓ | — | % |
+| Volkswagen | [Volkswagen Car-Net](https://github.com/robinostlund/homeassistant-volkswagencarnet), [Volkswagen We Connect ID](https://github.com/mitch-dc/volkswagen_we_connect_id) (HACS) | ✓ | % | % |
+| Audi | [Audi connect](https://github.com/audiconnect/audi_connect_ha) (HACS) | ✓ | % | % |
+| Škoda | [MySkoda](https://github.com/skodaconnect/homeassistant-myskoda) (HACS) | ✓ | % | % |
+| SEAT, CUPRA | [SEAT Connect](https://github.com/Farfar/homeassistant-seatconnect), [CUPRA We Connect](https://github.com/daernsinstantfortress/cupra_we_connect) (HACS) | ✓ | % | % |
+| Peugeot, Citroën, DS, Opel, Fiat, Jeep, Alfa Romeo | [Stellantis Vehicles](https://github.com/andreadegiovine/homeassistant-stellantis-vehicles) (HACS) | ✓ | % | kWh, % |
+| Ford | [FordPass](https://github.com/itchannel/fordpass-ha) (HACS) | ✓ | % ³ | — |
+| Nissan | [Nissan Leaf](https://www.home-assistant.io/integrations/nissan_leaf/) (official) | — ⁴ | — | % |
+| MG | [MG SAIC](https://github.com/ad-ha/mg-saic-ha) (HACS) | ✓ | % | kWh, % |
+| BYD | [BYD Vehicle](https://github.com/jkaberg/hass-byd-vehicle) (HACS) | ✓ | % | % |
+| Any (OBD-II) | [WiCAN](https://github.com/jay-oswald/ha-wican), [OVMS](https://github.com/ovms-hass/ovms-home-assistant) (HACS) | ✓ | litres, % ⁵ | % |
 
-- Tesla / Teslemetry
-- Kia / Hyundai (Kia Connect)
-- Volkswagen
-- BMW
-- Mercedes-Benz
-- Toyota
-- Peugeot / Citroën / DS / Opel
-- Volvo, Polestar
-- Ford, Skoda
-- OBD-II dongles…
+¹ Disabled by default in Tesla Fleet and Teslemetry: enable the *Odometer* entity first. ² Teslemetry and Tessie. ³ On an electric Ford, FordPass reports the battery level there. ⁴ The Leaf integration has no odometer: pick one from another source. ⁵ WiCAN, depending on the vehicle profile.
 
-The sensors are **detected automatically**, or pick the sensors yourself during setup. A level in % needs the tank or battery capacity to be turned into litres or kWh.
+**Any other vehicle integration** works too, as long as its device has an **odometer** plus **fuel** sensors (litres or gallons, or a level in %) and/or **battery** sensors (kWh, or a level in %): they are recognised from their names, units and device classes, or picked by hand. Units are converted (miles and metres to km, US gallons to litres, Wh, kJ and MJ to kWh). A level in % needs the tank or battery capacity to be turned into litres or kWh. The setup starts from the vehicle's device, so sensors without one (Torque) cannot be used.
+
+### Home chargers
+
+For an electric or plug-in hybrid car, the energy counter of your home charger is found automatically (it is another device) and measures home charges at the charger, losses included:
+
+- **evcc** ([HACS `evcc_intg`](https://github.com/marq24/ha-evcc)): *Charged (Total)* of the loadpoint, else *Session energy* / *Charge energy*
+- **Easee** ([HACS](https://github.com/fondberg/easee_hass)): *Lifetime energy*, else *Session energy*
+- **Zaptec** ([HACS](https://github.com/custom-components/zaptec)): *Energy meter*, else *Session total charge*
+- **Wallbox** ([official integration](https://www.home-assistant.io/integrations/wallbox/)): *Added energy*
+- **Ohme** ([official integration](https://www.home-assistant.io/integrations/ohme/)): *Energy* (Home Assistant before 2026.7)
+
+Any other energy sensor (kWh or Wh) that counts what the charger delivers works too, picked by hand: a total counter or a session counter that goes back to 0.
 
 ## Prerequisites
 
@@ -89,9 +111,9 @@ Remove each vehicle from **Settings → Devices & services**: its stored history
 
 1. Pick the **vehicle** (its device from the car integration) and give it a name
 2. Check the **sensors**: the odometer and the fuel and battery sensors found on the device are filled in; change or complete them if needed
-3. Set the **capacities**, **prices** and **thresholds**
+3. Set the **prices** (a price sensor, such as a station of [ha-carburants-france](https://github.com/juju35/ha-carburants-france), or a fixed price)
 
-Everything can be changed later with **Configure**.
+Everything can be changed later with **Configure**, which also holds the trip and refuel/charge thresholds.
 
 | Option | Default | Description |
 |---|---|---|
@@ -101,12 +123,13 @@ Everything can be changed later with **Configure**.
 | Battery energy | Detected | Energy left in the battery (kWh or Wh) |
 | Battery level | Detected | Battery level in % (needs the battery capacity) |
 | Tank capacity | — | Litres, to turn a fuel level in % into litres |
-| Battery capacity | — | Usable kWh, to turn a battery level in % into kWh |
+| Usable battery capacity | — | Usable kWh, to turn a battery level in % into kWh |
+| Charger energy | Detected | Energy counter of your home charger (total or per session, kWh); needs a battery sensor. Home charges are measured at the charger, losses included |
 | Fuel price sensor | — | Sensor giving the price per litre (wins over the fixed price) |
-| Fuel price | — | Fixed price per litre |
+| Fixed fuel price | — | Price per litre, when there is no price sensor |
 | Electricity price sensor | — | Sensor giving the price per kWh (wins over the fixed price) |
-| Electricity price | — | Fixed price per kWh |
-| Trip gap | `30` min | Minutes without the odometer moving that end a trip |
+| Fixed electricity price | — | Price per kWh, when there is no price sensor |
+| End of trip after | `30` min | Minutes without the odometer moving that end a trip |
 | Refuel threshold | `3` L | A rise of at least this much fuel is a refuel |
 | Charge threshold | `1` kWh | A rise of at least this much energy is a charge |
 
@@ -119,15 +142,15 @@ One device per vehicle; the entities only exist when they make sense for it (`fu
 | Entity | Description |
 |---|---|
 | `sensor.my_car_consumption` | Average consumption (L/100 km, or kWh/100 km for an electric car). Its attributes carry everything the card shows: `vehicle`, `entry_id`, `kind`, `currency`, current levels and prices, `driving`, `trip`, `month`, `total`, `months`, `trips`, `refuels`, `charges` |
-| `sensor.my_car_fuel_consumption_trip` / `_month` / `_average` | Fuel consumption of the last trip, this month and on average (L/100 km) |
-| `sensor.my_car_energy_consumption_trip` / `_month` / `_average` | Energy consumption of the last trip, this month and on average (kWh/100 km) |
-| `sensor.my_car_distance_trip` / `_month` | Distance of the last trip and this month (km) |
-| `sensor.my_car_fuel_used_month` | Fuel used this month (L) |
-| `sensor.my_car_energy_used_month` | Energy used this month (kWh) |
-| `sensor.my_car_cost_month` | Cost of the fuel and energy used this month |
+| `sensor.my_car_fuel_consumption_trip`, `sensor.my_car_fuel_consumption_this_month`, `sensor.my_car_average_fuel_consumption` | Fuel consumption of the last trip, this month and on average (L/100 km) |
+| `sensor.my_car_energy_consumption_trip`, `sensor.my_car_energy_consumption_this_month`, `sensor.my_car_average_energy_consumption` | Energy consumption of the last trip, this month and on average (kWh/100 km) |
+| `sensor.my_car_trip_distance`, `sensor.my_car_distance_this_month` | Distance of the last trip and this month (km) |
+| `sensor.my_car_fuel_used_this_month` | Fuel used this month (L) |
+| `sensor.my_car_energy_used_this_month` | Energy used this month (kWh) |
+| `sensor.my_car_cost_this_month` | Cost of the fuel and energy used this month |
 | `sensor.my_car_cost_per_km` | Cost per kilometre, on average |
 | `sensor.my_car_last_refuel` | Time of the last refuel; attributes `liters`, `cost`, `odometer`, `source` (`auto` or `manual`) |
-| `sensor.my_car_last_charge` | Time of the last charge; attributes `energy`, `cost`, `odometer`, `source` |
+| `sensor.my_car_last_charge` | Time of the last charge; attributes `energy`, `cost`, `odometer`, `source` (`auto`, `charger` or `manual`) |
 
 ### Actions
 
@@ -191,7 +214,7 @@ entity: sensor.my_car_consumption
 
 | Option | Default | Description |
 |---|---|---|
-| `entity` | Auto | The vehicle's **Consumption** sensor; the first one is found automatically |
+| `entity` | Auto | The vehicle: its **Consumption** sensor. Leave empty for the first vehicle |
 | `title` | Vehicle name | Card title |
 | `chart` | `true` | Monthly bar chart |
 | `chart_metric` | `consumption` | What the chart shows: `consumption`, `distance` or `cost` |
@@ -200,6 +223,8 @@ entity: sensor.my_car_consumption
 | `refuels` | `true` | **Refuels** / **Charges** section |
 | `add_button` | `true` | **+** button in the header to log a refuel or a charge |
 | `language` | Auto | Force language: `en`, `fr`, `de` or `es` |
+
+In the visual editor, **Vehicle** lists every vehicle set up in Vehicle Consumption, by name: nothing to look up, and a vehicle added later shows up in the list. The card picker previews the card with your first vehicle.
 
 The **+** button opens a popup at the top of the card to log a refuel (litres) or a charge (kWh), its total cost and, optionally, the odometer. The sections fold and unfold with a tap, and fold back on their own when you tap elsewhere.
 
@@ -237,6 +262,7 @@ Recent trips and refuels unfolded:
 Vehicle Consumption follows the levels reported by the car rather than asking you to log every refuel.
 
 - **Reference level**: for fuel (L) and energy (kWh), it keeps a reference level. When a reading goes **down**, the difference is counted as used and the reference follows. When it goes **up by at least the threshold** (3 L / 1 kWh by default), it is a **refuel or a charge**: the amount added is recorded, with its cost at the current price. A **smaller rise** is sensor noise (a tank sloshing, a battery warming up) and is ignored. `unknown` and `unavailable` readings are skipped. A level in % is turned into litres or kWh with the capacity you set.
+- **Home charger**: with a charger energy counter, a **home charge** is the counter going up, until it has not moved for 30 minutes. Its amount is what the counter delivered (losses included; a session counter going back to 0 starts a new session) and its cost that amount × the electricity price; it is listed as *Home charger*. A battery rise while the counter moves is that session, never counted twice; a battery rise while the charger is idle is a charge away from home, recorded as before. The energy used still comes from the battery going down.
 - **Distance**: every rise of the odometer is added up (a jump over 2000 km is ignored as a glitch).
 - **Trips**: a trip starts when the odometer moves and ends after the **trip gap** (30 minutes by default) without moving. Its distance, fuel, energy and cost are what was counted between its start and its end.
 - **Prices**: the fuel price per litre and the electricity price per kWh come from a **sensor** (such as the station prices of [ha-carburants-france](https://github.com/juju35/ha-carburants-france), or your electricity tariff) or a **fixed** value; a sensor wins over the fixed price. Without a price, cost stays empty.

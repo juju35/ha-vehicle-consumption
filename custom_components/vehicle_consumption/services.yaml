@@ -1,0 +1,93 @@
+add_refuel:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: vehicle_consumption
+    liters:
+      required: true
+      example: 42.5
+      selector:
+        number:
+          min: 0.1
+          max: 500
+          step: 0.01
+          mode: box
+          unit_of_measurement: L
+    cost:
+      example: 76.4
+      selector:
+        number:
+          min: 0
+          max: 10000
+          step: 0.01
+          mode: box
+    price:
+      example: 1.799
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: any
+          mode: box
+    odometer:
+      example: 48210
+      selector:
+        number:
+          min: 0
+          max: 2000000
+          step: 0.1
+          mode: box
+          unit_of_measurement: km
+
+add_charge:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: vehicle_consumption
+    energy:
+      required: true
+      example: 35
+      selector:
+        number:
+          min: 0.1
+          max: 300
+          step: 0.01
+          mode: box
+          unit_of_measurement: kWh
+    cost:
+      example: 8.75
+      selector:
+        number:
+          min: 0
+          max: 10000
+          step: 0.01
+          mode: box
+    price:
+      example: 0.25
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: any
+          mode: box
+    odometer:
+      example: 48210
+      selector:
+        number:
+          min: 0
+          max: 2000000
+          step: 0.1
+          mode: box
+          unit_of_measurement: km
+
+reset_statistics:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: vehicle_consumption
