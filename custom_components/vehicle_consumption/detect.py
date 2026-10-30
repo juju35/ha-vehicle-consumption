@@ -1,9 +1,8 @@
 """Find the odometer, fuel and battery sensors of a vehicle device.
 
-The Renault integration is matched exactly (its keys are known). Every other integration (Tesla / Teslemetry,
-Kia / Hyundai, Volkswagen, BMW, Mercedes, Toyota, PSA, Volvo, Polestar, OBD dongles…) is matched on keywords
-of the entity ID, translation key and name, plus the unit and the device class: the result only prefills
-the config flow, where the user checks it.
+The integrations in `_KNOWN` are matched exactly, on their own sensor keys. Every other sensor is matched on
+keywords of the entity ID, translation key and name, plus the unit and the device class. Either way the result
+only prefills the config flow, where the user checks it.
 """
 
 from __future__ import annotations
@@ -18,13 +17,29 @@ from homeassistant.helpers import entity_registry as er
 
 from .const import CONF_BATTERY_ENERGY, CONF_BATTERY_LEVEL, CONF_FUEL_LEVEL, CONF_FUEL_QUANTITY, CONF_ODOMETER
 
-# Renault: unique ID `<vin>_<key>`, translation key = key (battery_level has none: it is the battery device class).
-_RENAULT = {
-    "mileage": CONF_ODOMETER,
-    "fuel_quantity": CONF_FUEL_QUANTITY,
-    "battery_available_energy": CONF_BATTERY_ENERGY,
-    "battery_level": CONF_BATTERY_LEVEL,
+# Integrations whose sensor keys are known, by entity registry platform: source key -> their sensor keys. A sensor
+# matches when its translation key is one of them, or its unique ID ends with one (after `_`, `-` or `.`).
+# Every other sensor, and every source left unmatched, goes through the keyword matchers below.
+_KNOWN: dict[str, dict[str, tuple[str, ...]]] = {
+    # Renault: unique ID `<vin>_<key>`, translation key = key (battery_level has none: the battery device class
+    # finds it below).
+    "renault": {
+        CONF_ODOMETER: ("mileage",),
+        CONF_FUEL_QUANTITY: ("fuel_quantity",),
+        CONF_BATTERY_ENERGY: ("battery_available_energy",),
+        CONF_BATTERY_LEVEL: ("battery_level",),
+    },
 }
+
+
+def _known_key(platform: str, translation_key: str | None, unique_id: str) -> str | None:
+    """The source a sensor of a known integration provides, from its translation key or unique ID suffix."""
+    for conf, keys in _KNOWN.get(platform, {}).items():
+        for key in keys:
+            if translation_key == key or any(unique_id.endswith(f"{sep}{key}") for sep in "_-."):
+                return conf
+    return None
+
 
 _DISTANCE_UNITS = {"km", "mi"}
 _VOLUME_UNITS = {"L", "l", "gal"}
@@ -38,8 +53,7 @@ class _Candidate:
     unit: str | None
     device_class: str | None
     state_class: str | None
-    platform: str
-    key: str | None  # Renault key (unique ID suffix or translation key)
+    known: str | None  # the source it provides, for an integration whose keys are known
 
     def has(self, pattern: str) -> bool:
         return re.search(pattern, self.text) is not None
@@ -110,7 +124,6 @@ def _candidates(hass: HomeAssistant, device_id: str) -> list[_Candidate]:
         state = hass.states.get(entry.entity_id)
         attributes = state.attributes if state else {}
         unique_id = str(entry.unique_id).lower()
-        key = entry.translation_key or next((k for k in _RENAULT if unique_id.endswith(f"_{k}")), None)
         out.append(
             _Candidate(
                 entity_id=entry.entity_id,
@@ -120,8 +133,7 @@ def _candidates(hass: HomeAssistant, device_id: str) -> list[_Candidate]:
                 unit=attributes.get(ATTR_UNIT_OF_MEASUREMENT, entry.unit_of_measurement),
                 device_class=attributes.get(ATTR_DEVICE_CLASS, entry.device_class or entry.original_device_class),
                 state_class=attributes.get("state_class"),
-                platform=entry.platform,
-                key=key,
+                known=_known_key(entry.platform, entry.translation_key, unique_id),
             )
         )
     return sorted(out, key=lambda c: c.entity_id)
@@ -133,14 +145,8 @@ def async_detect(hass: HomeAssistant, device_id: str) -> dict[str, str]:
     found: dict[str, str] = {}
 
     for c in candidates:
-        if c.platform == "renault" and (conf := _RENAULT.get(c.key or "")) and conf not in found:
-            found[conf] = c.entity_id
-    # Renault's battery level has no translation key: the battery device class marks it.
-    if any(c.platform == "renault" for c in candidates) and CONF_BATTERY_LEVEL not in found:
-        for c in candidates:
-            if c.platform == "renault" and c.device_class == "battery" and c.unit == "%":
-                found[CONF_BATTERY_LEVEL] = c.entity_id
-                break
+        if c.known and c.known not in found:
+            found[c.known] = c.entity_id
 
     used = set(found.values())
     for conf, matcher in _MATCHERS.items():

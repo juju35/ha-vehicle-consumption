@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 
@@ -23,7 +24,7 @@ from custom_components.vehicle_consumption.const import (
     CONF_TRIP_GAP,
     DOMAIN,
 )
-from custom_components.vehicle_consumption.detect import async_detect
+from custom_components.vehicle_consumption.detect import _KNOWN, _known_key, async_detect
 
 from .conftest import KM, KWH, LITERS, PERCENT, add_sensor, setup_vehicle, state_of, vehicle_device
 
@@ -256,3 +257,34 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     # Reloaded with the new options
     attrs = state_of(hass, "consumption").attributes
     assert attrs["tank_capacity"] == 55 and attrs["fuel_quantity"] == 27.5
+
+
+# Units of each source, for the sensors of the known integrations below.
+_UNITS = {
+    CONF_ODOMETER: KM,
+    CONF_FUEL_QUANTITY: LITERS,
+    CONF_FUEL_LEVEL: PERCENT,
+    CONF_BATTERY_ENERGY: KWH,
+    CONF_BATTERY_LEVEL: {"unit_of_measurement": "%"},
+}
+
+
+@pytest.mark.parametrize("by", ["translation_key", "unique_id"])
+@pytest.mark.parametrize("platform", sorted(_KNOWN))
+async def test_known_integration_keys(hass: HomeAssistant, platform: str, by: str) -> None:
+    """Every key of a known integration is found from its translation key or its unique ID alone.
+
+    The entity IDs carry no keyword, so the generic matchers cannot be what finds them.
+    """
+    device = vehicle_device(hass, "Car", platform=platform)
+    for conf, keys in _KNOWN[platform].items():
+        for i, key in enumerate(keys):
+            entity_id = add_sensor(
+                hass, device, f"car_{conf}_{i}", "1", _UNITS[conf], platform=platform,
+                unique_id=f"vin123_{key}" if by == "unique_id" else f"vin123_{conf}_{i}",
+                translation_key=key if by == "translation_key" else None,
+            )  # fmt: skip
+            assert _known_key(platform, key if by == "translation_key" else None, f"vin123_{key}") == conf
+            if i == 0:
+                first = entity_id
+        assert async_detect(hass, device)[conf] == first, (platform, conf)
