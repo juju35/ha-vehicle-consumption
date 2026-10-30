@@ -215,6 +215,19 @@ async def test_sensor_errors(hass: HomeAssistant) -> None:
     assert result["step_id"] == "prices"
 
 
+async def test_same_sensor_twice(hass: HomeAssistant) -> None:
+    """One sensor cannot be two sources: a fuel quantity also picked as the fuel level is refused."""
+    device = vehicle_device(hass, "Captur")
+    add_sensor(hass, device, "captur_mileage", "1000", KM, unique_id="vf3_mileage", translation_key="mileage")
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": "user"})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_DEVICE_ID: device})
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ODOMETER: "sensor.captur_mileage", CONF_FUEL_QUANTITY: "sensor.q", CONF_FUEL_LEVEL: "sensor.q"},
+    )
+    assert result["errors"] == {CONF_FUEL_LEVEL: "duplicate_sensor"}
+
+
 async def test_options_flow(hass: HomeAssistant) -> None:
     entry = await setup_vehicle(hass)
     result = await hass.config_entries.options.async_init(entry.entry_id)

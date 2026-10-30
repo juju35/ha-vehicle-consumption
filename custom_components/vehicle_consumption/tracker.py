@@ -75,6 +75,8 @@ LITERS_PER_GALLON = 3.785411784  # US gallon
 MERGE_WINDOW = timedelta(hours=12)
 # Trip gap while replaying hourly statistics: one reading an hour, so an hour still is not a stop yet.
 HOURLY_TRIP_GAP = timedelta(minutes=61)
+# Stored with `history_imported`: a store with an older version is imported again once.
+HISTORY_IMPORT_VERSION = 2
 
 FUEL = "fuel"
 ENERGY = "energy"
@@ -394,7 +396,9 @@ class ConsumptionTracker:
 
     @property
     def fuel_level(self) -> float | None:
-        if (level := self._reading(CONF_FUEL_LEVEL)) is not None:
+        # The same sensor picked as quantity and level (before 0.2.1) is a quantity.
+        same = self.sensors.get(CONF_FUEL_LEVEL) == self.sensors.get(CONF_FUEL_QUANTITY)
+        if not same and (level := self._reading(CONF_FUEL_LEVEL)) is not None:
             return level
         quantity = self._reading(CONF_FUEL_QUANTITY)
         return quantity / self.tank_capacity * 100 if quantity is not None and self.tank_capacity else None
@@ -405,7 +409,8 @@ class ConsumptionTracker:
 
     @property
     def battery_level(self) -> float | None:
-        if (level := self._reading(CONF_BATTERY_LEVEL)) is not None:
+        same = self.sensors.get(CONF_BATTERY_LEVEL) == self.sensors.get(CONF_BATTERY_ENERGY)
+        if not same and (level := self._reading(CONF_BATTERY_LEVEL)) is not None:
             return level
         energy = self._reading(CONF_BATTERY_ENERGY)
         return energy / self.battery_capacity * 100 if energy is not None and self.battery_capacity else None
@@ -560,6 +565,12 @@ class ConsumptionTracker:
         if key == CONF_ODOMETER:
             value = self._reading(key, state)
             return value is not None and self._process_odometer(value, now)
+        # A level (%) only feeds the tracking without a quantity sensor: next to one, it is shown and nothing more
+        # (reading it would apply the quantity's current state, not the one of this reading).
+        if key == CONF_FUEL_LEVEL and CONF_FUEL_QUANTITY in self.sensors:
+            return False
+        if key == CONF_BATTERY_LEVEL and CONF_BATTERY_ENERGY in self.sensors:
+            return False
         if key in (CONF_FUEL_QUANTITY, CONF_FUEL_LEVEL):
             value = self._fuel_now(state, key)
             return value is not None and self._process_level(FUEL, value, now)
@@ -779,7 +790,13 @@ class ConsumptionTracker:
             by_entity.setdefault(entity_id, []).append(key)
         manual = {kind: [e for e in level.events if e.source == "manual"] for kind, level in self._levels.items()}
         self._reset_data(rows[0][0] if rows else now)
+        # Until a price sensor's first recorded state, its first known price stands in (the current one when it has
+        # no recorded state): the time before it is not left without a cost.
         self._replay_prices = {}
+        for entity_id in prices:
+            first = next((state for _, e, state in rows if e == entity_id), None) or self.hass.states.get(entity_id)
+            if first is not None:
+                self._replay_prices[entity_id] = first
         trip_gap = self.trip_gap
         try:
             for when, entity_id, state in rows:
@@ -842,7 +859,8 @@ class ConsumptionTracker:
                 seen=_time(raw.get("seen")),
             )
         self._charger = _Charger.load(data.get("charger"))
-        self.history_imported = bool(data.get("history_imported"))
+        # Imports before 0.2.1 could be wrong (a level next to its quantity, no early prices): done again once.
+        self.history_imported = int(data.get("history_imported") or 0) >= HISTORY_IMPORT_VERSION
 
     def _dump(self) -> dict[str, Any]:
         return {
@@ -862,7 +880,7 @@ class ConsumptionTracker:
                 for kind, level in self._levels.items()
             },
             "charger": self._charger.dump(),
-            "history_imported": self.history_imported,
+            "history_imported": HISTORY_IMPORT_VERSION if self.history_imported else 0,
         }
 
     async def async_save(self) -> None:

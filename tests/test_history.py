@@ -13,6 +13,7 @@ from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.components.recorder.common import async_wait_recording_done
 
 from custom_components.vehicle_consumption.const import (
+    CONF_FUEL_LEVEL,
     CONF_FUEL_PRICE,
     CONF_FUEL_PRICE_ENTITY,
     CONF_FUEL_QUANTITY,
@@ -190,4 +191,41 @@ async def test_days_limit(recorder_mock, hass: HomeAssistant, freezer: FrozenDat
     await hass.services.async_call(
         DOMAIN, SERVICE_IMPORT_HISTORY, {"config_entry_id": entry.entry_id, "days": 1}, blocking=True
     )
+    assert _attrs(hass)["total"]["distance"] == 100
+
+
+async def test_level_next_to_quantity_is_not_replayed(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    """A fuel level set next to the quantity (even the same sensor) adds nothing: no fake refuels from it."""
+    await _record(hass, freezer, JOURNEY)
+    await _setup(hass, freezer, **{CONF_FUEL_LEVEL: FUEL})
+    attrs = _attrs(hass)
+    assert [r["liters"] for r in attrs["refuels"]] == [13]
+    assert attrs["total"]["fuel"] == 7
+    assert attrs["fuel_level"] is None  # 46 L is not 46 %, and there is no tank capacity
+
+
+async def test_price_before_its_first_state(recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    """Fuel used before the price sensor's first recorded state costs that first price."""
+    await _record(hass, freezer, JOURNEY[:2])
+    freezer.move_to(START + timedelta(minutes=60))
+    hass.states.async_set(FUEL_PRICE, "1.5", PRICE)
+    await _record(hass, freezer, JOURNEY[2:3])
+    await _setup(hass, freezer, **{CONF_FUEL_PRICE_ENTITY: FUEL_PRICE})
+    assert _attrs(hass)["total"]["cost"] == 4 * 1.5
+
+
+async def test_old_import_done_again(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory, hass_storage: dict[str, Any]
+) -> None:
+    """A history imported before 0.2.1 (stored as `true`) is imported again once."""
+    await _record(hass, freezer, JOURNEY)
+    entry = await _setup(hass, freezer)
+    assert _attrs(hass)["total"]["distance"] == 100
+    await hass.config_entries.async_unload(entry.entry_id)
+    key = f"{DOMAIN}.{entry.entry_id}"
+    hass_storage[key]["data"].update(history_imported=True, total={"distance": 5})
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
     assert _attrs(hass)["total"]["distance"] == 100
