@@ -91,3 +91,11 @@ reset_statistics:
       selector:
         config_entry:
           integration: vehicle_consumption
+
+import_history:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: vehicle_consumption

@@ -32,7 +32,7 @@ It comes with a **Lovelace card** showing the tank and battery gauges, the key f
 - **Consumption** in L/100 km and kWh/100 km for the last trip, the current month and on average
 - **Cost**: fuel and electricity prices from a sensor (such as [ha-carburants-france](https://github.com/juju35/ha-carburants-france)) or fixed; cost of the month and **cost per km**
 - **History** kept across restarts: the last 24 months, 20 trips, 20 refuels and 20 charges
-- **Actions** to log a refuel or a charge by hand (`add_refuel`, `add_charge`) and to start over (`reset_statistics`)
+- **Actions** to log a refuel or a charge by hand (`add_refuel`, `add_charge`) to start over (`reset_statistics`) or to rebuild everything from the recorded history (`import_history`)
 - **Lovelace card bundled with the integration**, added automatically to the dashboard resources (nothing to add by hand): fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart (consumption, distance or cost), recent trips and refuels or charges, a pulsing dot while driving, a popup to log a refuel or a charge; visual editor
 - UI setup, no YAML; English, French, German and Spanish
 
@@ -203,6 +203,16 @@ data:
   config_entry_id: 01JC0EXAMPLE0000000000000
 ```
 
+#### `vehicle_consumption.import_history`
+
+Rebuilds the trips, months, refuels and charges of a vehicle from what Home Assistant recorded of its sensors, as far back as the [recorder](https://www.home-assistant.io/integrations/recorder/) keeps it (10 days by default). Refuels and charges logged by hand are kept. It runs on its own once, when the vehicle is added, so the card is filled from the first day.
+
+```yaml
+action: vehicle_consumption.import_history
+data:
+  config_entry_id: 01JC0EXAMPLE0000000000000
+```
+
 ### Card
 
 The card is added to the dashboard resources by the integration. Add it from the dashboard (**Add card → Vehicle Consumption Card**) or in YAML:
@@ -260,6 +270,8 @@ Recent trips and refuels unfolded:
 ## How it works
 
 Vehicle Consumption follows the levels reported by the car rather than asking you to log every refuel.
+
+When a vehicle is added, the history the recorder kept of its sensors is replayed once, in order, as if the integration had been there: the past trips, refuels and charges are found the same way, at the prices of then when a price sensor is used. How far back depends on the recorder's `purge_keep_days` (10 days by default).
 
 - **Reference level**: for fuel (L) and energy (kWh), it keeps a reference level. When a reading goes **down**, the difference is counted as used and the reference follows. When it goes **up by at least the threshold** (3 L / 1 kWh by default), it is a **refuel or a charge**: the amount added is recorded, with its cost at the current price. A **smaller rise** is sensor noise (a tank sloshing, a battery warming up) and is ignored. `unknown` and `unavailable` readings are skipped. A level in % is turned into litres or kWh with the capacity you set.
 - **Home charger**: with a charger energy counter, a **home charge** is the counter going up, until it has not moved for 30 minutes. Its amount is what the counter delivered (losses included; a session counter going back to 0 starts a new session) and its cost that amount × the electricity price; it is listed as *Home charger*. A battery rise while the counter moves is that session, never counted twice; a battery rise while the charger is idle is a charge away from home, recorded as before. The energy used still comes from the battery going down.

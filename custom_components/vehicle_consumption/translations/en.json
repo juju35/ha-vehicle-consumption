@@ -229,6 +229,13 @@
       "fields": {
         "config_entry_id": { "name": "Vehicle", "description": "The vehicle whose statistics are cleared." }
       }
+    },
+    "import_history": {
+      "name": "Import history",
+      "description": "Rebuilds the trips, months, refuels and charges of the vehicle from what Home Assistant recorded of its sensors (as far back as the recorder keeps it). Manual refuels and charges are kept.",
+      "fields": {
+        "config_entry_id": { "name": "Vehicle", "description": "The vehicle whose history is imported." }
+      }
     }
   },
   "exceptions": {
@@ -237,6 +244,9 @@
     },
     "not_loaded": {
       "message": "Vehicle Consumption for {name} is not loaded."
+    },
+    "no_recorder": {
+      "message": "The recorder is not set up: there is no history to import."
     }
   }
 }

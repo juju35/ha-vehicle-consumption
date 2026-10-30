@@ -6,7 +6,7 @@ from datetime import timedelta
 from typing import Final
 
 DOMAIN: Final = "vehicle_consumption"
-VERSION: Final = "0.1.0"
+VERSION: Final = "0.2.0"
 
 # Entry data
 CONF_DEVICE_ID: Final = "device_id"
@@ -72,6 +72,9 @@ UNIT_ENERGY_CONSUMPTION: Final = "kWh/100 km"
 SERVICE_ADD_REFUEL: Final = "add_refuel"
 SERVICE_ADD_CHARGE: Final = "add_charge"
 SERVICE_RESET_STATISTICS: Final = "reset_statistics"
+SERVICE_IMPORT_HISTORY: Final = "import_history"
+# How far back the history is read: the recorder keeps less (10 days by default), and gives what it has.
+HISTORY_MAX_AGE: Final = timedelta(days=400)
 ATTR_CONFIG_ENTRY_ID: Final = "config_entry_id"
 ATTR_LITERS: Final = "liters"
 ATTR_ENERGY: Final = "energy"

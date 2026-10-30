@@ -17,9 +17,10 @@ session, not another charge. Battery rises while the charger is idle stay charge
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
+from functools import partial
 from typing import Any
 
 from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, STATE_UNAVAILABLE, STATE_UNKNOWN
@@ -49,6 +50,7 @@ from .const import (
     DEFAULT_CHARGE_THRESHOLD,
     DEFAULT_REFUEL_THRESHOLD,
     DEFAULT_TRIP_GAP,
+    HISTORY_MAX_AGE,
     KIND_ELECTRIC,
     KIND_FUEL,
     KIND_PLUGIN_HYBRID,
@@ -284,6 +286,10 @@ class ConsumptionTracker:
 
         self._store: Store[dict[str, Any]] = Store(hass, STORAGE_VERSION, STORAGE_KEY.format(entry_id=entry_id))
         self._listeners: list[CALLBACK_TYPE] = []
+        # Price entity states while the history is replayed (the prices of then, not of now); None otherwise.
+        self._replay_prices: dict[str, State] | None = None
+        # The recorder's history has been read once (at the first start, or after an update adding it).
+        self.history_imported = False
         self._reset_data(dt_util.utcnow())
         self._shown_month = self.month_totals()[0]
 
@@ -331,7 +337,11 @@ class ConsumptionTracker:
         return self._price(self.electricity_price_entity, self.fixed_electricity_price, None)
 
     def _price(self, entity_id: str | None, fixed: float | None, per_gallon: float | None) -> float | None:
-        if entity_id and (state := self.hass.states.get(entity_id)) is not None:
+        if self._replay_prices is not None:
+            state = self._replay_prices.get(entity_id) if entity_id else None
+        else:
+            state = self.hass.states.get(entity_id) if entity_id else None
+        if state is not None:
             price = _float(state.state)
             if price is not None and price >= 0:
                 unit = str(state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) or "")
@@ -665,6 +675,74 @@ class ConsumptionTracker:
             updated |= self._process(key, None, now)
         return updated
 
+    # ── History ─────────────────────────────────────────────────────────────
+
+    async def async_import_history(self) -> bool:
+        """Rebuild trips, months, refuels and charges from the recorder's history of the source sensors.
+
+        Everything the sensors recorded (as far back as the recorder keeps it) is replayed in order, as if the
+        integration had been there: the odometer makes the trips, the levels the consumption, refuels and
+        charges, at the prices of then when a price sensor is used. Manual refuels and charges are kept. False
+        when the recorder is not there.
+        """
+        if "recorder" not in self.hass.config.components:
+            return False
+        from homeassistant.components.recorder import get_instance, history  # noqa: PLC0415 - optional dependency
+
+        prices = {e for e in (self.fuel_price_entity, self.electricity_price_entity) if e}
+        entity_ids = sorted(set(self.sensors.values()) | prices)
+        now = dt_util.utcnow()
+        states = await get_instance(self.hass).async_add_executor_job(
+            partial(
+                history.get_significant_states,
+                self.hass,
+                now - HISTORY_MAX_AGE,
+                None,
+                entity_ids,
+                significant_changes_only=False,
+                no_attributes=False,
+            )
+        )
+        timeline = sorted(
+            ((state.last_updated, entity_id, state) for entity_id, rows in states.items() for state in rows),
+            key=lambda row: (row[0], row[1]),
+        )
+        self._replay(timeline, prices, dt_util.utcnow())
+        _LOGGER.debug("%s: %d recorded states replayed", self.name, len(timeline))
+        return True
+
+    @callback
+    def _replay(self, timeline: Iterable[tuple[datetime, str, State]], prices: set[str], now: datetime) -> None:
+        """Start over from the first recorded state and apply every one, then the current states."""
+        rows = list(timeline)
+        by_entity: dict[str, list[str]] = {}
+        for key, entity_id in self.sensors.items():
+            by_entity.setdefault(entity_id, []).append(key)
+        manual = {kind: [e for e in level.events if e.source == "manual"] for kind, level in self._levels.items()}
+        self._reset_data(rows[0][0] if rows else now)
+        self._replay_prices = {}
+        try:
+            for when, entity_id, state in rows:
+                # What the 1-minute tick would have done between two readings.
+                self._end_trip_if_stopped(when)
+                self._close_charger_session(when)
+                if entity_id in prices:
+                    self._replay_prices[entity_id] = state
+                for key in by_entity.get(entity_id, ()):
+                    self._process(key, state, when)
+        finally:
+            self._replay_prices = None
+        self._end_trip_if_stopped(now)
+        self._close_charger_session(now)
+        self._read_current(now)
+        for kind, events in manual.items():
+            level_events = self._levels[kind].events
+            level_events.extend(events)
+            level_events.sort(key=lambda e: e.time, reverse=True)
+            del level_events[MAX_EVENTS:]
+        self.history_imported = True
+        self._changed()
+
     # ── Storage ─────────────────────────────────────────────────────────────
 
     async def async_load(self) -> None:
@@ -701,6 +779,7 @@ class ConsumptionTracker:
                 seen=_time(raw.get("seen")),
             )
         self._charger = _Charger.load(data.get("charger"))
+        self.history_imported = bool(data.get("history_imported"))
 
     def _dump(self) -> dict[str, Any]:
         return {
@@ -720,6 +799,7 @@ class ConsumptionTracker:
                 for kind, level in self._levels.items()
             },
             "charger": self._charger.dump(),
+            "history_imported": self.history_imported,
         }
 
     async def async_save(self) -> None:

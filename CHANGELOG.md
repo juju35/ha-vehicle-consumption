@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0
+
+### What's new
+- History import: when a vehicle is added, the trips, refuels, charges and months are rebuilt from what the recorder kept of its sensors (10 days by default), at the prices of then when a price sensor is used. The new `vehicle_consumption.import_history` action does it again on demand; refuels and charges logged by hand are kept. A vehicle added with 0.1.0 is imported once after the update.
+
 ## 0.1.0
 
 First public release.

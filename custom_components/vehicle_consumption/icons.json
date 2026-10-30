@@ -21,6 +21,7 @@
   "services": {
     "add_refuel": { "service": "mdi:gas-station" },
     "add_charge": { "service": "mdi:ev-station" },
-    "reset_statistics": { "service": "mdi:restart" }
+    "reset_statistics": { "service": "mdi:restart" },
+    "import_history": { "service": "mdi:history" }
   }
 }
