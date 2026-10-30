@@ -1,0 +1,275 @@
+# ha-vehicle-consumption
+
+[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![HACS Validation](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/hacs.yml/badge.svg)](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/hacs.yml)
+[![Validate](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/validate.yml/badge.svg)](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/validate.yml)
+[![Release](https://img.shields.io/github/v/release/juju35/ha-vehicle-consumption)](https://github.com/juju35/ha-vehicle-consumption/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="custom_components/vehicle_consumption/brand/dark_logo.png">
+    <img src="custom_components/vehicle_consumption/brand/logo.png" alt="Vehicle Consumption" height="64">
+  </picture>
+</p>
+
+Home Assistant integration that turns your car's own sensors into a **fuel and energy logbook**: consumption in **L/100 km or kWh/100 km** per trip, per month and on average, **refuels and charges detected on their own**, and what driving **costs you per kilometre**. Fuel, electric and plug-in hybrid vehicles alike.
+
+It comes with a **Lovelace card** showing the tank and battery gauges, the key figures, a monthly chart and your recent trips and refuels.
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-vehicle-consumption&category=integration)
+
+| Fuel car | Electric car |
+|---|---|
+| ![Vehicle Consumption card, fuel car](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-fuel.png) | ![Vehicle Consumption card, electric car](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-ev.png) |
+
+## Features
+
+- **One entry per vehicle**, set up from its device: the odometer and the fuel and battery sensors are **detected automatically**, or you pick them yourself
+- **Fuel, electric and plug-in hybrid**: fuel used (L) and energy used (kWh) worked out from the level changes; miles, US gallons and Wh converted
+- **Refuels and charges detected** when the level jumps up (3 L / 1 kWh by default), small sensor jitters ignored
+- **Trips**: a trip starts when the odometer moves and ends after a gap without driving (30 minutes by default), with its distance, consumption and cost
+- **Consumption** in L/100 km and kWh/100 km for the last trip, the current month and on average
+- **Cost**: fuel and electricity prices from a sensor (such as [ha-carburants-france](https://github.com/juju35/ha-carburants-france)) or fixed; cost of the month and **cost per km**
+- **History** kept across restarts: the last 24 months, 20 trips, 20 refuels and 20 charges
+- **Actions** to log a refuel or a charge by hand (`add_refuel`, `add_charge`) and to start over (`reset_statistics`)
+- **Lovelace card bundled with the integration**, added automatically to the dashboard resources (nothing to add by hand): fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart (consumption, distance or cost), recent trips and refuels or charges, a pulsing dot while driving, a popup to log a refuel or a charge; visual editor
+- UI setup, no YAML; English, French, German and Spanish
+
+## Compatible integrations
+
+**Renault** ([official integration](https://www.home-assistant.io/integrations/renault/)) is supported first-class: its **mileage**, **fuel quantity**, **battery available energy** and **battery level** sensors are detected automatically.
+
+Any other vehicle integration that exposes an **odometer** plus **fuel** sensors (quantity in L or gal, or level in %) and/or **battery** sensors (energy in kWh, or level in %) works too:
+
+- Tesla / Teslemetry
+- Kia / Hyundai (Kia Connect)
+- Volkswagen
+- BMW
+- Mercedes-Benz
+- Toyota
+- Peugeot / Citroën / DS / Opel
+- Volvo, Polestar
+- Ford, Skoda
+- OBD-II dongles…
+
+The sensors are **detected automatically**, or pick the sensors yourself during setup. A level in % needs the tank or battery capacity to be turned into litres or kWh.
+
+## Prerequisites
+
+- Home Assistant 2024.12 or newer
+- A vehicle integration with an odometer and at least one fuel or battery sensor
+
+## Installation
+
+### Via HACS (recommended)
+
+[![Add to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-vehicle-consumption&category=integration)
+
+Or manually:
+
+1. Open HACS → **⋮** → **Custom repositories**
+2. Add `https://github.com/juju35/ha-vehicle-consumption` — Type: **Integration**
+3. Search for **Vehicle Consumption** and download it
+4. Restart Home Assistant
+
+### Manual
+
+1. Download `vehicle_consumption.zip` from the [latest release](https://github.com/juju35/ha-vehicle-consumption/releases/latest)
+2. Unzip it into `/config/custom_components/vehicle_consumption/`
+3. Restart Home Assistant
+
+### Removal
+
+Remove each vehicle from **Settings → Devices & services**: its stored history is deleted with it, and the card resource is removed with the last one. Then remove the repository from HACS.
+
+## Configuration
+
+**Settings → Devices & services → Add integration → Vehicle Consumption**, once per vehicle:
+
+1. Pick the **vehicle** (its device from the car integration) and give it a name
+2. Check the **sensors**: the odometer and the fuel and battery sensors found on the device are filled in; change or complete them if needed
+3. Set the **capacities**, **prices** and **thresholds**
+
+Everything can be changed later with **Configure**.
+
+| Option | Default | Description |
+|---|---|---|
+| Odometer | Detected | Total distance sensor (km or mi), required |
+| Fuel quantity | Detected | Fuel left in the tank (L or gal) |
+| Fuel level | Detected | Fuel left in % (needs the tank capacity) |
+| Battery energy | Detected | Energy left in the battery (kWh or Wh) |
+| Battery level | Detected | Battery level in % (needs the battery capacity) |
+| Tank capacity | — | Litres, to turn a fuel level in % into litres |
+| Battery capacity | — | Usable kWh, to turn a battery level in % into kWh |
+| Fuel price sensor | — | Sensor giving the price per litre (wins over the fixed price) |
+| Fuel price | — | Fixed price per litre |
+| Electricity price sensor | — | Sensor giving the price per kWh (wins over the fixed price) |
+| Electricity price | — | Fixed price per kWh |
+| Trip gap | `30` min | Minutes without the odometer moving that end a trip |
+| Refuel threshold | `3` L | A rise of at least this much fuel is a refuel |
+| Charge threshold | `1` kWh | A rise of at least this much energy is a charge |
+
+At least one fuel or battery sensor is needed. A vehicle with only fuel sensors is tracked as **fuel**, with only battery sensors as **electric**, with both as **plug-in hybrid**.
+
+### Entities
+
+One device per vehicle; the entities only exist when they make sense for it (`fuel_*` with fuel sensors, `energy_*` with battery sensors). For a vehicle named *My car*:
+
+| Entity | Description |
+|---|---|
+| `sensor.my_car_consumption` | Average consumption (L/100 km, or kWh/100 km for an electric car). Its attributes carry everything the card shows: `vehicle`, `entry_id`, `kind`, `currency`, current levels and prices, `driving`, `trip`, `month`, `total`, `months`, `trips`, `refuels`, `charges` |
+| `sensor.my_car_fuel_consumption_trip` / `_month` / `_average` | Fuel consumption of the last trip, this month and on average (L/100 km) |
+| `sensor.my_car_energy_consumption_trip` / `_month` / `_average` | Energy consumption of the last trip, this month and on average (kWh/100 km) |
+| `sensor.my_car_distance_trip` / `_month` | Distance of the last trip and this month (km) |
+| `sensor.my_car_fuel_used_month` | Fuel used this month (L) |
+| `sensor.my_car_energy_used_month` | Energy used this month (kWh) |
+| `sensor.my_car_cost_month` | Cost of the fuel and energy used this month |
+| `sensor.my_car_cost_per_km` | Cost per kilometre, on average |
+| `sensor.my_car_last_refuel` | Time of the last refuel; attributes `liters`, `cost`, `odometer`, `source` (`auto` or `manual`) |
+| `sensor.my_car_last_charge` | Time of the last charge; attributes `energy`, `cost`, `odometer`, `source` |
+
+### Actions
+
+#### `vehicle_consumption.add_refuel`
+
+Logs a refuel by hand: it shows up in the card's refuels with source `manual`. Consumption still comes from the sensors, so a manual refuel does not change it. Fields: `config_entry_id` (the vehicle, required), `liters` (required), `cost` (total), `price` (per litre), `odometer`.
+
+```yaml
+action: vehicle_consumption.add_refuel
+data:
+  config_entry_id: 01JC0EXAMPLE0000000000000
+  liters: 42.5
+  cost: 74.80
+```
+
+For example from an automation, when a fuel card notification or a script tells you what you paid:
+
+```yaml
+triggers:
+  - trigger: event
+    event_type: fuel_receipt
+actions:
+  - action: vehicle_consumption.add_refuel
+    data:
+      config_entry_id: 01JC0EXAMPLE0000000000000
+      liters: "{{ trigger.event.data.liters }}"
+      price: "{{ trigger.event.data.price }}"
+      odometer: "{{ states('sensor.my_car_mileage') | float(0) }}"
+```
+
+#### `vehicle_consumption.add_charge`
+
+Same for a charge: `config_entry_id`, `energy` (kWh, required), `cost`, `price` (per kWh), `odometer`.
+
+```yaml
+action: vehicle_consumption.add_charge
+data:
+  config_entry_id: 01JC0EXAMPLE0000000000000
+  energy: 31.2
+  price: 0.2516
+```
+
+#### `vehicle_consumption.reset_statistics`
+
+Clears the trips, months, refuels, charges and totals of a vehicle and starts over.
+
+```yaml
+action: vehicle_consumption.reset_statistics
+data:
+  config_entry_id: 01JC0EXAMPLE0000000000000
+```
+
+### Card
+
+The card is added to the dashboard resources by the integration. Add it from the dashboard (**Add card → Vehicle Consumption Card**) or in YAML:
+
+```yaml
+type: custom:vehicle-consumption-card
+entity: sensor.my_car_consumption
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `entity` | Auto | The vehicle's **Consumption** sensor; the first one is found automatically |
+| `title` | Vehicle name | Card title |
+| `chart` | `true` | Monthly bar chart |
+| `chart_metric` | `consumption` | What the chart shows: `consumption`, `distance` or `cost` |
+| `months` | `6` | Number of months in the chart (3–12) |
+| `trips` | `true` | **Recent trips** section |
+| `refuels` | `true` | **Refuels** / **Charges** section |
+| `add_button` | `true` | **+** button in the header to log a refuel or a charge |
+| `language` | Auto | Force language: `en`, `fr`, `de` or `es` |
+
+The **+** button opens a popup at the top of the card to log a refuel (litres) or a charge (kWh), its total cost and, optionally, the odometer. The sections fold and unfold with a tap, and fold back on their own when you tap elsewhere.
+
+## Screenshots
+
+The card animates in three places, and stays still with `prefers-reduced-motion`:
+
+- **Gauges**: the fuel and battery gauges fill up to their level when the card appears
+
+  ![gauge animation](screenshots/gauge.gif)
+
+- **Chart**: the monthly bars grow from the bottom, the current month in the accent colour
+
+  ![chart animation](screenshots/chart.gif)
+
+- **Driving**: while a trip is in progress, a dot pulses in the header
+
+  ![driving animation](screenshots/driving.gif)
+
+| Fuel car | Electric car |
+|---|---|
+| ![fuel](screenshots/card-fuel.png) | ![electric](screenshots/card-ev.png) |
+| ![fuel dark](screenshots/card-fuel-dark.png) | ![electric dark](screenshots/card-ev-dark.png) |
+
+| Plug-in hybrid | Add a refuel |
+|---|---|
+| ![plug-in hybrid](screenshots/card-hybrid.png) | ![add a refuel](screenshots/popup.png) |
+
+Recent trips and refuels unfolded:
+
+![sections](screenshots/card-sections.png)
+
+## How it works
+
+Vehicle Consumption follows the levels reported by the car rather than asking you to log every refuel.
+
+- **Reference level**: for fuel (L) and energy (kWh), it keeps a reference level. When a reading goes **down**, the difference is counted as used and the reference follows. When it goes **up by at least the threshold** (3 L / 1 kWh by default), it is a **refuel or a charge**: the amount added is recorded, with its cost at the current price. A **smaller rise** is sensor noise (a tank sloshing, a battery warming up) and is ignored. `unknown` and `unavailable` readings are skipped. A level in % is turned into litres or kWh with the capacity you set.
+- **Distance**: every rise of the odometer is added up (a jump over 2000 km is ignored as a glitch).
+- **Trips**: a trip starts when the odometer moves and ends after the **trip gap** (30 minutes by default) without moving. Its distance, fuel, energy and cost are what was counted between its start and its end.
+- **Prices**: the fuel price per litre and the electricity price per kWh come from a **sensor** (such as the station prices of [ha-carburants-france](https://github.com/juju35/ha-carburants-france), or your electricity tariff) or a **fixed** value; a sensor wins over the fixed price. Without a price, cost stays empty.
+- **Consumption** is the amount used divided by the distance, × 100. Under **5 km** it is not shown: too short to mean anything.
+- **History**: months are kept for 24 months (local time), and the last 20 trips, refuels and charges. Everything is stored in `.storage/vehicle_consumption.<entry_id>` and survives restarts.
+
+## Development
+
+```bash
+pip install -r requirements_test.txt && pytest
+node --test test/*.test.mjs   # card tests
+python scripts/screenshots.py  # renders the card with mock vehicles into screenshots/ (also makes the GIFs, needs ffmpeg)
+```
+
+### Releasing
+
+1. Bump the version in `custom_components/vehicle_consumption/manifest.json`, `const.py` (`VERSION`) and the card (`VEHICLE_CONSUMPTION_CARD_VERSION`)
+2. Add a `## <version>` section at the top of [CHANGELOG.md](CHANGELOG.md)
+3. Push to `main`: the **Release** workflow creates the tag and the GitHub release with the changelog section as notes, and attaches `vehicle_consumption.zip`
+
+## Translations
+
+The integration and the card follow the language of Home Assistant. Currently supported:
+
+| Language | Code |
+|---|---|
+| English | `en` |
+| Français | `fr` |
+| Deutsch | `de` |
+| Español | `es` |
+
+Contributions for additional languages are welcome!
+
+## License
+
+[MIT](LICENSE)
