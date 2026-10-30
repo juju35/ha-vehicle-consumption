@@ -234,7 +234,8 @@
       "name": "Import history",
       "description": "Rebuilds the trips, months, refuels and charges of the vehicle from what Home Assistant recorded of its sensors (as far back as the recorder keeps it). Manual refuels and charges are kept.",
       "fields": {
-        "config_entry_id": { "name": "Vehicle", "description": "The vehicle whose history is imported." }
+        "config_entry_id": { "name": "Vehicle", "description": "The vehicle whose history is imported." },
+        "days": { "name": "Days", "description": "How far back to rebuild (60 by default). The recorded states are used where the recorder still has them (10 days by default), the hourly statistics of the sensors before." }
       }
     }
   },

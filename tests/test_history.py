@@ -128,3 +128,66 @@ async def test_import_without_recorder(hass: HomeAssistant) -> None:
         await hass.services.async_call(
             DOMAIN, SERVICE_IMPORT_HISTORY, {"config_entry_id": entry.entry_id}, blocking=True
         )
+
+
+def _metadata(statistic_id: str, unit: str) -> dict[str, Any]:
+    """Statistic metadata for a sensor, with the fields of the running Home Assistant version."""
+    from homeassistant.components.recorder.models import StatisticMetaData
+
+    metadata: dict[str, Any] = {
+        "has_mean": False,
+        # Total and total-increasing sensors (an odometer, a tank) have sums: only those keep their `state`.
+        "has_sum": True,
+        "name": None,
+        "source": "recorder",
+        "statistic_id": statistic_id,
+        "unit_of_measurement": unit,
+    }
+    fields = getattr(StatisticMetaData, "__annotations__", {})
+    if "mean_type" in fields:
+        from homeassistant.components.recorder.models import StatisticMeanType
+
+        metadata["mean_type"] = StatisticMeanType.NONE
+    if "unit_class" in fields:
+        metadata["unit_class"] = None
+    return metadata
+
+
+async def test_hourly_statistics_before_the_states(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    """Before the recorded states, the hourly statistics stand in: a drive over two hours is one trip."""
+    from homeassistant.components.recorder.statistics import async_import_statistics
+
+    # Five days before the recorded states: (odometer km, fuel L) at the end of each hour from 08:00.
+    hours = [(900, 50), (930, 48), (960, 46), (960, 52), (1000, 40)]
+    first = START - timedelta(days=5)
+    for statistic_id, unit, index in ((ODOMETER, "km", 0), (FUEL, "L", 1)):
+        async_import_statistics(
+            hass,
+            _metadata(statistic_id, unit),
+            [
+                {"start": first + timedelta(hours=h), "state": row[index], "sum": row[index]}
+                for h, row in enumerate(hours)
+            ],
+        )
+    await _record(hass, freezer, JOURNEY)
+    await _setup(hass, freezer, **{CONF_FUEL_PRICE: 2.0})
+
+    attrs = _attrs(hass)
+    # 60 km over two hours, then 40 km, then the three trips of the recorded states.
+    assert [(t["distance"], t["fuel"]) for t in attrs["trips"]] == [(50, 3), (30, 2), (20, 2), (40, 12), (60, 4)]
+    assert attrs["trips"][-1]["start"] == (first + timedelta(hours=2)).isoformat()
+    assert [r["liters"] for r in attrs["refuels"]] == [13, 6]
+    assert attrs["total"]["distance"] == 200 and attrs["total"]["since"] == (first + timedelta(hours=1)).isoformat()
+
+
+async def test_days_limit(recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    """The action only goes back the number of days asked."""
+    await _record(hass, freezer, [(-3 * 24 * 60, 900, 50), *JOURNEY])
+    entry = await _setup(hass, freezer)
+    assert _attrs(hass)["total"]["distance"] == 200
+    await hass.services.async_call(
+        DOMAIN, SERVICE_IMPORT_HISTORY, {"config_entry_id": entry.entry_id, "days": 1}, blocking=True
+    )
+    assert _attrs(hass)["total"]["distance"] == 100

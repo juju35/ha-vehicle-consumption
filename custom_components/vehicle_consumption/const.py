@@ -73,8 +73,10 @@ SERVICE_ADD_REFUEL: Final = "add_refuel"
 SERVICE_ADD_CHARGE: Final = "add_charge"
 SERVICE_RESET_STATISTICS: Final = "reset_statistics"
 SERVICE_IMPORT_HISTORY: Final = "import_history"
-# How far back the history is read: the recorder keeps less (10 days by default), and gives what it has.
-HISTORY_MAX_AGE: Final = timedelta(days=400)
+# How far back the history is read by default (days): the recorded states first, the hourly statistics before.
+DEFAULT_HISTORY_DAYS: Final = 60
+MAX_HISTORY_DAYS: Final = 730
+ATTR_DAYS: Final = "days"
 ATTR_CONFIG_ENTRY_ID: Final = "config_entry_id"
 ATTR_LITERS: Final = "liters"
 ATTR_ENERGY: Final = "energy"

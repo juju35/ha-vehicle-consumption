@@ -234,7 +234,8 @@
       "name": "Importar historial",
       "description": "Reconstruye los trayectos, meses, repostajes y recargas del vehículo a partir de lo que Home Assistant registró de sus sensores (tan atrás como lo conserve el registrador). Se conservan los repostajes y recargas añadidos a mano.",
       "fields": {
-        "config_entry_id": { "name": "Vehículo", "description": "El vehículo cuyo historial se importa." }
+        "config_entry_id": { "name": "Vehículo", "description": "El vehículo cuyo historial se importa." },
+        "days": { "name": "Días", "description": "Hasta dónde reconstruir (60 por defecto). Se usan los estados registrados donde el registrador aún los tiene (10 días por defecto) y, antes, las estadísticas horarias de los sensores." }
       }
     }
   },

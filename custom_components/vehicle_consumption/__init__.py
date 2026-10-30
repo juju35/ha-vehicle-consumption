@@ -19,13 +19,16 @@ from homeassistant.helpers.typing import ConfigType
 from .const import (
     ATTR_CONFIG_ENTRY_ID,
     ATTR_COST,
+    ATTR_DAYS,
     ATTR_ENERGY,
     ATTR_LITERS,
     ATTR_ODOMETER,
     ATTR_PRICE,
     CARD_URL,
     CONF_NAME,
+    DEFAULT_HISTORY_DAYS,
     DOMAIN,
+    MAX_HISTORY_DAYS,
     SERVICE_ADD_CHARGE,
     SERVICE_ADD_REFUEL,
     SERVICE_IMPORT_HISTORY,
@@ -44,6 +47,13 @@ type VehicleConsumptionConfigEntry = ConfigEntry[ConsumptionTracker]
 _AMOUNT = vol.All(vol.Coerce(float), vol.Range(min=0, min_included=False))
 _POSITIVE = vol.All(vol.Coerce(float), vol.Range(min=0))
 _ENTRY_SCHEMA = vol.Schema({vol.Required(ATTR_CONFIG_ENTRY_ID): cv.string})
+_IMPORT_SCHEMA = _ENTRY_SCHEMA.extend(
+    {
+        vol.Optional(ATTR_DAYS, default=DEFAULT_HISTORY_DAYS): vol.All(
+            vol.Coerce(float), vol.Range(min=1, max=MAX_HISTORY_DAYS)
+        )
+    }
+)
 
 
 def _event_schema(amount_key: str) -> vol.Schema:
@@ -107,11 +117,11 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     hass.services.async_register(DOMAIN, SERVICE_ADD_CHARGE, add_event(ENERGY, ATTR_ENERGY), _event_schema(ATTR_ENERGY))
 
     async def import_history(call: ServiceCall) -> None:
-        if not await tracker(call).async_import_history():
+        if not await tracker(call).async_import_history(call.data[ATTR_DAYS]):
             raise ServiceValidationError(translation_domain=DOMAIN, translation_key="no_recorder")
 
     hass.services.async_register(DOMAIN, SERVICE_RESET_STATISTICS, reset, _ENTRY_SCHEMA)
-    hass.services.async_register(DOMAIN, SERVICE_IMPORT_HISTORY, import_history, _ENTRY_SCHEMA)
+    hass.services.async_register(DOMAIN, SERVICE_IMPORT_HISTORY, import_history, _IMPORT_SCHEMA)
     return True
 
 
