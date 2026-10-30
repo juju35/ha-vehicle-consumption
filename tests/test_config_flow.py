@@ -24,7 +24,7 @@ from custom_components.vehicle_consumption.const import (
     CONF_TRIP_GAP,
     DOMAIN,
 )
-from custom_components.vehicle_consumption.detect import _KNOWN, _known_key, async_detect
+from custom_components.vehicle_consumption.detect import _KNOWN, _TRANSLATION_KEY_ONLY, _known_key, async_detect
 
 from .conftest import KM, KWH, LITERS, PERCENT, add_sensor, setup_vehicle, state_of, vehicle_device
 
@@ -278,17 +278,35 @@ async def test_known_integration_keys(hass: HomeAssistant, platform: str, by: st
     The entity IDs carry no keyword, so the generic matchers cannot be what finds them; the preferred key gets the
     last entity ID, so the order of the entity IDs cannot be what picks it.
     """
+    tilde = any(k.startswith("~") for keys in _KNOWN[platform].values() for k in keys)
+    if (by == "unique_id" and platform in _TRANSLATION_KEY_ONLY) or (by == "translation_key" and tilde):
+        pytest.skip(f"{platform} sensors are not matched by {by}")
     device = vehicle_device(hass, "Car", platform=platform)
     for conf, keys in _KNOWN[platform].items():
         preferred = None
         for rank, key in enumerate(keys):
             # Unique IDs as the integrations write them: mixed case, `-` or `/` before the key.
-            unique_id = f"VIN123{'-/_'[rank % 3]}{key.upper()}"
+            unique_id = f"ovms_e_v{key[1:]}a1b2c3" if key.startswith("~") else f"VIN123{'-/_'[rank % 3]}{key.upper()}"
             entity_id = add_sensor(
                 hass, device, f"car_{conf}_{len(keys) - rank}", "1", _UNITS[conf], platform=platform,
                 unique_id=unique_id if by == "unique_id" else f"vin123_{conf}_{rank}",
                 translation_key=key if by == "translation_key" else None,
             )  # fmt: skip
-            assert _known_key(platform, None, unique_id) == (conf, rank)
+            if by == "unique_id":
+                assert _known_key(platform, None, unique_id) == (conf, rank)
             preferred = preferred or entity_id
         assert async_detect(hass, device)[conf] == preferred, (platform, conf)
+
+
+async def test_translation_key_only_ignores_lookalike_unique_ids(hass: HomeAssistant) -> None:
+    """BYD's cumulative mileage statistic ends like its odometer key: only the translation key picks the odometer."""
+    device = vehicle_device(hass, "Seal", platform="byd_vehicle")
+    add_sensor(
+        hass, device, "seal_a", "61000", KM, platform="byd_vehicle",
+        unique_id="vin_stats_energy_cumulative_total_mileage", translation_key="energy_cumulative_total_mileage",
+    )  # fmt: skip
+    add_sensor(
+        hass, device, "seal_b", "48210", KM, platform="byd_vehicle",
+        unique_id="vin_realtime_total_mileage", translation_key="total_mileage",
+    )  # fmt: skip
+    assert async_detect(hass, device)[CONF_ODOMETER] == "sensor.seal_b"

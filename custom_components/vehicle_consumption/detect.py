@@ -19,8 +19,8 @@ from .const import CONF_BATTERY_ENERGY, CONF_BATTERY_LEVEL, CONF_FUEL_LEVEL, CON
 
 # Integrations whose sensor keys are known, by entity registry platform: source -> their sensor keys, preferred
 # first. A sensor matches when its translation key is one of them, or its unique ID ends with one after `_`, `-`,
-# `.` or `/` (compared in lower case). Every other sensor, and every source left unmatched, goes through the keyword
-# matchers below. Keys read from each integration's source code (October 2026).
+# `.` or `/` (in lower case; a `~` key may sit anywhere in it). Every other sensor, and every source left
+# unmatched, goes through the keyword matchers below. Keys read from each integration's source code (October 2026).
 _KNOWN: dict[str, dict[str, tuple[str, ...]]] = {
     # Renault (core): unique ID `<vin>_<key>`, translation key = key, except battery_level (battery device class).
     "renault": {
@@ -104,7 +104,94 @@ _KNOWN: dict[str, dict[str, tuple[str, ...]]] = {
         CONF_ODOMETER: ("current_odometer",),
         CONF_BATTERY_LEVEL: ("battery_charge_level",),
     },
+    # Volkswagen (HACS volkswagencarnet) and SEAT (HACS seatconnect): unique ID `<vin>-<component>-<attribute>`,
+    # no translation key. connection_state_battery_power_level is not the battery level: the whole suffix counts.
+    "volkswagencarnet": {
+        CONF_ODOMETER: ("sensor-distance",),
+        CONF_FUEL_LEVEL: ("sensor-fuel_level",),
+        CONF_BATTERY_LEVEL: ("sensor-battery_level",),
+    },
+    "seatconnect": {
+        CONF_ODOMETER: ("sensor-distance",),
+        CONF_FUEL_LEVEL: ("sensor-fuel_level",),
+        CONF_BATTERY_LEVEL: ("sensor-battery_level",),
+    },
+    # Volkswagen ID (HACS volkswagen_we_connect_id) and CUPRA (HACS cupra_we_connect): unique ID `<vin>-<key>`.
+    "volkswagen_we_connect_id": {
+        CONF_ODOMETER: ("odometer",),
+        CONF_FUEL_LEVEL: ("fuellevel",),
+        CONF_BATTERY_LEVEL: ("currentsoc_pct",),
+    },
+    "cupra_we_connect": {
+        CONF_ODOMETER: ("odometer_km", "odometer_mi"),
+        CONF_BATTERY_LEVEL: ("currentsoc_pct",),
+    },
+    # Audi (HACS audiconnect): unique ID `<vin>_sensor_<key>`, no translation key.
+    "audiconnect": {
+        CONF_ODOMETER: ("sensor_mileage",),
+        CONF_FUEL_LEVEL: ("sensor_tank_level",),
+        CONF_BATTERY_LEVEL: ("sensor_state_of_charge",),
+    },
+    # Škoda (HACS myskoda): translation keys (the odometer's own key is spelled `milage`).
+    "myskoda": {
+        CONF_ODOMETER: ("mileage",),
+        CONF_FUEL_LEVEL: ("fuel_level",),
+        CONF_BATTERY_LEVEL: ("battery_percentage",),
+    },
+    # Peugeot, Citroën, DS, Opel, Fiat, Jeep… (HACS stellantis_vehicles): translation key = key.
+    "stellantis_vehicles": {
+        CONF_ODOMETER: ("mileage",),
+        CONF_FUEL_LEVEL: ("fuel",),
+        CONF_BATTERY_ENERGY: ("battery_residual",),
+        CONF_BATTERY_LEVEL: ("battery",),
+    },
+    # Ford (HACS fordpass): unique ID `<vin>-fordpass_<key>`; on an electric Ford `fuel` holds the battery level.
+    "fordpass": {
+        CONF_ODOMETER: ("fordpass_odometer",),
+        CONF_FUEL_LEVEL: ("fordpass_fuel",),
+    },
+    # Nissan Leaf (core): unique ID `<vin>_soc`; no odometer.
+    "nissan_leaf": {
+        CONF_BATTERY_LEVEL: ("soc",),
+    },
+    # MG / SAIC (HACS mg_saic): unique ID `<entry>_<vin>_<key>`; its fuel level wrongly has the battery device class.
+    "mg_saic": {
+        CONF_ODOMETER: ("mileage",),
+        CONF_FUEL_LEVEL: ("fuellevelprc",),
+        CONF_BATTERY_ENERGY: ("battery_energy",),
+        CONF_BATTERY_LEVEL: ("extendeddata1_soc",),
+    },
+    # BYD (HACS byd_vehicle): translation key = key.
+    "byd_vehicle": {
+        CONF_ODOMETER: ("total_mileage", "total_mileage_v2"),
+        CONF_FUEL_LEVEL: ("oil_percent",),
+        CONF_BATTERY_LEVEL: ("elec_percent",),
+    },
+    # OVMS (HACS ovms): unique ID `ovms_<entry>_<vehicle>_<topic path>_<hash>`, matched on the topic path (`~`).
+    "ovms": {
+        CONF_ODOMETER: ("~_metric_v_p_odometer_",),
+        CONF_BATTERY_LEVEL: ("~_metric_v_b_soc_",),
+    },
+    # WiCAN OBD-II dongle (HACS wican): unique ID `<entry>_pid_<PID>`, PIDs from the vehicle profile or standard OBD.
+    # LV_SOC is the 12 V battery.
+    "wican": {
+        CONF_ODOMETER: ("pid_odometer", "pid_odometer_mi"),
+        CONF_FUEL_QUANTITY: ("pid_fuel_l",),
+        CONF_FUEL_LEVEL: ("pid_fuel", "pid_fueltanklevel"),
+        CONF_BATTERY_LEVEL: ("pid_soc", "pid_soc_d"),
+    },
 }
+
+# Integrations matched on their translation keys only: their short keys also end other sensors' unique IDs
+# (BYD's energy_cumulative_total_mileage, Škoda's overall_mileage…).
+_TRANSLATION_KEY_ONLY = {"myskoda", "stellantis_vehicles", "byd_vehicle", "mbapi2020"}
+
+
+def _uid_matches(unique_id: str, key: str) -> bool:
+    """A unique ID ends with the key after a separator, or holds it anywhere for a `~` key."""
+    if key.startswith("~"):
+        return key[1:] in unique_id
+    return any(unique_id.endswith(f"{sep}{key}") for sep in "_-./")
 
 
 def _known_key(platform: str, translation_key: str | None, unique_id: str) -> tuple[str, int] | None:
@@ -115,7 +202,7 @@ def _known_key(platform: str, translation_key: str | None, unique_id: str) -> tu
         (len(key), conf, rank)
         for conf, keys in _KNOWN.get(platform, {}).items()
         for rank, key in enumerate(keys)
-        if tkey == key or any(uid.endswith(f"{sep}{key}") for sep in "_-./")
+        if tkey == key or (platform not in _TRANSLATION_KEY_ONLY and _uid_matches(uid, key))
     ]
     # The longest key is the most specific: `phev_usable_battery_level` also ends with `_battery_level`.
     return max(matches)[1:] if matches else None
