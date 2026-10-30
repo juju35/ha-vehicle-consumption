@@ -12,7 +12,7 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.setup import async_setup_component
 
-from custom_components.vehicle_consumption.const import CARD_URL, CONF_FUEL_QUANTITY, CONF_ODOMETER, DOMAIN
+from custom_components.vehicle_consumption.const import CARD_URL, CONF_FUEL_QUANTITY, CONF_ODOMETER, DOMAIN, VERSION
 
 from .conftest import FUEL, KM, LITERS, ODOMETER, setup_vehicle, state_of
 
@@ -106,7 +106,7 @@ async def test_card_resource_updated_and_deduplicated(hass: HomeAssistant) -> No
     await resources.async_create_item({"res_type": "module", "url": CARD_URL})
     await setup_vehicle(hass)
     [url] = _card_urls(resources)
-    assert url.endswith("?v=0.1.0")
+    assert url.endswith(f"?v={VERSION}")
 
 
 @pytest.mark.parametrize(

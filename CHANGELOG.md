@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0
+
+### What's new
+- History import: when a vehicle is added, the trips, refuels, charges and months of the last 60 days are rebuilt from what Home Assistant recorded of its sensors: the recorded states where the recorder still has them (10 days by default), the hourly long-term statistics before, at the prices of then when a price sensor is used. The new `vehicle_consumption.import_history` action does it again on demand, over the number of days you choose (up to 730); refuels and charges logged by hand are kept. A vehicle added with 0.1.0 is imported once after the update.
+
 ## 0.1.0
 
 First public release.

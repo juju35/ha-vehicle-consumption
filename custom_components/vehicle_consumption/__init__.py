@@ -19,15 +19,19 @@ from homeassistant.helpers.typing import ConfigType
 from .const import (
     ATTR_CONFIG_ENTRY_ID,
     ATTR_COST,
+    ATTR_DAYS,
     ATTR_ENERGY,
     ATTR_LITERS,
     ATTR_ODOMETER,
     ATTR_PRICE,
     CARD_URL,
     CONF_NAME,
+    DEFAULT_HISTORY_DAYS,
     DOMAIN,
+    MAX_HISTORY_DAYS,
     SERVICE_ADD_CHARGE,
     SERVICE_ADD_REFUEL,
+    SERVICE_IMPORT_HISTORY,
     SERVICE_RESET_STATISTICS,
     VERSION,
 )
@@ -43,6 +47,13 @@ type VehicleConsumptionConfigEntry = ConfigEntry[ConsumptionTracker]
 _AMOUNT = vol.All(vol.Coerce(float), vol.Range(min=0, min_included=False))
 _POSITIVE = vol.All(vol.Coerce(float), vol.Range(min=0))
 _ENTRY_SCHEMA = vol.Schema({vol.Required(ATTR_CONFIG_ENTRY_ID): cv.string})
+_IMPORT_SCHEMA = _ENTRY_SCHEMA.extend(
+    {
+        vol.Optional(ATTR_DAYS, default=DEFAULT_HISTORY_DAYS): vol.All(
+            vol.Coerce(float), vol.Range(min=1, max=MAX_HISTORY_DAYS)
+        )
+    }
+)
 
 
 def _event_schema(amount_key: str) -> vol.Schema:
@@ -104,7 +115,13 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     hass.services.async_register(DOMAIN, SERVICE_ADD_REFUEL, add_event(FUEL, ATTR_LITERS), _event_schema(ATTR_LITERS))
     hass.services.async_register(DOMAIN, SERVICE_ADD_CHARGE, add_event(ENERGY, ATTR_ENERGY), _event_schema(ATTR_ENERGY))
+
+    async def import_history(call: ServiceCall) -> None:
+        if not await tracker(call).async_import_history(call.data[ATTR_DAYS]):
+            raise ServiceValidationError(translation_domain=DOMAIN, translation_key="no_recorder")
+
     hass.services.async_register(DOMAIN, SERVICE_RESET_STATISTICS, reset, _ENTRY_SCHEMA)
+    hass.services.async_register(DOMAIN, SERVICE_IMPORT_HISTORY, import_history, _IMPORT_SCHEMA)
     return True
 
 
@@ -155,7 +172,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: VehicleConsumptionConfig
     entry.async_on_unload(tracker.async_listen())
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_reload))
+    if not tracker.history_imported:
+        # Once per vehicle: what the sensors recorded before the integration was there (trips, refuels…).
+        entry.async_create_background_task(hass, _async_first_import(hass, tracker), f"{DOMAIN} history import")
     return True
+
+
+async def _async_first_import(hass: HomeAssistant, tracker: ConsumptionTracker) -> None:
+    """Read the recorder's history once it is up; a failure leaves the live tracking as it is."""
+    if hass.state is not CoreState.running:
+        started = hass.loop.create_future()
+        unsub = hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, lambda _: started.set_result(None))
+        try:
+            await started
+        finally:
+            if not started.done():
+                unsub()
+    try:
+        await tracker.async_import_history()
+    except Exception:  # noqa: BLE001 - the history is a bonus, never a reason to stop tracking
+        _LOGGER.exception("Could not import the history of %s", tracker.name)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: VehicleConsumptionConfigEntry) -> bool:

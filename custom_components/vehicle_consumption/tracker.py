@@ -17,9 +17,10 @@ session, not another charge. Battery rises while the charger is idle stay charge
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
+from functools import partial
 from typing import Any
 
 from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, STATE_UNAVAILABLE, STATE_UNKNOWN
@@ -47,6 +48,7 @@ from .const import (
     CONF_TANK_CAPACITY,
     CONF_TRIP_GAP,
     DEFAULT_CHARGE_THRESHOLD,
+    DEFAULT_HISTORY_DAYS,
     DEFAULT_REFUEL_THRESHOLD,
     DEFAULT_TRIP_GAP,
     KIND_ELECTRIC,
@@ -71,6 +73,8 @@ LITERS_PER_GALLON = 3.785411784  # US gallon
 # Rises of the same refuel / charge reported in steps (a car charging reports every few minutes) are merged
 # into one event while nothing was consumed in between and the previous step is this recent.
 MERGE_WINDOW = timedelta(hours=12)
+# Trip gap while replaying hourly statistics: one reading an hour, so an hour still is not a stop yet.
+HOURLY_TRIP_GAP = timedelta(minutes=61)
 
 FUEL = "fuel"
 ENERGY = "energy"
@@ -284,6 +288,10 @@ class ConsumptionTracker:
 
         self._store: Store[dict[str, Any]] = Store(hass, STORAGE_VERSION, STORAGE_KEY.format(entry_id=entry_id))
         self._listeners: list[CALLBACK_TYPE] = []
+        # Price entity states while the history is replayed (the prices of then, not of now); None otherwise.
+        self._replay_prices: dict[str, State] | None = None
+        # The recorder's history has been read once (at the first start, or after an update adding it).
+        self.history_imported = False
         self._reset_data(dt_util.utcnow())
         self._shown_month = self.month_totals()[0]
 
@@ -331,7 +339,11 @@ class ConsumptionTracker:
         return self._price(self.electricity_price_entity, self.fixed_electricity_price, None)
 
     def _price(self, entity_id: str | None, fixed: float | None, per_gallon: float | None) -> float | None:
-        if entity_id and (state := self.hass.states.get(entity_id)) is not None:
+        if self._replay_prices is not None:
+            state = self._replay_prices.get(entity_id) if entity_id else None
+        else:
+            state = self.hass.states.get(entity_id) if entity_id else None
+        if state is not None:
             price = _float(state.state)
             if price is not None and price >= 0:
                 unit = str(state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) or "")
@@ -665,6 +677,135 @@ class ConsumptionTracker:
             updated |= self._process(key, None, now)
         return updated
 
+    # ── History ─────────────────────────────────────────────────────────────
+
+    async def async_import_history(self, days: float = DEFAULT_HISTORY_DAYS) -> bool:
+        """Rebuild trips, months, refuels and charges from what the recorder kept of the source sensors.
+
+        The last `days` are replayed in order, as if the integration had been there: the odometer makes the trips,
+        the levels the consumption, refuels and charges, at the prices of then when a price sensor is used. The
+        recorded states are kept 10 days by default; before them, the hourly long-term statistics of the sensors
+        (kept for good, for sensors with a state class) stand in, one reading an hour. Manual refuels and charges
+        are kept. False when the recorder is not there.
+        """
+        if "recorder" not in self.hass.config.components:
+            return False
+        from homeassistant.components.recorder import get_instance, history, statistics  # noqa: PLC0415
+
+        recorder = get_instance(self.hass)
+        prices = {e for e in (self.fuel_price_entity, self.electricity_price_entity) if e}
+        entity_ids = sorted(set(self.sensors.values()) | prices)
+        now = dt_util.utcnow()
+        start = now - timedelta(days=days)
+        states = await recorder.async_add_executor_job(
+            partial(
+                history.get_significant_states,
+                self.hass,
+                start,
+                None,
+                entity_ids,
+                include_start_time_state=False,
+                significant_changes_only=False,
+                no_attributes=False,
+            )
+        )
+        timeline = [(state.last_updated, entity_id, state) for entity_id, rows in states.items() for state in rows]
+        # Where the recorded states of the source sensors begin: the statistics cover the time before.
+        sources = set(self.sensors.values())
+        first = min(
+            (
+                when
+                for when, entity_id, state in timeline
+                if entity_id in sources and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN)
+            ),
+            default=now,
+        )
+        hourly: list[tuple[datetime, str, State]] = []
+        if first - start > timedelta(hours=1):
+            rows = await recorder.async_add_executor_job(
+                statistics.statistics_during_period, self.hass, start, first, set(entity_ids), "hour", None, {"state"}
+            )
+            hourly = self._statistic_states(rows, states, first)
+        # At the same time, the odometer first: the fuel or energy used in that step belongs to the trip it starts.
+        odometer = self.sensors.get(CONF_ODOMETER)
+        order = lambda row: (row[0], row[1] != odometer, row[1])  # noqa: E731
+        hourly.sort(key=order)
+        timeline.sort(key=order)
+        self._replay([*hourly, *timeline], prices, dt_util.utcnow(), hourly_until=hourly[-1][0] if hourly else None)
+        _LOGGER.debug("%s: %d hourly statistics and %d recorded states replayed", self.name, len(hourly), len(timeline))
+        return True
+
+    def _statistic_states(
+        self, rows: dict[str, list[Any]], recorded: dict[str, list[State]], before: datetime
+    ) -> list[tuple[datetime, str, State]]:
+        """The hourly statistics as readings at the end of each hour, with the sensor's unit, before `before`.
+
+        Only sensors with a sum (total or total-increasing state class, as an odometer or a tank) keep their state in
+        the statistics.
+        """
+        out: list[tuple[datetime, str, State]] = []
+        for entity_id, stats in rows.items():
+            # The statistics are in the sensor's unit: take it from a recorded or the current state.
+            sample = next(iter(recorded.get(entity_id) or ()), None) or self.hass.states.get(entity_id)
+            attributes = dict(sample.attributes) if sample else {}
+            for row in stats:
+                begin, value = row.get("start"), row.get("state")
+                if begin is None or value is None:
+                    continue
+                when = (
+                    dt_util.utc_from_timestamp(begin) if isinstance(begin, int | float) else dt_util.as_utc(begin)
+                ) + timedelta(hours=1)
+                if when < before:
+                    state = State(entity_id, str(value), attributes, last_changed=when, last_updated=when)
+                    out.append((when, entity_id, state))
+        return out
+
+    @callback
+    def _replay(
+        self,
+        timeline: Iterable[tuple[datetime, str, State]],
+        prices: set[str],
+        now: datetime,
+        hourly_until: datetime | None = None,
+    ) -> None:
+        """Start over from the first recorded state and apply every one, then the current states.
+
+        Up to `hourly_until` the readings are hourly statistics: a trip then only ends after an hour without the
+        odometer moving (a trip over two hours is one trip, not two).
+        """
+        rows = list(timeline)
+        by_entity: dict[str, list[str]] = {}
+        for key, entity_id in self.sensors.items():
+            by_entity.setdefault(entity_id, []).append(key)
+        manual = {kind: [e for e in level.events if e.source == "manual"] for kind, level in self._levels.items()}
+        self._reset_data(rows[0][0] if rows else now)
+        self._replay_prices = {}
+        trip_gap = self.trip_gap
+        try:
+            for when, entity_id, state in rows:
+                hourly = hourly_until is not None and when <= hourly_until
+                self.trip_gap = max(trip_gap, HOURLY_TRIP_GAP) if hourly else trip_gap
+                # What the 1-minute tick would have done between two readings.
+                self._end_trip_if_stopped(when)
+                self._close_charger_session(when)
+                if entity_id in prices:
+                    self._replay_prices[entity_id] = state
+                for key in by_entity.get(entity_id, ()):
+                    self._process(key, state, when)
+        finally:
+            self._replay_prices = None
+            self.trip_gap = trip_gap
+        self._end_trip_if_stopped(now)
+        self._close_charger_session(now)
+        self._read_current(now)
+        for kind, events in manual.items():
+            level_events = self._levels[kind].events
+            level_events.extend(events)
+            level_events.sort(key=lambda e: e.time, reverse=True)
+            del level_events[MAX_EVENTS:]
+        self.history_imported = True
+        self._changed()
+
     # ── Storage ─────────────────────────────────────────────────────────────
 
     async def async_load(self) -> None:
@@ -701,6 +842,7 @@ class ConsumptionTracker:
                 seen=_time(raw.get("seen")),
             )
         self._charger = _Charger.load(data.get("charger"))
+        self.history_imported = bool(data.get("history_imported"))
 
     def _dump(self) -> dict[str, Any]:
         return {
@@ -720,6 +862,7 @@ class ConsumptionTracker:
                 for kind, level in self._levels.items()
             },
             "charger": self._charger.dump(),
+            "history_imported": self.history_imported,
         }
 
     async def async_save(self) -> None:

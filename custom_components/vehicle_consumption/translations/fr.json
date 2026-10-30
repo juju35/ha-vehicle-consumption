@@ -229,6 +229,14 @@
       "fields": {
         "config_entry_id": { "name": "Véhicule", "description": "Le véhicule dont les statistiques sont effacées." }
       }
+    },
+    "import_history": {
+      "name": "Importer l’historique",
+      "description": "Reconstruit les trajets, les mois, les pleins et les recharges du véhicule à partir de ce que Home Assistant a enregistré de ses capteurs (aussi loin que l’enregistreur le garde). Les pleins et recharges saisis à la main sont conservés.",
+      "fields": {
+        "config_entry_id": { "name": "Véhicule", "description": "Le véhicule dont l’historique est importé." },
+        "days": { "name": "Jours", "description": "Jusqu’où remonter (60 par défaut). Les états enregistrés servent là où l’enregistreur les a encore (10 jours par défaut), les statistiques horaires des capteurs avant." }
+      }
     }
   },
   "exceptions": {
@@ -237,6 +245,9 @@
     },
     "not_loaded": {
       "message": "Vehicle Consumption pour {name} n'est pas chargé."
+    },
+    "no_recorder": {
+      "message": "L’enregistreur n’est pas configuré : il n’y a pas d’historique à importer."
     }
   }
 }
