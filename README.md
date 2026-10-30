@@ -89,9 +89,9 @@ Remove each vehicle from **Settings → Devices & services**: its stored history
 
 1. Pick the **vehicle** (its device from the car integration) and give it a name
 2. Check the **sensors**: the odometer and the fuel and battery sensors found on the device are filled in; change or complete them if needed
-3. Set the **capacities**, **prices** and **thresholds**
+3. Set the **prices** (a price sensor, such as a station of [ha-carburants-france](https://github.com/juju35/ha-carburants-france), or a fixed price)
 
-Everything can be changed later with **Configure**.
+Everything can be changed later with **Configure**, which also holds the trip and refuel/charge thresholds.
 
 | Option | Default | Description |
 |---|---|---|
@@ -101,12 +101,12 @@ Everything can be changed later with **Configure**.
 | Battery energy | Detected | Energy left in the battery (kWh or Wh) |
 | Battery level | Detected | Battery level in % (needs the battery capacity) |
 | Tank capacity | — | Litres, to turn a fuel level in % into litres |
-| Battery capacity | — | Usable kWh, to turn a battery level in % into kWh |
+| Usable battery capacity | — | Usable kWh, to turn a battery level in % into kWh |
 | Fuel price sensor | — | Sensor giving the price per litre (wins over the fixed price) |
-| Fuel price | — | Fixed price per litre |
+| Fixed fuel price | — | Price per litre, when there is no price sensor |
 | Electricity price sensor | — | Sensor giving the price per kWh (wins over the fixed price) |
-| Electricity price | — | Fixed price per kWh |
-| Trip gap | `30` min | Minutes without the odometer moving that end a trip |
+| Fixed electricity price | — | Price per kWh, when there is no price sensor |
+| End of trip after | `30` min | Minutes without the odometer moving that end a trip |
 | Refuel threshold | `3` L | A rise of at least this much fuel is a refuel |
 | Charge threshold | `1` kWh | A rise of at least this much energy is a charge |
 
@@ -119,12 +119,12 @@ One device per vehicle; the entities only exist when they make sense for it (`fu
 | Entity | Description |
 |---|---|
 | `sensor.my_car_consumption` | Average consumption (L/100 km, or kWh/100 km for an electric car). Its attributes carry everything the card shows: `vehicle`, `entry_id`, `kind`, `currency`, current levels and prices, `driving`, `trip`, `month`, `total`, `months`, `trips`, `refuels`, `charges` |
-| `sensor.my_car_fuel_consumption_trip` / `_month` / `_average` | Fuel consumption of the last trip, this month and on average (L/100 km) |
-| `sensor.my_car_energy_consumption_trip` / `_month` / `_average` | Energy consumption of the last trip, this month and on average (kWh/100 km) |
-| `sensor.my_car_distance_trip` / `_month` | Distance of the last trip and this month (km) |
-| `sensor.my_car_fuel_used_month` | Fuel used this month (L) |
-| `sensor.my_car_energy_used_month` | Energy used this month (kWh) |
-| `sensor.my_car_cost_month` | Cost of the fuel and energy used this month |
+| `sensor.my_car_fuel_consumption_trip`, `sensor.my_car_fuel_consumption_this_month`, `sensor.my_car_average_fuel_consumption` | Fuel consumption of the last trip, this month and on average (L/100 km) |
+| `sensor.my_car_energy_consumption_trip`, `sensor.my_car_energy_consumption_this_month`, `sensor.my_car_average_energy_consumption` | Energy consumption of the last trip, this month and on average (kWh/100 km) |
+| `sensor.my_car_trip_distance`, `sensor.my_car_distance_this_month` | Distance of the last trip and this month (km) |
+| `sensor.my_car_fuel_used_this_month` | Fuel used this month (L) |
+| `sensor.my_car_energy_used_this_month` | Energy used this month (kWh) |
+| `sensor.my_car_cost_this_month` | Cost of the fuel and energy used this month |
 | `sensor.my_car_cost_per_km` | Cost per kilometre, on average |
 | `sensor.my_car_last_refuel` | Time of the last refuel; attributes `liters`, `cost`, `odometer`, `source` (`auto` or `manual`) |
 | `sensor.my_car_last_charge` | Time of the last charge; attributes `energy`, `cost`, `odometer`, `source` |
@@ -191,7 +191,7 @@ entity: sensor.my_car_consumption
 
 | Option | Default | Description |
 |---|---|---|
-| `entity` | Auto | The vehicle's **Consumption** sensor; the first one is found automatically |
+| `entity` | Auto | The vehicle: its **Consumption** sensor. Leave empty for the first vehicle |
 | `title` | Vehicle name | Card title |
 | `chart` | `true` | Monthly bar chart |
 | `chart_metric` | `consumption` | What the chart shows: `consumption`, `distance` or `cost` |
@@ -200,6 +200,8 @@ entity: sensor.my_car_consumption
 | `refuels` | `true` | **Refuels** / **Charges** section |
 | `add_button` | `true` | **+** button in the header to log a refuel or a charge |
 | `language` | Auto | Force language: `en`, `fr`, `de` or `es` |
+
+In the visual editor, **Vehicle** lists every vehicle set up in Vehicle Consumption, by name: nothing to look up, and a vehicle added later shows up in the list. The card picker previews the card with your first vehicle.
 
 The **+** button opens a popup at the top of the card to log a refuel (litres) or a charge (kWh), its total cost and, optionally, the odometer. The sections fold and unfold with a tap, and fold back on their own when you tap elsewhere.
 

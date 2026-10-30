@@ -103,6 +103,19 @@ def r(value, digits):
     return None if value is None else round(value, digits)
 
 
+def amounts(km, fuel, energy, cost):
+    """The distance, amounts, consumptions and cost of a month or a trip, rounded like the integration."""
+    return {
+        "distance": float(km),
+        "fuel": r(fuel, 2),
+        "energy": r(energy, 2),
+        "fuel_consumption": r(fuel and fuel / km * 100, 1),
+        "energy_consumption": r(energy and energy / km * 100, 1),
+        "cost": r(cost, 2),
+        "cost_per_km": r(cost / km, 3),
+    }
+
+
 def month_rows(kind):
     rows = []
     for month, km, fc, ec in zip(MONTHS, DISTANCE, FUEL_CONS, EV_CONS, strict=True):
@@ -113,18 +126,7 @@ def month_rows(kind):
         if kind == "plugin_hybrid":
             fuel, energy = km * fc * 0.45 / 100, km * ec * 0.6 / 100
         cost = (fuel or 0) * FUEL_PRICE + (energy or 0) * KWH_PRICE
-        rows.append(
-            {
-                "month": month,
-                "distance": float(km),
-                "fuel": r(fuel, 2),
-                "energy": r(energy, 2),
-                "fuel_consumption": r(fuel and fuel / km * 100, 1),
-                "energy_consumption": r(energy and energy / km * 100, 1),
-                "cost": r(cost, 2),
-                "cost_per_km": r(cost / km, 3),
-            }
-        )
+        rows.append({"month": month, **amounts(km, fuel, energy, cost)})
     return rows
 
 
@@ -164,19 +166,7 @@ def trip_rows(kind):
         if kind == "plugin_hybrid":
             fuel, energy = fuel * 0.4, energy * 0.6
         cost = (fuel or 0) * FUEL_PRICE + (energy or 0) * KWH_PRICE
-        out.append(
-            {
-                "start": start,
-                "end": start,
-                "distance": km,
-                "fuel": r(fuel, 2),
-                "energy": r(energy, 2),
-                "fuel_consumption": r(fuel and fuel / km * 100, 1),
-                "energy_consumption": r(energy and energy / km * 100, 1),
-                "cost": round(cost, 2),
-                "cost_per_km": round(cost / km, 3),
-            }
-        )
+        out.append({"start": start, "end": start, **amounts(km, fuel, energy, cost)})
     return out
 
 

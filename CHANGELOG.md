@@ -11,5 +11,5 @@ First public release.
 - Consumption in L/100 km and kWh/100 km for the last trip, the current month and on average; distance, fuel and energy used and cost of the month; cost per km; last refuel and last charge. Prices from a sensor (such as [ha-carburants-france](https://github.com/juju35/ha-carburants-france)) or fixed.
 - History kept across restarts: the last 24 months, 20 trips, 20 refuels and 20 charges.
 - `vehicle_consumption.add_refuel` and `vehicle_consumption.add_charge` actions to log a refuel or a charge by hand (from an automation, say), and `vehicle_consumption.reset_statistics`.
-- Vehicle Consumption card, bundled with the integration and added to the dashboard resources automatically: fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart of consumption, distance or cost, recent trips and refuels or charges, a dot while driving, and a popup to log a refuel or a charge; visual editor.
+- Vehicle Consumption card, bundled with the integration and added to the dashboard resources automatically: fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart of consumption, distance or cost, recent trips and refuels or charges, a dot while driving, and a popup to log a refuel or a charge; visual editor that lists your vehicles automatically.
 - English, French, German and Spanish.
