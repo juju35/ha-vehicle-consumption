@@ -17,33 +17,113 @@ from homeassistant.helpers import entity_registry as er
 
 from .const import CONF_BATTERY_ENERGY, CONF_BATTERY_LEVEL, CONF_FUEL_LEVEL, CONF_FUEL_QUANTITY, CONF_ODOMETER
 
-# Integrations whose sensor keys are known, by entity registry platform: source key -> their sensor keys. A sensor
-# matches when its translation key is one of them, or its unique ID ends with one (after `_`, `-` or `.`).
-# Every other sensor, and every source left unmatched, goes through the keyword matchers below.
+# Integrations whose sensor keys are known, by entity registry platform: source -> their sensor keys, preferred
+# first. A sensor matches when its translation key is one of them, or its unique ID ends with one after `_`, `-`,
+# `.` or `/` (compared in lower case). Every other sensor, and every source left unmatched, goes through the keyword
+# matchers below. Keys read from each integration's source code (October 2026).
 _KNOWN: dict[str, dict[str, tuple[str, ...]]] = {
-    # Renault: unique ID `<vin>_<key>`, translation key = key (battery_level has none: the battery device class
-    # finds it below).
+    # Renault (core): unique ID `<vin>_<key>`, translation key = key, except battery_level (battery device class).
     "renault": {
         CONF_ODOMETER: ("mileage",),
         CONF_FUEL_QUANTITY: ("fuel_quantity",),
         CONF_BATTERY_ENERGY: ("battery_available_energy",),
         CONF_BATTERY_LEVEL: ("battery_level",),
     },
+    # Tesla Fleet, Teslemetry, Tessie (core): unique ID `<vin>-<key>`, translation key = key. The odometer (miles)
+    # is disabled by default in Tesla Fleet and Teslemetry: it has to be enabled to be found.
+    "tesla_fleet": {
+        CONF_ODOMETER: ("vehicle_state_odometer",),
+        CONF_BATTERY_LEVEL: ("charge_state_battery_level", "charge_state_usable_battery_level"),
+    },
+    "teslemetry": {
+        CONF_ODOMETER: ("vehicle_state_odometer",),
+        CONF_BATTERY_ENERGY: ("energy_remaining",),
+        CONF_BATTERY_LEVEL: ("charge_state_battery_level", "charge_state_usable_battery_level"),
+    },
+    "tessie": {
+        CONF_ODOMETER: ("vehicle_state_odometer",),
+        CONF_BATTERY_ENERGY: ("charge_state_energy_remaining",),
+        CONF_BATTERY_LEVEL: ("charge_state_usable_battery_level",),
+    },
+    # Kia / Hyundai (HACS kia_uvo): unique ID `kia_uvo_<id>_<key>`; energy left in kJ. car_battery_percentage is
+    # the 12 V battery, ev_battery_soh_percentage its health: neither is listed.
+    "kia_uvo": {
+        CONF_ODOMETER: ("odometer",),
+        CONF_FUEL_LEVEL: ("fuel_level",),
+        CONF_BATTERY_ENERGY: ("ev_battery_remain",),
+        CONF_BATTERY_LEVEL: ("ev_battery_percentage",),
+    },
+    # BMW Connected Drive (core until 2026.3): unique ID `<vin>-fuel_and_battery.<key>`, short translation keys.
+    "bmw_connected_drive": {
+        CONF_ODOMETER: ("mileage",),
+        CONF_FUEL_QUANTITY: ("remaining_fuel",),
+        CONF_FUEL_LEVEL: ("remaining_fuel_percent",),
+        CONF_BATTERY_LEVEL: ("remaining_battery_percent",),
+    },
+    # BMW CarData (HACS cardata, BavarianData): unique ID `<vin>_<CarData descriptor>`.
+    "cardata": {
+        CONF_ODOMETER: ("vehicle.vehicle.travelleddistance",),
+        CONF_FUEL_QUANTITY: ("vehicle.drivetrain.fuelsystem.remainingfuel",),
+        CONF_FUEL_LEVEL: ("vehicle.drivetrain.fuelsystem.level",),
+        CONF_BATTERY_LEVEL: (
+            "vehicle.drivetrain.batterymanagement.header",
+            "vehicle.powertrain.electric.battery.stateofcharge.displayed",
+        ),
+    },
+    "bavariandata": {
+        CONF_ODOMETER: ("vehicle.vehicle.mileage", "vehicle.vehicle.travelleddistance"),
+        CONF_FUEL_QUANTITY: ("vehicle.drivetrain.fuelsystem.remainingfuel",),
+        CONF_FUEL_LEVEL: ("vehicle.drivetrain.fuelsystem.level",),
+        CONF_BATTERY_LEVEL: ("vehicle.drivetrain.batterymanagement.header",),
+    },
+    # Mercedes-Benz (HACS mbapi2020): unique ID `<vin>_<name>` in lower case, translation key = name in lower case.
+    "mbapi2020": {
+        CONF_ODOMETER: ("odometer",),
+        CONF_FUEL_LEVEL: ("tanklevelpercent", "gastanklevelpercent"),
+        CONF_BATTERY_LEVEL: ("soc",),
+    },
+    # Toyota / Lexus (HACS ha_toyota): unique ID `<entry>_<vin>/<key>`, translation key = key.
+    "toyota": {
+        CONF_ODOMETER: ("odometer",),
+        CONF_FUEL_LEVEL: ("fuel_level",),
+        CONF_BATTERY_LEVEL: ("battery_level", "phev_usable_battery_level"),
+    },
+    # Volvo (core; HACS volvo_cars before it): unique ID `[volvo_]<vin>_<key>` in lower case.
+    "volvo": {
+        CONF_ODOMETER: ("odometer",),
+        CONF_FUEL_QUANTITY: ("fuel_amount",),
+        CONF_BATTERY_LEVEL: ("battery_charge_level",),
+    },
+    "volvo_cars": {
+        CONF_ODOMETER: ("odometer",),
+        CONF_FUEL_QUANTITY: ("fuel_amount",),
+        CONF_BATTERY_LEVEL: ("battery_charge_level",),
+    },
+    # Polestar (HACS polestar_api): unique ID `polestar_<vin>_<key>`.
+    "polestar_api": {
+        CONF_ODOMETER: ("current_odometer",),
+        CONF_BATTERY_LEVEL: ("battery_charge_level",),
+    },
 }
 
 
-def _known_key(platform: str, translation_key: str | None, unique_id: str) -> str | None:
-    """The source a sensor of a known integration provides, from its translation key or unique ID suffix."""
-    for conf, keys in _KNOWN.get(platform, {}).items():
-        for key in keys:
-            if translation_key == key or any(unique_id.endswith(f"{sep}{key}") for sep in "_-."):
-                return conf
-    return None
+def _known_key(platform: str, translation_key: str | None, unique_id: str) -> tuple[str, int] | None:
+    """The source a sensor of a known integration provides and the rank of its key (0: preferred), from its
+    translation key or unique ID suffix."""
+    tkey, uid = (translation_key or "").lower(), unique_id.lower()
+    matches = [
+        (len(key), conf, rank)
+        for conf, keys in _KNOWN.get(platform, {}).items()
+        for rank, key in enumerate(keys)
+        if tkey == key or any(uid.endswith(f"{sep}{key}") for sep in "_-./")
+    ]
+    # The longest key is the most specific: `phev_usable_battery_level` also ends with `_battery_level`.
+    return max(matches)[1:] if matches else None
 
 
 _DISTANCE_UNITS = {"km", "mi"}
 _VOLUME_UNITS = {"L", "l", "gal"}
-_ENERGY_UNITS = {"kWh", "Wh"}
+_ENERGY_UNITS = {"kWh", "Wh", "kJ", "MJ"}
 
 
 @dataclass(slots=True)
@@ -53,7 +133,7 @@ class _Candidate:
     unit: str | None
     device_class: str | None
     state_class: str | None
-    known: str | None  # the source it provides, for an integration whose keys are known
+    known: tuple[str, int] | None  # the source it provides and the key rank, for an integration whose keys are known
 
     def has(self, pattern: str) -> bool:
         return re.search(pattern, self.text) is not None
@@ -144,9 +224,10 @@ def async_detect(hass: HomeAssistant, device_id: str) -> dict[str, str]:
     candidates = _candidates(hass, device_id)
     found: dict[str, str] = {}
 
-    for c in candidates:
-        if c.known and c.known not in found:
-            found[c.known] = c.entity_id
+    # Known keys first, the preferred key of each source winning over the others.
+    for c in sorted((c for c in candidates if c.known), key=lambda c: (c.known[1], c.entity_id)):
+        if c.known[0] not in found:
+            found[c.known[0]] = c.entity_id
 
     used = set(found.values())
     for conf, matcher in _MATCHERS.items():

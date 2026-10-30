@@ -272,19 +272,23 @@ _UNITS = {
 @pytest.mark.parametrize("by", ["translation_key", "unique_id"])
 @pytest.mark.parametrize("platform", sorted(_KNOWN))
 async def test_known_integration_keys(hass: HomeAssistant, platform: str, by: str) -> None:
-    """Every key of a known integration is found from its translation key or its unique ID alone.
+    """Every key of a known integration is found from its translation key or its unique ID alone, the preferred
+    key first.
 
-    The entity IDs carry no keyword, so the generic matchers cannot be what finds them.
+    The entity IDs carry no keyword, so the generic matchers cannot be what finds them; the preferred key gets the
+    last entity ID, so the order of the entity IDs cannot be what picks it.
     """
     device = vehicle_device(hass, "Car", platform=platform)
     for conf, keys in _KNOWN[platform].items():
-        for i, key in enumerate(keys):
+        preferred = None
+        for rank, key in enumerate(keys):
+            # Unique IDs as the integrations write them: mixed case, `-` or `/` before the key.
+            unique_id = f"VIN123{'-/_'[rank % 3]}{key.upper()}"
             entity_id = add_sensor(
-                hass, device, f"car_{conf}_{i}", "1", _UNITS[conf], platform=platform,
-                unique_id=f"vin123_{key}" if by == "unique_id" else f"vin123_{conf}_{i}",
+                hass, device, f"car_{conf}_{len(keys) - rank}", "1", _UNITS[conf], platform=platform,
+                unique_id=unique_id if by == "unique_id" else f"vin123_{conf}_{rank}",
                 translation_key=key if by == "translation_key" else None,
             )  # fmt: skip
-            assert _known_key(platform, key if by == "translation_key" else None, f"vin123_{key}") == conf
-            if i == 0:
-                first = entity_id
-        assert async_detect(hass, device)[conf] == first, (platform, conf)
+            assert _known_key(platform, None, unique_id) == (conf, rank)
+            preferred = preferred or entity_id
+        assert async_detect(hass, device)[conf] == preferred, (platform, conf)
