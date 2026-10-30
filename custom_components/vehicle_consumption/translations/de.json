@@ -58,6 +58,7 @@
       "no_energy_sensor": "Wähle mindestens einen Kraftstoff- oder Batteriesensor.",
       "tank_capacity_required": "Für den Kraftstoffstand wird der Tankinhalt benötigt.",
       "battery_capacity_required": "Für den Batteriestand wird die Batteriekapazität benötigt.",
+      "duplicate_sensor": "Dieser Sensor wird bereits für eine andere Quelle verwendet.",
       "charger_needs_battery": "Ein Wallbox-Zähler erfordert einen Sensor für Batterieenergie oder -ladestand."
     },
     "abort": {
@@ -117,6 +118,7 @@
       "no_energy_sensor": "Wähle mindestens einen Kraftstoff- oder Batteriesensor.",
       "tank_capacity_required": "Für den Kraftstoffstand wird der Tankinhalt benötigt.",
       "battery_capacity_required": "Für den Batteriestand wird die Batteriekapazität benötigt.",
+      "duplicate_sensor": "Dieser Sensor wird bereits für eine andere Quelle verwendet.",
       "charger_needs_battery": "Ein Wallbox-Zähler erfordert einen Sensor für Batterieenergie oder -ladestand."
     }
   },

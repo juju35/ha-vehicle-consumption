@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1
+
+### Fixes
+- History import: a fuel level (or battery level) set next to the quantity (or energy) sensor, or the same sensor picked for both, no longer creates a refuel at every reading and a huge consumption; the level is only used when there is no quantity sensor. The setup and options refuse a sensor picked for two sources.
+- History import: the fuel and energy used before a price sensor's first recorded state now cost its first known price, instead of having no cost.
+- Vehicles imported with 0.2.0 are imported again once, automatically.
+
 ## 0.2.0
 
 ### What's new

@@ -58,6 +58,7 @@
       "no_energy_sensor": "Elige al menos un sensor de combustible o de batería.",
       "tank_capacity_required": "Se necesita la capacidad del depósito para usar el nivel de combustible.",
       "battery_capacity_required": "Se necesita la capacidad de la batería para usar el nivel de la batería.",
+      "duplicate_sensor": "Este sensor ya se usa para otra fuente.",
       "charger_needs_battery": "El contador de un cargador doméstico requiere un sensor de energía o de nivel de batería."
     },
     "abort": {
@@ -117,6 +118,7 @@
       "no_energy_sensor": "Elige al menos un sensor de combustible o de batería.",
       "tank_capacity_required": "Se necesita la capacidad del depósito para usar el nivel de combustible.",
       "battery_capacity_required": "Se necesita la capacidad de la batería para usar el nivel de la batería.",
+      "duplicate_sensor": "Este sensor ya se usa para otra fuente.",
       "charger_needs_battery": "El contador de un cargador doméstico requiere un sensor de energía o de nivel de batería."
     }
   },
