@@ -47,7 +47,9 @@ async def test_setup_and_entities(hass: HomeAssistant) -> None:
         ]
     )
     assert all(e.unique_id == f"{entry.entry_id}_{e.translation_key}" for e in entities)
-    device = dr.async_get(hass).async_get_device(identifiers={(DOMAIN, entry.entry_id)})
+    # The entry's own device; async_get_device by identifiers is deprecated since 2026.10.
+    [device] = dr.async_entries_for_config_entry(dr.async_get(hass), entry.entry_id)
+    assert (DOMAIN, entry.entry_id) in device.identifiers
     assert device.name == "My car" and device.manufacturer == "juju35" and device.model == "Vehicle Consumption"
     assert device.entry_type is dr.DeviceEntryType.SERVICE
 
