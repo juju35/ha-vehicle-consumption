@@ -315,8 +315,9 @@ SHOTS = [
 ]
 
 # One GIF per animation, on a compact card. `names`: the animations stepped; the others are shown finished.
+# Every animation is recorded in both themes: each light GIF gets a -dark twin with the exact same setup.
 COMPACT = {"trips": False, "refuels": False}
-GIFS = [
+LIGHT_GIFS = [
     {
         "file": "gauge",
         "kind": "plugin_hybrid",
@@ -339,6 +340,9 @@ GIFS = [
         "names": ["vc-pulse"],
         "seconds": 1.6,
     },
+]
+GIFS = [{**g, "theme": "light"} for g in LIGHT_GIFS] + [
+    {**g, "file": f"{g['file']}-dark", "theme": "dark"} for g in LIGHT_GIFS
 ]
 
 
