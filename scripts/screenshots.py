@@ -295,6 +295,7 @@ SHOTS = [
     {"file": "card-ev", "theme": "light", "kind": "electric", "config": {}},
     {"file": "card-ev-dark", "theme": "dark", "kind": "electric", "config": {}},
     {"file": "card-hybrid", "theme": "light", "kind": "plugin_hybrid", "config": {"months": 12}},
+    {"file": "card-hybrid-dark", "theme": "dark", "kind": "plugin_hybrid", "config": {"months": 12}},
     {
         "file": "card-sections",
         "theme": "light",
@@ -302,7 +303,15 @@ SHOTS = [
         "config": {"chart": False},
         "open": ["trips", "refuels"],
     },
+    {
+        "file": "card-sections-dark",
+        "theme": "dark",
+        "kind": "fuel",
+        "config": {"chart": False},
+        "open": ["trips", "refuels"],
+    },
     {"file": "popup", "theme": "light", "kind": "fuel", "config": {}, "popup": {"amount": "41.2", "cost": "74.98"}},
+    {"file": "popup-dark", "theme": "dark", "kind": "fuel", "config": {}, "popup": {"amount": "41.2", "cost": "74.98"}},
 ]
 
 # One GIF per animation, on a compact card. `names`: the animations stepped; the others are shown finished.

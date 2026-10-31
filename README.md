@@ -263,10 +263,13 @@ The card animates in three places, and stays still with `prefers-reduced-motion`
 | Plug-in hybrid | Add a refuel |
 |---|---|
 | ![plug-in hybrid](screenshots/card-hybrid.png) | ![add a refuel](screenshots/popup.png) |
+| ![plug-in hybrid dark](screenshots/card-hybrid-dark.png) | ![add a refuel dark](screenshots/popup-dark.png) |
 
 Recent trips and refuels unfolded:
 
-![sections](screenshots/card-sections.png)
+| Light | Dark |
+|---|---|
+| ![sections](screenshots/card-sections.png) | ![sections dark](screenshots/card-sections-dark.png) |
 
 ## How it works
 
