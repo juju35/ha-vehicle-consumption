@@ -245,15 +245,21 @@ The card animates in three places, and stays still with `prefers-reduced-motion`
 
 - **Gauges**: the fuel and battery gauges fill up to their level when the card appears
 
-  ![gauge animation](screenshots/gauge.gif)
+  | Light | Dark |
+  |---|---|
+  | ![gauge animation](screenshots/gauge.gif) | ![gauge animation dark](screenshots/gauge-dark.gif) |
 
 - **Chart**: the monthly bars grow from the bottom, the current month in the accent colour
 
-  ![chart animation](screenshots/chart.gif)
+  | Light | Dark |
+  |---|---|
+  | ![chart animation](screenshots/chart.gif) | ![chart animation dark](screenshots/chart-dark.gif) |
 
 - **Driving**: while a trip is in progress, a dot pulses in the header
 
-  ![driving animation](screenshots/driving.gif)
+  | Light | Dark |
+  |---|---|
+  | ![driving animation](screenshots/driving.gif) | ![driving animation dark](screenshots/driving-dark.gif) |
 
 | Fuel car | Electric car |
 |---|---|
