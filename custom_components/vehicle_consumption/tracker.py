@@ -683,10 +683,11 @@ class ConsumptionTracker:
         """Rebuild trips, months, refuels and charges from what the recorder kept of the source sensors.
 
         The last `days` are replayed in order, as if the integration had been there: the odometer makes the trips,
-        the levels the consumption, refuels and charges, at the prices of then when a price sensor is used. The
-        recorded states are kept 10 days by default; before them, the hourly long-term statistics of the sensors
-        (kept for good, for sensors with a state class) stand in, one reading an hour. Manual refuels and charges
-        are kept. False when the recorder is not there.
+        the levels the consumption, refuels and charges, at the prices of then when a price sensor is used (the price
+        when the window starts, else the first one known in it, else the current one). The recorded states are kept
+        10 days by default; before them, the hourly long-term statistics of the sensors (kept for good, for sensors
+        with a state class) stand in, one reading an hour. Manual refuels and charges are kept. False when the
+        recorder is not there.
         """
         if "recorder" not in self.hass.config.components:
             return False
@@ -709,6 +710,21 @@ class ConsumptionTracker:
                 no_attributes=False,
             )
         )
+        start_prices: dict[str, list[State]] = {}
+        if prices:
+            # A price that did not change in the window has no state in it: ask for the one it had at the start.
+            start_prices = await recorder.async_add_executor_job(
+                partial(
+                    history.get_significant_states,
+                    self.hass,
+                    start,
+                    None,
+                    sorted(prices),
+                    include_start_time_state=True,
+                    significant_changes_only=False,
+                    no_attributes=False,
+                )
+            )
         timeline = [(state.last_updated, entity_id, state) for entity_id, rows in states.items() for state in rows]
         # Where the recorded states of the source sensors begin: the statistics cover the time before.
         sources = set(self.sensors.values())
@@ -723,7 +739,14 @@ class ConsumptionTracker:
         hourly: list[tuple[datetime, str, State]] = []
         if first - start > timedelta(hours=1):
             rows = await recorder.async_add_executor_job(
-                statistics.statistics_during_period, self.hass, start, first, set(entity_ids), "hour", None, {"state"}
+                statistics.statistics_during_period,
+                self.hass,
+                start,
+                first,
+                set(entity_ids),
+                "hour",
+                None,
+                {"state", "mean"},
             )
             hourly = self._statistic_states(rows, states, first)
         # At the same time, the odometer first: the fuel or energy used in that step belongs to the trip it starts.
@@ -731,7 +754,25 @@ class ConsumptionTracker:
         order = lambda row: (row[0], row[1] != odometer, row[1])  # noqa: E731
         hourly.sort(key=order)
         timeline.sort(key=order)
-        self._replay([*hourly, *timeline], prices, dt_util.utcnow(), hourly_until=hourly[-1][0] if hourly else None)
+        # The price of then before the first change replayed: at the start, else the first known, else the current.
+        initial_prices: dict[str, State] = {}
+        for entity_id in prices:
+            known = [
+                *(start_prices.get(entity_id) or ()),
+                *(state for _, e, state in hourly if e == entity_id),
+                *(states.get(entity_id) or ()),
+            ]
+            if first_price := min(known, key=lambda state: state.last_updated, default=None):
+                initial_prices[entity_id] = first_price
+            elif current := self.hass.states.get(entity_id):
+                initial_prices[entity_id] = current
+        self._replay(
+            [*hourly, *timeline],
+            prices,
+            dt_util.utcnow(),
+            hourly_until=hourly[-1][0] if hourly else None,
+            initial_prices=initial_prices,
+        )
         _LOGGER.debug("%s: %d hourly statistics and %d recorded states replayed", self.name, len(hourly), len(timeline))
         return True
 
@@ -740,16 +781,23 @@ class ConsumptionTracker:
     ) -> list[tuple[datetime, str, State]]:
         """The hourly statistics as readings at the end of each hour, with the sensor's unit, before `before`.
 
-        Only sensors with a sum (total or total-increasing state class, as an odometer or a tank) keep their state in
-        the statistics.
+        Sensors with a sum (total or total-increasing state class, as an odometer or a tank) keep their state in the
+        statistics; measurement sensors (a level in %, a price) only their mean over the hour, which stands in.
+        The hours only start once the odometer and every fuel or battery sensor have a reading: an hour with a
+        distance but no level would count trips with nothing used (0 L/100 km). Without statistics for one of them,
+        there is no hourly reading at all.
         """
         out: list[tuple[datetime, str, State]] = []
+        firsts: dict[str, datetime] = {}
         for entity_id, stats in rows.items():
             # The statistics are in the sensor's unit: take it from a recorded or the current state.
             sample = next(iter(recorded.get(entity_id) or ()), None) or self.hass.states.get(entity_id)
             attributes = dict(sample.attributes) if sample else {}
             for row in stats:
-                begin, value = row.get("start"), row.get("state")
+                begin = row.get("start")
+                value = row.get("state")
+                if value is None:
+                    value = row.get("mean")
                 if begin is None or value is None:
                     continue
                 when = (
@@ -758,7 +806,13 @@ class ConsumptionTracker:
                 if when < before:
                     state = State(entity_id, str(value), attributes, last_changed=when, last_updated=when)
                     out.append((when, entity_id, state))
-        return out
+                    firsts[entity_id] = min(when, firsts.get(entity_id, when))
+        # The charger counter is optional: home charges are also seen from the battery.
+        needed = {e for key, e in self.sensors.items() if key != CONF_CHARGER_ENERGY}
+        if not needed <= firsts.keys():
+            return []
+        begin = max(firsts[e] for e in needed)
+        return [row for row in out if row[0] >= begin]
 
     @callback
     def _replay(
@@ -767,6 +821,7 @@ class ConsumptionTracker:
         prices: set[str],
         now: datetime,
         hourly_until: datetime | None = None,
+        initial_prices: dict[str, State] | None = None,
     ) -> None:
         """Start over from the first recorded state and apply every one, then the current states.
 
@@ -779,7 +834,7 @@ class ConsumptionTracker:
             by_entity.setdefault(entity_id, []).append(key)
         manual = {kind: [e for e in level.events if e.source == "manual"] for kind, level in self._levels.items()}
         self._reset_data(rows[0][0] if rows else now)
-        self._replay_prices = {}
+        self._replay_prices = dict(initial_prices or {})
         trip_gap = self.trip_gap
         try:
             for when, entity_id, state in rows:
