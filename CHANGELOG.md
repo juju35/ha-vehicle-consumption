@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+### Fixes
+- History import: trips found in the hourly statistics no longer show 0.0 L/100 km (or kWh/100 km) when the fuel or battery level is a sensor in % (Tesla, Kia, Toyota, Volkswagen, Renault battery and most others). Its hourly mean is now used, and the hours are only replayed once the odometer and every fuel or battery sensor have statistics, so a level without statistics no longer leaves trips with nothing used.
+- History import: a price sensor that did not change during the imported days now prices them (its value when the period starts, else the first one recorded); the trips, months and refuels of the import were left without a cost, or at the fixed price. The hourly mean of a price sensor is used before the recorded states too.
+
 ## 0.2.0
 
 ### What's new
