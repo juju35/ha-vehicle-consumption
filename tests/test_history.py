@@ -241,9 +241,7 @@ async def _record_level(hass: HomeAssistant, freezer: FrozenDateTimeFactory, km:
 
 async def _setup_level(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
     freezer.move_to(START + timedelta(hours=6))
-    await setup_vehicle(
-        hass, {CONF_ODOMETER: ODOMETER, CONF_FUEL_LEVEL: FUEL_LEVEL, CONF_TANK_CAPACITY: 50}, states={}
-    )
+    await setup_vehicle(hass, {CONF_ODOMETER: ODOMETER, CONF_FUEL_LEVEL: FUEL_LEVEL, CONF_TANK_CAPACITY: 50}, states={})
     await hass.async_block_till_done(wait_background_tasks=True)
 
 
@@ -325,3 +323,30 @@ async def test_price_known_only_later_in_the_window(
     await _setup(hass, freezer, **{CONF_FUEL_PRICE_ENTITY: FUEL_PRICE})
     # Trip 1 (2 L) before any price: the first known price, 1.5; trip 2 (2 L) at 1.0.
     assert _attrs(hass)["total"]["cost"] == 2 * 1.5 + 2 * 1.0
+
+
+async def test_hourly_price_means(recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    """A price sensor (a measurement) has an hourly mean too: the hourly trips cost the price of then."""
+    from homeassistant.components.recorder.statistics import async_import_statistics
+
+    hours = [(900, 50), (930, 48), (960, 46), (960, 52), (1000, 40)]
+    first = START - timedelta(days=5)
+    for statistic_id, unit, index in ((ODOMETER, "km", 0), (FUEL, "L", 1)):
+        async_import_statistics(
+            hass,
+            _metadata(statistic_id, unit),
+            [
+                {"start": first + timedelta(hours=h), "state": row[index], "sum": row[index]}
+                for h, row in enumerate(hours)
+            ],
+        )
+    _import_hourly(hass, FUEL_PRICE, "€/L", first, [2.0] * len(hours))
+    freezer.move_to(START - timedelta(minutes=5))
+    hass.states.async_set(FUEL_PRICE, "1.0", PRICE)
+    await _record(hass, freezer, JOURNEY)
+    await _setup(hass, freezer, **{CONF_FUEL_PRICE_ENTITY: FUEL_PRICE})
+
+    attrs = _attrs(hass)
+    # 16 L over the hours at 2.0, then the 7 L of the recorded states at 1.0.
+    assert attrs["total"]["fuel"] == 23 and attrs["total"]["cost"] == 16 * 2.0 + 7 * 1.0
+    assert [r["cost"] for r in attrs["refuels"]] == [13 * 1.0, 6 * 2.0]
