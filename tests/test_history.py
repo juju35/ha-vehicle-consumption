@@ -13,16 +13,29 @@ from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.components.recorder.common import async_wait_recording_done
 
 from custom_components.vehicle_consumption.const import (
+    CONF_FUEL_LEVEL,
     CONF_FUEL_PRICE,
     CONF_FUEL_PRICE_ENTITY,
     CONF_FUEL_QUANTITY,
     CONF_ODOMETER,
+    CONF_TANK_CAPACITY,
     DOMAIN,
     SERVICE_ADD_REFUEL,
     SERVICE_IMPORT_HISTORY,
 )
 
-from .conftest import FUEL, FUEL_PRICE, KM, LITERS, ODOMETER, entity_id, setup_vehicle, state_of
+from .conftest import (
+    FUEL,
+    FUEL_LEVEL,
+    FUEL_PRICE,
+    KM,
+    LITERS,
+    ODOMETER,
+    PERCENT,
+    entity_id,
+    setup_vehicle,
+    state_of,
+)
 
 PRICE = {"unit_of_measurement": "€/L"}
 START = datetime(2026, 10, 20, 7, 0, tzinfo=dt_util.UTC)
@@ -130,14 +143,17 @@ async def test_import_without_recorder(hass: HomeAssistant) -> None:
         )
 
 
-def _metadata(statistic_id: str, unit: str) -> dict[str, Any]:
-    """Statistic metadata for a sensor, with the fields of the running Home Assistant version."""
+def _metadata(statistic_id: str, unit: str, *, mean: bool = False) -> dict[str, Any]:
+    """Statistic metadata for a sensor, with the fields of the running Home Assistant version.
+
+    Total and total-increasing sensors (an odometer, a tank) have sums and keep their `state`; measurement sensors
+    (a level in %, a price) only have a mean, a min and a max (`mean`).
+    """
     from homeassistant.components.recorder.models import StatisticMetaData
 
     metadata: dict[str, Any] = {
-        "has_mean": False,
-        # Total and total-increasing sensors (an odometer, a tank) have sums: only those keep their `state`.
-        "has_sum": True,
+        "has_mean": mean,
+        "has_sum": not mean,
         "name": None,
         "source": "recorder",
         "statistic_id": statistic_id,
@@ -147,7 +163,7 @@ def _metadata(statistic_id: str, unit: str) -> dict[str, Any]:
     if "mean_type" in fields:
         from homeassistant.components.recorder.models import StatisticMeanType
 
-        metadata["mean_type"] = StatisticMeanType.NONE
+        metadata["mean_type"] = StatisticMeanType.ARITHMETIC if mean else StatisticMeanType.NONE
     if "unit_class" in fields:
         metadata["unit_class"] = None
     return metadata
@@ -191,3 +207,121 @@ async def test_days_limit(recorder_mock, hass: HomeAssistant, freezer: FrozenDat
         DOMAIN, SERVICE_IMPORT_HISTORY, {"config_entry_id": entry.entry_id, "days": 1}, blocking=True
     )
     assert _attrs(hass)["total"]["distance"] == 100
+
+
+def _import_hourly(hass: HomeAssistant, statistic_id: str, unit: str, first: datetime, values: list[float]) -> None:
+    """Hourly statistics of a measurement sensor (mean, min and max only, no state), from `first`."""
+    from homeassistant.components.recorder.statistics import async_import_statistics
+
+    async_import_statistics(
+        hass,
+        _metadata(statistic_id, unit, mean=True),
+        [{"start": first + timedelta(hours=h), "mean": v, "min": v, "max": v} for h, v in enumerate(values)],
+    )
+
+
+def _import_odometer(hass: HomeAssistant, first: datetime, values: list[float]) -> None:
+    from homeassistant.components.recorder.statistics import async_import_statistics
+
+    async_import_statistics(
+        hass,
+        _metadata(ODOMETER, "km"),
+        [{"start": first + timedelta(hours=h), "state": v, "sum": v} for h, v in enumerate(values)],
+    )
+
+
+async def _record_level(hass: HomeAssistant, freezer: FrozenDateTimeFactory, km: float, level: float) -> None:
+    freezer.move_to(START)
+    hass.states.async_set(ODOMETER, str(km), KM)
+    freezer.tick(timedelta(seconds=1))
+    hass.states.async_set(FUEL_LEVEL, str(level), PERCENT)
+    await hass.async_block_till_done()
+    await async_wait_recording_done(hass)
+
+
+async def _setup_level(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    freezer.move_to(START + timedelta(hours=6))
+    await setup_vehicle(
+        hass, {CONF_ODOMETER: ODOMETER, CONF_FUEL_LEVEL: FUEL_LEVEL, CONF_TANK_CAPACITY: 50}, states={}
+    )
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+
+async def test_hourly_statistics_of_a_level_in_percent(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    """A level in % (a measurement sensor) has no hourly state, only a mean: the mean stands in.
+
+    Without it, the odometer alone was replayed and the hourly trips used 0 L (0.0 L/100 km).
+    """
+    first = START - timedelta(days=5)
+    _import_odometer(hass, first, [900, 950, 1000])
+    _import_hourly(hass, FUEL_LEVEL, "%", first, [100, 92, 84])
+    await _record_level(hass, freezer, 1000, 84)
+    await _setup_level(hass, freezer)
+
+    attrs = _attrs(hass)
+    # 50 L tank: 16 % is 8 L over 100 km.
+    assert [(t["distance"], t["fuel"]) for t in attrs["trips"]] == [(100, 8)]
+    assert attrs["trips"][0]["fuel_consumption"] == 8.0
+    assert attrs["total"]["fuel_consumption"] == 8.0
+
+
+async def test_hourly_statistics_skipped_without_the_level(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    """A level without any statistics (no state class): no hourly replay at all, rather than trips with 0 L."""
+    first = START - timedelta(days=5)
+    _import_odometer(hass, first, [900, 950, 1000])
+    await _record_level(hass, freezer, 1000, 84)
+    await _setup_level(hass, freezer)
+
+    attrs = _attrs(hass)
+    assert attrs["trips"] == []
+    assert attrs["total"]["distance"] == 0 and attrs["total"]["since"] == START.isoformat()
+
+
+async def test_hourly_statistics_start_with_the_level(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    """The level's statistics begin later than the odometer's: the hours before (no fuel known) are skipped."""
+    first = START - timedelta(days=5)
+    _import_odometer(hass, first, [800, 900, 950, 1000])
+    _import_hourly(hass, FUEL_LEVEL, "%", first + timedelta(hours=1), [100, 92, 84])
+    await _record_level(hass, freezer, 1000, 84)
+    await _setup_level(hass, freezer)
+
+    attrs = _attrs(hass)
+    assert [(t["distance"], t["fuel"]) for t in attrs["trips"]] == [(100, 8)]
+    assert attrs["total"]["distance"] == 100
+
+
+async def test_stable_price_before_the_window(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    """A price sensor that did not change during the imported days still prices the trips and the refuel."""
+    freezer.move_to(START - timedelta(days=90))
+    hass.states.async_set(FUEL_PRICE, "2.0", PRICE)
+    await hass.async_block_till_done()
+    await _record(hass, freezer, JOURNEY)
+    await _setup(hass, freezer, **{CONF_FUEL_PRICE_ENTITY: FUEL_PRICE})
+
+    attrs = _attrs(hass)
+    assert attrs["total"]["cost"] == 14
+    assert [r["cost"] for r in attrs["refuels"]] == [26]
+
+
+async def test_price_known_only_later_in_the_window(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    """No price before the window: the first price known in it stands in for the start, then each change applies."""
+    await _record(hass, freezer, JOURNEY[:2])
+    freezer.move_to(START + timedelta(minutes=60))
+    hass.states.async_set(FUEL_PRICE, "1.5", PRICE)
+    await _record(hass, freezer, JOURNEY[2:3])
+    freezer.move_to(START + timedelta(minutes=120))
+    hass.states.async_set(FUEL_PRICE, "1.0", PRICE)
+    await hass.async_block_till_done()
+    await _setup(hass, freezer, **{CONF_FUEL_PRICE_ENTITY: FUEL_PRICE})
+    # Trip 1 (2 L) before any price: the first known price, 1.5; trip 2 (2 L) at 1.0.
+    assert _attrs(hass)["total"]["cost"] == 2 * 1.5 + 2 * 1.0
