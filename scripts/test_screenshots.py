@@ -64,6 +64,42 @@ class Comparator(unittest.TestCase):
         b = image(self.tmp / "b.gif", (0, 255, 0, 255), frames=2)
         self.assertTrue(self.written(a, b))
 
+    def test_gif_noise_is_kept_but_not_more(self):
+        # Chromium's run-to-run noise on a moving edge, through the GIF palette: a few values, a few units off.
+        old = image(self.tmp / "old.gif", (100, 100, 100, 255), size=(32, 32), frames=2)
+        base = shots.pixels(old)
+        head = base.find(b"ENDHDR\n") + 7
+
+        def noisy(values, units):
+            out = bytearray(base)
+            for k in range(values):
+                out[head + 4 * k] += units  # the red channel of the first pixels
+            return bytes(out)
+
+        noise = shots.GIF_NOISE
+        self.assertTrue(shots.same_pixels(base, noisy(noise["values"], noise["units"]), noise))
+        self.assertFalse(shots.same_pixels(base, noisy(noise["values"] + 1, 1), noise))
+        self.assertFalse(shots.same_pixels(base, noisy(1, noise["units"] + 1), noise))
+        self.assertFalse(shots.same_pixels(base, noisy(1, 1)))  # no noise allowed: one unit is a change
+
+    def test_gif_tinted_all_over_is_rewritten(self):
+        # Every pixel 6 units off (as much as the noise seen in CI, but everywhere): a real change, not noise.
+        exact = ["-vf", "split[a][b];[a]palettegen=reserve_transparent=0[p];[b][p]paletteuse=dither=none"]
+        a = image(self.tmp / "a.gif", (100, 100, 100, 255), size=(64, 64), frames=2, extra=exact)
+        b = image(self.tmp / "b.gif", (100, 100, 106, 255), size=(64, 64), frames=2, extra=exact)
+        self.assertTrue(self.written(a, b))
+
+    def test_png_noise_counts(self):
+        # No tolerance on a PNG: one unit on one channel is a change.
+        a = image(self.tmp / "a.png", (100, 100, 100, 255), extra=["-pix_fmt", "rgba"])
+        b = image(self.tmp / "b.png", (100, 101, 100, 255), extra=["-pix_fmt", "rgba"])
+        self.assertTrue(self.written(a, b))
+
+    def test_gif_with_more_frames_is_rewritten(self):
+        a = image(self.tmp / "a.gif", (255, 0, 0, 255), frames=2)
+        b = image(self.tmp / "b.gif", (255, 0, 0, 255), frames=3)
+        self.assertTrue(self.written(a, b))
+
     def test_same_pixels_other_bytes_are_kept(self):
         a = image(self.tmp / "a.png", (51, 102, 204, 255), extra=["-pix_fmt", "rgb24", "-compression_level", "0"])
         b = image(self.tmp / "b.png", (51, 102, 204, 255), extra=["-pix_fmt", "rgb24", "-compression_level", "9"])
