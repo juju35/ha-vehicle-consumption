@@ -699,6 +699,15 @@ const vcVehicles = (hass) =>
 // The first vehicle's sensor, or undefined.
 const vcPick = (hass) => vcVehicles(hass)[0]?.entity;
 
+// No vehicle with its history (Home Assistant starting, the integration reloading): the main sensor that is down,
+// by its translation key, else any sensor of the integration when they are all down; undefined when none is.
+const vcDown = (hass) => {
+  const ids = vcCandidates(hass?.entities);
+  const down = (id) => ['unavailable', 'unknown', undefined].includes(hass?.states?.[id]?.state);
+  const main = ids.filter((id) => hass.entities[id]?.translation_key === 'consumption' && down(id)).sort()[0];
+  return main || (ids.length && ids.every(down) ? [...ids].sort()[0] : undefined);
+};
+
 // Which energies the vehicle tracks.
 const vcTracks = (kind) => ({ fuel: kind !== 'electric', energy: kind === 'electric' || kind === 'plugin_hybrid' });
 
@@ -785,17 +794,20 @@ class VehicleConsumptionCard extends HTMLElement {
   }
 
   getGridOptions() {
-    return { columns: 12, min_columns: 6, rows: 'auto' };
+    // 8 of 12 columns: about 208 px in a phone's section, the narrowest where the figures and the pill still fit (at
+    // 6, about 156 px, the consumption values are cut and the pill leaves the card while driving).
+    return { columns: 12, min_columns: 8, rows: 'auto' };
   }
 
   _t(key, vars) {
     return vcT(vcLang(this._hass, this._config), key, vars);
   }
 
-  // The main sensor: the configured one, else the first vehicle found (by name). The registry scan is kept until
+  // The main sensor: the configured one, else the first vehicle found (by name), else one that is down (so the card
+  // says it is unavailable, not that nothing is set up). The registry scan is kept until
   // hass.entities changes; the states are read again each time.
   _lookup() {
-    return this._config.entity || vcPick(this._hass);
+    return this._config.entity || vcPick(this._hass) || vcDown(this._hass);
   }
 
   _render(force = false) {
@@ -1199,8 +1211,10 @@ class VehicleConsumptionCard extends HTMLElement {
 
   static get styles() {
     return `
+      /* min-width: 0 lets a 1fr grid track shrink the card below its intrinsic width (no overflow). */
       :host {
         display: block;
+        min-width: 0;
         --vc-ok: var(--primary-color, #03a9f4);
         --vc-drive: var(--success-color, #43a047);
         --vc-warn: var(--warning-color, #ffa600);
@@ -1209,6 +1223,9 @@ class VehicleConsumptionCard extends HTMLElement {
         --vc-battery: var(--vc-battery-color, #22c55e);
       }
       ha-card { position: relative; padding: 12px; overflow: hidden; container-type: inline-size;
+                /* The inline-size container has no content width: in a parent sized by its content (inline-block, an
+                   "auto" grid column) it would fall to its padding. contain-intrinsic-inline-size gives it one there. */
+                contain-intrinsic-inline-size: 300px;
                 --ci: color-mix(in srgb, var(--c) 40%, var(--primary-text-color)); }
       ha-card.lvl-ok    { --c: var(--vc-ok); }
       ha-card.lvl-drive { --c: var(--vc-drive); }
@@ -1220,17 +1237,24 @@ class VehicleConsumptionCard extends HTMLElement {
       .badge { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
                background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
       .badge ha-icon { --mdc-icon-size: 24px; }
-      .title { flex: 1 1 auto; min-width: 4ch; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 500;
+      .title { flex: 1 1 0; min-width: 4ch; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 500;
                color: var(--primary-text-color); white-space: nowrap; }
       .title:has(.drive) { min-width: calc(4ch + 18px); }
       .tname { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
       .pill { flex: 0 1 auto; min-width: 0; max-width: 50%; overflow: hidden; text-overflow: ellipsis; font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 999px; white-space: nowrap;
               color: var(--ci); background: color-mix(in srgb, var(--c) 14%, transparent); font-variant-numeric: tabular-nums; }
       .pdot { display: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
-      @container (max-width: 250px) {
+      /* Only the coloured dot (the text stays in title / aria-label) once the whole label no longer fits next to a
+         4-character title: below 214 px of content, 232 px while driving (the title then also holds the drive dot). */
+      @container (max-width: 213px) {
         .pill { padding: 5px; }
         .pill .ptxt { display: none; }
         .pill .pdot { display: block; }
+      }
+      @container (max-width: 231px) {
+        ha-card.lvl-drive .pill { padding: 5px; }
+        ha-card.lvl-drive .pill .ptxt { display: none; }
+        ha-card.lvl-drive .pill .pdot { display: block; }
       }
       .icon-btn { all: unset; cursor: pointer; flex: none; width: 26px; height: 26px; border-radius: 50%;
                   display: grid; place-items: center; color: var(--secondary-text-color); }

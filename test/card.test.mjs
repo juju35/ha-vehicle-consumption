@@ -678,7 +678,8 @@ const contrast = (a, b) => {
 };
 
 test('header: the title keeps a few letters, the pill shrinks and turns into a dot on a narrow card', () => {
-  assert.match(rule('.title'), /flex: 1 1 auto/);
+  // A zero basis: a long title no longer takes the pill's room (the pill keeps its whole label while it fits).
+  assert.match(rule('.title'), /flex: 1 1 0;/);
   assert.match(rule('.title'), /min-width: 4ch/);
   assert.match(rule('.tname'), /text-overflow: ellipsis/);
   const pill = rule('.pill');
@@ -691,6 +692,27 @@ test('header: the title keeps a few letters, the pill shrinks and turns into a d
   card.hass = hassWith(fuelAttrs());
   // The value stays readable for assistive technology and in the tooltip once only the dot shows.
   assert.match(html(card), /class="pill" title="6.1 L\/100 km" aria-label="6.1 L\/100 km"><span class="pdot"><\/span><span class="ptxt">6.1 L\/100 km<\/span>/);
+});
+
+test('width: the card keeps a width in a parent sized by its content, and still shrinks in a 1fr column', () => {
+  const css = styles();
+  const host = css.slice(css.indexOf(':host {'), css.indexOf('}', css.indexOf(':host {')));
+  // min-width: 0 (never a px minimum on the host): a `1fr 1fr` grid can shrink it, no overflow.
+  assert.match(host, /min-width: 0;/);
+  assert.doesNotMatch(host, /min-width: [1-9]/);
+  // The inline-size container would fall to its padding in an inline-block or an "auto" grid column.
+  assert.match(rule('ha-card'), /container-type: inline-size;/);
+  assert.match(rule('ha-card'), /contain-intrinsic-inline-size: \d+px;/);
+});
+
+test('narrow: 8 of 12 columns at least, and the pill turns into a dot sooner while driving', () => {
+  assert.equal(makeCard().getGridOptions().min_columns, 8);
+  const at = (sel) => {
+    const m = styles().match(new RegExp(`@container \\(max-width: (\\d+)px\\) \\{ ${sel.replace(/\./g, '\\.')} \\{ padding: 5px; \\}`));
+    assert.ok(m, sel);
+    return Number(m[1]);
+  };
+  assert.ok(at('ha-card.lvl-drive .pill') > at('.pill'));
 });
 
 test('contrast: coloured texts use an ink mixed with the text colour, ≥ 4.5:1 in light and dark', () => {
@@ -768,6 +790,40 @@ test('not set up, unavailable or not found: each says so, with the sensor', () =
   none.hass = hassWith(null);
   assert.match(html(none), /Not set up/);
   assert.match(html(none), /Settings → Devices/);
+});
+
+test('no entity set, the only vehicle unavailable (Home Assistant starting): unavailable, not "Not set up"', () => {
+  const down = (registry, states) => {
+    const card = makeCard();
+    const hass = hassWith(null);
+    hass.entities = registry;
+    hass.states = states;
+    card.hass = hass;
+    return html(card);
+  };
+  const restored = { state: 'unavailable', attributes: { restored: true, friendly_name: 'Family car Consumption' } };
+  // The main sensor named by its translation key in the registry.
+  const named = down(
+    { 'sensor.family_car_distance_trip': { platform: 'vehicle_consumption', translation_key: 'distance_trip' }, [SENSOR]: { platform: 'vehicle_consumption', translation_key: 'consumption' } },
+    { 'sensor.family_car_distance_trip': { state: '42.3', attributes: {} }, [SENSOR]: restored },
+  );
+  assert.match(named, /class="ptxt">Unavailable</);
+  assert.match(named, /sensor\.family_car_consumption is unavailable/);
+  assert.doesNotMatch(named, /Not set up/);
+  // Without translation keys, every sensor of the integration down (unknown just after a start).
+  const all = down(registry(), {
+    'sensor.family_car_distance_trip': { state: 'unknown', attributes: {} },
+    [SENSOR]: { ...restored, state: 'unknown' },
+  });
+  assert.match(all, /class="ptxt">Unavailable</);
+  assert.doesNotMatch(all, /Not set up/);
+  // A vehicle that works is still picked over one that is down.
+  const card = makeCard();
+  const hass = hassWith(fuelAttrs());
+  hass.entities = { ...hass.entities, 'sensor.van_consumption': { platform: 'vehicle_consumption', translation_key: 'consumption' } };
+  hass.states['sensor.van_consumption'] = { state: 'unavailable', attributes: {} };
+  card.hass = hass;
+  assert.doesNotMatch(html(card), /Unavailable/);
 });
 
 test('section count: the rows shown out of the total when the list is longer', () => {
