@@ -12,6 +12,10 @@ const VC_I18N = {
     title: 'Vehicle',
     not_loaded: 'Not set up',
     not_loaded_hint: 'Vehicle Consumption is not set up: add a vehicle in Settings → Devices & services',
+    unavailable: 'Unavailable',
+    unavailable_hint: '{entity} is unavailable: Vehicle Consumption may be starting or reloading',
+    not_found: 'Not found',
+    not_found_hint: '{entity} is not a Vehicle Consumption sensor or does not exist: check the card options',
     driving: 'Driving',
     fuel: 'Fuel',
     battery: 'Battery',
@@ -63,6 +67,10 @@ const VC_I18N = {
     title: 'Véhicule',
     not_loaded: 'Non configuré',
     not_loaded_hint: 'Vehicle Consumption n’est pas configuré : ajouter un véhicule dans Paramètres → Appareils et services',
+    unavailable: 'Indisponible',
+    unavailable_hint: '{entity} est indisponible : Vehicle Consumption est peut-être en train de démarrer ou de se recharger',
+    not_found: 'Introuvable',
+    not_found_hint: '{entity} n’est pas un capteur Vehicle Consumption ou n’existe pas : vérifier les options de la carte',
     driving: 'En route',
     fuel: 'Carburant',
     battery: 'Batterie',
@@ -114,6 +122,10 @@ const VC_I18N = {
     title: 'Fahrzeug',
     not_loaded: 'Nicht eingerichtet',
     not_loaded_hint: 'Vehicle Consumption ist nicht eingerichtet: Fahrzeug unter Einstellungen → Geräte & Dienste hinzufügen',
+    unavailable: 'Nicht verfügbar',
+    unavailable_hint: '{entity} ist nicht verfügbar: Vehicle Consumption startet oder lädt möglicherweise gerade neu',
+    not_found: 'Nicht gefunden',
+    not_found_hint: '{entity} ist kein Vehicle-Consumption-Sensor oder existiert nicht: Kartenoptionen prüfen',
     driving: 'Unterwegs',
     fuel: 'Kraftstoff',
     battery: 'Batterie',
@@ -165,6 +177,10 @@ const VC_I18N = {
     title: 'Vehículo',
     not_loaded: 'No configurado',
     not_loaded_hint: 'Vehicle Consumption no está configurado: añade un vehículo en Ajustes → Dispositivos y servicios',
+    unavailable: 'No disponible',
+    unavailable_hint: '{entity} no está disponible: puede que Vehicle Consumption se esté iniciando o recargando',
+    not_found: 'No encontrado',
+    not_found_hint: '{entity} no es un sensor de Vehicle Consumption o no existe: revisa las opciones de la tarjeta',
     driving: 'En marcha',
     fuel: 'Combustible',
     battery: 'Batería',
@@ -216,6 +232,10 @@ const VC_I18N = {
     title: 'Veicolo',
     not_loaded: 'Non configurato',
     not_loaded_hint: 'Vehicle Consumption non è configurato: aggiungi un veicolo in Impostazioni → Dispositivi e servizi',
+    unavailable: 'Non disponibile',
+    unavailable_hint: '{entity} non è disponibile: Vehicle Consumption potrebbe essere in fase di avvio o di ricaricamento',
+    not_found: 'Non trovato',
+    not_found_hint: '{entity} non è un sensore di Vehicle Consumption o non esiste: controlla le opzioni della scheda',
     driving: 'In marcia',
     fuel: 'Carburante',
     battery: 'Batteria',
@@ -267,6 +287,10 @@ const VC_I18N = {
     title: 'Voertuig',
     not_loaded: 'Niet ingesteld',
     not_loaded_hint: 'Vehicle Consumption is niet ingesteld: voeg een voertuig toe via Instellingen → Apparaten & diensten',
+    unavailable: 'Niet beschikbaar',
+    unavailable_hint: '{entity} is niet beschikbaar: Vehicle Consumption wordt mogelijk gestart of opnieuw geladen',
+    not_found: 'Niet gevonden',
+    not_found_hint: '{entity} is geen Vehicle Consumption-sensor of bestaat niet: controleer de kaartopties',
     driving: 'Onderweg',
     fuel: 'Brandstof',
     battery: 'Accu',
@@ -318,6 +342,10 @@ const VC_I18N = {
     title: 'Veículo',
     not_loaded: 'Não configurado',
     not_loaded_hint: 'O Vehicle Consumption não está configurado: adicione um veículo em Definições → Dispositivos e serviços',
+    unavailable: 'Indisponível',
+    unavailable_hint: '{entity} está indisponível: o Vehicle Consumption pode estar a iniciar ou a recarregar',
+    not_found: 'Não encontrado',
+    not_found_hint: '{entity} não é um sensor do Vehicle Consumption ou não existe: verifique as opções do cartão',
     driving: 'Em viagem',
     fuel: 'Combustível',
     battery: 'Bateria',
@@ -369,6 +397,10 @@ const VC_I18N = {
     title: 'Pojazd',
     not_loaded: 'Nieskonfigurowane',
     not_loaded_hint: 'Vehicle Consumption nie jest skonfigurowane: dodaj pojazd w Ustawienia → Urządzenia oraz usługi',
+    unavailable: 'Niedostępne',
+    unavailable_hint: 'Encja {entity} jest niedostępna: Vehicle Consumption może się właśnie uruchamiać lub przeładowywać',
+    not_found: 'Nie znaleziono',
+    not_found_hint: 'Encja {entity} nie jest sensorem Vehicle Consumption lub nie istnieje: sprawdź opcje karty',
     driving: 'W trasie',
     fuel: 'Paliwo',
     battery: 'Akumulator',
@@ -420,6 +452,10 @@ const VC_I18N = {
     title: 'Возило',
     not_loaded: 'Није подешено',
     not_loaded_hint: 'Vehicle Consumption није подешен: додајте возило у Подешавања → Уређаји и услуге',
+    unavailable: 'Недоступно',
+    unavailable_hint: 'Ентитет {entity} није доступан: Vehicle Consumption се можда покреће или поново учитава',
+    not_found: 'Није пронађено',
+    not_found_hint: 'Ентитет {entity} није сензор Vehicle Consumption или не постоји: проверите опције картице',
     driving: 'У вожњи',
     fuel: 'Гориво',
     battery: 'Батерија',
@@ -471,6 +507,10 @@ const VC_I18N = {
     title: 'Vozilo',
     not_loaded: 'Nije podešeno',
     not_loaded_hint: 'Vehicle Consumption nije podešen: dodajte vozilo u Podešavanja → Uređaji i usluge',
+    unavailable: 'Nedostupno',
+    unavailable_hint: 'Entitet {entity} nije dostupan: Vehicle Consumption se možda pokreće ili ponovo učitava',
+    not_found: 'Nije pronađeno',
+    not_found_hint: 'Entitet {entity} nije senzor Vehicle Consumption ili ne postoji: proverite opcije kartice',
     driving: 'U vožnji',
     fuel: 'Gorivo',
     battery: 'Baterija',
@@ -596,7 +636,13 @@ function vcFormat(hass, lang, currency) {
     dateLocale = vcIntlLocale(lang);
   }
   const dateFmt = new Intl.DateTimeFormat(dateLocale, { day: 'numeric', month: 'short' });
-  const timeFmt = new Intl.DateTimeFormat(dateLocale, { hour: '2-digit', minute: '2-digit' });
+  // Home Assistant's 12 / 24 h setting ('language' and 'system' leave it to the locale).
+  const hour12 = loc.time_format === '12' ? true : loc.time_format === '24' ? false : undefined;
+  const timeFmt = new Intl.DateTimeFormat(dateLocale, {
+    hour: '2-digit',
+    minute: '2-digit',
+    ...(hour12 === undefined ? {} : { hourCycle: hour12 ? 'h12' : 'h23' }),
+  });
   const monthFmt = new Intl.DateTimeFormat(dateLocale, { month: 'short', timeZone: 'UTC' });
   const date = (iso, withTime = true) => {
     const d = iso ? new Date(iso) : null;
@@ -714,9 +760,21 @@ class VehicleConsumptionCard extends HTMLElement {
 
   connectedCallback() {
     document.addEventListener('click', this._onDocClick);
+    // The chart is drawn at the card's width (its labels keep their size); a few pixels do not re-render.
+    if (typeof ResizeObserver === 'function') {
+      this._ro ??= new ResizeObserver((entries) => {
+        const width = Math.round(entries[entries.length - 1]?.contentRect?.width || 0);
+        if (width > 0 && Math.abs(width - (this._width || 0)) >= 8) {
+          this._width = width;
+          this._render();
+        }
+      });
+      this._ro.observe(this);
+    }
   }
 
   disconnectedCallback() {
+    this._ro?.disconnect();
     document.removeEventListener('click', this._onDocClick);
     document.removeEventListener('keydown', this._onKey);
   }
@@ -747,7 +805,7 @@ class VehicleConsumptionCard extends HTMLElement {
     const st = entity ? this._hass.states[entity] : undefined;
     const a = Array.isArray(st?.attributes?.months) ? st.attributes : null;
     const lang = vcLang(this._hass, c);
-    const sig = JSON.stringify([c, lang, this._hass.locale, entity, st?.state, a, [...this._open], this._popup?.mode, !!this._popup]);
+    const sig = JSON.stringify([c, lang, this._hass.locale, entity, st?.state, a, [...this._open], this._popup?.mode, !!this._popup, this._width]);
     this._entity = entity;
     if (!force && sig === this._sig) return;
     // The popup is being filled in: the update waits until it closes, so typing is never interrupted.
@@ -760,15 +818,18 @@ class VehicleConsumptionCard extends HTMLElement {
     this._attrs = a;
 
     if (!a) {
+      // No vehicle found at all: not set up. A configured sensor: unavailable (starting, reloading) or not found
+      // (a typo, another sensor, a vehicle removed).
+      const why = !entity ? 'not_loaded' : st && ['unavailable', 'unknown'].includes(st.state) ? 'unavailable' : 'not_found';
       this.shadowRoot.innerHTML = `
       <style>${VehicleConsumptionCard.styles}</style>
       <ha-card class="lvl-na">
         <div class="head">
           <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
-          <div class="title">${vcEsc(c.title || this._t('title'))}</div>
-          <div class="pill">${vcEsc(this._t('not_loaded'))}</div>
+          <div class="title"><span class="tname">${vcEsc(c.title || this._t('title'))}</span></div>
+          ${this._pill(this._t(why))}
         </div>
-        <div class="empty">${vcEsc(this._t('not_loaded_hint'))}</div>
+        <div class="empty">${vcEsc(this._t(`${why}_hint`, { entity }))}</div>
       </ha-card>`;
       return;
     }
@@ -805,7 +866,7 @@ class VehicleConsumptionCard extends HTMLElement {
           <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
           <div class="title"><span class="tname">${vcEsc(c.title || a.vehicle || this._t('title'))}</span>${driving}</div>
           ${add}
-          <div class="pill">${vcEsc(avg)}</div>
+          ${this._pill(avg)}
         </div>
         <div class="gauges">${gauges.map((g) => g.html).join('')}</div>
         <div class="kpis">${this._kpis(a, kind, f)}</div>
@@ -815,6 +876,12 @@ class VehicleConsumptionCard extends HTMLElement {
       </ha-card>`;
 
     this._bind();
+  }
+
+  // The header pill: its text, or only its coloured dot on a narrow card (the text stays in the tooltip and label).
+  _pill(text) {
+    const t = vcEsc(text);
+    return `<div class="pill" title="${t}" aria-label="${t}"><span class="pdot"></span><span class="ptxt">${t}</span></div>`;
   }
 
   _bind() {
@@ -910,13 +977,17 @@ class VehicleConsumptionCard extends HTMLElement {
     const unit = metric === 'distance' ? 'km' : metric === 'cost' ? a.currency || '' : primary === 'fuel' ? 'L/100 km' : 'kWh/100 km';
     const label = (v) =>
       metric === 'cost' ? f.money(v, 0) : metric === 'distance' ? f.num(v, 0) : f.num(v, 1);
-    const W = 400;
+    // The card's width less its padding (12 px) and the chart's (10 px), so 1 unit is 1 px; 400 until measured.
+    const W = this._width ? Math.max(160, Math.min(1200, this._width - 44)) : 400;
     const top = 16;
     const plot = 78;
     const base = top + plot;
     const H = base + 18;
     const slot = W / n;
     const bw = Math.min(30, slot * 0.58);
+    // Narrow slots: every other month name (the current one kept), the value of the current month only.
+    const named = (i) => slot >= 24 || (n - 1 - i) % 2 === 0;
+    const valued = (i) => slot >= 28 || i === n - 1;
     const bars = keys
       .map((k, i) => {
         const v = values[i];
@@ -926,12 +997,12 @@ class VehicleConsumptionCard extends HTMLElement {
         const name = f.month(k);
         if (v == null || v <= 0 || max <= 0) {
           return `<g class="col"><rect class="bar stub" x="${x.toFixed(1)}" y="${base - 3}" width="${bw.toFixed(1)}" height="3" rx="1.5"><title>${vcEsc(`${name}: ${VC_DASH}`)}</title></rect>
-            <text class="ml${now ? ' now' : ''}" x="${cx}" y="${H - 4}">${vcEsc(name)}</text></g>`;
+            ${named(i) ? `<text class="ml${now ? ' now' : ''}" x="${cx}" y="${H - 4}">${vcEsc(name)}</text>` : ''}</g>`;
         }
         const h = Math.max(4, (v / max) * plot);
         return `<g class="col"><rect class="bar${now ? ' now' : ''}" style="--i:${i}" x="${x.toFixed(1)}" y="${(base - h).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="4"><title>${vcEsc(`${name}: ${label(v)} ${metric === 'cost' ? '' : unit}`.trim())}</title></rect>
-            <text class="bv${now ? ' now' : ''}" x="${cx}" y="${(base - h - 4).toFixed(1)}">${vcEsc(label(v))}</text>
-            <text class="ml${now ? ' now' : ''}" x="${cx}" y="${H - 4}">${vcEsc(name)}</text></g>`;
+            ${valued(i) ? `<text class="bv${now ? ' now' : ''}" x="${cx}" y="${(base - h - 4).toFixed(1)}">${vcEsc(label(v))}</text>` : ''}
+            ${named(i) ? `<text class="ml${now ? ' now' : ''}" x="${cx}" y="${H - 4}">${vcEsc(name)}</text>` : ''}</g>`;
       })
       .join('');
     return `
@@ -951,11 +1022,11 @@ class VehicleConsumptionCard extends HTMLElement {
     if (c.trips !== false) {
       const trips = (Array.isArray(a.trips) ? a.trips : []).slice(0, VC_ROWS);
       const rows = trips.map((t) => {
+        // A plug-in hybrid has two: one a line, so the column stays narrow.
         const cons = this._cons(t, kind, f)
           .filter((l) => l.v !== VC_DASH)
-          .map((l) => `${l.v} ${l.unit}`)
-          .join(' · ');
-        return this._row(f.date(t.start), vcFinite(t.distance) ? `${f.num(t.distance, 1)} km` : VC_DASH, cons || VC_DASH, f.money(t.cost));
+          .map((l) => `${l.v} ${l.unit}`);
+        return this._row(f.date(t.start), vcFinite(t.distance) ? `${f.num(t.distance, 1)} km` : VC_DASH, cons.length ? cons : VC_DASH, f.money(t.cost));
       });
       out.push(this._section('trips', 'mdi:map-marker-path', this._t('recent_trips'), a.trips?.length || 0, rows, 'no_trips'));
     }
@@ -975,24 +1046,28 @@ class VehicleConsumptionCard extends HTMLElement {
     return out.length ? `<div class="sections">${out.join('')}</div>` : '';
   }
 
+  // `value`: a text, or several (one a line).
   _row(main, sub, value, cost, manual = false) {
+    const values = (Array.isArray(value) ? value : [value]).map((v) => `<span class="v">${vcEsc(v)}</span>`).join('');
     return `
               <div class="row${manual ? ' manual' : ''}">
                 <span class="txt"><span class="name">${vcEsc(main)}</span><span class="sub">${vcEsc(sub)}</span></span>
-                <span class="val"><span class="v">${vcEsc(value)}</span><span class="sub">${vcEsc(cost)}</span></span>
+                <span class="val">${values}<span class="sub">${vcEsc(cost)}</span></span>
               </div>`;
   }
 
   // A collapsible section: chevron right when folded, down when open.
   _section(key, icon, label, count, rows, emptyKey) {
     const open = this._open.has(key);
+    // Only the last rows are listed: "5/6" when there are more.
+    const shown = count > rows.length && rows.length ? `${rows.length}/${count}` : String(count);
     return `
           <section class="section${open ? ' open' : ''}" data-section="${key}">
             <button class="fold" data-key="${key}" aria-expanded="${open}">
               <ha-icon class="chev" icon="mdi:chevron-right"></ha-icon>
               <ha-icon class="sic" icon="${icon}"></ha-icon>
               <span class="slabel">${vcEsc(label)}</span>
-              <span class="count">${count}</span>
+              <span class="count">${shown}</span>
             </button>
             <div class="body"><div class="inner">${rows.length ? rows.join('') : `<div class="none">${vcEsc(this._t(emptyKey))}</div>`}</div></div>
           </section>`;
@@ -1125,6 +1200,7 @@ class VehicleConsumptionCard extends HTMLElement {
   static get styles() {
     return `
       :host {
+        display: block;
         --vc-ok: var(--primary-color, #03a9f4);
         --vc-drive: var(--success-color, #43a047);
         --vc-warn: var(--warning-color, #ffa600);
@@ -1132,7 +1208,8 @@ class VehicleConsumptionCard extends HTMLElement {
         --vc-fuel: var(--vc-fuel-color, #f59e0b);
         --vc-battery: var(--vc-battery-color, #22c55e);
       }
-      ha-card { position: relative; padding: 12px; overflow: hidden; container-type: inline-size; }
+      ha-card { position: relative; padding: 12px; overflow: hidden; container-type: inline-size;
+                --ci: color-mix(in srgb, var(--c) 40%, var(--primary-text-color)); }
       ha-card.lvl-ok    { --c: var(--vc-ok); }
       ha-card.lvl-drive { --c: var(--vc-drive); }
       ha-card.lvl-warn  { --c: var(--vc-warn); }
@@ -1143,11 +1220,18 @@ class VehicleConsumptionCard extends HTMLElement {
       .badge { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
                background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
       .badge ha-icon { --mdc-icon-size: 24px; }
-      .title { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 500;
+      .title { flex: 1 1 auto; min-width: 4ch; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 500;
                color: var(--primary-text-color); white-space: nowrap; }
+      .title:has(.drive) { min-width: calc(4ch + 18px); }
       .tname { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-      .pill { flex: none; font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 999px; white-space: nowrap;
-              color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); font-variant-numeric: tabular-nums; }
+      .pill { flex: 0 1 auto; min-width: 0; max-width: 50%; overflow: hidden; text-overflow: ellipsis; font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 999px; white-space: nowrap;
+              color: var(--ci); background: color-mix(in srgb, var(--c) 14%, transparent); font-variant-numeric: tabular-nums; }
+      .pdot { display: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+      @container (max-width: 250px) {
+        .pill { padding: 5px; }
+        .pill .ptxt { display: none; }
+        .pill .pdot { display: block; }
+      }
       .icon-btn { all: unset; cursor: pointer; flex: none; width: 26px; height: 26px; border-radius: 50%;
                   display: grid; place-items: center; color: var(--secondary-text-color); }
       .icon-btn:hover { background: color-mix(in srgb, var(--secondary-text-color) 14%, transparent); color: var(--primary-text-color); }
@@ -1171,7 +1255,7 @@ class VehicleConsumptionCard extends HTMLElement {
       .ic ha-icon { --mdc-icon-size: 16px; }
       .glabel { font-size: 13px; font-weight: 500; color: var(--primary-text-color); line-height: 1.2; }
       .gval { font-size: 12px; font-weight: 500; color: var(--primary-text-color); font-variant-numeric: tabular-nums; line-height: 1.2; }
-      .gauge.low .gval { color: var(--t); }
+      .gauge.low .gval { color: color-mix(in srgb, var(--t) 40%, var(--primary-text-color)); }
       .track { grid-column: 2 / 4; height: 6px; border-radius: 3px; overflow: hidden;
                background: color-mix(in srgb, var(--secondary-text-color) 18%, transparent); }
       .fill { display: block; height: 100%; border-radius: 3px; transform-origin: left center;
@@ -1190,6 +1274,12 @@ class VehicleConsumptionCard extends HTMLElement {
       .kv small { margin-left: 3px; font-size: 11px; font-weight: 500; color: var(--secondary-text-color); }
       .ks { font-size: 11px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             font-variant-numeric: tabular-nums; }
+      /* Narrow card (6 columns of a section): the unit under the value, long labels on two lines. */
+      @container (max-width: 250px) {
+        .kv small { display: block; margin-left: 0; }
+        .kl, .ks { white-space: normal; overflow-wrap: anywhere; }
+        .kl { align-items: flex-start; }
+      }
 
       .chart { margin-top: 12px; padding: 10px 10px 4px; border-radius: 10px;
                background: var(--secondary-background-color, rgba(127,127,127,.08)); }
@@ -1208,7 +1298,7 @@ class VehicleConsumptionCard extends HTMLElement {
       .anim .chart .bv { animation: vc-fade .4s ease-out both; animation-delay: calc(var(--vc-t, 0ms) + 800ms + var(--i, 0) * 70ms); }
       .chart text { font-size: 10px; text-anchor: middle; fill: var(--secondary-text-color); font-variant-numeric: tabular-nums; }
       .chart .bv { font-size: 9.5px; }
-      .chart text.now { fill: var(--primary-color, #03a9f4); font-weight: 600; }
+      .chart text.now { fill: color-mix(in srgb, var(--primary-color) 40%, var(--primary-text-color)); font-weight: 600; }
 
       .sections { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
       .section { border-radius: 10px; background: var(--secondary-background-color, rgba(127,127,127,.08)); }
@@ -1229,12 +1319,12 @@ class VehicleConsumptionCard extends HTMLElement {
       .row { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid var(--divider-color, rgba(127,127,127,.15)); }
       .txt, .val { display: flex; flex-direction: column; min-width: 0; }
       .txt { flex: 1; }
-      .val { flex: none; align-items: flex-end; }
+      .val { flex: 0 1 auto; min-width: 0; max-width: 60%; align-items: flex-end; }
       .name, .v { font-size: 13px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap;
                   overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
       .sub { font-size: 11px; line-height: 1.25; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden;
              text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
-      .row.manual .txt .sub { color: var(--primary-color); }
+      .row.manual .txt .sub { color: color-mix(in srgb, var(--primary-color) 40%, var(--primary-text-color)); }
       .none { padding: 8px 0 4px; font-size: 12px; color: var(--secondary-text-color); border-top: 1px solid var(--divider-color, rgba(127,127,127,.15)); }
 
       /* The popup: anchored at the top of the card, over a smoked veil */
@@ -1254,7 +1344,7 @@ class VehicleConsumptionCard extends HTMLElement {
       .tab { all: unset; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
              padding: 6px 12px; border-radius: 9px; font-size: 13px; font-weight: 500; color: var(--secondary-text-color); }
       .tab ha-icon { --mdc-icon-size: 16px; }
-      .tab.on { background: color-mix(in srgb, var(--primary-color) 15%, transparent); color: var(--primary-color); }
+      .tab.on { background: color-mix(in srgb, var(--primary-color) 15%, transparent); color: color-mix(in srgb, var(--primary-color) 40%, var(--primary-text-color)); }
       .tab:focus-visible, .btn:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
       .fields { display: grid; gap: 10px; margin-top: 12px; }
       .field { display: flex; flex-direction: column; gap: 4px; }
@@ -1272,7 +1362,7 @@ class VehicleConsumptionCard extends HTMLElement {
       .btn { all: unset; cursor: pointer; padding: 7px 16px; border-radius: 999px; font-size: 13px; font-weight: 500;
              color: var(--primary-text-color); border: 1px solid var(--divider-color, rgba(127,127,127,.35)); }
       .btn:hover { background: color-mix(in srgb, var(--secondary-text-color) 10%, transparent); }
-      .btn.accent { color: var(--primary-color); border-color: color-mix(in srgb, var(--primary-color) 60%, transparent); }
+      .btn.accent { color: color-mix(in srgb, var(--primary-color) 40%, var(--primary-text-color)); border-color: color-mix(in srgb, var(--primary-color) 60%, transparent); }
       .btn.accent:hover { background: color-mix(in srgb, var(--primary-color) 10%, transparent); }
       .btn[disabled] { cursor: default; opacity: .45; background: none; }
 
@@ -1337,13 +1427,18 @@ class VehicleConsumptionCardEditor extends HTMLElement {
       { name: 'entity', selector: { select: { mode: 'dropdown', options: vehicles } } },
       { name: 'title', selector: { text: {} } },
       { name: 'chart', selector: { boolean: {} } },
-      {
-        name: 'chart_metric',
-        selector: {
-          select: { mode: 'dropdown', options: VC_METRICS.map((m) => ({ value: m, label: vcT(lang, `chart_${m}`) })) },
-        },
-      },
-      { name: 'months', selector: { number: { min: 3, max: 12, mode: 'slider' } } },
+      // What the chart shows only matters with the chart.
+      ...(c.chart === false
+        ? []
+        : [
+            {
+              name: 'chart_metric',
+              selector: {
+                select: { mode: 'dropdown', options: VC_METRICS.map((m) => ({ value: m, label: vcT(lang, `chart_${m}`) })) },
+              },
+            },
+            { name: 'months', selector: { number: { min: 3, max: 12, mode: 'slider' } } },
+          ]),
       { name: 'trips', selector: { boolean: {} } },
       { name: 'refuels', selector: { boolean: {} } },
       { name: 'add_button', selector: { boolean: {} } },

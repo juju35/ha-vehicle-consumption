@@ -309,7 +309,7 @@ test('fuel: one fuel gauge, L/100 km tiles, refuels section but no charges, aver
   assert.match(out, /g-fuel/);
   assert.doesNotMatch(out, /g-battery/);
   assert.match(out, /63 % · 31.5 L/);
-  assert.match(out, /class="pill">6.1 L\/100 km</);
+  assert.match(out, /class="ptxt">6.1 L\/100 km</);
   assert.match(out, /5.7<small>L\/100 km/);
   assert.match(out, /€0.107<small>\/km/);
   assert.match(out, /data-section="refuels"/);
@@ -660,8 +660,8 @@ test('editor: a Vehicle list of the vehicles found, keeping a configured sensor 
 const styles = () => VehicleConsumptionCard.styles.replace(/\s+/g, ' ');
 const rule = (selector) => {
   const css = styles();
-  const at = css.indexOf(`${selector} {`);
-  assert.ok(at >= 0, `no rule for ${selector}`);
+  const at = css.indexOf(`} ${selector} {`) + 2;
+  assert.ok(at >= 2, `no rule for ${selector}`);
   return css.slice(at, css.indexOf('}', at));
 };
 // WCAG contrast of `fg` over `bg` (hex), as the card mixes the ink: `color-mix(in srgb, c p%, text)`.
@@ -685,7 +685,7 @@ test('header: the title keeps a few letters, the pill shrinks and turns into a d
   for (const p of ['flex: 0 1 auto', 'min-width: 0', 'max-width: 50%', 'overflow: hidden', 'text-overflow: ellipsis']) {
     assert.ok(pill.includes(p), p);
   }
-  assert.match(styles(), /@container \(max-width: \d+px\) \{[^}]*\.pill \.ptxt \{ display: none; \}/);
+  assert.match(styles(), /@container \(max-width: \d+px\) \{[^@]*\.pill \.ptxt \{ display: none; \}/);
   for (const sel of ['.icon-btn', '.badge']) assert.match(rule(sel), /flex: none/);
   const card = makeCard();
   card.hass = hassWith(fuelAttrs());
