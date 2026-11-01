@@ -158,6 +158,19 @@ class Totals:
         )
 
 
+def _sum(items: Iterable[Totals]) -> Totals:
+    out = Totals()
+    for item in items:
+        out = _plus(out, item)
+    return out
+
+
+def _plus(a: Totals, b: Totals, sign: float = 1.0) -> Totals:
+    """`a + b` (or `a - b` with `sign` -1); the cost stays None only when neither has one."""
+    cost = None if a.cost is None and b.cost is None else (a.cost or 0.0) + sign * (b.cost or 0.0)
+    return Totals(a.distance + sign * b.distance, a.fuel + sign * b.fuel, a.energy + sign * b.energy, cost)
+
+
 @dataclass(slots=True)
 class Trip:
     """A drive: from the first odometer move to the last one before a `trip_gap` pause."""
@@ -260,6 +273,19 @@ class _Charger:
             session_start=_time(data.get("session_start")),
             session_amount=_float(data.get("session_amount")) or 0.0,
         )
+
+
+@dataclass(slots=True)
+class _Kept:
+    """What an import keeps of the tracking: everything before `cut` (start of the month `key`, local time)."""
+
+    cut: datetime
+    key: str
+    since: datetime
+    total: Totals  # the total minus the months from `key` on
+    months: dict[str, Totals]
+    trips: list[Trip]
+    events: dict[str, list[Refill]]  # refuels / charges from the sensors and the charger, by kind
 
 
 class ConsumptionTracker:
@@ -848,8 +874,18 @@ class ConsumptionTracker:
         by_entity: dict[str, list[str]] = {}
         for key, entity_id in self.sensors.items():
             by_entity.setdefault(entity_id, []).append(key)
+        first = next((when for when, entity_id, _ in rows if entity_id in by_entity), None)
+        if first is None:
+            # Nothing recorded for the source sensors (excluded from the recorder, or new): what was tracked stays.
+            _LOGGER.debug("%s: no recorded state of the source sensors, nothing replayed", self.name)
+            self.history_imported = True
+            self._changed()
+            return
+        # The tracking started before the recorded readings: the replay only stands in from the first month it fully
+        # covers, the months before it (and their trips, refuels and charges) are kept as tracked.
+        kept = self._kept_before(first) if first > self.since else None
         manual = {kind: [e for e in level.events if e.source == "manual"] for kind, level in self._levels.items()}
-        self._reset_data(rows[0][0] if rows else now)
+        self._reset_data(first)
         self._replay_prices = dict(initial_prices or {})
         trip_gap = self.trip_gap
         try:
@@ -869,6 +905,8 @@ class ConsumptionTracker:
         self._end_trip_if_stopped(now)
         self._close_charger_session(now)
         self._read_current(now)
+        if kept is not None:
+            self._merge_kept(kept)
         for kind, events in manual.items():
             level_events = self._levels[kind].events
             level_events.extend(events)
@@ -876,6 +914,47 @@ class ConsumptionTracker:
             del level_events[MAX_EVENTS:]
         self.history_imported = True
         self._changed()
+
+    def _kept_before(self, first: datetime) -> _Kept:
+        """What a replay starting at `first` does not fully rebuild: the months before the next month start."""
+        local = dt_util.as_local(first)
+        year, month = (local.year + 1, 1) if local.month == 12 else (local.year, local.month + 1)
+        cut = dt_util.as_utc(local.replace(year=year, month=month, day=1, hour=0, minute=0, second=0, microsecond=0))
+        key = dt_util.as_local(cut).strftime("%Y-%m")
+        replaced = _sum(v for k, v in self.months.items() if k >= key)
+        return _Kept(
+            cut=cut,
+            key=key,
+            since=self.since,
+            total=_plus(self.total, replaced, -1),
+            months={k: v for k, v in self.months.items() if k < key},
+            trips=[t for t in self.trips if t.start < cut],
+            events={
+                kind: [e for e in level.events if e.source != "manual" and e.time < cut]
+                for kind, level in self._levels.items()
+            },
+        )
+
+    def _merge_kept(self, kept: _Kept) -> None:
+        """Put back what the replay did not fully cover; the replayed months from `kept.key` on stay."""
+        before = _sum(v for k, v in self.months.items() if k < kept.key)
+        # Shift the totals (and the open trip's start, so its own figures stay) by what is kept minus what was replaced.
+        offset = _plus(kept.total, before, -1)
+        self.total = _plus(self.total, offset)
+        self._trip_start = _plus(self._trip_start, offset)
+        self.since = kept.since
+        self.months = {**kept.months, **{k: v for k, v in self.months.items() if k >= kept.key}}
+        for old in sorted(self.months)[:-MAX_MONTHS]:
+            del self.months[old]
+        self.trips = sorted(
+            [*kept.trips, *(t for t in self.trips if t.start >= kept.cut)], key=lambda t: t.start, reverse=True
+        )[:MAX_TRIPS]
+        for kind, level in self._levels.items():
+            level.events = sorted(
+                [*kept.events[kind], *(e for e in level.events if e.time >= kept.cut)],
+                key=lambda e: e.time,
+                reverse=True,
+            )[:MAX_EVENTS]
 
     # ── Storage ─────────────────────────────────────────────────────────────
 

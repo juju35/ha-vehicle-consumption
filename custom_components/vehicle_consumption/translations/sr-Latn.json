@@ -237,7 +237,7 @@
       "description": "Ponovo gradi vožnje, mesece, točenja goriva i punjenja vozila iz onoga što je Home Assistant zabeležio o njegovim senzorima (onoliko unazad koliko ih rekorder čuva). Ručno uneta točenja goriva i punjenja se zadržavaju.",
       "fields": {
         "config_entry_id": { "name": "Vozilo", "description": "Vozilo čija se istorija uvozi." },
-        "days": { "name": "Dani", "description": "Koliko dana unazad se ponovo gradi (podrazumevano 60). Zabeležena stanja se koriste tamo gde ih rekorder još ima (podrazumevano 10 dana), a pre toga satna statistika senzora." }
+        "days": { "name": "Dani", "description": "Koliko dana unazad se ponovo gradi (podrazumevano 60). Zabeležena stanja se koriste tamo gde ih rekorder još ima (podrazumevano 10 dana), a pre toga satna statistika senzora. Meseci koje istorija ne pokriva u potpunosti zadržavaju već praćene podatke." }
       }
     }
   },

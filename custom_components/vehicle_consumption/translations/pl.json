@@ -237,7 +237,7 @@
       "description": "Odtwarza trasy, miesiące, tankowania i ładowania pojazdu na podstawie tego, co Home Assistant zarejestrował z jego sensorów (tak daleko wstecz, jak przechowuje to rejestrator). Tankowania i ładowania wprowadzone ręcznie są zachowywane.",
       "fields": {
         "config_entry_id": { "name": "Pojazd", "description": "Pojazd, którego historia jest importowana." },
-        "days": { "name": "Dni", "description": "Jak daleko wstecz odtworzyć (domyślnie 60). Używane są zarejestrowane stany tam, gdzie rejestrator je jeszcze ma (domyślnie 10 dni), a wcześniej godzinowe statystyki sensorów." }
+        "days": { "name": "Dni", "description": "Jak daleko wstecz odtworzyć (domyślnie 60). Używane są zarejestrowane stany tam, gdzie rejestrator je jeszcze ma (domyślnie 10 dni), a wcześniej godzinowe statystyki sensorów. Miesiące, których historia nie obejmuje w całości, zachowują już zebrane dane." }
       }
     }
   },

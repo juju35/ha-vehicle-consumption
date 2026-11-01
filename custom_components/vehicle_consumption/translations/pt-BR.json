@@ -237,7 +237,7 @@
       "description": "Reconstrói as viagens, os meses, os abastecimentos e os carregamentos do veículo a partir do que o Home Assistant registou dos seus sensores (até onde o gravador o conserva). Os abastecimentos e carregamentos registados manualmente são mantidos.",
       "fields": {
         "config_entry_id": { "name": "Veículo", "description": "O veículo cujo histórico é importado." },
-        "days": { "name": "Dias", "description": "Quantos dias recuar na reconstrução (60 por predefinição). São usados os estados gravados onde o gravador ainda os tem (10 dias por predefinição) e, antes disso, as estatísticas horárias dos sensores." }
+        "days": { "name": "Dias", "description": "Quantos dias recuar na reconstrução (60 por predefinição). São usados os estados gravados onde o gravador ainda os tem (10 dias por predefinição) e, antes disso, as estatísticas horárias dos sensores. Os meses que o histórico não cobre por completo mantêm os dados já registados." }
       }
     }
   },
