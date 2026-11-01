@@ -200,14 +200,16 @@ async def test_hourly_statistics_before_the_states(
 
 
 async def test_days_limit(recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
-    """The action only goes back the number of days asked."""
+    """The action only goes back the number of days asked: what it does not cover is kept, not wiped."""
     await _record(hass, freezer, [(-3 * 24 * 60, 900, 50), *JOURNEY])
     entry = await _setup(hass, freezer)
     assert _attrs(hass)["total"]["distance"] == 200
     await hass.services.async_call(
         DOMAIN, SERVICE_IMPORT_HISTORY, {"config_entry_id": entry.entry_id, "days": 1}, blocking=True
     )
-    assert _attrs(hass)["total"]["distance"] == 100
+    # One day of October recorded: the month (and the 100 km driven three days before) stays as it was.
+    assert _attrs(hass)["total"]["distance"] == 200
+    assert [(m["month"], m["distance"]) for m in _attrs(hass)["months"]] == [("2026-10", 200)]
 
 
 def _import_hourly(hass: HomeAssistant, statistic_id: str, unit: str, first: datetime, values: list[float]) -> None:
@@ -447,3 +449,102 @@ async def test_current_import_not_done_again(
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done(wait_background_tasks=True)
     assert _attrs(hass)["total"]["distance"] == 5
+
+
+async def _store_old_import(hass: HomeAssistant, hass_storage: dict[str, Any], entry, **data: Any) -> dict[str, Any]:
+    """Unload the vehicle and make its store look like a 0.2.0 / 0.2.1 import (`history_imported: true`)."""
+    await hass.config_entries.async_unload(entry.entry_id)
+    stored = hass_storage[f"{DOMAIN}.{entry.entry_id}"]["data"]
+    stored.update(history_imported=True, **data)
+    return stored
+
+
+async def test_old_import_with_an_empty_recorder_keeps_the_data(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory, hass_storage: dict[str, Any]
+) -> None:
+    """Imported again with nothing recorded for the sensors (excluded from the recorder): nothing is wiped."""
+    entry = await _setup(hass, freezer)
+    trip = {"start": "2026-09-12T08:00:00+00:00", "end": "2026-09-12T09:00:00+00:00", "distance": 80, "fuel": 5}
+    await _store_old_import(
+        hass,
+        hass_storage,
+        entry,
+        since="2026-08-01T00:00:00+00:00",
+        total={"distance": 5000, "fuel": 300},
+        months={"2026-08": {"distance": 3000, "fuel": 180}, "2026-09": {"distance": 2000, "fuel": 120}},
+        trips=[trip],
+    )
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    attrs = _attrs(hass)
+    assert attrs["total"]["distance"] == 5000 and attrs["total"]["fuel"] == 300
+    assert attrs["total"]["since"] == "2026-08-01T00:00:00+00:00"
+    assert [(m["month"], m["distance"]) for m in attrs["months"]] == [("2026-08", 3000), ("2026-09", 2000), ("2026-10", 0)]
+    assert [t["distance"] for t in attrs["trips"]] == [80]
+    # Marked as imported: not tried again at the next start.
+    await hass.config_entries.async_unload(entry.entry_id)
+    assert hass_storage[f"{DOMAIN}.{entry.entry_id}"]["data"]["history_imported"] == HISTORY_IMPORT_VERSION
+
+
+async def test_import_keeps_the_months_before_the_recorded_ones(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory, hass_storage: dict[str, Any]
+) -> None:
+    """Imported again from a recorder that starts after the tracking did: the months it does not fully cover stay.
+
+    The recorded states start on 20 October: August, September and October stay as tracked, November (fully
+    recorded) is rebuilt, and the total adds them up.
+    """
+    await _record(hass, freezer, JOURNEY)
+    entry = await _setup(hass, freezer)
+    old_trip = {"start": "2026-08-12T08:00:00+00:00", "end": "2026-08-12T09:00:00+00:00", "distance": 70, "fuel": 4}
+    stored = await _store_old_import(
+        hass,
+        hass_storage,
+        entry,
+        since="2026-08-01T00:00:00+00:00",
+        total={"distance": 3040, "fuel": 183},
+        months={
+            "2026-08": {"distance": 1000, "fuel": 60},
+            "2026-09": {"distance": 2000, "fuel": 120},
+            "2026-10": {"distance": 40, "fuel": 3},
+        },
+    )
+    stored["trips"].append(old_trip)
+    # 2 November (local time): one drive of 80 km, 5 L, while the integration was not loaded.
+    await _record(hass, freezer, [(19200, 1150, 43), (19220, 1180, 41)])
+    freezer.move_to(START + timedelta(days=13, hours=12))
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    attrs = _attrs(hass)
+    assert [(m["month"], m["distance"], m["fuel"]) for m in attrs["months"]] == [
+        ("2026-08", 1000, 60),
+        ("2026-09", 2000, 120),
+        ("2026-10", 40, 3),
+        ("2026-11", 80, 5),
+    ]
+    assert attrs["total"]["distance"] == 3120 and attrs["total"]["fuel"] == 188
+    assert attrs["total"]["since"] == "2026-08-01T00:00:00+00:00"
+    assert [t["distance"] for t in attrs["trips"]] == [80, 50, 30, 20, 70]
+    assert [r["liters"] for r in attrs["refuels"]] == [13]
+    assert attrs["odometer"] == 1180 and attrs["fuel_quantity"] == 41
+
+
+async def test_import_with_only_the_price_recorded_keeps_the_data(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    """The action, with a price sensor recorded but not the vehicle's sensors: the tracked figures stay."""
+    freezer.move_to(START)
+    hass.states.async_set(FUEL_PRICE, "2.0", PRICE)
+    await hass.async_block_till_done()
+    await async_wait_recording_done(hass)
+    entry = await _setup(hass, freezer, **{CONF_FUEL_PRICE_ENTITY: FUEL_PRICE})
+    # Tracked live, sensors excluded from the recorder (not recorded here: set after the recorder was paused).
+    tracker = entry.runtime_data
+    tracker.total.distance = 640
+    tracker.months["2026-10"] = tracker.total.copy()
+    await hass.services.async_call(DOMAIN, SERVICE_IMPORT_HISTORY, {"config_entry_id": entry.entry_id}, blocking=True)
+    attrs = _attrs(hass)
+    assert attrs["total"]["distance"] == 640
+    assert [(m["month"], m["distance"]) for m in attrs["months"]] == [("2026-10", 640)]
