@@ -700,9 +700,17 @@ test('width: the card keeps a width in a parent sized by its content, and still 
   // min-width: 0 (never a px minimum on the host): a `1fr 1fr` grid can shrink it, no overflow.
   assert.match(host, /min-width: 0;/);
   assert.doesNotMatch(host, /min-width: [1-9]/);
-  // The inline-size container would fall to its padding in an inline-block or an "auto" grid column.
+  // The inline-size container would fall to its padding in an inline-block or an "auto" grid column: an empty grid
+  // row gives the card a max-content width (300px) with a 0 min-content one.
   assert.match(rule('ha-card'), /container-type: inline-size;/);
-  assert.match(rule('ha-card'), /contain-intrinsic-inline-size: \d+px;/);
+  const before = css.match(/:host::before \{([^}]*)\}/);
+  assert.ok(before, 'no :host::before rule');
+  for (const p of ['content: ""', 'display: grid', 'grid-template-columns: minmax(0, 300px)', 'height: 0']) {
+    assert.ok(before[1].includes(p), p);
+  }
+  // contain-intrinsic-* is a min-content width: wrapped in a div (or hui-card) in a `1fr 1fr` grid, whose
+  // min-width stays auto, the card refused to shrink and overflowed by 160-340 px.
+  assert.doesNotMatch(css, /contain-intrinsic/);
 });
 
 test('narrow: 8 of 12 columns at least, and the pill turns into a dot sooner while driving', () => {
