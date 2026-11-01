@@ -15,7 +15,7 @@
       },
       "sensors": {
         "title": "Sensores de {name}",
-        "description": "Se han encontrado {found} sensores automáticamente: compruébalos. El cuentakilómetros es obligatorio, además de al menos un sensor de combustible o de batería.",
+        "description": "Sensores encontrados automáticamente: {found}. Compruébalos. El cuentakilómetros es obligatorio, además de al menos un sensor de combustible o de batería.",
         "data": {
           "odometer": "Cuentakilómetros",
           "fuel_quantity": "Cantidad de combustible",

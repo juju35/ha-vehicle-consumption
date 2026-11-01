@@ -15,7 +15,7 @@
       },
       "sensors": {
         "title": "Sensoren von {name}",
-        "description": "{found} Sensoren wurden automatisch gefunden: Bitte prüfen. Der Kilometerzähler ist erforderlich, dazu mindestens ein Kraftstoff- oder Batteriesensor.",
+        "description": "Automatisch gefundene Sensoren: {found}. Bitte prüfen. Der Kilometerzähler ist erforderlich, dazu mindestens ein Kraftstoff- oder Batteriesensor.",
         "data": {
           "odometer": "Kilometerzähler",
           "fuel_quantity": "Kraftstoffmenge",

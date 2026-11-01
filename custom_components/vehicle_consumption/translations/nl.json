@@ -15,7 +15,7 @@
       },
       "sensors": {
         "title": "Sensoren van {name}",
-        "description": "Er zijn automatisch {found} sensoren gevonden: controleer ze. De kilometerstand is verplicht, plus minstens één brandstof- of accusensor.",
+        "description": "Automatisch gevonden sensoren: {found}. Controleer ze. De kilometerstand is verplicht, plus minstens één brandstof- of accusensor.",
         "data": {
           "odometer": "Kilometerstand",
           "fuel_quantity": "Hoeveelheid brandstof",

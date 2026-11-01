@@ -15,7 +15,7 @@
       },
       "sensors": {
         "title": "Capteurs de {name}",
-        "description": "{found} capteurs ont été trouvés automatiquement : vérifiez-les. Le compteur kilométrique est obligatoire, ainsi qu'au moins un capteur de carburant ou de batterie.",
+        "description": "Capteurs trouvés automatiquement : {found}. Vérifiez-les. Le compteur kilométrique est obligatoire, ainsi qu'au moins un capteur de carburant ou de batterie.",
         "data": {
           "odometer": "Compteur kilométrique",
           "fuel_quantity": "Quantité de carburant",

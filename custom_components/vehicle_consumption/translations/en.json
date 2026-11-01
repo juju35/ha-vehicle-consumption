@@ -15,7 +15,7 @@
       },
       "sensors": {
         "title": "Sensors of {name}",
-        "description": "{found} sensors were found automatically: check them. The odometer is required, plus at least one fuel or battery sensor.",
+        "description": "Sensors found automatically: {found}. Check them. The odometer is required, plus at least one fuel or battery sensor.",
         "data": {
           "odometer": "Odometer",
           "fuel_quantity": "Fuel quantity",
