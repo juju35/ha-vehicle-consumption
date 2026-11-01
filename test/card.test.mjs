@@ -133,7 +133,12 @@ test('vcLang: card option, then Home Assistant, then English', () => {
   assert.equal(vcLang({ language: 'de' }, {}), 'de');
   assert.equal(vcLang({ locale: { language: 'es-ES' } }, {}), 'es');
   assert.equal(vcLang({ language: 'ja' }, {}), 'en');
-  assert.equal(vcLang({ language: 'pt-BR' }, {}), 'en');
+  // Italian, Dutch, Portuguese and Polish: region dropped; Brazilian Portuguese falls back to European Portuguese.
+  assert.equal(vcLang({ locale: { language: 'it-IT' } }, {}), 'it');
+  assert.equal(vcLang({ locale: { language: 'nl-BE' } }, {}), 'nl');
+  assert.equal(vcLang({ language: 'pt' }, {}), 'pt');
+  assert.equal(vcLang({ language: 'pt-BR' }, {}), 'pt');
+  assert.equal(vcLang({ locale: { language: 'pl-PL' } }, {}), 'pl');
   // Serbian: Cyrillic by default, Latin script when Home Assistant (or the card) asks for sr-Latn.
   assert.equal(vcLang({ language: 'sr' }, {}), 'sr');
   assert.equal(vcLang({ locale: { language: 'sr-Latn' } }, {}), 'sr-Latn');
@@ -175,13 +180,19 @@ test('i18n: a key missing in a language falls back to English, then to the key',
   delete VC_I18N.en._probe;
 });
 
-test('i18n parity: every language has exactly the English keys and placeholders', () => {
+const VC_LANGS = ['de', 'en', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'sr', 'sr-Latn'];
+
+test('i18n parity: every language has exactly the English keys and placeholders, and no empty text', () => {
   const ph = (s) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join();
   const keys = Object.keys(VC_I18N.en).sort();
-  assert.deepEqual(Object.keys(VC_I18N).sort(), ['de', 'en', 'es', 'fr', 'sr', 'sr-Latn']);
+  assert.deepEqual(Object.keys(VC_I18N).sort(), VC_LANGS);
   for (const lang of Object.keys(VC_I18N)) {
     assert.deepEqual(Object.keys(VC_I18N[lang]).sort(), keys, lang);
-    for (const k of keys) assert.equal(ph(VC_I18N[lang][k]), ph(VC_I18N.en[k]), `${lang}.${k}`);
+    for (const k of keys) {
+      assert.equal(typeof VC_I18N[lang][k], 'string', `${lang}.${k}`);
+      assert.ok(VC_I18N[lang][k].trim(), `${lang}.${k} is empty`);
+      assert.equal(ph(VC_I18N[lang][k]), ph(VC_I18N.en[k]), `${lang}.${k}`);
+    }
   }
 });
 
@@ -505,6 +516,20 @@ test('editor: options left at their default are not written to the YAML', () => 
   assert.equal(form.computeLabel({ name: 'months' }), 'Months in the chart');
   editor.setConfig({ language: 'de' });
   assert.equal(form.computeLabel({ name: 'months' }), 'Monate im Diagramm');
+});
+
+test('editor: the language picker offers every language of the card', () => {
+  const editor = new VehicleConsumptionCardEditor();
+  editor.appendChild = () => {};
+  editor.setConfig({ type: 'custom:vehicle-consumption-card' });
+  editor.hass = hassWith(fuelAttrs());
+  const options = editor._form.schema.find((s) => s.name === 'language').selector.select.options;
+  assert.deepEqual([...options.map((o) => o.value)].sort(), VC_LANGS);
+  const labels = Object.fromEntries(options.map((o) => [o.value, o.label]));
+  assert.equal(labels.it, 'Italiano');
+  assert.equal(labels.nl, 'Nederlands');
+  assert.equal(labels.pt, 'Português');
+  assert.equal(labels.pl, 'Polski');
 });
 
 // Two vehicles: "Family car" (fuel) and "City EV" (electric), the EV listed last in the registry.
