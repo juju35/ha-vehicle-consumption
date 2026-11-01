@@ -122,6 +122,13 @@ def _validate_sensors(user_input: dict[str, Any]) -> dict[str, str]:
         user_input.get(CONF_BATTERY_ENERGY) or user_input.get(CONF_BATTERY_LEVEL)
     ):
         errors[CONF_CHARGER_ENERGY] = "charger_needs_battery"
+    # One sensor is one source: a fuel quantity also picked as the fuel level would be read as a percentage.
+    seen: set[str] = set()
+    for key in (*SENSOR_KEYS, CONF_CHARGER_ENERGY):
+        if (entity_id := user_input.get(key)) and entity_id in seen:
+            errors.setdefault(key, "duplicate_sensor")
+        elif entity_id:
+            seen.add(entity_id)
     return errors
 
 
