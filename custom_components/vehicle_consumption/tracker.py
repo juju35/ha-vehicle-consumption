@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable, Iterable
+from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 from functools import partial
@@ -77,6 +78,13 @@ MERGE_WINDOW = timedelta(hours=12)
 HOURLY_TRIP_GAP = timedelta(minutes=61)
 # Stored as `history_imported`: a store with an older version (or `true`, before 0.2.2) is imported again once.
 HISTORY_IMPORT_VERSION = 2
+# A replay never replaces tracked figures it has less of: below them by more than this (km, L, kWh, %; for the fuel
+# and the energy, also this share of them: hourly means of a level are not exact), the recorded history misses
+# readings and the tracked figures stay. The distance comes from the odometer, exact in both: no share.
+REPLAY_TOLERANCE = 1.0
+REPLAY_SHARE = 0.05
+# What a replay replaces, put back as it was when the history turns out to miss readings.
+_TRACKED_FIELDS = ("since", "total", "months", "trip", "_trip_start", "trips", "odometer", "_levels", "_charger")
 
 FUEL = "fuel"
 ENERGY = "energy"
@@ -874,16 +882,21 @@ class ConsumptionTracker:
         by_entity: dict[str, list[str]] = {}
         for key, entity_id in self.sensors.items():
             by_entity.setdefault(entity_id, []).append(key)
-        first = next((when for when, entity_id, _ in rows if entity_id in by_entity), None)
-        if first is None:
-            # Nothing recorded for the source sensors (excluded from the recorder, or new): what was tracked stays.
-            _LOGGER.debug("%s: no recorded state of the source sensors, nothing replayed", self.name)
+        coverage = self._coverage(rows)
+        if coverage is None:
+            # A source sensor without a reading in the history (excluded from the recorder, only unavailable, new or
+            # changed) or recorded no longer (its current reading is not the last recorded one): the replay would
+            # be partial, what was tracked stays.
             self.history_imported = True
             self._changed()
             return
-        # The tracking started before the recorded readings: the replay only stands in from the first month it fully
-        # covers, the months before it (and their trips, refuels and charges) are kept as tracked.
-        kept = self._kept_before(first) if first > self.since else None
+        first, covered = coverage
+        # The tracking started before the recorded readings: the replay only stands in from the first month where
+        # every source has readings from its first day, the months before it (and their trips, refuels and charges)
+        # are kept as tracked. Otherwise (recorded from before the tracking) it replaces everything, unless it has
+        # less than tracked somewhere: a source recorded only after the tracking started is caught there (below).
+        kept = self._kept_before(covered) if first > self.since else None
+        tracked = self._snapshot()
         manual = {kind: [e for e in level.events if e.source == "manual"] for kind, level in self._levels.items()}
         self._reset_data(first)
         self._replay_prices = dict(initial_prices or {})
@@ -907,6 +920,15 @@ class ConsumptionTracker:
         self._read_current(now)
         if kept is not None:
             self._merge_kept(kept)
+        if short := self._short_of(tracked, kept):
+            # Less than tracked somewhere: the history misses readings (a gap in the recorder). Never replaced.
+            _LOGGER.warning(
+                "%s: the recorded history has less %s than tracked, the tracked figures are kept", self.name, short
+            )
+            self._restore(tracked)
+            self.history_imported = True
+            self._changed()
+            return
         for kind, events in manual.items():
             level_events = self._levels[kind].events
             level_events.extend(events)
@@ -914,6 +936,95 @@ class ConsumptionTracker:
             del level_events[MAX_EVENTS:]
         self.history_imported = True
         self._changed()
+
+    def _needed(self) -> list[str]:
+        """The sources the figures are made of: the odometer and every fuel or battery sensor that is replayed."""
+        return [key for key in self.sensors if key != CONF_CHARGER_ENERGY and key not in self._shown_only]
+
+    def _coverage(self, rows: list[tuple[datetime, str, State]]) -> tuple[datetime, datetime] | None:
+        """When the readings of the replayed sources start: the first one of any, and the time all have one.
+
+        None (nothing to replay) when a source has no valid reading, or when its current reading differs from its
+        last recorded one (the recorder stopped recording it: what was tracked after would be missing).
+        """
+        needed = self._needed()
+        keys: dict[str, list[str]] = {}
+        for key in needed:
+            keys.setdefault(self.sensors[key], []).append(key)
+        firsts: dict[str, datetime] = {}
+        lasts: dict[str, tuple[datetime, float]] = {}
+        for when, entity_id, state in rows:
+            for key in keys.get(entity_id, ()):
+                if (value := self._reading(key, state)) is None:
+                    continue
+                firsts[key] = min(when, firsts.get(key, when))
+                if key not in lasts or when >= lasts[key][0]:
+                    lasts[key] = (when, value)
+        nothing_tracked = not (
+            self.trips
+            or self.trip
+            or any(level.events for level in self._levels.values())
+            or any((self.total.distance, self.total.fuel, self.total.energy))
+        )
+        if missing := [self.sensors[key] for key in needed if key not in firsts]:
+            _LOGGER.debug("%s: no recorded reading of %s, nothing replayed", self.name, ", ".join(missing))
+            return None
+        for key in needed:
+            current = self._reading(key)
+            # Nothing tracked yet (the first import): nothing to lose, the current reading is applied after the replay.
+            if not nothing_tracked and current is not None and abs(current - lasts[key][1]) > REPLAY_TOLERANCE:
+                _LOGGER.warning(
+                    "%s: %s is %s but was last recorded at %s, the tracked figures are kept",
+                    self.name,
+                    self.sensors[key],
+                    current,
+                    lasts[key][1],
+                )
+                return None
+        return min(firsts.values()), max(firsts.values())
+
+    def _snapshot(self) -> dict[str, Any]:
+        return {name: deepcopy(getattr(self, name)) for name in _TRACKED_FIELDS}
+
+    def _restore(self, snapshot: dict[str, Any]) -> None:
+        for name, value in snapshot.items():
+            setattr(self, name, value)
+
+    def _short_of(self, tracked: dict[str, Any], kept: _Kept | None) -> str | None:
+        """What the replay counts less of than the tracking did (distance, fuel or energy), if anything.
+
+        Compared: the total, every month (except one dropped as the oldest of a full list) and the distance of the
+        trips the replay rebuilt (from `kept.cut`, within what both lists still hold).
+        """
+
+        def short(new: Totals, old: Totals) -> str | None:
+            for name in ("distance", "fuel", "energy"):
+                before = getattr(old, name)
+                share = 0.0 if name == "distance" else before * REPLAY_SHARE
+                if getattr(new, name) < before - max(REPLAY_TOLERANCE, share):
+                    return name
+            return None
+
+        if found := short(self.total, tracked["total"]):
+            return found
+        oldest = min(self.months) if len(self.months) >= MAX_MONTHS else ""
+        for key, old in tracked["months"].items():
+            if key >= oldest and (found := short(self.months.get(key, Totals()), old)):
+                return found
+        floor = kept.cut if kept else datetime.min.replace(tzinfo=dt_util.UTC)
+        for trips in (tracked["trips"], self.trips):
+            if len(trips) >= MAX_TRIPS:
+                floor = max(floor, trips[-1].start)
+
+        def driven(trips: list[Trip], trip: Trip | None, total: Totals, start: Totals) -> Totals:
+            out = Totals(distance=sum(t.totals.distance for t in trips if t.start >= floor))
+            if trip is not None and trip.start >= floor:
+                out.distance += total.distance - start.distance
+            return out
+
+        old_trips = driven(tracked["trips"], tracked["trip"], tracked["total"], tracked["_trip_start"])
+        new_trips = driven(self.trips, self.trip, self.total, self._trip_start)
+        return "distance in trips" if short(new_trips, old_trips) else None
 
     def _kept_before(self, first: datetime) -> _Kept:
         """What a replay starting at `first` does not fully rebuild: the months before the next month start."""

@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 from freezegun.api import FrozenDateTimeFactory
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, State
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.components.recorder.common import async_wait_recording_done
@@ -552,3 +552,281 @@ async def test_import_with_only_the_price_recorded_keeps_the_data(
     attrs = _attrs(hass)
     assert attrs["total"]["distance"] == 640
     assert [(m["month"], m["distance"]) for m in attrs["months"]] == [("2026-10", 640)]
+
+
+# ── A re-import never replaces tracked data with an empty or partial one ──────────────────────────────────────
+
+NOV_15 = datetime(2026, 11, 15, 12, tzinfo=dt_util.UTC)
+EXCLUDE_ODOMETER = pytest.mark.parametrize("recorder_config", [{"exclude": {"entities": [ODOMETER]}}])
+# Tracked since 1 August; 300 km and 18 L in November, in one trip on 12 November.
+NOVEMBER_TRIP = {"start": "2026-11-12T08:00:00+00:00", "end": "2026-11-12T09:00:00+00:00", "distance": 300, "fuel": 18}
+TRACKED = {
+    "since": "2026-08-01T00:00:00+00:00",
+    "total": {"distance": 3700, "fuel": 222},
+    "months": {
+        "2026-08": {"distance": 1000, "fuel": 60},
+        "2026-09": {"distance": 2000, "fuel": 120},
+        "2026-10": {"distance": 400, "fuel": 24},
+        "2026-11": {"distance": 300, "fuel": 18},
+    },
+}
+
+
+async def _record_at(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, when: datetime, km: float | None, liters: float | None
+) -> None:
+    freezer.move_to(when)
+    if km is not None:
+        hass.states.async_set(ODOMETER, str(km), KM)
+    freezer.tick(timedelta(seconds=1))
+    if liters is not None:
+        hass.states.async_set(FUEL, str(liters), LITERS)
+    await hass.async_block_till_done()
+
+
+async def _reimport_tracked(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, hass_storage: dict[str, Any], **data: Any
+) -> None:
+    """Set the vehicle up on 15 November, then start it again from a 0.2.0 / 0.2.1 store: imported again once."""
+    await async_wait_recording_done(hass)
+    freezer.move_to(NOV_15)
+    entry = await _setup(hass, freezer)
+    stored = await _store_old_import(hass, hass_storage, entry, **{**TRACKED, **data})
+    stored["trips"] = [NOVEMBER_TRIP]
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    return entry
+
+
+def _months(hass: HomeAssistant) -> list[tuple[str, float, float]]:
+    return [(m["month"], m["distance"], m["fuel"]) for m in _attrs(hass)["months"]]
+
+
+def _assert_tracked_kept(hass: HomeAssistant) -> None:
+    attrs = _attrs(hass)
+    assert _months(hass) == [(k, v["distance"], v["fuel"]) for k, v in TRACKED["months"].items()]
+    assert attrs["total"]["distance"] == 3700 and attrs["total"]["fuel"] == 222
+    assert attrs["total"]["since"] == TRACKED["since"]
+    assert [t["distance"] for t in attrs["trips"]] == [300]
+
+
+@EXCLUDE_ODOMETER
+async def test_reimport_without_the_odometer_recorded_keeps_the_data(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory, hass_storage: dict[str, Any]
+) -> None:
+    """The odometer is excluded from the recorder, the fuel recorded since 28 October: nothing is replaced."""
+    for day in range(0, 18, 2):
+        when = datetime(2026, 10, 28, 12, tzinfo=dt_util.UTC) + timedelta(days=day)
+        await _record_at(hass, freezer, when, 5000 + day * 10, 40 - day)
+    await _reimport_tracked(hass, freezer, hass_storage)
+    _assert_tracked_kept(hass)
+
+
+async def test_reimport_with_only_unavailable_states_keeps_the_data(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory, hass_storage: dict[str, Any]
+) -> None:
+    """The vehicle's sensors were only recorded as unavailable: no reading, nothing replaced."""
+    freezer.move_to(datetime(2026, 10, 28, 12, tzinfo=dt_util.UTC))
+    hass.states.async_set(ODOMETER, "unavailable", KM)
+    hass.states.async_set(FUEL, "unavailable", LITERS)
+    await hass.async_block_till_done()
+    await _reimport_tracked(hass, freezer, hass_storage)
+    _assert_tracked_kept(hass)
+
+
+@EXCLUDE_ODOMETER
+async def test_import_action_without_the_odometer_recorded_keeps_the_data(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory, hass_storage: dict[str, Any]
+) -> None:
+    """The action, tracking since 5 November, the fuel recorded since 1 November (before it), no odometer."""
+    for day in range(14):
+        await _record_at(hass, freezer, datetime(2026, 11, 1, 20, tzinfo=dt_util.UTC) + timedelta(days=day), 5000, 40)
+    await async_wait_recording_done(hass)
+    freezer.move_to(NOV_15)
+    entry = await _setup(hass, freezer)
+    stored = await _store_old_import(
+        hass,
+        hass_storage,
+        entry,
+        since="2026-11-05T00:00:00+00:00",
+        total={"distance": 300, "fuel": 18},
+        months={"2026-11": {"distance": 300, "fuel": 18}},
+    )
+    stored.update(trips=[NOVEMBER_TRIP], history_imported=HISTORY_IMPORT_VERSION)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    await hass.services.async_call(DOMAIN, SERVICE_IMPORT_HISTORY, {"config_entry_id": entry.entry_id}, blocking=True)
+
+    attrs = _attrs(hass)
+    assert attrs["total"]["distance"] == 300 and attrs["total"]["fuel"] == 18
+    assert attrs["total"]["since"] == "2026-11-05T00:00:00+00:00"
+    assert [t["distance"] for t in attrs["trips"]] == [300]
+
+
+async def test_reimport_after_a_source_change_keeps_what_it_does_not_cover(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory, hass_storage: dict[str, Any]
+) -> None:
+    """A new odometer sensor, recorded only since 13 November (the fuel since 28 October): November stays."""
+    for day in range(0, 18, 2):
+        when = datetime(2026, 10, 28, 12, tzinfo=dt_util.UTC) + timedelta(days=day)
+        await _record_at(hass, freezer, when, 5000 + day * 10 if day >= 16 else None, 40 - day)
+    await _reimport_tracked(hass, freezer, hass_storage)
+    _assert_tracked_kept(hass)
+
+
+def _rows(*readings: tuple[datetime, str, str, dict[str, Any]]) -> list[tuple[datetime, str, State]]:
+    return [
+        (when, e, State(e, value, attrs, last_changed=when, last_updated=when)) for when, e, value, attrs in readings
+    ]
+
+
+def _tracked_tracker(hass: HomeAssistant, entry, since: str, months: dict[str, tuple[float, float]], trips):
+    """The vehicle's tracker with these tracked figures (as if followed live)."""
+    from custom_components.vehicle_consumption.tracker import Totals, Trip
+
+    tracker = entry.runtime_data
+    tracker.since = dt_util.parse_datetime(since)
+    tracker.months = {k: Totals(distance=d, fuel=f) for k, (d, f) in months.items()}
+    tracker.total = Totals(distance=sum(d for d, _ in months.values()), fuel=sum(f for _, f in months.values()))
+    tracker.trips = [t for d in trips if (t := Trip.load(d))]
+    return tracker
+
+
+async def test_replay_missing_the_latest_readings_keeps_the_data(hass: HomeAssistant) -> None:
+    """Recorded from before the tracking started (first <= since), but the odometer stopped being recorded on
+    8 November (excluded since): its current reading is not the last recorded one, nothing is replaced."""
+    entry = await setup_vehicle(hass)
+    hass.states.async_set(ODOMETER, "5380", KM)
+    hass.states.async_set(FUEL, "12", LITERS)
+    await hass.async_block_till_done()
+    tracker = _tracked_tracker(hass, entry, "2026-11-05T00:00:00+00:00", {"2026-11": (300, 18)}, [NOVEMBER_TRIP])
+    day = datetime(2026, 11, 1, 8, tzinfo=dt_util.UTC)
+    rows = _rows(
+        (day, ODOMETER, "5000", KM),
+        (day, FUEL, "40", LITERS),
+        (day + timedelta(days=7), ODOMETER, "5080", KM),
+        (day + timedelta(days=7), FUEL, "12", LITERS),
+    )
+    tracker._replay(rows, set(), NOV_15)
+
+    assert tracker.history_imported
+    assert tracker.since == dt_util.parse_datetime("2026-11-05T00:00:00+00:00")
+    assert (tracker.total.distance, tracker.total.fuel) == (300, 18)
+    assert [(t.start, t.totals.distance) for t in tracker.trips] == [
+        (dt_util.parse_datetime(NOVEMBER_TRIP["start"]), 300)
+    ]
+
+
+async def test_replay_with_a_gap_keeps_the_data(hass: HomeAssistant) -> None:
+    """Recorded from before the tracking started, but the fuel not recorded for most of October (a refuel and
+    24 L used in between): the replay would count no fuel in October, less than tracked, so nothing is replaced."""
+    entry = await setup_vehicle(hass)
+    hass.states.async_set(ODOMETER, "5400", KM)
+    hass.states.async_set(FUEL, "45", LITERS)
+    await hass.async_block_till_done()
+    october_trip = {"start": "2026-10-10T08:00:00+00:00", "end": "2026-10-10T12:00:00+00:00", "distance": 400}
+    tracker = _tracked_tracker(hass, entry, "2026-10-01T00:00:00+00:00", {"2026-10": (400, 24)}, [october_trip])
+    rows = _rows(
+        (datetime(2026, 9, 28, 8, tzinfo=dt_util.UTC), ODOMETER, "5000", KM),
+        (datetime(2026, 9, 28, 8, tzinfo=dt_util.UTC), FUEL, "40", LITERS),
+        (datetime(2026, 10, 10, 8, tzinfo=dt_util.UTC), ODOMETER, "5200", KM),
+        (datetime(2026, 10, 10, 12, tzinfo=dt_util.UTC), ODOMETER, "5400", KM),
+        (datetime(2026, 10, 25, 8, tzinfo=dt_util.UTC), FUEL, "45", LITERS),
+    )
+    tracker._replay(rows, set(), NOV_15)
+
+    assert tracker.history_imported
+    assert (tracker.months["2026-10"].distance, tracker.months["2026-10"].fuel) == (400, 24)
+    assert (tracker.total.distance, tracker.total.fuel) == (400, 24)
+
+
+async def test_replay_covering_the_tracking_still_corrects_it(hass: HomeAssistant) -> None:
+    """Fully recorded, at least as much as tracked in every month: the replay replaces the figures (an old import
+    that missed the fuel of hourly trips is corrected)."""
+    entry = await setup_vehicle(hass)
+    hass.states.async_set(ODOMETER, "5400", KM)
+    hass.states.async_set(FUEL, "16", LITERS)
+    await hass.async_block_till_done()
+    tracker = _tracked_tracker(hass, entry, "2026-10-01T00:00:00+00:00", {"2026-10": (400, 0)}, [])
+    rows = _rows(
+        (datetime(2026, 9, 28, 8, tzinfo=dt_util.UTC), ODOMETER, "5000", KM),
+        (datetime(2026, 9, 28, 8, tzinfo=dt_util.UTC), FUEL, "40", LITERS),
+        (datetime(2026, 10, 10, 8, tzinfo=dt_util.UTC), ODOMETER, "5200", KM),
+        (datetime(2026, 10, 10, 8, tzinfo=dt_util.UTC), FUEL, "28", LITERS),
+        (datetime(2026, 10, 12, 8, tzinfo=dt_util.UTC), ODOMETER, "5400", KM),
+        (datetime(2026, 10, 12, 8, tzinfo=dt_util.UTC), FUEL, "16", LITERS),
+    )
+    tracker._replay(rows, set(), NOV_15)
+
+    assert (tracker.months["2026-10"].distance, tracker.months["2026-10"].fuel) == (400, 24)
+    assert tracker.since == datetime(2026, 9, 28, 8, tzinfo=dt_util.UTC)
+
+
+async def test_replay_with_the_odometer_recorded_after_the_tracking_started_keeps_the_data(
+    hass: HomeAssistant,
+) -> None:
+    """The fuel recorded from before the tracking started (first <= since), the odometer only from 5 October (a new
+    sensor): the replay misses October's distance, so every tracked figure stays."""
+    entry = await setup_vehicle(hass)
+    hass.states.async_set(ODOMETER, "5300", KM)
+    hass.states.async_set(FUEL, "22", LITERS)
+    await hass.async_block_till_done()
+    november = {**NOVEMBER_TRIP, "distance": 290, "fuel": 17}
+    tracker = _tracked_tracker(
+        hass, entry, "2026-10-01T00:00:00+00:00", {"2026-10": (400, 24), "2026-11": (290, 17)}, [november]
+    )
+    rows = _rows(
+        (datetime(2026, 9, 28, 8, tzinfo=dt_util.UTC), FUEL, "40", LITERS),
+        (datetime(2026, 10, 5, 8, tzinfo=dt_util.UTC), ODOMETER, "5000", KM),
+        (datetime(2026, 11, 12, 8, tzinfo=dt_util.UTC), ODOMETER, "5000", KM),
+        (datetime(2026, 11, 12, 9, tzinfo=dt_util.UTC), ODOMETER, "5300", KM),
+        (datetime(2026, 11, 12, 9, tzinfo=dt_util.UTC), FUEL, "22", LITERS),
+    )
+    tracker._replay(rows, set(), NOV_15)
+
+    assert tracker.history_imported
+    assert tracker.since == dt_util.parse_datetime("2026-10-01T00:00:00+00:00")
+    assert (tracker.months["2026-10"].distance, tracker.months["2026-10"].fuel) == (400, 24)
+    assert (tracker.months["2026-11"].distance, tracker.months["2026-11"].fuel) == (290, 17)
+    assert (tracker.total.distance, tracker.total.fuel) == (690, 41)
+    assert [t.totals.distance for t in tracker.trips] == [290]
+
+
+async def test_replay_with_a_little_less_distance_keeps_the_data(hass: HomeAssistant) -> None:
+    """The odometer is exact in both: 50 km short of 2000 tracked (2.5 %) is a gap, not a rounding."""
+    entry = await setup_vehicle(hass)
+    hass.states.async_set(ODOMETER, "6950", KM)
+    hass.states.async_set(FUEL, "40", LITERS)
+    await hass.async_block_till_done()
+    tracker = _tracked_tracker(hass, entry, "2026-10-01T00:00:00+00:00", {"2026-10": (2000, 0)}, [])
+    rows = _rows(
+        (datetime(2026, 9, 28, 8, tzinfo=dt_util.UTC), ODOMETER, "5000", KM),
+        (datetime(2026, 9, 28, 8, tzinfo=dt_util.UTC), FUEL, "40", LITERS),
+        (datetime(2026, 10, 10, 8, tzinfo=dt_util.UTC), ODOMETER, "6950", KM),
+    )
+    tracker._replay(rows, set(), NOV_15)
+
+    assert tracker.history_imported
+    assert tracker.months["2026-10"].distance == 2000
+    assert tracker.total.distance == 2000
+    assert tracker.since == dt_util.parse_datetime("2026-10-01T00:00:00+00:00")
+
+
+async def test_first_import_with_the_latest_readings_not_recorded_yet_still_replays(hass: HomeAssistant) -> None:
+    """Nothing tracked yet (a new vehicle) and the last reading not recorded yet: nothing to lose, the history is
+    replayed and the current reading applied after it."""
+    entry = await setup_vehicle(hass, states={ODOMETER: ("5380", KM), FUEL: ("12", LITERS)})
+    tracker = entry.runtime_data
+    assert tracker.total.distance == 0 and not tracker.trips
+    day = datetime(2026, 11, 1, 8, tzinfo=dt_util.UTC)
+    rows = _rows(
+        (day, ODOMETER, "5000", KM),
+        (day, FUEL, "40", LITERS),
+        (day + timedelta(days=7), ODOMETER, "5080", KM),
+        (day + timedelta(days=7), FUEL, "35", LITERS),
+    )
+    tracker._replay(rows, set(), NOV_15)
+
+    assert tracker.history_imported
+    assert tracker.since == day
+    assert tracker.total.distance == 380
