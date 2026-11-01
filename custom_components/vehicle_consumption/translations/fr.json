@@ -58,6 +58,7 @@
       "no_energy_sensor": "Choisissez au moins un capteur de carburant ou de batterie.",
       "tank_capacity_required": "La capacité du réservoir est nécessaire pour utiliser le niveau de carburant.",
       "battery_capacity_required": "La capacité de la batterie est nécessaire pour utiliser le niveau de batterie.",
+      "duplicate_sensor": "Ce capteur est déjà utilisé pour une autre source.",
       "charger_needs_battery": "Le compteur d’une borne de recharge nécessite un capteur d’énergie ou de niveau de batterie."
     },
     "abort": {
@@ -117,6 +118,7 @@
       "no_energy_sensor": "Choisissez au moins un capteur de carburant ou de batterie.",
       "tank_capacity_required": "La capacité du réservoir est nécessaire pour utiliser le niveau de carburant.",
       "battery_capacity_required": "La capacité de la batterie est nécessaire pour utiliser le niveau de batterie.",
+      "duplicate_sensor": "Ce capteur est déjà utilisé pour une autre source.",
       "charger_needs_battery": "Le compteur d’une borne de recharge nécessite un capteur d’énergie ou de niveau de batterie."
     }
   },

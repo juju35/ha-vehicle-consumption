@@ -75,6 +75,8 @@ LITERS_PER_GALLON = 3.785411784  # US gallon
 MERGE_WINDOW = timedelta(hours=12)
 # Trip gap while replaying hourly statistics: one reading an hour, so an hour still is not a stop yet.
 HOURLY_TRIP_GAP = timedelta(minutes=61)
+# Stored as `history_imported`: a store with an older version (or `true`, before 0.2.2) is imported again once.
+HISTORY_IMPORT_VERSION = 2
 
 FUEL = "fuel"
 ENERGY = "energy"
@@ -282,6 +284,13 @@ class ConsumptionTracker:
 
         self.tracks_fuel = CONF_FUEL_QUANTITY in self.sensors or CONF_FUEL_LEVEL in self.sensors
         self.tracks_energy = CONF_BATTERY_ENERGY in self.sensors or CONF_BATTERY_LEVEL in self.sensors
+        # A level (%) only feeds the tracking without its quantity sensor: next to one, it is shown and nothing more
+        # (reading it would apply the quantity's current state, not the one of this reading, wrong in a replay).
+        self._shown_only = {
+            level
+            for level, quantity in ((CONF_FUEL_LEVEL, CONF_FUEL_QUANTITY), (CONF_BATTERY_LEVEL, CONF_BATTERY_ENERGY))
+            if level in self.sensors and quantity in self.sensors
+        }
         # Only with a battery, and read first: a battery rise is then checked against an up-to-date counter.
         if self.tracks_energy and isinstance(charger := options.get(CONF_CHARGER_ENERGY), str) and charger:
             self.sensors = {CONF_CHARGER_ENERGY: charger, **self.sensors}
@@ -394,7 +403,9 @@ class ConsumptionTracker:
 
     @property
     def fuel_level(self) -> float | None:
-        if (level := self._reading(CONF_FUEL_LEVEL)) is not None:
+        # The same sensor picked as quantity and level (allowed before 0.2.2) is a quantity.
+        same = self.sensors.get(CONF_FUEL_LEVEL) == self.sensors.get(CONF_FUEL_QUANTITY)
+        if not same and (level := self._reading(CONF_FUEL_LEVEL)) is not None:
             return level
         quantity = self._reading(CONF_FUEL_QUANTITY)
         return quantity / self.tank_capacity * 100 if quantity is not None and self.tank_capacity else None
@@ -405,7 +416,8 @@ class ConsumptionTracker:
 
     @property
     def battery_level(self) -> float | None:
-        if (level := self._reading(CONF_BATTERY_LEVEL)) is not None:
+        same = self.sensors.get(CONF_BATTERY_LEVEL) == self.sensors.get(CONF_BATTERY_ENERGY)
+        if not same and (level := self._reading(CONF_BATTERY_LEVEL)) is not None:
             return level
         energy = self._reading(CONF_BATTERY_ENERGY)
         return energy / self.battery_capacity * 100 if energy is not None and self.battery_capacity else None
@@ -560,6 +572,8 @@ class ConsumptionTracker:
         if key == CONF_ODOMETER:
             value = self._reading(key, state)
             return value is not None and self._process_odometer(value, now)
+        if key in self._shown_only:
+            return False
         if key in (CONF_FUEL_QUANTITY, CONF_FUEL_LEVEL):
             value = self._fuel_now(state, key)
             return value is not None and self._process_level(FUEL, value, now)
@@ -595,12 +609,13 @@ class ConsumptionTracker:
             entity_id = event.data["entity_id"]
             now = dt_util.utcnow()
             updated = False
-            for key in by_entity.get(entity_id, ()):
+            keys = by_entity.get(entity_id, ())
+            for key in keys:
                 updated |= self._process(key, event.data["new_state"], now)
             if updated:
                 self._changed()
-            elif entity_id in prices:
-                self._notify_listeners()  # the current price is shown, nothing to store
+            elif entity_id in prices or any(key in self._shown_only for key in keys):
+                self._notify_listeners()  # the current price or level is shown, nothing to store
 
         @callback
         def tick(now: datetime) -> None:
@@ -807,8 +822,9 @@ class ConsumptionTracker:
                     state = State(entity_id, str(value), attributes, last_changed=when, last_updated=when)
                     out.append((when, entity_id, state))
                     firsts[entity_id] = min(when, firsts.get(entity_id, when))
-        # The charger counter is optional: home charges are also seen from the battery.
-        needed = {e for key, e in self.sensors.items() if key != CONF_CHARGER_ENERGY}
+        # The charger counter is optional: home charges are also seen from the battery. A level next to its quantity
+        # is not replayed: no statistics for it is no reason to skip the hours.
+        needed = {e for key, e in self.sensors.items() if key != CONF_CHARGER_ENERGY and key not in self._shown_only}
         if not needed <= firsts.keys():
             return []
         begin = max(firsts[e] for e in needed)
@@ -897,7 +913,12 @@ class ConsumptionTracker:
                 seen=_time(raw.get("seen")),
             )
         self._charger = _Charger.load(data.get("charger"))
-        self.history_imported = bool(data.get("history_imported"))
+        # Imports before 0.2.2 (stored as `true`) could be wrong (a level next to its quantity, 0 L hourly trips,
+        # no cost for a stable price): done again once.
+        imported = data.get("history_imported")
+        self.history_imported = (
+            isinstance(imported, int) and not isinstance(imported, bool) and imported >= HISTORY_IMPORT_VERSION
+        )
 
     def _dump(self) -> dict[str, Any]:
         return {
@@ -917,7 +938,7 @@ class ConsumptionTracker:
                 for kind, level in self._levels.items()
             },
             "charger": self._charger.dump(),
-            "history_imported": self.history_imported,
+            "history_imported": HISTORY_IMPORT_VERSION if self.history_imported else 0,
         }
 
     async def async_save(self) -> None:
