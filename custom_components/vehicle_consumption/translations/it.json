@@ -1,0 +1,255 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vehicle Consumption",
+        "description": "Scegli il veicolo: i suoi sensori di contachilometri, carburante e batteria vengono cercati su questo dispositivo.",
+        "data": {
+          "device_id": "Veicolo",
+          "name": "Nome"
+        },
+        "data_description": {
+          "device_id": "Dispositivo dell'integrazione del veicolo (Renault, Tesla, Kia, Volkswagen, dongle OBD…).",
+          "name": "Mostrato sulla scheda e sulle entità. Lascia vuoto per usare il nome del dispositivo."
+        }
+      },
+      "sensors": {
+        "title": "Sensori di {name}",
+        "description": "{found} sensori sono stati trovati automaticamente: verificali. Il contachilometri è obbligatorio, oltre ad almeno un sensore di carburante o di batteria.",
+        "data": {
+          "odometer": "Contachilometri",
+          "fuel_quantity": "Quantità di carburante",
+          "fuel_level": "Livello del carburante",
+          "battery_energy": "Energia della batteria",
+          "battery_level": "Livello della batteria",
+          "tank_capacity": "Capacità del serbatoio",
+          "battery_capacity": "Capacità utile della batteria",
+          "charger_energy": "Energia della wallbox di casa"
+        },
+        "data_description": {
+          "odometer": "Distanza totale del veicolo (km o mi).",
+          "fuel_quantity": "Carburante rimasto nel serbatoio (L o gal).",
+          "fuel_level": "Carburante rimasto nel serbatoio (%). Richiede la capacità del serbatoio quando non c'è un sensore di quantità di carburante.",
+          "battery_energy": "Energia rimasta nella batteria di trazione (kWh o Wh).",
+          "battery_level": "Stato di carica della batteria di trazione (%). Richiede la capacità della batteria quando non c'è un sensore di energia della batteria.",
+          "tank_capacity": "Converte il livello del carburante in litri.",
+          "battery_capacity": "Converte il livello della batteria in kWh.",
+          "charger_energy": "Contatore di energia della tua wallbox di casa (evcc, Wallbox, Easee, Zaptec, Ohme…): le ricariche a casa vengono misurate alla wallbox, perdite incluse. Richiede un sensore della batteria."
+        }
+      },
+      "prices": {
+        "title": "Prezzi per {name}",
+        "description": "Usati per calcolare il costo di ogni viaggio e di ogni mese. Un sensore di prezzo (distributore, tariffa elettrica) ha la precedenza sul prezzo fisso; senza nessuno dei due, i costi non vengono mostrati.",
+        "data": {
+          "fuel_price_entity": "Sensore del prezzo del carburante",
+          "fuel_price": "Prezzo fisso del carburante",
+          "electricity_price_entity": "Sensore del prezzo dell'elettricità",
+          "electricity_price": "Prezzo fisso dell'elettricità"
+        },
+        "data_description": {
+          "fuel_price_entity": "Prezzo al litro (o al gallone) che segue i prezzi del distributore.",
+          "fuel_price": "Prezzo al litro, usato quando non c'è un sensore di prezzo o non è disponibile.",
+          "electricity_price_entity": "Prezzo al kWh della tua tariffa.",
+          "electricity_price": "Prezzo al kWh, usato quando non c'è un sensore di prezzo o non è disponibile."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Scegli almeno un sensore di carburante o di batteria.",
+      "tank_capacity_required": "La capacità del serbatoio è necessaria per usare il livello del carburante.",
+      "battery_capacity_required": "La capacità della batteria è necessaria per usare il livello della batteria.",
+      "duplicate_sensor": "Questo sensore è già usato per un'altra fonte.",
+      "charger_needs_battery": "Un contatore della wallbox di casa richiede un sensore di energia o di livello della batteria."
+    },
+    "abort": {
+      "already_configured": "Questo veicolo è già configurato."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sensori del veicolo",
+        "description": "Il contachilometri è obbligatorio, oltre ad almeno un sensore di carburante o di batteria.",
+        "data": {
+          "odometer": "Contachilometri",
+          "fuel_quantity": "Quantità di carburante",
+          "fuel_level": "Livello del carburante",
+          "battery_energy": "Energia della batteria",
+          "battery_level": "Livello della batteria",
+          "tank_capacity": "Capacità del serbatoio",
+          "battery_capacity": "Capacità utile della batteria",
+          "charger_energy": "Energia della wallbox di casa"
+        },
+        "data_description": {
+          "odometer": "Distanza totale del veicolo (km o mi).",
+          "fuel_quantity": "Carburante rimasto nel serbatoio (L o gal).",
+          "fuel_level": "Carburante rimasto nel serbatoio (%). Richiede la capacità del serbatoio quando non c'è un sensore di quantità di carburante.",
+          "battery_energy": "Energia rimasta nella batteria di trazione (kWh o Wh).",
+          "battery_level": "Stato di carica della batteria di trazione (%). Richiede la capacità della batteria quando non c'è un sensore di energia della batteria.",
+          "tank_capacity": "Converte il livello del carburante in litri.",
+          "battery_capacity": "Converte il livello della batteria in kWh.",
+          "charger_energy": "Contatore di energia della tua wallbox di casa (evcc, Wallbox, Easee, Zaptec, Ohme…): le ricariche a casa vengono misurate alla wallbox, perdite incluse. Richiede un sensore della batteria."
+        }
+      },
+      "prices": {
+        "title": "Prezzi e rilevamento",
+        "description": "Un sensore di prezzo ha la precedenza sul prezzo fisso. Le soglie distinguono un rifornimento o una ricarica dal rumore dei sensori.",
+        "data": {
+          "fuel_price_entity": "Sensore del prezzo del carburante",
+          "fuel_price": "Prezzo fisso del carburante",
+          "electricity_price_entity": "Sensore del prezzo dell'elettricità",
+          "electricity_price": "Prezzo fisso dell'elettricità",
+          "trip_gap": "Fine del viaggio dopo",
+          "refuel_threshold": "Soglia di rifornimento",
+          "charge_threshold": "Soglia di ricarica"
+        },
+        "data_description": {
+          "fuel_price_entity": "Prezzo al litro (o al gallone) che segue i prezzi del distributore.",
+          "fuel_price": "Prezzo al litro, usato quando non c'è un sensore di prezzo o non è disponibile.",
+          "electricity_price_entity": "Prezzo al kWh della tua tariffa.",
+          "electricity_price": "Prezzo al kWh, usato quando non c'è un sensore di prezzo o non è disponibile.",
+          "trip_gap": "Un viaggio termina quando il contachilometri non si muove per questo tempo.",
+          "refuel_threshold": "Un aumento del carburante di almeno questa quantità è un rifornimento; gli aumenti minori vengono ignorati.",
+          "charge_threshold": "Un aumento della batteria di almeno questa quantità è una ricarica; gli aumenti minori vengono ignorati."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Scegli almeno un sensore di carburante o di batteria.",
+      "tank_capacity_required": "La capacità del serbatoio è necessaria per usare il livello del carburante.",
+      "battery_capacity_required": "La capacità della batteria è necessaria per usare il livello della batteria.",
+      "duplicate_sensor": "Questo sensore è già usato per un'altra fonte.",
+      "charger_needs_battery": "Un contatore della wallbox di casa richiede un sensore di energia o di livello della batteria."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "consumption": {
+        "name": "Consumo",
+        "state_attributes": {
+          "vehicle": { "name": "Veicolo" },
+          "entry_id": { "name": "ID della voce" },
+          "kind": {
+            "name": "Energia",
+            "state": {
+              "fuel": "Carburante",
+              "electric": "Elettrico",
+              "plugin_hybrid": "Ibrido plug-in"
+            }
+          },
+          "currency": { "name": "Valuta" },
+          "odometer": { "name": "Contachilometri" },
+          "fuel_quantity": { "name": "Quantità di carburante" },
+          "fuel_level": { "name": "Livello del carburante" },
+          "tank_capacity": { "name": "Capacità del serbatoio" },
+          "battery_energy": { "name": "Energia della batteria" },
+          "battery_level": { "name": "Livello della batteria" },
+          "battery_capacity": { "name": "Capacità della batteria" },
+          "fuel_price": { "name": "Prezzo del carburante" },
+          "electricity_price": { "name": "Prezzo dell'elettricità" },
+          "driving": { "name": "In marcia" },
+          "trip": { "name": "Viaggio" },
+          "month": { "name": "Mese" },
+          "total": { "name": "Totale" },
+          "months": { "name": "Mesi" },
+          "trips": { "name": "Viaggi" },
+          "refuels": { "name": "Rifornimenti" },
+          "charges": { "name": "Ricariche" }
+        }
+      },
+      "fuel_consumption_trip": { "name": "Consumo di carburante del viaggio" },
+      "fuel_consumption_month": { "name": "Consumo di carburante questo mese" },
+      "fuel_consumption_average": { "name": "Consumo medio di carburante" },
+      "energy_consumption_trip": { "name": "Consumo di energia del viaggio" },
+      "energy_consumption_month": { "name": "Consumo di energia questo mese" },
+      "energy_consumption_average": { "name": "Consumo medio di energia" },
+      "distance_trip": { "name": "Distanza del viaggio" },
+      "distance_month": { "name": "Distanza questo mese" },
+      "fuel_used_month": { "name": "Carburante usato questo mese" },
+      "energy_used_month": { "name": "Energia usata questo mese" },
+      "cost_month": { "name": "Costo questo mese" },
+      "cost_per_km": { "name": "Costo al km" },
+      "last_refuel": {
+        "name": "Ultimo rifornimento",
+        "state_attributes": {
+          "liters": { "name": "Litri" },
+          "cost": { "name": "Costo" },
+          "odometer": { "name": "Contachilometri" },
+          "source": {
+            "name": "Fonte",
+            "state": {
+              "auto": "Rilevato",
+              "manual": "Manuale"
+            }
+          }
+        }
+      },
+      "last_charge": {
+        "name": "Ultima ricarica",
+        "state_attributes": {
+          "energy": { "name": "Energia" },
+          "cost": { "name": "Costo" },
+          "odometer": { "name": "Contachilometri" },
+          "source": {
+            "name": "Fonte",
+            "state": {
+              "auto": "Rilevata",
+              "manual": "Manuale",
+              "charger": "Wallbox di casa"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "add_refuel": {
+      "name": "Aggiungi un rifornimento",
+      "description": "Registra un rifornimento a mano. Viene elencato insieme a quelli rilevati; il consumo continua a essere calcolato dai sensori.",
+      "fields": {
+        "config_entry_id": { "name": "Veicolo", "description": "Il veicolo che è stato rifornito." },
+        "liters": { "name": "Litri", "description": "Carburante aggiunto." },
+        "cost": { "name": "Costo totale", "description": "Importo pagato. Calcolato dal prezzo se omesso." },
+        "price": { "name": "Prezzo al litro", "description": "Calcolato dal costo totale se omesso; il prezzo attuale se mancano entrambi." },
+        "odometer": { "name": "Contachilometri", "description": "Lettura del contachilometri (km). L'ultima lettura nota se omessa." }
+      }
+    },
+    "add_charge": {
+      "name": "Aggiungi una ricarica",
+      "description": "Registra una ricarica a mano. Viene elencata insieme a quelle rilevate; il consumo continua a essere calcolato dai sensori.",
+      "fields": {
+        "config_entry_id": { "name": "Veicolo", "description": "Il veicolo che è stato ricaricato." },
+        "energy": { "name": "Energia", "description": "Energia aggiunta (kWh)." },
+        "cost": { "name": "Costo totale", "description": "Importo pagato. Calcolato dal prezzo se omesso." },
+        "price": { "name": "Prezzo al kWh", "description": "Calcolato dal costo totale se omesso; il prezzo attuale se mancano entrambi." },
+        "odometer": { "name": "Contachilometri", "description": "Lettura del contachilometri (km). L'ultima lettura nota se omessa." }
+      }
+    },
+    "reset_statistics": {
+      "name": "Azzera le statistiche",
+      "description": "Cancella i viaggi, i mesi, i rifornimenti, le ricariche e i totali del veicolo; il monitoraggio riparte dalle letture attuali.",
+      "fields": {
+        "config_entry_id": { "name": "Veicolo", "description": "Il veicolo di cui vengono cancellate le statistiche." }
+      }
+    },
+    "import_history": {
+      "name": "Importa lo storico",
+      "description": "Ricostruisce i viaggi, i mesi, i rifornimenti e le ricariche del veicolo da ciò che Home Assistant ha registrato dei suoi sensori (fin dove il registratore lo conserva). I rifornimenti e le ricariche inseriti a mano vengono mantenuti.",
+      "fields": {
+        "config_entry_id": { "name": "Veicolo", "description": "Il veicolo di cui viene importato lo storico." },
+        "days": { "name": "Giorni", "description": "Quanto indietro ricostruire (60 per impostazione predefinita). Vengono usati gli stati registrati dove il registratore li ha ancora (10 giorni per impostazione predefinita), prima le statistiche orarie dei sensori." }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Nessuna voce Vehicle Consumption con ID {entry_id}."
+    },
+    "not_loaded": {
+      "message": "Vehicle Consumption per {name} non è caricato."
+    },
+    "no_recorder": {
+      "message": "Il registratore non è configurato: non c'è uno storico da importare."
+    }
+  }
+}

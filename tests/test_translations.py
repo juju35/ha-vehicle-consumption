@@ -27,23 +27,33 @@ def _load(lang: str) -> dict[str, str]:
     return _flatten(json.loads((TRANSLATIONS / f"{lang}.json").read_text(encoding="utf-8")))
 
 
+LANGUAGES = {"en", "fr", "de", "es", "it", "nl", "pt", "pt-BR", "pl", "sr", "sr-Latn"}
+
+
 def test_languages() -> None:
-    """English, French, German, Spanish and Serbian (Cyrillic and Latin) are shipped."""
-    assert {p.stem for p in TRANSLATIONS.glob("*.json")} >= {"en", "fr", "de", "es", "sr", "sr-Latn"}
+    """English, French, German, Spanish, Italian, Dutch, Portuguese, Polish and Serbian (both scripts) are shipped."""
+    assert {p.stem for p in TRANSLATIONS.glob("*.json")} >= LANGUAGES
 
 
-@pytest.mark.parametrize("lang", sorted(p.stem for p in TRANSLATIONS.glob("*.json") if p.stem != "en"))
+@pytest.mark.parametrize("lang", sorted(LANGUAGES - {"en"}))
 def test_parity(lang: str) -> None:
-    """Same keys as English, same placeholders in every string."""
+    """Same keys as English, same placeholders in every string, no empty string."""
     en, other = _load("en"), _load(lang)
     assert sorted(other) == sorted(en)
     for key, text in en.items():
+        assert isinstance(other[key], str), f"{lang}: {key}"
+        assert other[key].strip(), f"{lang}: {key} is empty"
         assert sorted(PLACEHOLDER.findall(other[key])) == sorted(PLACEHOLDER.findall(text)), f"{lang}: {key}"
 
 
 def test_exact_languages() -> None:
-    """No other language is shipped (the card has the same six)."""
-    assert {p.stem for p in TRANSLATIONS.glob("*.json")} == {"en", "fr", "de", "es", "sr", "sr-Latn"}
+    """No other language is shipped (the card has the same ten; pt-BR is the integration's copy of pt)."""
+    assert {p.stem for p in TRANSLATIONS.glob("*.json")} == LANGUAGES
+
+
+def test_brazilian_portuguese_is_european() -> None:
+    """pt-BR uses the European Portuguese texts, unchanged."""
+    assert _load("pt-BR") == _load("pt")
 
 
 # Serbian Cyrillic letter by letter, then its Latin spelling (љ, њ and џ take two letters).
