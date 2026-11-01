@@ -2,7 +2,8 @@
 
 Usage: python scripts/screenshots.py  (needs `pip install playwright` and `playwright install chromium`, and ffmpeg for
 the GIFs). CHROMIUM_PATH=/path/to/chrome to use another browser. The clock is frozen so the dates stay the same.
-Every capture keeps a 16 px frame of the theme background around the card.
+Every capture keeps a 16 px frame of the theme background around the card. A file is only rewritten when its decoded
+pixels change (the bytes of a PNG or a GIF can differ for the same image): an unchanged render leaves no diff to commit.
 """
 
 import json
@@ -343,6 +344,39 @@ GIFS = [{**g, "theme": "light"} for g in LIGHT_GIFS] + [
 ]
 
 
+def pixels(path):
+    """The decoded RGBA pixels of an image, every frame of a GIF, each with its size (PAM): not the encoded bytes."""
+    return subprocess.run(
+        [
+            FFMPEG,
+            "-nostdin",
+            "-v",
+            "error",
+            "-i",
+            str(path),
+            "-f",
+            "image2pipe",
+            "-c:v",
+            "pam",
+            "-pix_fmt",
+            "rgba",
+            "-",
+        ],
+        check=True,
+        capture_output=True,
+    ).stdout
+
+
+def save(new, out):
+    """Move the new render to `out` unless `out` already shows the same pixels; True when written."""
+    new, out = Path(new), Path(out)
+    if out.exists() and pixels(new) == pixels(out):
+        new.unlink()
+        return False
+    new.replace(out)
+    return True
+
+
 def page_html(theme):
     variables = "".join(f"{k}:{v};" for k, v in {**THEMES[theme], **COMMON}.items())
     return f"""<!doctype html><html><head><meta charset="utf-8"><style>
@@ -409,7 +443,7 @@ def animate(browser, shot, *, fps=20):
             )
             page.screenshot(path=f"{frame_dir}/f{i:03d}.png", clip=clip)
         page.close()
-        out = str(ROOT / "screenshots" / f"{shot['file']}.gif")
+        out = f"{frame_dir}/out.gif"
         subprocess.run(
             [
                 FFMPEG,
@@ -428,7 +462,8 @@ def animate(browser, shot, *, fps=20):
             ],
             check=True,
         )
-    print(f"screenshots/{shot['file']}.gif")
+        written = save(out, ROOT / "screenshots" / f"{shot['file']}.gif")
+    print(f"screenshots/{shot['file']}.gif" + ("" if written else " (unchanged)"))
 
 
 def main():
@@ -438,8 +473,10 @@ def main():
         for shot in SHOTS:
             page, clip = open_card(browser, shot)
             path = ROOT / "screenshots" / f"{shot['file']}.png"
-            page.screenshot(path=str(path), clip=clip, animations="disabled")
-            print(path.relative_to(ROOT))
+            with tempfile.TemporaryDirectory() as tmp:
+                page.screenshot(path=f"{tmp}/new.png", clip=clip, animations="disabled")
+                written = save(f"{tmp}/new.png", path)
+            print(path.relative_to(ROOT), "" if written else "(unchanged)")
             page.close()
         for shot in GIFS:
             animate(browser, shot)
