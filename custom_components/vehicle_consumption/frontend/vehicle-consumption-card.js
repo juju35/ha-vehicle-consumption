@@ -662,7 +662,9 @@ const vcParse = (s) => {
   return String(s ?? '').trim() !== '' && Number.isFinite(v) ? v : null;
 };
 
-const VC_ICON = { fuel: 'mdi:car', electric: 'mdi:car-electric', plugin_hybrid: 'mdi:car-electric-outline' };
+// The badge: the gauge of the projects site, coloured by the card's level.
+const VC_ICON = 'mdi:gauge-low';
+const VC_KINDS = ['fuel', 'electric', 'plugin_hybrid'];
 
 class VehicleConsumptionCard extends HTMLElement {
   static getConfigElement() {
@@ -762,7 +764,7 @@ class VehicleConsumptionCard extends HTMLElement {
       <style>${VehicleConsumptionCard.styles}</style>
       <ha-card class="lvl-na">
         <div class="head">
-          <div class="badge"><ha-icon icon="mdi:car-off"></ha-icon></div>
+          <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
           <div class="title">${vcEsc(c.title || this._t('title'))}</div>
           <div class="pill">${vcEsc(this._t('not_loaded'))}</div>
         </div>
@@ -772,7 +774,7 @@ class VehicleConsumptionCard extends HTMLElement {
     }
 
     const f = vcFormat(this._hass, lang, a.currency);
-    const kind = a.kind in VC_ICON ? a.kind : 'fuel';
+    const kind = VC_KINDS.includes(a.kind) ? a.kind : 'fuel';
     const tracks = vcTracks(kind);
     const gauges = [
       tracks.fuel ? this._gauge('fuel', a.fuel_level, a.fuel_quantity, 'L', 'mdi:gas-station', f) : null,
@@ -800,7 +802,7 @@ class VehicleConsumptionCard extends HTMLElement {
       <style>${VehicleConsumptionCard.styles}</style>
       <ha-card class="lvl-${level}${this._popup ? ' has-popup' : ''}${anim}">
         <div class="head">
-          <div class="badge"><ha-icon icon="${VC_ICON[kind]}"></ha-icon></div>
+          <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
           <div class="title"><span class="tname">${vcEsc(c.title || a.vehicle || this._t('title'))}</span>${driving}</div>
           ${add}
           <div class="pill">${vcEsc(avg)}</div>

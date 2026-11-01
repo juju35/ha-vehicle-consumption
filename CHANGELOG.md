@@ -5,6 +5,9 @@
 ### What's new
 - Added Italian, Dutch, European Portuguese and Polish translations: `it`, `nl`, `pt` and `pl` for the setup and options, the entities, the actions and the card with its visual editor. Brazilian Portuguese: `pt-BR` uses the European Portuguese texts, in the integration as in the card.
 
+### Changes
+- Card: the header badge is now a gauge (`mdi:gauge-low`), the icon of the projects site, for every vehicle; its colour still follows the state (driving, low level, not available). It replaced a car icon that changed with the vehicle type.
+
 ## 0.2.3 - 2026-11-01
 
 ### What's new

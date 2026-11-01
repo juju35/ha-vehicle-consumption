@@ -286,7 +286,7 @@ test('fuel: one fuel gauge, L/100 km tiles, refuels section but no charges, aver
   const card = makeCard();
   card.hass = hassWith(fuelAttrs());
   const out = html(card);
-  assert.match(out, /mdi:car"/);
+  assert.match(out, /mdi:gauge-low"/);
   assert.match(out, /g-fuel/);
   assert.doesNotMatch(out, /g-battery/);
   assert.match(out, /63 % · 31.5 L/);
@@ -305,7 +305,7 @@ test('electric: one battery gauge, kWh/100 km, charges section only', () => {
   hass.states[SENSOR].attributes.unit_of_measurement = 'kWh/100 km';
   card.hass = hass;
   const out = html(card);
-  assert.match(out, /mdi:car-electric"/);
+  assert.match(out, /mdi:gauge-low"/);
   assert.match(out, /g-battery/);
   assert.doesNotMatch(out, /g-fuel/);
   assert.match(out, /16.1<small>kWh\/100 km/);
@@ -339,7 +339,7 @@ test('plugin hybrid: two gauges, both consumptions in the tiles, refuels and cha
     }),
   );
   const out = html(card);
-  assert.match(out, /mdi:car-electric-outline/);
+  assert.match(out, /mdi:gauge-low"/);
   assert.match(out, /g-fuel/);
   assert.match(out, /g-battery/);
   assert.match(out, /2.1<small>L\/100 km.*12.4<small>kWh\/100 km/s);

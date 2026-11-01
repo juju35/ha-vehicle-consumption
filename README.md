@@ -237,6 +237,8 @@ entity: sensor.my_car_consumption
 
 In the visual editor, **Vehicle** lists every vehicle set up in Vehicle Consumption, by name: nothing to look up, and a vehicle added later shows up in the list. The card picker previews the card with your first vehicle.
 
+The badge in the header is a gauge whose colour gives the state of the vehicle: the primary colour when all is well, green while driving, orange when the fuel or battery is low, grey when the vehicle is not available.
+
 The **+** button opens a popup at the top of the card to log a refuel (litres) or a charge (kWh), its total cost and, optionally, the odometer. The sections fold and unfold with a tap, and fold back on their own when you tap elsewhere.
 
 ## Screenshots
