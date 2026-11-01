@@ -205,7 +205,16 @@ data:
 
 #### `vehicle_consumption.import_history`
 
-Rebuilds the trips, months, refuels and charges of a vehicle from what Home Assistant recorded of its sensors over the last `days` (60 by default, up to 730). The [recorder](https://www.home-assistant.io/integrations/recorder/)'s states are used where it still has them (10 days by default); before them, the hourly long-term statistics of the sensors stand in (kept for good for sensors with a state class: the hourly state of a mileage or a fuel quantity, the hourly mean of a level in % or a price), so older trips are found to the hour. Those hours are only used once the odometer and every fuel or battery sensor that does the counting have statistics: a level without a state class has none, and the import then starts with the recorded states. Refuels and charges logged by hand are kept. Nothing tracked is wiped by an import: the months the recorded history does not cover from their first day (those before it starts, and the month it starts in) keep their trips, figures, refuels and charges as tracked, and with nothing recorded for the vehicle's sensors (excluded from the recorder) the import changes nothing. It runs on its own once, over 60 days, when the vehicle is added, so the card is filled from the first day.
+Rebuilds the trips, months, refuels and charges of a vehicle from what Home Assistant recorded of its sensors over the last `days` (60 by default, up to 730). The [recorder](https://www.home-assistant.io/integrations/recorder/)'s states are used where it still has them (10 days by default); before them, the hourly long-term statistics of the sensors stand in (kept for good for sensors with a state class: the hourly state of a mileage or a fuel quantity, the hourly mean of a level in % or a price), so older trips are found to the hour. Those hours are only used once the odometer and every fuel or battery sensor that does the counting have statistics: a level without a state class has none, and the import then starts with the recorded states. Refuels and charges logged by hand are kept. It runs on its own once, over 60 days, when the vehicle is added, so the card is filled from the first day.
+
+An import never replaces what was tracked with less:
+
+- **A source missing from the history**: when the odometer or a fuel or battery sensor that does the counting has no usable recorded reading (excluded from the recorder, only `unavailable` or `unknown`, new or just changed), the import changes nothing.
+- **A source no longer recorded**: when a source's current reading is not its last recorded one (excluded from the recorder since), the import changes nothing, as long as something is already tracked.
+- **Partly covered months**: the replay only stands in from the month after the one where *every* counting source has its first recorded reading; the months before keep their trips, figures, refuels and charges as tracked, even when one source was recorded from before the tracking started.
+- **Less than tracked**: if the replay still ends with less distance (by more than 1 km), fuel or energy (by more than 1 L / kWh and 5 %) than tracked, in total, in any month or in the trips, the recorder has a gap: everything stays as tracked and a warning is logged.
+
+The charger counter is optional and is not required for an import.
 
 ```yaml
 action: vehicle_consumption.import_history

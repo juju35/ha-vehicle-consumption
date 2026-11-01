@@ -4,12 +4,14 @@
 
 ### Fixes
 - History import no longer wipes what was tracked. With the vehicle's sensors excluded from the recorder (or nothing recorded for them), the one-off re-import after updating from 0.2.0 / 0.2.1 reset the totals, months and trips to zero; it now leaves them as they are. When the recorder starts after the tracking did (and with the `import_history` action over a few `days`), the months it does not cover from their first day keep their figures, trips, refuels and charges, and the total adds them up.
+- History import (the one-off re-import and the `import_history` action) never replaces tracked figures with a partial history either: it changes nothing when the odometer or a fuel / battery sensor has no usable recorded reading (excluded from the recorder, only `unavailable`, new or just changed) or is no longer recorded; it only replays the months that every counting source covers from their first day; and when the replay still has less distance, fuel or energy than tracked (a gap in the recorder), everything stays as tracked and a warning is logged.
 - Setup: the sensors step says "Sensors found automatically: 2" instead of "1 sensors were found".
-- Card: on a narrow column (6 columns of a section), the vehicle name stays visible: the average consumption pill shrinks, then shows only its coloured dot (the value stays in its tooltip). The KPI tiles put the unit under the value and wrap long labels instead of cutting them.
+- Card: on a narrow column, the vehicle name stays visible: the average consumption pill keeps its whole value while it fits, then shows only its coloured dot (the value stays in its tooltip). The card now takes at least 8 of the 12 columns of a section (6 cut the values on a phone). The KPI tiles put the unit under the value and wrap long labels instead of cutting them.
 - Card: the trips of a plug-in hybrid show one consumption a line, so the date and distance no longer disappear and the values no longer overflow the card.
 - Card: the monthly chart is drawn at the card's width, so its month names and values keep a readable size on a narrow card.
 - Card: coloured texts (the average pill, a low tank or battery, refuels logged by hand, the current month of the chart, the add popup) are darker in light themes and lighter in dark ones, for a readable contrast.
-- Card: an unavailable sensor (Home Assistant starting, the integration reloading) or a wrong `entity` now says so, with the sensor, instead of "Not set up".
+- Card: an unavailable sensor (Home Assistant starting, the integration reloading) or a wrong `entity` now says so, with the sensor, instead of "Not set up", also when the card picks the vehicle on its own (no `entity`).
+- Card: in a layout-card, a grid card column sized `auto` or any parent sized by its content, the card no longer collapses to a thin strip, and it still shrinks in a `1fr` column without overflowing.
 - Card: the trips, refuels and charges counters read "5/6" when only the last 5 rows are listed.
 - Card: times follow Home Assistant's 12 / 24-hour setting.
 - Card editor: "Chart shows" and "Months in the chart" are hidden while the chart is turned off.
