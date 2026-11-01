@@ -11,6 +11,7 @@ from custom_components.vehicle_consumption.const import (
     CONF_BATTERY_ENERGY,
     CONF_BATTERY_LEVEL,
     CONF_CHARGE_THRESHOLD,
+    CONF_CHARGER_ENERGY,
     CONF_DEVICE_ID,
     CONF_ELECTRICITY_PRICE,
     CONF_FUEL_LEVEL,
@@ -26,7 +27,7 @@ from custom_components.vehicle_consumption.const import (
 )
 from custom_components.vehicle_consumption.detect import _KNOWN, _TRANSLATION_KEY_ONLY, _known_key, async_detect
 
-from .conftest import KM, KWH, LITERS, PERCENT, add_sensor, setup_vehicle, state_of, vehicle_device
+from .conftest import KM, KWH, LITERS, ODOMETER, PERCENT, add_sensor, setup_vehicle, state_of, vehicle_device
 
 
 def _renault(hass: HomeAssistant) -> str:
@@ -213,6 +214,36 @@ async def test_sensor_errors(hass: HomeAssistant) -> None:
         {CONF_ODOMETER: "sensor.clio_mileage", CONF_FUEL_LEVEL: "sensor.a", CONF_FUEL_QUANTITY: "sensor.q"},
     )
     assert result["step_id"] == "prices"
+
+
+async def test_same_sensor_twice(hass: HomeAssistant) -> None:
+    """One sensor cannot be two sources: a fuel quantity also picked as the fuel level is refused."""
+    device = vehicle_device(hass, "Captur")
+    add_sensor(hass, device, "captur_mileage", "1000", KM, unique_id="vf3_mileage", translation_key="mileage")
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": "user"})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_DEVICE_ID: device})
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ODOMETER: "sensor.captur_mileage", CONF_FUEL_QUANTITY: "sensor.q", CONF_FUEL_LEVEL: "sensor.q"},
+    )
+    assert result["errors"] == {CONF_FUEL_LEVEL: "duplicate_sensor"}
+    # Distinct sensors go on
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ODOMETER: "sensor.captur_mileage", CONF_FUEL_QUANTITY: "sensor.q", CONF_FUEL_LEVEL: "sensor.l"},
+    )
+    assert result["step_id"] == "prices"
+
+
+async def test_options_refuse_same_sensor_twice(hass: HomeAssistant) -> None:
+    """The options flow refuses it too, the home charger counter included."""
+    entry = await setup_vehicle(hass)
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {CONF_ODOMETER: ODOMETER, CONF_BATTERY_ENERGY: "sensor.e", CONF_CHARGER_ENERGY: "sensor.e"},
+    )
+    assert result["errors"] == {CONF_CHARGER_ENERGY: "duplicate_sensor"}
 
 
 async def test_options_flow(hass: HomeAssistant) -> None:
