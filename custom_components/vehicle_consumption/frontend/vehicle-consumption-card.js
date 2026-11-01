@@ -5,7 +5,7 @@
  * Served and added to the dashboard resources by the integration.
  * https://github.com/juju35/ha-vehicle-consumption
  */
-var VEHICLE_CONSUMPTION_CARD_VERSION = '0.2.4';
+var VEHICLE_CONSUMPTION_CARD_VERSION = '0.2.5';
 
 const VC_I18N = {
   en: {
