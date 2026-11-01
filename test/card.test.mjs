@@ -20,7 +20,26 @@ const fakeNode = () => ({
   },
 });
 const listeners = {};
+// A ResizeObserver stand-in: the test calls `observers[i].fire(width)`.
+const observers = [];
+class FakeResizeObserver {
+  constructor(cb) {
+    this.cb = cb;
+    this.targets = [];
+    observers.push(this);
+  }
+  observe(el) {
+    this.targets.push(el);
+  }
+  disconnect() {
+    this.targets = [];
+  }
+  fire(width) {
+    for (const target of this.targets) this.cb([{ target, contentRect: { width } }]);
+  }
+}
 const context = {
+  ResizeObserver: FakeResizeObserver,
   HTMLElement: class {},
   customElements: { get: () => true, define() {} },
   window: {},
@@ -635,4 +654,162 @@ test('editor: a Vehicle list of the vehicles found, keeping a configured sensor 
   hass.states[more] = { state: '7', attributes: { ...fuelAttrs(), vehicle: 'Van' } };
   editor.hass = hass;
   assert.ok(editor._form.schema[0].selector.select.options.some((o) => o.value === more));
+});
+
+// ── Review pass 9 ──
+const styles = () => VehicleConsumptionCard.styles.replace(/\s+/g, ' ');
+const rule = (selector) => {
+  const css = styles();
+  const at = css.indexOf(`${selector} {`);
+  assert.ok(at >= 0, `no rule for ${selector}`);
+  return css.slice(at, css.indexOf('}', at));
+};
+// WCAG contrast of `fg` over `bg` (hex), as the card mixes the ink: `color-mix(in srgb, c p%, text)`.
+const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const mix = (a, b, p) => a.map((v, i) => v * p + b[i] * (1 - p));
+const lum = (rgb) =>
+  rgb
+    .map((v) => v / 255)
+    .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
+    .reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);
+const contrast = (a, b) => {
+  const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+  return (x + 0.05) / (y + 0.05);
+};
+
+test('header: the title keeps a few letters, the pill shrinks and turns into a dot on a narrow card', () => {
+  assert.match(rule('.title'), /flex: 1 1 auto/);
+  assert.match(rule('.title'), /min-width: 4ch/);
+  assert.match(rule('.tname'), /text-overflow: ellipsis/);
+  const pill = rule('.pill');
+  for (const p of ['flex: 0 1 auto', 'min-width: 0', 'max-width: 50%', 'overflow: hidden', 'text-overflow: ellipsis']) {
+    assert.ok(pill.includes(p), p);
+  }
+  assert.match(styles(), /@container \(max-width: \d+px\) \{[^}]*\.pill \.ptxt \{ display: none; \}/);
+  for (const sel of ['.icon-btn', '.badge']) assert.match(rule(sel), /flex: none/);
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs());
+  // The value stays readable for assistive technology and in the tooltip once only the dot shows.
+  assert.match(html(card), /class="pill" title="6.1 L\/100 km" aria-label="6.1 L\/100 km"><span class="pdot"><\/span><span class="ptxt">6.1 L\/100 km<\/span>/);
+});
+
+test('contrast: coloured texts use an ink mixed with the text colour, ≥ 4.5:1 in light and dark', () => {
+  for (const sel of ['.pill', '.gauge.low .gval', '.row.manual .txt .sub', '.chart text.now', '.tab.on', '.btn.accent']) {
+    assert.match(rule(sel), /(color|fill): (var\(--ci\)|var\(--vc-ink\)|color-mix\(in srgb, var\(--[a-z-]+\) 40%, var\(--primary-text-color\)\))/, sel);
+  }
+  assert.match(rule('ha-card'), /--ci: color-mix\(in srgb, var\(--c\) 40%, var\(--primary-text-color\)\)/);
+  // HA default colours: the state colours over the light / dark card with the pill tint.
+  const themes = [
+    { text: hex('#212121'), card: hex('#ffffff') },
+    { text: hex('#e1e1e1'), card: hex('#1c1c1c') },
+  ];
+  for (const c of ['#03a9f4', '#43a047', '#ffa600', '#9e9e9e', '#f59e0b']) {
+    for (const t of themes) {
+      const ink = mix(hex(c), t.text, 0.4);
+      const bg = mix(hex(c), t.card, 0.14);
+      assert.ok(contrast(ink, bg) >= 4.5, `${c}: ${contrast(ink, bg).toFixed(2)}`);
+    }
+  }
+});
+
+test('plugin hybrid trips: one consumption a line, the value column never pushes the date out', () => {
+  const card = makeCard();
+  card._open = new Set(['trips']);
+  card.hass = hassWith(
+    fuelAttrs({
+      kind: 'plugin_hybrid',
+      trips: [{ start: '2026-10-30T08:00:00+01:00', distance: 42.3, fuel_consumption: 2.2, energy_consumption: 9.2, cost: 4.32 }],
+    }),
+  );
+  assert.match(html(card), /<span class="val"><span class="v">2.2 L\/100 km<\/span><span class="v">9.2 kWh\/100 km<\/span><span class="sub">€4.32<\/span>/);
+  const val = rule('.val');
+  for (const p of ['flex: 0 1 auto', 'min-width: 0', 'max-width: 60%']) assert.ok(val.includes(p), p);
+});
+
+test('chart: drawn at the width of the card, so its labels keep their size', () => {
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs());
+  assert.match(html(card), /viewBox="0 0 400 112"/);
+  card.connectedCallback();
+  const ro = observers.at(-1);
+  assert.equal(ro.targets[0], card);
+  ro.fire(230);
+  // 230 px card: 12 px card padding and 10 px chart padding on each side.
+  assert.match(html(card), /viewBox="0 0 186 112"/);
+  card.shadowRoot.innerHTML = 'kept';
+  ro.fire(232); // a few pixels do not re-render
+  assert.equal(html(card), 'kept');
+  card.disconnectedCallback();
+  assert.equal(ro.targets.length, 0);
+  // Twelve months on a narrow card: every other month name, the values only for the current month.
+  const narrow = makeCard({ months: 12 });
+  narrow.hass = hassWith(fuelAttrs());
+  narrow.connectedCallback();
+  observers.at(-1).fire(230);
+  const out = html(narrow);
+  assert.equal((out.match(/class="ml/g) || []).length, 6);
+  assert.equal((out.match(/class="bv/g) || []).length, 1);
+  narrow.disconnectedCallback();
+});
+
+test('not set up, unavailable or not found: each says so, with the sensor', () => {
+  const missing = makeCard({ entity: 'sensor.typo' });
+  missing.hass = hassWith(fuelAttrs());
+  assert.match(html(missing), /class="ptxt">Not found</);
+  assert.match(html(missing), /sensor\.typo is not a Vehicle Consumption sensor/);
+  const down = makeCard({ entity: SENSOR });
+  const hass = hassWith(null);
+  hass.states[SENSOR] = { state: 'unavailable', attributes: { restored: true, friendly_name: 'Family car Consumption' } };
+  down.hass = hass;
+  assert.match(html(down), /class="ptxt">Unavailable</);
+  assert.match(html(down), /sensor\.family_car_consumption is unavailable/);
+  assert.doesNotMatch(html(down), /Settings → Devices/);
+  const none = makeCard();
+  none.hass = hassWith(null);
+  assert.match(html(none), /Not set up/);
+  assert.match(html(none), /Settings → Devices/);
+});
+
+test('section count: the rows shown out of the total when the list is longer', () => {
+  const trip = { start: '2026-10-30T08:00:00+01:00', distance: 10, fuel_consumption: 5, cost: 1 };
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs({ trips: Array.from({ length: 6 }, () => trip) }));
+  assert.match(html(card), /data-key="trips"[\s\S]*?<span class="count">5\/6<\/span>/);
+  const few = makeCard();
+  few.hass = hassWith(fuelAttrs());
+  assert.match(html(few), /data-key="trips"[\s\S]*?<span class="count">1<\/span>/);
+});
+
+test('KPIs on a narrow card: the unit goes under the value, labels and sub-lines wrap', () => {
+  const css = styles();
+  const at = css.search(/@container \(max-width: \d+px\) \{[^@]*\.kv small/);
+  assert.ok(at >= 0);
+  const block = css.slice(at, css.indexOf('} }', at));
+  assert.match(block, /\.kv small \{ display: block; margin-left: 0; \}/);
+  assert.match(block, /\.kl, \.ks \{ white-space: normal;/);
+});
+
+test('editor: the chart options are hidden while the chart is off', () => {
+  const editor = new VehicleConsumptionCardEditor();
+  editor.appendChild = () => {};
+  editor.dispatchEvent = () => {};
+  editor.setConfig({ type: 'custom:vehicle-consumption-card' });
+  editor.hass = hassWith(fuelAttrs());
+  const names = () => editor._form.schema.map((s) => s.name);
+  assert.ok(names().includes('chart_metric') && names().includes('months'));
+  editor.setConfig({ type: 'custom:vehicle-consumption-card', chart: false });
+  assert.ok(!names().includes('chart_metric') && !names().includes('months'));
+  assert.ok(names().includes('chart'));
+});
+
+test('times follow the 12 / 24 h setting of Home Assistant', () => {
+  const d = '2026-10-30T17:05:00Z';
+  const at = (time_format, lang = 'en') =>
+    vcFormat({ locale: { language: lang, time_format, time_zone: 'server' } }, lang, 'EUR').date(d).replace(/\s/g, ' ');
+  const h24 = new Intl.DateTimeFormat('en', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(d));
+  const h12 = new Intl.DateTimeFormat('fr', { hour: '2-digit', minute: '2-digit', hour12: true }).format(new Date(d));
+  assert.ok(at('24').endsWith(h24), at('24'));
+  assert.doesNotMatch(at('24'), /PM/);
+  assert.ok(at('12', 'fr').replace(/\s/g, ' ').endsWith(h12.replace(/\s/g, ' ')), at('12', 'fr'));
+  assert.match(at('language'), /PM/);
 });
