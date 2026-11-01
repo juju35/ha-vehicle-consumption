@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Changes
+- Card: the header badge is now a gauge (`mdi:gauge-low`), the icon of the projects site, for every vehicle; its colour still follows the state (driving, low level, not available). It replaced a car icon that changed with the vehicle type.
+
 ## 0.2.3 - 2026-11-01
 
 ### What's new
