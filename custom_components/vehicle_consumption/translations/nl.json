@@ -1,0 +1,255 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vehicle Consumption",
+        "description": "Kies het voertuig: de kilometerstand-, brandstof- en accusensoren worden op dit apparaat gezocht.",
+        "data": {
+          "device_id": "Voertuig",
+          "name": "Naam"
+        },
+        "data_description": {
+          "device_id": "Apparaat van de integratie van het voertuig (Renault, Tesla, Kia, Volkswagen, OBD-dongle…).",
+          "name": "Getoond op de kaart en de entiteiten. Laat leeg om de naam van het apparaat te gebruiken."
+        }
+      },
+      "sensors": {
+        "title": "Sensoren van {name}",
+        "description": "Er zijn automatisch {found} sensoren gevonden: controleer ze. De kilometerstand is verplicht, plus minstens één brandstof- of accusensor.",
+        "data": {
+          "odometer": "Kilometerstand",
+          "fuel_quantity": "Hoeveelheid brandstof",
+          "fuel_level": "Brandstofniveau",
+          "battery_energy": "Accu-energie",
+          "battery_level": "Accuniveau",
+          "tank_capacity": "Tankinhoud",
+          "battery_capacity": "Bruikbare accucapaciteit",
+          "charger_energy": "Energie van de laadpaal thuis"
+        },
+        "data_description": {
+          "odometer": "Totale afstand van het voertuig (km of mi).",
+          "fuel_quantity": "Resterende brandstof in de tank (L of gal).",
+          "fuel_level": "Resterende brandstof in de tank (%). Vereist de tankinhoud als er geen sensor voor de hoeveelheid brandstof is.",
+          "battery_energy": "Resterende energie in de tractiebatterij (kWh of Wh).",
+          "battery_level": "Laadtoestand van de tractiebatterij (%). Vereist de accucapaciteit als er geen sensor voor de accu-energie is.",
+          "tank_capacity": "Zet het brandstofniveau om in liters.",
+          "battery_capacity": "Zet het accuniveau om in kWh.",
+          "charger_energy": "Energiemeter van je laadpaal thuis (evcc, Wallbox, Easee, Zaptec, Ohme…): laadbeurten thuis worden aan de laadpaal gemeten, verliezen inbegrepen. Vereist een accusensor."
+        }
+      },
+      "prices": {
+        "title": "Prijzen voor {name}",
+        "description": "Gebruikt om de kosten van elke rit en elke maand te berekenen. Een prijssensor (tankstation, elektriciteitstarief) gaat voor de vaste prijs; zonder een van beide worden geen kosten getoond.",
+        "data": {
+          "fuel_price_entity": "Brandstofprijssensor",
+          "fuel_price": "Vaste brandstofprijs",
+          "electricity_price_entity": "Elektriciteitsprijssensor",
+          "electricity_price": "Vaste elektriciteitsprijs"
+        },
+        "data_description": {
+          "fuel_price_entity": "Prijs per liter (of per gallon) die de prijzen van het tankstation volgt.",
+          "fuel_price": "Prijs per liter, gebruikt als er geen prijssensor is of als die niet beschikbaar is.",
+          "electricity_price_entity": "Prijs per kWh van je tarief.",
+          "electricity_price": "Prijs per kWh, gebruikt als er geen prijssensor is of als die niet beschikbaar is."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Kies minstens één brandstof- of accusensor.",
+      "tank_capacity_required": "De tankinhoud is nodig om het brandstofniveau te gebruiken.",
+      "battery_capacity_required": "De accucapaciteit is nodig om het accuniveau te gebruiken.",
+      "duplicate_sensor": "Deze sensor wordt al voor een andere bron gebruikt.",
+      "charger_needs_battery": "Een meter van de laadpaal thuis vereist een sensor voor de accu-energie of het accuniveau."
+    },
+    "abort": {
+      "already_configured": "Dit voertuig is al geconfigureerd."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sensoren van het voertuig",
+        "description": "De kilometerstand is verplicht, plus minstens één brandstof- of accusensor.",
+        "data": {
+          "odometer": "Kilometerstand",
+          "fuel_quantity": "Hoeveelheid brandstof",
+          "fuel_level": "Brandstofniveau",
+          "battery_energy": "Accu-energie",
+          "battery_level": "Accuniveau",
+          "tank_capacity": "Tankinhoud",
+          "battery_capacity": "Bruikbare accucapaciteit",
+          "charger_energy": "Energie van de laadpaal thuis"
+        },
+        "data_description": {
+          "odometer": "Totale afstand van het voertuig (km of mi).",
+          "fuel_quantity": "Resterende brandstof in de tank (L of gal).",
+          "fuel_level": "Resterende brandstof in de tank (%). Vereist de tankinhoud als er geen sensor voor de hoeveelheid brandstof is.",
+          "battery_energy": "Resterende energie in de tractiebatterij (kWh of Wh).",
+          "battery_level": "Laadtoestand van de tractiebatterij (%). Vereist de accucapaciteit als er geen sensor voor de accu-energie is.",
+          "tank_capacity": "Zet het brandstofniveau om in liters.",
+          "battery_capacity": "Zet het accuniveau om in kWh.",
+          "charger_energy": "Energiemeter van je laadpaal thuis (evcc, Wallbox, Easee, Zaptec, Ohme…): laadbeurten thuis worden aan de laadpaal gemeten, verliezen inbegrepen. Vereist een accusensor."
+        }
+      },
+      "prices": {
+        "title": "Prijzen en detectie",
+        "description": "Een prijssensor gaat voor de vaste prijs. De drempels onderscheiden een tank- of laadbeurt van ruis van de sensoren.",
+        "data": {
+          "fuel_price_entity": "Brandstofprijssensor",
+          "fuel_price": "Vaste brandstofprijs",
+          "electricity_price_entity": "Elektriciteitsprijssensor",
+          "electricity_price": "Vaste elektriciteitsprijs",
+          "trip_gap": "Einde van de rit na",
+          "refuel_threshold": "Drempel voor tankbeurt",
+          "charge_threshold": "Drempel voor laadbeurt"
+        },
+        "data_description": {
+          "fuel_price_entity": "Prijs per liter (of per gallon) die de prijzen van het tankstation volgt.",
+          "fuel_price": "Prijs per liter, gebruikt als er geen prijssensor is of als die niet beschikbaar is.",
+          "electricity_price_entity": "Prijs per kWh van je tarief.",
+          "electricity_price": "Prijs per kWh, gebruikt als er geen prijssensor is of als die niet beschikbaar is.",
+          "trip_gap": "Een rit eindigt als de kilometerstand zo lang niet is veranderd.",
+          "refuel_threshold": "Een stijging van de brandstof van minstens deze hoeveelheid is een tankbeurt; kleinere stijgingen worden genegeerd.",
+          "charge_threshold": "Een stijging van de accu van minstens deze hoeveelheid is een laadbeurt; kleinere stijgingen worden genegeerd."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Kies minstens één brandstof- of accusensor.",
+      "tank_capacity_required": "De tankinhoud is nodig om het brandstofniveau te gebruiken.",
+      "battery_capacity_required": "De accucapaciteit is nodig om het accuniveau te gebruiken.",
+      "duplicate_sensor": "Deze sensor wordt al voor een andere bron gebruikt.",
+      "charger_needs_battery": "Een meter van de laadpaal thuis vereist een sensor voor de accu-energie of het accuniveau."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "consumption": {
+        "name": "Verbruik",
+        "state_attributes": {
+          "vehicle": { "name": "Voertuig" },
+          "entry_id": { "name": "Item-ID" },
+          "kind": {
+            "name": "Energie",
+            "state": {
+              "fuel": "Brandstof",
+              "electric": "Elektrisch",
+              "plugin_hybrid": "Plug-in hybride"
+            }
+          },
+          "currency": { "name": "Valuta" },
+          "odometer": { "name": "Kilometerstand" },
+          "fuel_quantity": { "name": "Hoeveelheid brandstof" },
+          "fuel_level": { "name": "Brandstofniveau" },
+          "tank_capacity": { "name": "Tankinhoud" },
+          "battery_energy": { "name": "Accu-energie" },
+          "battery_level": { "name": "Accuniveau" },
+          "battery_capacity": { "name": "Accucapaciteit" },
+          "fuel_price": { "name": "Brandstofprijs" },
+          "electricity_price": { "name": "Elektriciteitsprijs" },
+          "driving": { "name": "Onderweg" },
+          "trip": { "name": "Rit" },
+          "month": { "name": "Maand" },
+          "total": { "name": "Totaal" },
+          "months": { "name": "Maanden" },
+          "trips": { "name": "Ritten" },
+          "refuels": { "name": "Tankbeurten" },
+          "charges": { "name": "Laadbeurten" }
+        }
+      },
+      "fuel_consumption_trip": { "name": "Brandstofverbruik rit" },
+      "fuel_consumption_month": { "name": "Brandstofverbruik deze maand" },
+      "fuel_consumption_average": { "name": "Gemiddeld brandstofverbruik" },
+      "energy_consumption_trip": { "name": "Energieverbruik rit" },
+      "energy_consumption_month": { "name": "Energieverbruik deze maand" },
+      "energy_consumption_average": { "name": "Gemiddeld energieverbruik" },
+      "distance_trip": { "name": "Ritafstand" },
+      "distance_month": { "name": "Afstand deze maand" },
+      "fuel_used_month": { "name": "Verbruikte brandstof deze maand" },
+      "energy_used_month": { "name": "Verbruikte energie deze maand" },
+      "cost_month": { "name": "Kosten deze maand" },
+      "cost_per_km": { "name": "Kosten per km" },
+      "last_refuel": {
+        "name": "Laatste tankbeurt",
+        "state_attributes": {
+          "liters": { "name": "Liters" },
+          "cost": { "name": "Kosten" },
+          "odometer": { "name": "Kilometerstand" },
+          "source": {
+            "name": "Bron",
+            "state": {
+              "auto": "Gedetecteerd",
+              "manual": "Handmatig"
+            }
+          }
+        }
+      },
+      "last_charge": {
+        "name": "Laatste laadbeurt",
+        "state_attributes": {
+          "energy": { "name": "Energie" },
+          "cost": { "name": "Kosten" },
+          "odometer": { "name": "Kilometerstand" },
+          "source": {
+            "name": "Bron",
+            "state": {
+              "auto": "Gedetecteerd",
+              "manual": "Handmatig",
+              "charger": "Laadpaal thuis"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "add_refuel": {
+      "name": "Tankbeurt toevoegen",
+      "description": "Voert handmatig een tankbeurt in. Deze wordt samen met de gedetecteerde getoond; het verbruik blijft van de sensoren komen.",
+      "fields": {
+        "config_entry_id": { "name": "Voertuig", "description": "Het voertuig dat getankt is." },
+        "liters": { "name": "Liters", "description": "Getankte brandstof." },
+        "cost": { "name": "Totale kosten", "description": "Betaald bedrag. Berekend uit de prijs als het wordt weggelaten." },
+        "price": { "name": "Prijs per liter", "description": "Berekend uit de totale kosten als het wordt weggelaten; de huidige prijs als beide ontbreken." },
+        "odometer": { "name": "Kilometerstand", "description": "Afgelezen kilometerstand (km). De laatst bekende stand als het wordt weggelaten." }
+      }
+    },
+    "add_charge": {
+      "name": "Laadbeurt toevoegen",
+      "description": "Voert handmatig een laadbeurt in. Deze wordt samen met de gedetecteerde getoond; het verbruik blijft van de sensoren komen.",
+      "fields": {
+        "config_entry_id": { "name": "Voertuig", "description": "Het voertuig dat geladen is." },
+        "energy": { "name": "Energie", "description": "Geladen energie (kWh)." },
+        "cost": { "name": "Totale kosten", "description": "Betaald bedrag. Berekend uit de prijs als het wordt weggelaten." },
+        "price": { "name": "Prijs per kWh", "description": "Berekend uit de totale kosten als het wordt weggelaten; de huidige prijs als beide ontbreken." },
+        "odometer": { "name": "Kilometerstand", "description": "Afgelezen kilometerstand (km). De laatst bekende stand als het wordt weggelaten." }
+      }
+    },
+    "reset_statistics": {
+      "name": "Statistieken resetten",
+      "description": "Wist de ritten, maanden, tankbeurten, laadbeurten en totalen van het voertuig; het bijhouden begint opnieuw vanaf de huidige waarden.",
+      "fields": {
+        "config_entry_id": { "name": "Voertuig", "description": "Het voertuig waarvan de statistieken worden gewist." }
+      }
+    },
+    "import_history": {
+      "name": "Geschiedenis importeren",
+      "description": "Bouwt de ritten, maanden, tankbeurten en laadbeurten van het voertuig opnieuw op uit wat Home Assistant van zijn sensoren heeft vastgelegd (zo ver terug als de recorder het bewaart). Handmatig ingevoerde tank- en laadbeurten blijven behouden.",
+      "fields": {
+        "config_entry_id": { "name": "Voertuig", "description": "Het voertuig waarvan de geschiedenis wordt geïmporteerd." },
+        "days": { "name": "Dagen", "description": "Hoe ver terug opnieuw op te bouwen (standaard 60). De vastgelegde statussen worden gebruikt waar de recorder ze nog heeft (standaard 10 dagen), daarvoor de uurstatistieken van de sensoren." }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Geen Vehicle Consumption-item met ID {entry_id}."
+    },
+    "not_loaded": {
+      "message": "Vehicle Consumption voor {name} is niet geladen."
+    },
+    "no_recorder": {
+      "message": "De recorder is niet ingesteld: er is geen geschiedenis om te importeren."
+    }
+  }
+}

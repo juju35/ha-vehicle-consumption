@@ -1,0 +1,255 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vehicle Consumption",
+        "description": "Wybierz pojazd: jego sensory licznika przebiegu, paliwa i akumulatora są wyszukiwane na tym urządzeniu.",
+        "data": {
+          "device_id": "Pojazd",
+          "name": "Nazwa"
+        },
+        "data_description": {
+          "device_id": "Urządzenie integracji pojazdu (Renault, Tesla, Kia, Volkswagen, adapter OBD…).",
+          "name": "Wyświetlana na karcie i w encjach. Pozostaw puste, aby użyć nazwy urządzenia."
+        }
+      },
+      "sensors": {
+        "title": "Sensory: {name}",
+        "description": "Znalezione automatycznie sensory: {found}. Sprawdź je. Licznik przebiegu jest wymagany, a do tego co najmniej jeden sensor paliwa lub akumulatora.",
+        "data": {
+          "odometer": "Licznik przebiegu",
+          "fuel_quantity": "Ilość paliwa",
+          "fuel_level": "Poziom paliwa",
+          "battery_energy": "Energia akumulatora",
+          "battery_level": "Poziom naładowania akumulatora",
+          "tank_capacity": "Pojemność zbiornika",
+          "battery_capacity": "Użyteczna pojemność akumulatora",
+          "charger_energy": "Energia ładowarki domowej"
+        },
+        "data_description": {
+          "odometer": "Całkowity przebieg pojazdu (km lub mi).",
+          "fuel_quantity": "Paliwo pozostałe w zbiorniku (L lub gal).",
+          "fuel_level": "Paliwo pozostałe w zbiorniku (%). Wymaga pojemności zbiornika, gdy nie ma sensora ilości paliwa.",
+          "battery_energy": "Energia pozostała w akumulatorze trakcyjnym (kWh lub Wh).",
+          "battery_level": "Stan naładowania akumulatora trakcyjnego (%). Wymaga pojemności akumulatora, gdy nie ma sensora energii akumulatora.",
+          "tank_capacity": "Przelicza poziom paliwa na litry.",
+          "battery_capacity": "Przelicza poziom naładowania akumulatora na kWh.",
+          "charger_energy": "Licznik energii Twojej ładowarki domowej (evcc, Wallbox, Easee, Zaptec, Ohme…): ładowania w domu są mierzone na ładowarce, wraz ze stratami. Wymaga sensora akumulatora."
+        }
+      },
+      "prices": {
+        "title": "Ceny: {name}",
+        "description": "Służą do obliczania kosztu każdej trasy i każdego miesiąca. Sensor ceny (stacja paliw, taryfa energii elektrycznej) ma pierwszeństwo przed stałą ceną; bez żadnego z nich koszty nie są wyświetlane.",
+        "data": {
+          "fuel_price_entity": "Sensor ceny paliwa",
+          "fuel_price": "Stała cena paliwa",
+          "electricity_price_entity": "Sensor ceny energii elektrycznej",
+          "electricity_price": "Stała cena energii elektrycznej"
+        },
+        "data_description": {
+          "fuel_price_entity": "Cena za litr (lub za galon) zgodna z cenami na stacji.",
+          "fuel_price": "Cena za litr, używana, gdy nie ma sensora ceny lub jest on niedostępny.",
+          "electricity_price_entity": "Cena za kWh w Twojej taryfie.",
+          "electricity_price": "Cena za kWh, używana, gdy nie ma sensora ceny lub jest on niedostępny."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Wybierz co najmniej jeden sensor paliwa lub akumulatora.",
+      "tank_capacity_required": "Pojemność zbiornika jest potrzebna, aby użyć poziomu paliwa.",
+      "battery_capacity_required": "Pojemność akumulatora jest potrzebna, aby użyć poziomu naładowania akumulatora.",
+      "duplicate_sensor": "Ten sensor jest już używany dla innego źródła.",
+      "charger_needs_battery": "Licznik ładowarki domowej wymaga sensora energii lub poziomu naładowania akumulatora."
+    },
+    "abort": {
+      "already_configured": "Ten pojazd jest już skonfigurowany."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sensory pojazdu",
+        "description": "Licznik przebiegu jest wymagany, a do tego co najmniej jeden sensor paliwa lub akumulatora.",
+        "data": {
+          "odometer": "Licznik przebiegu",
+          "fuel_quantity": "Ilość paliwa",
+          "fuel_level": "Poziom paliwa",
+          "battery_energy": "Energia akumulatora",
+          "battery_level": "Poziom naładowania akumulatora",
+          "tank_capacity": "Pojemność zbiornika",
+          "battery_capacity": "Użyteczna pojemność akumulatora",
+          "charger_energy": "Energia ładowarki domowej"
+        },
+        "data_description": {
+          "odometer": "Całkowity przebieg pojazdu (km lub mi).",
+          "fuel_quantity": "Paliwo pozostałe w zbiorniku (L lub gal).",
+          "fuel_level": "Paliwo pozostałe w zbiorniku (%). Wymaga pojemności zbiornika, gdy nie ma sensora ilości paliwa.",
+          "battery_energy": "Energia pozostała w akumulatorze trakcyjnym (kWh lub Wh).",
+          "battery_level": "Stan naładowania akumulatora trakcyjnego (%). Wymaga pojemności akumulatora, gdy nie ma sensora energii akumulatora.",
+          "tank_capacity": "Przelicza poziom paliwa na litry.",
+          "battery_capacity": "Przelicza poziom naładowania akumulatora na kWh.",
+          "charger_energy": "Licznik energii Twojej ładowarki domowej (evcc, Wallbox, Easee, Zaptec, Ohme…): ładowania w domu są mierzone na ładowarce, wraz ze stratami. Wymaga sensora akumulatora."
+        }
+      },
+      "prices": {
+        "title": "Ceny i wykrywanie",
+        "description": "Sensor ceny ma pierwszeństwo przed stałą ceną. Progi odróżniają tankowanie lub ładowanie od szumu sensorów.",
+        "data": {
+          "fuel_price_entity": "Sensor ceny paliwa",
+          "fuel_price": "Stała cena paliwa",
+          "electricity_price_entity": "Sensor ceny energii elektrycznej",
+          "electricity_price": "Stała cena energii elektrycznej",
+          "trip_gap": "Koniec trasy po",
+          "refuel_threshold": "Próg tankowania",
+          "charge_threshold": "Próg ładowania"
+        },
+        "data_description": {
+          "fuel_price_entity": "Cena za litr (lub za galon) zgodna z cenami na stacji.",
+          "fuel_price": "Cena za litr, używana, gdy nie ma sensora ceny lub jest on niedostępny.",
+          "electricity_price_entity": "Cena za kWh w Twojej taryfie.",
+          "electricity_price": "Cena za kWh, używana, gdy nie ma sensora ceny lub jest on niedostępny.",
+          "trip_gap": "Trasa kończy się, gdy licznik przebiegu nie zmienia się przez ten czas.",
+          "refuel_threshold": "Wzrost ilości paliwa o co najmniej tę wartość to tankowanie; mniejsze wzrosty są ignorowane.",
+          "charge_threshold": "Wzrost naładowania akumulatora o co najmniej tę wartość to ładowanie; mniejsze wzrosty są ignorowane."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Wybierz co najmniej jeden sensor paliwa lub akumulatora.",
+      "tank_capacity_required": "Pojemność zbiornika jest potrzebna, aby użyć poziomu paliwa.",
+      "battery_capacity_required": "Pojemność akumulatora jest potrzebna, aby użyć poziomu naładowania akumulatora.",
+      "duplicate_sensor": "Ten sensor jest już używany dla innego źródła.",
+      "charger_needs_battery": "Licznik ładowarki domowej wymaga sensora energii lub poziomu naładowania akumulatora."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "consumption": {
+        "name": "Zużycie",
+        "state_attributes": {
+          "vehicle": { "name": "Pojazd" },
+          "entry_id": { "name": "ID wpisu" },
+          "kind": {
+            "name": "Energia",
+            "state": {
+              "fuel": "Paliwo",
+              "electric": "Elektryczny",
+              "plugin_hybrid": "Hybryda plug-in"
+            }
+          },
+          "currency": { "name": "Waluta" },
+          "odometer": { "name": "Licznik przebiegu" },
+          "fuel_quantity": { "name": "Ilość paliwa" },
+          "fuel_level": { "name": "Poziom paliwa" },
+          "tank_capacity": { "name": "Pojemność zbiornika" },
+          "battery_energy": { "name": "Energia akumulatora" },
+          "battery_level": { "name": "Poziom naładowania akumulatora" },
+          "battery_capacity": { "name": "Pojemność akumulatora" },
+          "fuel_price": { "name": "Cena paliwa" },
+          "electricity_price": { "name": "Cena energii elektrycznej" },
+          "driving": { "name": "W trasie" },
+          "trip": { "name": "Trasa" },
+          "month": { "name": "Miesiąc" },
+          "total": { "name": "Łącznie" },
+          "months": { "name": "Miesiące" },
+          "trips": { "name": "Trasy" },
+          "refuels": { "name": "Tankowania" },
+          "charges": { "name": "Ładowania" }
+        }
+      },
+      "fuel_consumption_trip": { "name": "Zużycie paliwa na trasie" },
+      "fuel_consumption_month": { "name": "Zużycie paliwa w tym miesiącu" },
+      "fuel_consumption_average": { "name": "Średnie zużycie paliwa" },
+      "energy_consumption_trip": { "name": "Zużycie energii na trasie" },
+      "energy_consumption_month": { "name": "Zużycie energii w tym miesiącu" },
+      "energy_consumption_average": { "name": "Średnie zużycie energii" },
+      "distance_trip": { "name": "Dystans trasy" },
+      "distance_month": { "name": "Dystans w tym miesiącu" },
+      "fuel_used_month": { "name": "Paliwo zużyte w tym miesiącu" },
+      "energy_used_month": { "name": "Energia zużyta w tym miesiącu" },
+      "cost_month": { "name": "Koszt w tym miesiącu" },
+      "cost_per_km": { "name": "Koszt za km" },
+      "last_refuel": {
+        "name": "Ostatnie tankowanie",
+        "state_attributes": {
+          "liters": { "name": "Litry" },
+          "cost": { "name": "Koszt" },
+          "odometer": { "name": "Licznik przebiegu" },
+          "source": {
+            "name": "Źródło",
+            "state": {
+              "auto": "Wykryte",
+              "manual": "Ręczne"
+            }
+          }
+        }
+      },
+      "last_charge": {
+        "name": "Ostatnie ładowanie",
+        "state_attributes": {
+          "energy": { "name": "Energia" },
+          "cost": { "name": "Koszt" },
+          "odometer": { "name": "Licznik przebiegu" },
+          "source": {
+            "name": "Źródło",
+            "state": {
+              "auto": "Wykryte",
+              "manual": "Ręczne",
+              "charger": "Ładowarka domowa"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "add_refuel": {
+      "name": "Dodaj tankowanie",
+      "description": "Zapisuje tankowanie ręcznie. Jest wyświetlane razem z wykrytymi; zużycie nadal jest obliczane z sensorów.",
+      "fields": {
+        "config_entry_id": { "name": "Pojazd", "description": "Pojazd, który został zatankowany." },
+        "liters": { "name": "Litry", "description": "Zatankowane paliwo." },
+        "cost": { "name": "Koszt całkowity", "description": "Zapłacona kwota. Obliczana z ceny, jeśli pominięta." },
+        "price": { "name": "Cena za litr", "description": "Obliczana z kosztu całkowitego, jeśli pominięta; bieżąca cena, jeśli pominięte są obie." },
+        "odometer": { "name": "Licznik przebiegu", "description": "Odczyt licznika przebiegu (km). Ostatni znany odczyt, jeśli pominięty." }
+      }
+    },
+    "add_charge": {
+      "name": "Dodaj ładowanie",
+      "description": "Zapisuje ładowanie ręcznie. Jest wyświetlane razem z wykrytymi; zużycie nadal jest obliczane z sensorów.",
+      "fields": {
+        "config_entry_id": { "name": "Pojazd", "description": "Pojazd, który został naładowany." },
+        "energy": { "name": "Energia", "description": "Doładowana energia (kWh)." },
+        "cost": { "name": "Koszt całkowity", "description": "Zapłacona kwota. Obliczana z ceny, jeśli pominięta." },
+        "price": { "name": "Cena za kWh", "description": "Obliczana z kosztu całkowitego, jeśli pominięta; bieżąca cena, jeśli pominięte są obie." },
+        "odometer": { "name": "Licznik przebiegu", "description": "Odczyt licznika przebiegu (km). Ostatni znany odczyt, jeśli pominięty." }
+      }
+    },
+    "reset_statistics": {
+      "name": "Resetuj statystyki",
+      "description": "Usuwa trasy, miesiące, tankowania, ładowania i sumy pojazdu; śledzenie zaczyna się od nowa od bieżących odczytów.",
+      "fields": {
+        "config_entry_id": { "name": "Pojazd", "description": "Pojazd, którego statystyki są usuwane." }
+      }
+    },
+    "import_history": {
+      "name": "Importuj historię",
+      "description": "Odtwarza trasy, miesiące, tankowania i ładowania pojazdu na podstawie tego, co Home Assistant zarejestrował z jego sensorów (tak daleko wstecz, jak przechowuje to rejestrator). Tankowania i ładowania wprowadzone ręcznie są zachowywane.",
+      "fields": {
+        "config_entry_id": { "name": "Pojazd", "description": "Pojazd, którego historia jest importowana." },
+        "days": { "name": "Dni", "description": "Jak daleko wstecz odtworzyć (domyślnie 60). Używane są zarejestrowane stany tam, gdzie rejestrator je jeszcze ma (domyślnie 10 dni), a wcześniej godzinowe statystyki sensorów." }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Brak wpisu Vehicle Consumption o ID {entry_id}."
+    },
+    "not_loaded": {
+      "message": "Vehicle Consumption dla {name} nie jest załadowane."
+    },
+    "no_recorder": {
+      "message": "Rejestrator nie jest skonfigurowany: brak historii do zaimportowania."
+    }
+  }
+}

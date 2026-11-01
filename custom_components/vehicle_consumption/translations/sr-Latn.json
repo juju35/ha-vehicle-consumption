@@ -1,0 +1,255 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vehicle Consumption",
+        "description": "Izaberite vozilo: njegovi senzori kilometraže, goriva i baterije traže se na ovom uređaju.",
+        "data": {
+          "device_id": "Vozilo",
+          "name": "Naziv"
+        },
+        "data_description": {
+          "device_id": "Uređaj integracije vozila (Renault, Tesla, Kia, Volkswagen, OBD adapter…).",
+          "name": "Prikazuje se na kartici i na entitetima. Ostavite prazno da bi se koristio naziv uređaja."
+        }
+      },
+      "sensors": {
+        "title": "Senzori za {name}",
+        "description": "Automatski pronađeni senzori: {found}. Proverite ih. Kilometraža je obavezna, uz najmanje jedan senzor goriva ili baterije.",
+        "data": {
+          "odometer": "Kilometraža",
+          "fuel_quantity": "Količina goriva",
+          "fuel_level": "Nivo goriva",
+          "battery_energy": "Energija baterije",
+          "battery_level": "Nivo baterije",
+          "tank_capacity": "Zapremina rezervoara",
+          "battery_capacity": "Korisni kapacitet baterije",
+          "charger_energy": "Energija kućnog punjača"
+        },
+        "data_description": {
+          "odometer": "Ukupno pređeni put vozila (km ili mi).",
+          "fuel_quantity": "Gorivo preostalo u rezervoaru (L ili gal).",
+          "fuel_level": "Gorivo preostalo u rezervoaru (%). Potrebna je zapremina rezervoara kada nema senzora količine goriva.",
+          "battery_energy": "Energija preostala u pogonskoj bateriji (kWh ili Wh).",
+          "battery_level": "Stanje napunjenosti pogonske baterije (%). Potreban je kapacitet baterije kada nema senzora energije baterije.",
+          "tank_capacity": "Pretvara nivo goriva u litre.",
+          "battery_capacity": "Pretvara nivo baterije u kWh.",
+          "charger_energy": "Brojač energije vašeg kućnog punjača (evcc, Wallbox, Easee, Zaptec, Ohme…): kućna punjenja se mere na punjaču, zajedno sa gubicima. Potreban je senzor baterije."
+        }
+      },
+      "prices": {
+        "title": "Cene za {name}",
+        "description": "Koriste se za izračunavanje troška svake vožnje i svakog meseca. Senzor cene (benzinska stanica, tarifa struje) ima prednost nad fiksnom cenom; bez njih se troškovi ne prikazuju.",
+        "data": {
+          "fuel_price_entity": "Senzor cene goriva",
+          "fuel_price": "Fiksna cena goriva",
+          "electricity_price_entity": "Senzor cene struje",
+          "electricity_price": "Fiksna cena struje"
+        },
+        "data_description": {
+          "fuel_price_entity": "Cena po litru (ili po galonu) koja prati cene na stanicama.",
+          "fuel_price": "Cena po litru, koristi se kada nema senzora cene ili kada je nedostupan.",
+          "electricity_price_entity": "Cena po kWh vaše tarife.",
+          "electricity_price": "Cena po kWh, koristi se kada nema senzora cene ili kada je nedostupan."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Izaberite najmanje jedan senzor goriva ili baterije.",
+      "tank_capacity_required": "Za korišćenje nivoa goriva potrebna je zapremina rezervoara.",
+      "battery_capacity_required": "Za korišćenje nivoa baterije potreban je kapacitet baterije.",
+      "duplicate_sensor": "Ovaj senzor se već koristi za drugi izvor.",
+      "charger_needs_battery": "Brojaču kućnog punjača potreban je senzor energije ili nivoa baterije."
+    },
+    "abort": {
+      "already_configured": "Ovo vozilo je već podešeno."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Senzori vozila",
+        "description": "Kilometraža je obavezna, uz najmanje jedan senzor goriva ili baterije.",
+        "data": {
+          "odometer": "Kilometraža",
+          "fuel_quantity": "Količina goriva",
+          "fuel_level": "Nivo goriva",
+          "battery_energy": "Energija baterije",
+          "battery_level": "Nivo baterije",
+          "tank_capacity": "Zapremina rezervoara",
+          "battery_capacity": "Korisni kapacitet baterije",
+          "charger_energy": "Energija kućnog punjača"
+        },
+        "data_description": {
+          "odometer": "Ukupno pređeni put vozila (km ili mi).",
+          "fuel_quantity": "Gorivo preostalo u rezervoaru (L ili gal).",
+          "fuel_level": "Gorivo preostalo u rezervoaru (%). Potrebna je zapremina rezervoara kada nema senzora količine goriva.",
+          "battery_energy": "Energija preostala u pogonskoj bateriji (kWh ili Wh).",
+          "battery_level": "Stanje napunjenosti pogonske baterije (%). Potreban je kapacitet baterije kada nema senzora energije baterije.",
+          "tank_capacity": "Pretvara nivo goriva u litre.",
+          "battery_capacity": "Pretvara nivo baterije u kWh.",
+          "charger_energy": "Brojač energije vašeg kućnog punjača (evcc, Wallbox, Easee, Zaptec, Ohme…): kućna punjenja se mere na punjaču, zajedno sa gubicima. Potreban je senzor baterije."
+        }
+      },
+      "prices": {
+        "title": "Cene i otkrivanje",
+        "description": "Senzor cene ima prednost nad fiksnom cenom. Pragovi razlikuju točenje goriva ili punjenje od šuma senzora.",
+        "data": {
+          "fuel_price_entity": "Senzor cene goriva",
+          "fuel_price": "Fiksna cena goriva",
+          "electricity_price_entity": "Senzor cene struje",
+          "electricity_price": "Fiksna cena struje",
+          "trip_gap": "Kraj vožnje nakon",
+          "refuel_threshold": "Prag točenja goriva",
+          "charge_threshold": "Prag punjenja"
+        },
+        "data_description": {
+          "fuel_price_entity": "Cena po litru (ili po galonu) koja prati cene na stanicama.",
+          "fuel_price": "Cena po litru, koristi se kada nema senzora cene ili kada je nedostupan.",
+          "electricity_price_entity": "Cena po kWh vaše tarife.",
+          "electricity_price": "Cena po kWh, koristi se kada nema senzora cene ili kada je nedostupan.",
+          "trip_gap": "Vožnja se završava kada se kilometraža ne promeni tokom ovog vremena.",
+          "refuel_threshold": "Porast goriva od najmanje ove vrednosti je točenje goriva; manji porast se zanemaruje.",
+          "charge_threshold": "Porast baterije od najmanje ove vrednosti je punjenje; manji porast se zanemaruje."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Izaberite najmanje jedan senzor goriva ili baterije.",
+      "tank_capacity_required": "Za korišćenje nivoa goriva potrebna je zapremina rezervoara.",
+      "battery_capacity_required": "Za korišćenje nivoa baterije potreban je kapacitet baterije.",
+      "duplicate_sensor": "Ovaj senzor se već koristi za drugi izvor.",
+      "charger_needs_battery": "Brojaču kućnog punjača potreban je senzor energije ili nivoa baterije."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "consumption": {
+        "name": "Potrošnja",
+        "state_attributes": {
+          "vehicle": { "name": "Vozilo" },
+          "entry_id": { "name": "ID unosa" },
+          "kind": {
+            "name": "Pogon",
+            "state": {
+              "fuel": "Gorivo",
+              "electric": "Električni",
+              "plugin_hybrid": "Plag-in hibrid"
+            }
+          },
+          "currency": { "name": "Valuta" },
+          "odometer": { "name": "Kilometraža" },
+          "fuel_quantity": { "name": "Količina goriva" },
+          "fuel_level": { "name": "Nivo goriva" },
+          "tank_capacity": { "name": "Zapremina rezervoara" },
+          "battery_energy": { "name": "Energija baterije" },
+          "battery_level": { "name": "Nivo baterije" },
+          "battery_capacity": { "name": "Kapacitet baterije" },
+          "fuel_price": { "name": "Cena goriva" },
+          "electricity_price": { "name": "Cena struje" },
+          "driving": { "name": "U vožnji" },
+          "trip": { "name": "Vožnja" },
+          "month": { "name": "Mesec" },
+          "total": { "name": "Ukupno" },
+          "months": { "name": "Meseci" },
+          "trips": { "name": "Vožnje" },
+          "refuels": { "name": "Točenja goriva" },
+          "charges": { "name": "Punjenja" }
+        }
+      },
+      "fuel_consumption_trip": { "name": "Potrošnja goriva u vožnji" },
+      "fuel_consumption_month": { "name": "Potrošnja goriva ovog meseca" },
+      "fuel_consumption_average": { "name": "Prosečna potrošnja goriva" },
+      "energy_consumption_trip": { "name": "Potrošnja energije u vožnji" },
+      "energy_consumption_month": { "name": "Potrošnja energije ovog meseca" },
+      "energy_consumption_average": { "name": "Prosečna potrošnja energije" },
+      "distance_trip": { "name": "Pređeni put u vožnji" },
+      "distance_month": { "name": "Pređeni put ovog meseca" },
+      "fuel_used_month": { "name": "Potrošeno gorivo ovog meseca" },
+      "energy_used_month": { "name": "Potrošena energija ovog meseca" },
+      "cost_month": { "name": "Trošak ovog meseca" },
+      "cost_per_km": { "name": "Trošak po km" },
+      "last_refuel": {
+        "name": "Poslednje točenje goriva",
+        "state_attributes": {
+          "liters": { "name": "Litri" },
+          "cost": { "name": "Trošak" },
+          "odometer": { "name": "Kilometraža" },
+          "source": {
+            "name": "Izvor",
+            "state": {
+              "auto": "Otkriveno",
+              "manual": "Ručno"
+            }
+          }
+        }
+      },
+      "last_charge": {
+        "name": "Poslednje punjenje",
+        "state_attributes": {
+          "energy": { "name": "Energija" },
+          "cost": { "name": "Trošak" },
+          "odometer": { "name": "Kilometraža" },
+          "source": {
+            "name": "Izvor",
+            "state": {
+              "auto": "Otkriveno",
+              "manual": "Ručno",
+              "charger": "Kućni punjač"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "add_refuel": {
+      "name": "Dodaj točenje goriva",
+      "description": "Ručno unosi točenje goriva. Prikazuje se uz otkrivena točenja; potrošnja se i dalje računa iz senzora.",
+      "fields": {
+        "config_entry_id": { "name": "Vozilo", "description": "Vozilo u koje je sipano gorivo." },
+        "liters": { "name": "Litri", "description": "Sipano gorivo." },
+        "cost": { "name": "Ukupan trošak", "description": "Plaćeni iznos. Ako se izostavi, izračunava se iz cene." },
+        "price": { "name": "Cena po litru", "description": "Ako se izostavi, izračunava se iz ukupnog troška; ako se izostave oba, koristi se trenutna cena." },
+        "odometer": { "name": "Kilometraža", "description": "Stanje kilometraže (km). Ako se izostavi, koristi se poslednje poznato stanje." }
+      }
+    },
+    "add_charge": {
+      "name": "Dodaj punjenje",
+      "description": "Ručno unosi punjenje. Prikazuje se uz otkrivena punjenja; potrošnja se i dalje računa iz senzora.",
+      "fields": {
+        "config_entry_id": { "name": "Vozilo", "description": "Vozilo koje je punjeno." },
+        "energy": { "name": "Energija", "description": "Dodata energija (kWh)." },
+        "cost": { "name": "Ukupan trošak", "description": "Plaćeni iznos. Ako se izostavi, izračunava se iz cene." },
+        "price": { "name": "Cena po kWh", "description": "Ako se izostavi, izračunava se iz ukupnog troška; ako se izostave oba, koristi se trenutna cena." },
+        "odometer": { "name": "Kilometraža", "description": "Stanje kilometraže (km). Ako se izostavi, koristi se poslednje poznato stanje." }
+      }
+    },
+    "reset_statistics": {
+      "name": "Resetuj statistiku",
+      "description": "Briše vožnje, mesece, točenja goriva, punjenja i ukupne vrednosti vozila; praćenje počinje ponovo od trenutnih vrednosti.",
+      "fields": {
+        "config_entry_id": { "name": "Vozilo", "description": "Vozilo čija se statistika briše." }
+      }
+    },
+    "import_history": {
+      "name": "Uvezi istoriju",
+      "description": "Ponovo gradi vožnje, mesece, točenja goriva i punjenja vozila iz onoga što je Home Assistant zabeležio o njegovim senzorima (onoliko unazad koliko ih rekorder čuva). Ručno uneta točenja goriva i punjenja se zadržavaju.",
+      "fields": {
+        "config_entry_id": { "name": "Vozilo", "description": "Vozilo čija se istorija uvozi." },
+        "days": { "name": "Dani", "description": "Koliko dana unazad se ponovo gradi (podrazumevano 60). Zabeležena stanja se koriste tamo gde ih rekorder još ima (podrazumevano 10 dana), a pre toga satna statistika senzora." }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Ne postoji unos Vehicle Consumption sa ID-om {entry_id}."
+    },
+    "not_loaded": {
+      "message": "Vehicle Consumption za {name} nije učitan."
+    },
+    "no_recorder": {
+      "message": "Rekorder nije podešen: nema istorije za uvoz."
+    }
+  }
+}

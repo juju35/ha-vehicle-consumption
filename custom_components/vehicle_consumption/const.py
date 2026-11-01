@@ -6,7 +6,7 @@ from datetime import timedelta
 from typing import Final
 
 DOMAIN: Final = "vehicle_consumption"
-VERSION: Final = "0.2.1"
+VERSION: Final = "0.2.4"
 
 # Entry data
 CONF_DEVICE_ID: Final = "device_id"
