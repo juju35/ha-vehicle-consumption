@@ -1222,10 +1222,12 @@ class VehicleConsumptionCard extends HTMLElement {
         --vc-fuel: var(--vc-fuel-color, #f59e0b);
         --vc-battery: var(--vc-battery-color, #22c55e);
       }
+      /* The inline-size container (ha-card) has no content width: in a parent sized by its content (inline-block, an
+         "auto" grid column) it would fall to its padding. This empty row gives the card a 300px max-content width but a
+         0 min-content one, so a 1fr grid track still shrinks it, even through a wrapper (a div, hui-card) that keeps
+         min-width: auto. (An intrinsic-size containment would be a min-content width there: the card would overflow.) */
+      :host::before { content: ""; display: grid; grid-template-columns: minmax(0, 300px); height: 0; }
       ha-card { position: relative; padding: 12px; overflow: hidden; container-type: inline-size;
-                /* The inline-size container has no content width: in a parent sized by its content (inline-block, an
-                   "auto" grid column) it would fall to its padding. contain-intrinsic-inline-size gives it one there. */
-                contain-intrinsic-inline-size: 300px;
                 --ci: color-mix(in srgb, var(--c) 40%, var(--primary-text-color)); }
       ha-card.lvl-ok    { --c: var(--vc-ok); }
       ha-card.lvl-drive { --c: var(--vc-drive); }

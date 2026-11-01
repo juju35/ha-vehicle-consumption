@@ -11,7 +11,7 @@
 - Card: the monthly chart is drawn at the card's width, so its month names and values keep a readable size on a narrow card.
 - Card: coloured texts (the average pill, a low tank or battery, refuels logged by hand, the current month of the chart, the add popup) are darker in light themes and lighter in dark ones, for a readable contrast.
 - Card: an unavailable sensor (Home Assistant starting, the integration reloading) or a wrong `entity` now says so, with the sensor, instead of "Not set up", also when the card picks the vehicle on its own (no `entity`).
-- Card: in a layout-card, a grid card column sized `auto` or any parent sized by its content, the card no longer collapses to a thin strip, and it still shrinks in a `1fr` column without overflowing.
+- Card: in a layout-card, a grid card column sized `auto` or any parent sized by its content, the card no longer collapses to a thin strip, and it still shrinks in a `1fr` column without overflowing, also when a wrapper (a `div`, the dashboard's card container) sits between the grid and the card.
 - Card: the trips, refuels and charges counters read "5/6" when only the last 5 rows are listed.
 - Card: times follow Home Assistant's 12 / 24-hour setting.
 - Card editor: "Chart shows" and "Months in the chart" are hidden while the chart is turned off.
