@@ -317,7 +317,7 @@ The integration and the card follow the language of Home Assistant (Serbian in L
 | Español | `es` |
 | Italiano | `it` |
 | Nederlands | `nl` |
-| Português (European) | `pt` |
+| Português (Portugal) | `pt` |
 | Polski | `pl` |
 | Српски (Serbian, Cyrillic) | `sr` |
 | Srpski (Serbian, Latin) | `sr-Latn` |

@@ -553,12 +553,15 @@ const VC_DASH = '—';
 
 const vcFinite = (v) => v != null && v !== '' && Number.isFinite(Number(v));
 
+// Home Assistant's `pt` is European Portuguese, while Intl reads a bare `pt` as Brazilian (« € 1.234 », « 30 de out. »).
+const vcIntlLocale = (l) => (String(l || '').toLowerCase() === 'pt' ? 'pt-PT' : l);
+
 // Number, money and date formatting: numbers follow Home Assistant's number format (its locale by default),
 // month and day names follow the card language.
 function vcFormat(hass, lang, currency) {
   const loc = hass?.locale || {};
   const byFormat = { comma_decimal: 'en-US', decimal_comma: 'de-DE', space_comma: 'fr-FR', system: undefined };
-  const locale = loc.number_format in byFormat ? byFormat[loc.number_format] : loc.language || hass?.language || lang;
+  const locale = vcIntlLocale(loc.number_format in byFormat ? byFormat[loc.number_format] : loc.language || hass?.language || lang);
   const grouping = loc.number_format !== 'none';
   const cache = new Map();
   const nf = (opts) => {
@@ -586,11 +589,11 @@ function vcFormat(hass, lang, currency) {
   // Home Assistant's full locale (pt-BR, de-CH) when it resolves to the card language, the card language otherwise
   // (a card set to sr keeps Cyrillic month names under a Home Assistant in sr-Latn).
   const haLang = String(loc.language || hass?.language || '');
-  let dateLocale = haLang && vcLang({ language: haLang }, {}) === lang ? haLang : lang;
+  let dateLocale = vcIntlLocale(haLang && vcLang({ language: haLang }, {}) === lang ? haLang : lang);
   try {
     Intl.DateTimeFormat.supportedLocalesOf(dateLocale);
   } catch {
-    dateLocale = lang;
+    dateLocale = vcIntlLocale(lang);
   }
   const dateFmt = new Intl.DateTimeFormat(dateLocale, { day: 'numeric', month: 'short' });
   const timeFmt = new Intl.DateTimeFormat(dateLocale, { hour: '2-digit', minute: '2-digit' });

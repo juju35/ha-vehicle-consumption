@@ -212,8 +212,31 @@ test('formatting follows the locale; currency through Intl; missing values are a
   const d = '2026-10-30T08:00:00Z';
   const dt = (loc, opts) => new Intl.DateTimeFormat(loc, { day: 'numeric', month: 'short', ...opts }).format(new Date(d));
   assert.equal(vcFormat({ locale: { language: 'pt-BR' } }, 'pt', 'EUR').date(d, false), dt('pt-BR'));
-  assert.equal(vcFormat({ locale: { language: 'en-GB' } }, 'pt', 'EUR').date(d, false), dt('pt'));
+  assert.equal(vcFormat({ locale: { language: 'en-GB' } }, 'pt', 'EUR').date(d, false), dt('pt-PT'));
   assert.match(vcFormat({ locale: { language: 'sr-Latn' } }, 'sr', 'EUR').month('2026-10'), /^[\u0400-\u04FF]+$/);
+});
+
+test('Home Assistant pt formats as European Portuguese (pt-PT), pt-BR stays Brazilian, the language option wins', () => {
+  const d = '2026-10-30T08:00:00Z';
+  const dt = (loc) => new Intl.DateTimeFormat(loc, { day: 'numeric', month: 'short' }).format(new Date(d));
+  const nf = (loc, opts) => new Intl.NumberFormat(loc, { useGrouping: true, ...opts }).format(1234.5);
+  const eur = { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 };
+  const pt = vcFormat({ locale: { language: 'pt', number_format: 'language' } }, 'pt', 'EUR');
+  assert.equal(pt.date(d, false), dt('pt-PT'));
+  assert.equal(pt.money(1234.5), nf('pt-PT', eur));
+  assert.notEqual(pt.money(1234.5), nf('pt-BR', eur));
+  assert.equal(pt.num(1234.5, 1), nf('pt-PT', { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
+  const br = vcFormat({ locale: { language: 'pt-BR', number_format: 'language' } }, 'pt', 'EUR');
+  assert.equal(br.date(d, false), dt('pt-BR'));
+  assert.equal(br.money(1234.5), nf('pt-BR', eur));
+  // A card forced to pt under an English Home Assistant: European Portuguese dates.
+  const hass = { locale: { language: 'en' } };
+  const forced = vcLang(hass, { language: 'pt' });
+  assert.equal(forced, 'pt');
+  assert.equal(vcFormat(hass, forced, 'EUR').date(d, false), dt('pt-PT'));
+  // A card forced to en under a Portuguese Home Assistant keeps English dates.
+  const ptHass = { locale: { language: 'pt' } };
+  assert.equal(vcFormat(ptHass, vcLang(ptHass, { language: 'en' }), 'EUR').date(d, false), dt('en'));
 });
 
 test('vcMonthKeys spans the year boundary; vcParse reads a comma or a dot', () => {
