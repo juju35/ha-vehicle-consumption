@@ -480,7 +480,11 @@ async def test_old_import_with_an_empty_recorder_keeps_the_data(
     attrs = _attrs(hass)
     assert attrs["total"]["distance"] == 5000 and attrs["total"]["fuel"] == 300
     assert attrs["total"]["since"] == "2026-08-01T00:00:00+00:00"
-    assert [(m["month"], m["distance"]) for m in attrs["months"]] == [("2026-08", 3000), ("2026-09", 2000), ("2026-10", 0)]
+    assert [(m["month"], m["distance"]) for m in attrs["months"]] == [
+        ("2026-08", 3000),
+        ("2026-09", 2000),
+        ("2026-10", 0),
+    ]
     assert [t["distance"] for t in attrs["trips"]] == [80]
     # Marked as imported: not tried again at the next start.
     await hass.config_entries.async_unload(entry.entry_id)
