@@ -434,7 +434,9 @@ def animate(browser, shot, *, fps=20):
         for i in range(frames + hold):
             page.evaluate(
                 """([t, names]) => {
-                    for (const a of document.getAnimations()) {
+                    // The card's animations live in its shadow root: document.getAnimations() does not list them.
+                    const roots = [document, ...[...document.querySelectorAll("*")].flatMap((e) => e.shadowRoot || [])];
+                    for (const a of roots.flatMap((r) => r.getAnimations())) {
                         a.pause();
                         a.currentTime = names.includes(a.animationName) ? t : 100000;
                     }
