@@ -27,7 +27,7 @@ def _load(lang: str) -> dict[str, str]:
     return _flatten(json.loads((TRANSLATIONS / f"{lang}.json").read_text(encoding="utf-8")))
 
 
-LANGUAGES = {"en", "fr", "de", "es", "it", "nl", "pt", "pl", "sr", "sr-Latn"}
+LANGUAGES = {"en", "fr", "de", "es", "it", "nl", "pt", "pt-BR", "pl", "sr", "sr-Latn"}
 
 
 def test_languages() -> None:
@@ -47,8 +47,13 @@ def test_parity(lang: str) -> None:
 
 
 def test_exact_languages() -> None:
-    """No other language is shipped (the card has the same ten)."""
+    """No other language is shipped (the card has the same ten; pt-BR is the integration's copy of pt)."""
     assert {p.stem for p in TRANSLATIONS.glob("*.json")} == LANGUAGES
+
+
+def test_brazilian_portuguese_is_european() -> None:
+    """pt-BR uses the European Portuguese texts, unchanged."""
+    assert _load("pt-BR") == _load("pt")
 
 
 # Serbian Cyrillic letter by letter, then its Latin spelling (љ, њ and џ take two letters).

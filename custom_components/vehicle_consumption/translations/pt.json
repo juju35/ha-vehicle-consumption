@@ -15,7 +15,7 @@
       },
       "sensors": {
         "title": "Sensores de {name}",
-        "description": "Foram encontrados {found} sensores automaticamente: verifique-os. O conta-quilómetros é obrigatório, mais pelo menos um sensor de combustível ou de bateria.",
+        "description": "Foram encontrados {found} sensores automaticamente: verifique-os. O conta-quilómetros é obrigatório, bem como pelo menos um sensor de combustível ou de bateria.",
         "data": {
           "odometer": "Conta-quilómetros",
           "fuel_quantity": "Quantidade de combustível",
@@ -69,7 +69,7 @@
     "step": {
       "init": {
         "title": "Sensores do veículo",
-        "description": "O conta-quilómetros é obrigatório, mais pelo menos um sensor de combustível ou de bateria.",
+        "description": "O conta-quilómetros é obrigatório, bem como pelo menos um sensor de combustível ou de bateria.",
         "data": {
           "odometer": "Conta-quilómetros",
           "fuel_quantity": "Quantidade de combustível",
@@ -147,7 +147,7 @@
           "battery_capacity": { "name": "Capacidade da bateria" },
           "fuel_price": { "name": "Preço do combustível" },
           "electricity_price": { "name": "Preço da eletricidade" },
-          "driving": { "name": "Em andamento" },
+          "driving": { "name": "Em viagem" },
           "trip": { "name": "Viagem" },
           "month": { "name": "Mês" },
           "total": { "name": "Total" },
@@ -210,7 +210,7 @@
         "config_entry_id": { "name": "Veículo", "description": "O veículo que foi abastecido." },
         "liters": { "name": "Litros", "description": "Combustível abastecido." },
         "cost": { "name": "Custo total", "description": "Montante pago. Calculado a partir do preço quando omitido." },
-        "price": { "name": "Preço por litro", "description": "Calculado a partir do custo total quando omitido; o preço atual quando ambos o são." },
+        "price": { "name": "Preço por litro", "description": "Calculado a partir do custo total quando omitido; o preço atual quando ambos são omitidos." },
         "odometer": { "name": "Conta-quilómetros", "description": "Leitura do conta-quilómetros (km). A última leitura conhecida quando omitida." }
       }
     },
@@ -221,7 +221,7 @@
         "config_entry_id": { "name": "Veículo", "description": "O veículo que foi carregado." },
         "energy": { "name": "Energia", "description": "Energia carregada (kWh)." },
         "cost": { "name": "Custo total", "description": "Montante pago. Calculado a partir do preço quando omitido." },
-        "price": { "name": "Preço por kWh", "description": "Calculado a partir do custo total quando omitido; o preço atual quando ambos o são." },
+        "price": { "name": "Preço por kWh", "description": "Calculado a partir do custo total quando omitido; o preço atual quando ambos são omitidos." },
         "odometer": { "name": "Conta-quilómetros", "description": "Leitura do conta-quilómetros (km). A última leitura conhecida quando omitida." }
       }
     },
@@ -237,7 +237,7 @@
       "description": "Reconstrói as viagens, os meses, os abastecimentos e os carregamentos do veículo a partir do que o Home Assistant registou dos seus sensores (até onde o gravador o conserva). Os abastecimentos e carregamentos registados manualmente são mantidos.",
       "fields": {
         "config_entry_id": { "name": "Veículo", "description": "O veículo cujo histórico é importado." },
-        "days": { "name": "Dias", "description": "Até quando reconstruir (60 por predefinição). São usados os estados gravados onde o gravador ainda os tem (10 dias por predefinição) e, antes disso, as estatísticas horárias dos sensores." }
+        "days": { "name": "Dias", "description": "Quantos dias recuar na reconstrução (60 por predefinição). São usados os estados gravados onde o gravador ainda os tem (10 dias por predefinição) e, antes disso, as estatísticas horárias dos sensores." }
       }
     }
   },

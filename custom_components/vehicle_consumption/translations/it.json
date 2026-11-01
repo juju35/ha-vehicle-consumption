@@ -15,7 +15,7 @@
       },
       "sensors": {
         "title": "Sensori di {name}",
-        "description": "{found} sensori sono stati trovati automaticamente: verificali. Il contachilometri è obbligatorio, più almeno un sensore di carburante o di batteria.",
+        "description": "{found} sensori sono stati trovati automaticamente: verificali. Il contachilometri è obbligatorio, oltre ad almeno un sensore di carburante o di batteria.",
         "data": {
           "odometer": "Contachilometri",
           "fuel_quantity": "Quantità di carburante",
@@ -69,7 +69,7 @@
     "step": {
       "init": {
         "title": "Sensori del veicolo",
-        "description": "Il contachilometri è obbligatorio, più almeno un sensore di carburante o di batteria.",
+        "description": "Il contachilometri è obbligatorio, oltre ad almeno un sensore di carburante o di batteria.",
         "data": {
           "odometer": "Contachilometri",
           "fuel_quantity": "Quantità di carburante",

@@ -3,7 +3,7 @@
 ## 0.2.4 - 2026-11-01
 
 ### What's new
-- Added Italian, Dutch, European Portuguese and Polish translations: `it`, `nl`, `pt` and `pl` for the setup and options, the entities, the actions and the card with its visual editor. Brazilian Portuguese (`pt-BR`) falls back to European Portuguese.
+- Added Italian, Dutch, European Portuguese and Polish translations: `it`, `nl`, `pt` and `pl` for the setup and options, the entities, the actions and the card with its visual editor. Brazilian Portuguese: `pt-BR` uses the European Portuguese texts, in the integration as in the card.
 
 ## 0.2.3 - 2026-11-01
 

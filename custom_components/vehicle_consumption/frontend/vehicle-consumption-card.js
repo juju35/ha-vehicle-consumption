@@ -318,7 +318,7 @@ const VC_I18N = {
     title: 'Veículo',
     not_loaded: 'Não configurado',
     not_loaded_hint: 'O Vehicle Consumption não está configurado: adicione um veículo em Definições → Dispositivos e serviços',
-    driving: 'Em andamento',
+    driving: 'Em viagem',
     fuel: 'Combustível',
     battery: 'Bateria',
     trip: 'Última viagem',
@@ -377,7 +377,7 @@ const VC_I18N = {
     month: 'Ten miesiąc',
     average: 'Średnio',
     cost_km: 'Koszt za km',
-    month_cost: '{v} w tym miesiącu',
+    month_cost: '{v} w tym mies.',
     recent_trips: 'Ostatnie trasy',
     refuels: 'Tankowania',
     charges: 'Ładowania',
@@ -583,9 +583,18 @@ function vcFormat(hass, lang, currency) {
     return nf({ style: 'currency', currency: cur, minimumFractionDigits: digits, maximumFractionDigits: digits }).format(Number(v));
   };
   const symbol = () => (cur ? nf({ style: 'currency', currency: cur }).formatToParts(0).find((p) => p.type === 'currency')?.value || cur : '');
-  const dateFmt = new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'short' });
-  const timeFmt = new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit' });
-  const monthFmt = new Intl.DateTimeFormat(lang, { month: 'short', timeZone: 'UTC' });
+  // Home Assistant's full locale (pt-BR, de-CH) when it resolves to the card language, the card language otherwise
+  // (a card set to sr keeps Cyrillic month names under a Home Assistant in sr-Latn).
+  const haLang = String(loc.language || hass?.language || '');
+  let dateLocale = haLang && vcLang({ language: haLang }, {}) === lang ? haLang : lang;
+  try {
+    Intl.DateTimeFormat.supportedLocalesOf(dateLocale);
+  } catch {
+    dateLocale = lang;
+  }
+  const dateFmt = new Intl.DateTimeFormat(dateLocale, { day: 'numeric', month: 'short' });
+  const timeFmt = new Intl.DateTimeFormat(dateLocale, { hour: '2-digit', minute: '2-digit' });
+  const monthFmt = new Intl.DateTimeFormat(dateLocale, { month: 'short', timeZone: 'UTC' });
   const date = (iso, withTime = true) => {
     const d = iso ? new Date(iso) : null;
     if (!d || Number.isNaN(d.getTime())) return VC_DASH;
@@ -1345,7 +1354,7 @@ class VehicleConsumptionCardEditor extends HTMLElement {
               { value: 'es', label: 'Español' },
               { value: 'it', label: 'Italiano' },
               { value: 'nl', label: 'Nederlands' },
-              { value: 'pt', label: 'Português' },
+              { value: 'pt', label: 'Português (Portugal)' },
               { value: 'pl', label: 'Polski' },
               { value: 'sr', label: 'Српски' },
               { value: 'sr-Latn', label: 'Srpski (latinica)' },

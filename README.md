@@ -307,7 +307,7 @@ python scripts/screenshots.py  # renders the card with mock vehicles into screen
 
 ## Translations
 
-The integration and the card follow the language of Home Assistant (Serbian in Latin script when Home Assistant is set to `sr-Latn`, European Portuguese for `pt-BR`). Currently supported:
+The integration and the card follow the language of Home Assistant (Serbian in Latin script when Home Assistant is set to `sr-Latn`; `pt-BR` uses the European Portuguese texts). Currently supported:
 
 | Language | Code |
 |---|---|

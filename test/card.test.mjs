@@ -208,6 +208,12 @@ test('formatting follows the locale; currency through Intl; missing values are a
   assert.equal(en.num(48210.4, 0), '48,210');
   assert.equal(en.month('2026-01'), 'Jan');
   assert.equal(vcFormat({ locale: { language: 'en' } }, 'de', 'EUR').month('2026-03'), 'Mär');
+  // Dates take Home Assistant's full locale when it resolves to the card language, the card language otherwise.
+  const d = '2026-10-30T08:00:00Z';
+  const dt = (loc, opts) => new Intl.DateTimeFormat(loc, { day: 'numeric', month: 'short', ...opts }).format(new Date(d));
+  assert.equal(vcFormat({ locale: { language: 'pt-BR' } }, 'pt', 'EUR').date(d, false), dt('pt-BR'));
+  assert.equal(vcFormat({ locale: { language: 'en-GB' } }, 'pt', 'EUR').date(d, false), dt('pt'));
+  assert.match(vcFormat({ locale: { language: 'sr-Latn' } }, 'sr', 'EUR').month('2026-10'), /^[\u0400-\u04FF]+$/);
 });
 
 test('vcMonthKeys spans the year boundary; vcParse reads a comma or a dot', () => {
@@ -528,7 +534,7 @@ test('editor: the language picker offers every language of the card', () => {
   const labels = Object.fromEntries(options.map((o) => [o.value, o.label]));
   assert.equal(labels.it, 'Italiano');
   assert.equal(labels.nl, 'Nederlands');
-  assert.equal(labels.pt, 'Português');
+  assert.equal(labels.pt, 'Português (Portugal)');
   assert.equal(labels.pl, 'Polski');
 });
 
