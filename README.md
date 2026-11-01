@@ -34,7 +34,7 @@ It comes with a **Lovelace card** showing the tank and battery gauges, the key f
 - **History** kept across restarts: the last 24 months, 20 trips, 20 refuels and 20 charges
 - **Actions** to log a refuel or a charge by hand (`add_refuel`, `add_charge`) to start over (`reset_statistics`) or to rebuild everything from the recorded history (`import_history`)
 - **Lovelace card bundled with the integration**, added automatically to the dashboard resources (nothing to add by hand): fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart (consumption, distance or cost), recent trips and refuels or charges, a pulsing dot while driving, a popup to log a refuel or a charge; visual editor
-- UI setup, no YAML; English, French, German and Spanish
+- UI setup, no YAML; English, French, German, Spanish, Italian, Dutch, Portuguese, Polish and Serbian (Cyrillic and Latin)
 
 ## Compatible integrations
 
@@ -205,7 +205,7 @@ data:
 
 #### `vehicle_consumption.import_history`
 
-Rebuilds the trips, months, refuels and charges of a vehicle from what Home Assistant recorded of its sensors over the last `days` (60 by default, up to 730). The [recorder](https://www.home-assistant.io/integrations/recorder/)'s states are used where it still has them (10 days by default); before them, the hourly long-term statistics of the sensors stand in (kept for good for sensors with a state class: the hourly state of a mileage or a fuel quantity, the hourly mean of a level in % or a price), so older trips are found to the hour. Those hours are only used once the odometer and every fuel or battery sensor have statistics: a level without a state class has none, and the import then starts with the recorded states. Refuels and charges logged by hand are kept. It runs on its own once, over 60 days, when the vehicle is added, so the card is filled from the first day.
+Rebuilds the trips, months, refuels and charges of a vehicle from what Home Assistant recorded of its sensors over the last `days` (60 by default, up to 730). The [recorder](https://www.home-assistant.io/integrations/recorder/)'s states are used where it still has them (10 days by default); before them, the hourly long-term statistics of the sensors stand in (kept for good for sensors with a state class: the hourly state of a mileage or a fuel quantity, the hourly mean of a level in % or a price), so older trips are found to the hour. Those hours are only used once the odometer and every fuel or battery sensor that does the counting have statistics: a level without a state class has none, and the import then starts with the recorded states. Refuels and charges logged by hand are kept. It runs on its own once, over 60 days, when the vehicle is added, so the card is filled from the first day.
 
 ```yaml
 action: vehicle_consumption.import_history
@@ -233,9 +233,11 @@ entity: sensor.my_car_consumption
 | `trips` | `true` | **Recent trips** section |
 | `refuels` | `true` | **Refuels** / **Charges** section |
 | `add_button` | `true` | **+** button in the header to log a refuel or a charge |
-| `language` | Auto | Force language: `en`, `fr`, `de` or `es` |
+| `language` | Auto | Force language: `en`, `fr`, `de`, `es`, `it`, `nl`, `pt`, `pl`, `sr` (Serbian, Cyrillic) or `sr-Latn` (Serbian, Latin) |
 
 In the visual editor, **Vehicle** lists every vehicle set up in Vehicle Consumption, by name: nothing to look up, and a vehicle added later shows up in the list. The card picker previews the card with your first vehicle.
+
+The badge in the header is a gauge whose colour gives the state of the vehicle: the primary colour when all is well, green while driving, orange when the fuel or battery is low, grey when the vehicle is not available.
 
 The **+** button opens a popup at the top of the card to log a refuel (litres) or a charge (kWh), its total cost and, optionally, the odometer. The sections fold and unfold with a tap, and fold back on their own when you tap elsewhere.
 
@@ -283,7 +285,7 @@ Vehicle Consumption follows the levels reported by the car rather than asking yo
 
 When a vehicle is added, the last 60 days of its sensors are replayed once, in order, as if the integration had been there: the past trips, refuels and charges are found the same way, at the prices of then when a price sensor is used (its value when the period starts, else the first one recorded). The recorded states give every reading (as long as the recorder keeps them, `purge_keep_days`: 10 days by default); before them, the hourly statistics give one reading an hour, so a trip there only ends after an hour parked.
 
-- **Reference level**: for fuel (L) and energy (kWh), it keeps a reference level. When a reading goes **down**, the difference is counted as used and the reference follows. When it goes **up by at least the threshold** (3 L / 1 kWh by default), it is a **refuel or a charge**: the amount added is recorded, with its cost at the current price. A **smaller rise** is sensor noise (a tank sloshing, a battery warming up) and is ignored. `unknown` and `unavailable` readings are skipped. A level in % is turned into litres or kWh with the capacity you set.
+- **Reference level**: for fuel (L) and energy (kWh), it keeps a reference level. When a reading goes **down**, the difference is counted as used and the reference follows. When it goes **up by at least the threshold** (3 L / 1 kWh by default), it is a **refuel or a charge**: the amount added is recorded, with its cost at the current price. A **smaller rise** is sensor noise (a tank sloshing, a battery warming up) and is ignored. `unknown` and `unavailable` readings are skipped. A level in % is turned into litres or kWh with the capacity you set; when a quantity (L) or energy (kWh) sensor is set too, the level is only shown, the quantity does the counting. A sensor can be used for one source only.
 - **Home charger**: with a charger energy counter, a **home charge** is the counter going up, until it has not moved for 30 minutes. Its amount is what the counter delivered (losses included; a session counter going back to 0 starts a new session) and its cost that amount × the electricity price; it is listed as *Home charger*. A battery rise while the counter moves is that session, never counted twice; a battery rise while the charger is idle is a charge away from home, recorded as before. The energy used still comes from the battery going down.
 - **Distance**: every rise of the odometer is added up (a jump over 2000 km is ignored as a glitch).
 - **Trips**: a trip starts when the odometer moves and ends after the **trip gap** (30 minutes by default) without moving. Its distance, fuel, energy and cost are what was counted between its start and its end.
@@ -307,7 +309,7 @@ python scripts/screenshots.py  # renders the card with mock vehicles into screen
 
 ## Translations
 
-The integration and the card follow the language of Home Assistant. Currently supported:
+The integration and the card follow the language of Home Assistant (Serbian in Latin script when Home Assistant is set to `sr-Latn`; `pt-BR` uses the European Portuguese texts). Currently supported:
 
 | Language | Code |
 |---|---|
@@ -315,6 +317,12 @@ The integration and the card follow the language of Home Assistant. Currently su
 | Français | `fr` |
 | Deutsch | `de` |
 | Español | `es` |
+| Italiano | `it` |
+| Nederlands | `nl` |
+| Português (Portugal) | `pt` |
+| Polski | `pl` |
+| Српски (Serbian, Cyrillic) | `sr` |
+| Srpski (Serbian, Latin) | `sr-Latn` |
 
 Contributions for additional languages are welcome!
 

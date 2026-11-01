@@ -5,7 +5,7 @@
  * Served and added to the dashboard resources by the integration.
  * https://github.com/juju35/ha-vehicle-consumption
  */
-var VEHICLE_CONSUMPTION_CARD_VERSION = '0.2.1';
+var VEHICLE_CONSUMPTION_CARD_VERSION = '0.2.4';
 
 const VC_I18N = {
   en: {
@@ -212,12 +212,319 @@ const VC_I18N = {
     ed_language: 'Idioma',
     ed_language_helper: 'Déjalo vacío para seguir a Home Assistant',
   },
+  it: {
+    title: 'Veicolo',
+    not_loaded: 'Non configurato',
+    not_loaded_hint: 'Vehicle Consumption non è configurato: aggiungi un veicolo in Impostazioni → Dispositivi e servizi',
+    driving: 'In marcia',
+    fuel: 'Carburante',
+    battery: 'Batteria',
+    trip: 'Ultimo viaggio',
+    trip_now: 'Viaggio in corso',
+    month: 'Questo mese',
+    average: 'Media',
+    cost_km: 'Costo al km',
+    month_cost: '{v} questo mese',
+    recent_trips: 'Viaggi recenti',
+    refuels: 'Rifornimenti',
+    charges: 'Ricariche',
+    no_trips: 'Ancora nessun viaggio',
+    no_refuels: 'Ancora nessun rifornimento',
+    no_charges: 'Ancora nessuna ricarica',
+    manual: 'Inserito a mano',
+    charger: 'Wallbox di casa',
+    chart_consumption: 'Consumo',
+    chart_distance: 'Distanza',
+    chart_cost: 'Costo',
+    last_months: 'Ultimi {n} mesi',
+    add: 'Registra un rifornimento o una ricarica',
+    add_refuel: 'Registra un rifornimento',
+    add_charge: 'Registra una ricarica',
+    mode_refuel: 'Carburante',
+    mode_charge: 'Ricarica',
+    liters: 'Carburante aggiunto',
+    energy: 'Energia aggiunta',
+    total_cost: 'Costo totale',
+    odometer: 'Contachilometri',
+    optional: 'facoltativo',
+    save: 'Salva',
+    cancel: 'Annulla',
+    save_error: 'Impossibile salvare: {e}',
+    ed_entity: 'Veicolo',
+    ed_entity_helper: 'Trovato automaticamente; lascia vuoto per usare il primo veicolo',
+    ed_title: 'Titolo',
+    ed_title_helper: 'Lascia vuoto per il nome del veicolo',
+    ed_chart: 'Grafico mensile',
+    ed_chart_metric: 'Il grafico mostra',
+    ed_months: 'Mesi nel grafico',
+    ed_trips: 'Viaggi recenti',
+    ed_refuels: 'Rifornimenti e ricariche',
+    ed_add_button: 'Pulsante «Registra un rifornimento o una ricarica»',
+    ed_language: 'Lingua',
+    ed_language_helper: 'Lascia vuoto per seguire Home Assistant',
+  },
+  nl: {
+    title: 'Voertuig',
+    not_loaded: 'Niet ingesteld',
+    not_loaded_hint: 'Vehicle Consumption is niet ingesteld: voeg een voertuig toe via Instellingen → Apparaten & diensten',
+    driving: 'Onderweg',
+    fuel: 'Brandstof',
+    battery: 'Accu',
+    trip: 'Laatste rit',
+    trip_now: 'Huidige rit',
+    month: 'Deze maand',
+    average: 'Gemiddeld',
+    cost_km: 'Kosten per km',
+    month_cost: '{v} deze maand',
+    recent_trips: 'Recente ritten',
+    refuels: 'Tankbeurten',
+    charges: 'Laadbeurten',
+    no_trips: 'Nog geen rit',
+    no_refuels: 'Nog geen tankbeurt',
+    no_charges: 'Nog geen laadbeurt',
+    manual: 'Handmatig ingevoerd',
+    charger: 'Laadpaal thuis',
+    chart_consumption: 'Verbruik',
+    chart_distance: 'Afstand',
+    chart_cost: 'Kosten',
+    last_months: 'Laatste {n} maanden',
+    add: 'Tankbeurt of laadbeurt invoeren',
+    add_refuel: 'Tankbeurt invoeren',
+    add_charge: 'Laadbeurt invoeren',
+    mode_refuel: 'Brandstof',
+    mode_charge: 'Laden',
+    liters: 'Getankte brandstof',
+    energy: 'Geladen energie',
+    total_cost: 'Totale kosten',
+    odometer: 'Kilometerstand',
+    optional: 'optioneel',
+    save: 'Opslaan',
+    cancel: 'Annuleren',
+    save_error: 'Opslaan mislukt: {e}',
+    ed_entity: 'Voertuig',
+    ed_entity_helper: 'Automatisch gevonden; laat leeg om het eerste voertuig te gebruiken',
+    ed_title: 'Titel',
+    ed_title_helper: 'Laat leeg voor de naam van het voertuig',
+    ed_chart: 'Maandgrafiek',
+    ed_chart_metric: 'Grafiek toont',
+    ed_months: 'Maanden in de grafiek',
+    ed_trips: 'Recente ritten',
+    ed_refuels: 'Tank- en laadbeurten',
+    ed_add_button: 'Knop „Tankbeurt of laadbeurt invoeren”',
+    ed_language: 'Taal',
+    ed_language_helper: 'Laat leeg om Home Assistant te volgen',
+  },
+  pt: {
+    title: 'Veículo',
+    not_loaded: 'Não configurado',
+    not_loaded_hint: 'O Vehicle Consumption não está configurado: adicione um veículo em Definições → Dispositivos e serviços',
+    driving: 'Em viagem',
+    fuel: 'Combustível',
+    battery: 'Bateria',
+    trip: 'Última viagem',
+    trip_now: 'Viagem em curso',
+    month: 'Este mês',
+    average: 'Média',
+    cost_km: 'Custo por km',
+    month_cost: '{v} este mês',
+    recent_trips: 'Viagens recentes',
+    refuels: 'Abastecimentos',
+    charges: 'Carregamentos',
+    no_trips: 'Ainda sem viagens',
+    no_refuels: 'Ainda sem abastecimentos',
+    no_charges: 'Ainda sem carregamentos',
+    manual: 'Registado manualmente',
+    charger: 'Carregador doméstico',
+    chart_consumption: 'Consumo',
+    chart_distance: 'Distância',
+    chart_cost: 'Custo',
+    last_months: 'Últimos {n} meses',
+    add: 'Registar um abastecimento ou carregamento',
+    add_refuel: 'Registar um abastecimento',
+    add_charge: 'Registar um carregamento',
+    mode_refuel: 'Combustível',
+    mode_charge: 'Carregamento',
+    liters: 'Combustível abastecido',
+    energy: 'Energia carregada',
+    total_cost: 'Custo total',
+    odometer: 'Conta-quilómetros',
+    optional: 'opcional',
+    save: 'Guardar',
+    cancel: 'Cancelar',
+    save_error: 'Não foi possível guardar: {e}',
+    ed_entity: 'Veículo',
+    ed_entity_helper: 'Encontrado automaticamente; deixe vazio para usar o primeiro veículo',
+    ed_title: 'Título',
+    ed_title_helper: 'Deixe vazio para o nome do veículo',
+    ed_chart: 'Gráfico mensal',
+    ed_chart_metric: 'O gráfico mostra',
+    ed_months: 'Meses no gráfico',
+    ed_trips: 'Viagens recentes',
+    ed_refuels: 'Abastecimentos e carregamentos',
+    ed_add_button: 'Botão «Registar um abastecimento ou carregamento»',
+    ed_language: 'Idioma',
+    ed_language_helper: 'Deixe vazio para seguir o Home Assistant',
+  },
+  pl: {
+    title: 'Pojazd',
+    not_loaded: 'Nieskonfigurowane',
+    not_loaded_hint: 'Vehicle Consumption nie jest skonfigurowane: dodaj pojazd w Ustawienia → Urządzenia oraz usługi',
+    driving: 'W trasie',
+    fuel: 'Paliwo',
+    battery: 'Akumulator',
+    trip: 'Ostatnia trasa',
+    trip_now: 'Bieżąca trasa',
+    month: 'Ten miesiąc',
+    average: 'Średnio',
+    cost_km: 'Koszt za km',
+    month_cost: '{v} w tym mies.',
+    recent_trips: 'Ostatnie trasy',
+    refuels: 'Tankowania',
+    charges: 'Ładowania',
+    no_trips: 'Brak tras',
+    no_refuels: 'Brak tankowań',
+    no_charges: 'Brak ładowań',
+    manual: 'Wprowadzone ręcznie',
+    charger: 'Ładowarka domowa',
+    chart_consumption: 'Zużycie',
+    chart_distance: 'Dystans',
+    chart_cost: 'Koszt',
+    last_months: 'Ostatnie miesiące: {n}',
+    add: 'Zapisz tankowanie lub ładowanie',
+    add_refuel: 'Zapisz tankowanie',
+    add_charge: 'Zapisz ładowanie',
+    mode_refuel: 'Paliwo',
+    mode_charge: 'Ładowanie',
+    liters: 'Zatankowane paliwo',
+    energy: 'Doładowana energia',
+    total_cost: 'Koszt całkowity',
+    odometer: 'Licznik przebiegu',
+    optional: 'opcjonalnie',
+    save: 'Zapisz',
+    cancel: 'Anuluj',
+    save_error: 'Nie udało się zapisać: {e}',
+    ed_entity: 'Pojazd',
+    ed_entity_helper: 'Wyszukiwany automatycznie; pozostaw puste, aby użyć pierwszego pojazdu',
+    ed_title: 'Tytuł',
+    ed_title_helper: 'Pozostaw puste, aby użyć nazwy pojazdu',
+    ed_chart: 'Wykres miesięczny',
+    ed_chart_metric: 'Wykres pokazuje',
+    ed_months: 'Miesiące na wykresie',
+    ed_trips: 'Ostatnie trasy',
+    ed_refuels: 'Tankowania i ładowania',
+    ed_add_button: 'Przycisk „Zapisz tankowanie lub ładowanie”',
+    ed_language: 'Język',
+    ed_language_helper: 'Pozostaw puste, aby używać języka Home Assistant',
+  },
+  sr: {
+    title: 'Возило',
+    not_loaded: 'Није подешено',
+    not_loaded_hint: 'Vehicle Consumption није подешен: додајте возило у Подешавања → Уређаји и услуге',
+    driving: 'У вожњи',
+    fuel: 'Гориво',
+    battery: 'Батерија',
+    trip: 'Последња вожња',
+    trip_now: 'Тренутна вожња',
+    month: 'Овај месец',
+    average: 'Просек',
+    cost_km: 'Трошак по km',
+    month_cost: '{v} овог месеца',
+    recent_trips: 'Недавне вожње',
+    refuels: 'Точења горива',
+    charges: 'Пуњења',
+    no_trips: 'Још нема вожњи',
+    no_refuels: 'Још нема точења горива',
+    no_charges: 'Још нема пуњења',
+    manual: 'Унето ручно',
+    charger: 'Кућни пуњач',
+    chart_consumption: 'Потрошња',
+    chart_distance: 'Пређени пут',
+    chart_cost: 'Трошак',
+    last_months: 'Последњи месеци: {n}',
+    add: 'Унеси точење горива или пуњење',
+    add_refuel: 'Унеси точење горива',
+    add_charge: 'Унеси пуњење',
+    mode_refuel: 'Гориво',
+    mode_charge: 'Пуњење',
+    liters: 'Сипано гориво',
+    energy: 'Додата енергија',
+    total_cost: 'Укупан трошак',
+    odometer: 'Километража',
+    optional: 'опционо',
+    save: 'Сачувај',
+    cancel: 'Откажи',
+    save_error: 'Чување није успело: {e}',
+    ed_entity: 'Возило',
+    ed_entity_helper: 'Проналази се аутоматски; оставите празно да би се користило прво возило',
+    ed_title: 'Наслов',
+    ed_title_helper: 'Оставите празно за назив возила',
+    ed_chart: 'Месечни графикон',
+    ed_chart_metric: 'Графикон приказује',
+    ed_months: 'Месеци у графикону',
+    ed_trips: 'Недавне вожње',
+    ed_refuels: 'Точења горива и пуњења',
+    ed_add_button: 'Дугме „Унеси точење горива или пуњење“',
+    ed_language: 'Језик',
+    ed_language_helper: 'Оставите празно да би се пратио Home Assistant',
+  },
+  'sr-Latn': {
+    title: 'Vozilo',
+    not_loaded: 'Nije podešeno',
+    not_loaded_hint: 'Vehicle Consumption nije podešen: dodajte vozilo u Podešavanja → Uređaji i usluge',
+    driving: 'U vožnji',
+    fuel: 'Gorivo',
+    battery: 'Baterija',
+    trip: 'Poslednja vožnja',
+    trip_now: 'Trenutna vožnja',
+    month: 'Ovaj mesec',
+    average: 'Prosek',
+    cost_km: 'Trošak po km',
+    month_cost: '{v} ovog meseca',
+    recent_trips: 'Nedavne vožnje',
+    refuels: 'Točenja goriva',
+    charges: 'Punjenja',
+    no_trips: 'Još nema vožnji',
+    no_refuels: 'Još nema točenja goriva',
+    no_charges: 'Još nema punjenja',
+    manual: 'Uneto ručno',
+    charger: 'Kućni punjač',
+    chart_consumption: 'Potrošnja',
+    chart_distance: 'Pređeni put',
+    chart_cost: 'Trošak',
+    last_months: 'Poslednji meseci: {n}',
+    add: 'Unesi točenje goriva ili punjenje',
+    add_refuel: 'Unesi točenje goriva',
+    add_charge: 'Unesi punjenje',
+    mode_refuel: 'Gorivo',
+    mode_charge: 'Punjenje',
+    liters: 'Sipano gorivo',
+    energy: 'Dodata energija',
+    total_cost: 'Ukupan trošak',
+    odometer: 'Kilometraža',
+    optional: 'opciono',
+    save: 'Sačuvaj',
+    cancel: 'Otkaži',
+    save_error: 'Čuvanje nije uspelo: {e}',
+    ed_entity: 'Vozilo',
+    ed_entity_helper: 'Pronalazi se automatski; ostavite prazno da bi se koristilo prvo vozilo',
+    ed_title: 'Naslov',
+    ed_title_helper: 'Ostavite prazno za naziv vozila',
+    ed_chart: 'Mesečni grafikon',
+    ed_chart_metric: 'Grafikon prikazuje',
+    ed_months: 'Meseci u grafikonu',
+    ed_trips: 'Nedavne vožnje',
+    ed_refuels: 'Točenja goriva i punjenja',
+    ed_add_button: 'Dugme „Unesi točenje goriva ili punjenje“',
+    ed_language: 'Jezik',
+    ed_language_helper: 'Ostavite prazno da bi se pratio Home Assistant',
+  },
 };
 
 const vcLang = (hass, config) => {
   const raw = String(config?.language || hass?.locale?.language || hass?.language || 'en');
+  // Exact code first (sr-Latn, Serbian in Latin script), then its base language (fr-FR → fr), then English.
   if (VC_I18N[raw]) return raw;
-  const l = raw.slice(0, 2);
+  const l = raw.split('-')[0];
   return VC_I18N[l] ? l : 'en';
 };
 
@@ -246,12 +553,15 @@ const VC_DASH = '—';
 
 const vcFinite = (v) => v != null && v !== '' && Number.isFinite(Number(v));
 
+// Home Assistant's `pt` is European Portuguese, while Intl reads a bare `pt` as Brazilian (« € 1.234 », « 30 de out. »).
+const vcIntlLocale = (l) => (String(l || '').toLowerCase() === 'pt' ? 'pt-PT' : l);
+
 // Number, money and date formatting: numbers follow Home Assistant's number format (its locale by default),
 // month and day names follow the card language.
 function vcFormat(hass, lang, currency) {
   const loc = hass?.locale || {};
   const byFormat = { comma_decimal: 'en-US', decimal_comma: 'de-DE', space_comma: 'fr-FR', system: undefined };
-  const locale = loc.number_format in byFormat ? byFormat[loc.number_format] : loc.language || hass?.language || lang;
+  const locale = vcIntlLocale(loc.number_format in byFormat ? byFormat[loc.number_format] : loc.language || hass?.language || lang);
   const grouping = loc.number_format !== 'none';
   const cache = new Map();
   const nf = (opts) => {
@@ -276,9 +586,18 @@ function vcFormat(hass, lang, currency) {
     return nf({ style: 'currency', currency: cur, minimumFractionDigits: digits, maximumFractionDigits: digits }).format(Number(v));
   };
   const symbol = () => (cur ? nf({ style: 'currency', currency: cur }).formatToParts(0).find((p) => p.type === 'currency')?.value || cur : '');
-  const dateFmt = new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'short' });
-  const timeFmt = new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit' });
-  const monthFmt = new Intl.DateTimeFormat(lang, { month: 'short', timeZone: 'UTC' });
+  // Home Assistant's full locale (pt-BR, de-CH) when it resolves to the card language, the card language otherwise
+  // (a card set to sr keeps Cyrillic month names under a Home Assistant in sr-Latn).
+  const haLang = String(loc.language || hass?.language || '');
+  let dateLocale = vcIntlLocale(haLang && vcLang({ language: haLang }, {}) === lang ? haLang : lang);
+  try {
+    Intl.DateTimeFormat.supportedLocalesOf(dateLocale);
+  } catch {
+    dateLocale = vcIntlLocale(lang);
+  }
+  const dateFmt = new Intl.DateTimeFormat(dateLocale, { day: 'numeric', month: 'short' });
+  const timeFmt = new Intl.DateTimeFormat(dateLocale, { hour: '2-digit', minute: '2-digit' });
+  const monthFmt = new Intl.DateTimeFormat(dateLocale, { month: 'short', timeZone: 'UTC' });
   const date = (iso, withTime = true) => {
     const d = iso ? new Date(iso) : null;
     if (!d || Number.isNaN(d.getTime())) return VC_DASH;
@@ -343,7 +662,9 @@ const vcParse = (s) => {
   return String(s ?? '').trim() !== '' && Number.isFinite(v) ? v : null;
 };
 
-const VC_ICON = { fuel: 'mdi:car', electric: 'mdi:car-electric', plugin_hybrid: 'mdi:car-electric-outline' };
+// The badge: the gauge of the projects site, coloured by the card's level.
+const VC_ICON = 'mdi:gauge-low';
+const VC_KINDS = ['fuel', 'electric', 'plugin_hybrid'];
 
 class VehicleConsumptionCard extends HTMLElement {
   static getConfigElement() {
@@ -443,7 +764,7 @@ class VehicleConsumptionCard extends HTMLElement {
       <style>${VehicleConsumptionCard.styles}</style>
       <ha-card class="lvl-na">
         <div class="head">
-          <div class="badge"><ha-icon icon="mdi:car-off"></ha-icon></div>
+          <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
           <div class="title">${vcEsc(c.title || this._t('title'))}</div>
           <div class="pill">${vcEsc(this._t('not_loaded'))}</div>
         </div>
@@ -453,7 +774,7 @@ class VehicleConsumptionCard extends HTMLElement {
     }
 
     const f = vcFormat(this._hass, lang, a.currency);
-    const kind = a.kind in VC_ICON ? a.kind : 'fuel';
+    const kind = VC_KINDS.includes(a.kind) ? a.kind : 'fuel';
     const tracks = vcTracks(kind);
     const gauges = [
       tracks.fuel ? this._gauge('fuel', a.fuel_level, a.fuel_quantity, 'L', 'mdi:gas-station', f) : null,
@@ -481,7 +802,7 @@ class VehicleConsumptionCard extends HTMLElement {
       <style>${VehicleConsumptionCard.styles}</style>
       <ha-card class="lvl-${level}${this._popup ? ' has-popup' : ''}${anim}">
         <div class="head">
-          <div class="badge"><ha-icon icon="${VC_ICON[kind]}"></ha-icon></div>
+          <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
           <div class="title"><span class="tname">${vcEsc(c.title || a.vehicle || this._t('title'))}</span>${driving}</div>
           ${add}
           <div class="pill">${vcEsc(avg)}</div>
@@ -1036,6 +1357,12 @@ class VehicleConsumptionCardEditor extends HTMLElement {
               { value: 'fr', label: 'Français' },
               { value: 'de', label: 'Deutsch' },
               { value: 'es', label: 'Español' },
+              { value: 'it', label: 'Italiano' },
+              { value: 'nl', label: 'Nederlands' },
+              { value: 'pt', label: 'Português (Portugal)' },
+              { value: 'pl', label: 'Polski' },
+              { value: 'sr', label: 'Српски' },
+              { value: 'sr-Latn', label: 'Srpski (latinica)' },
             ],
           },
         },

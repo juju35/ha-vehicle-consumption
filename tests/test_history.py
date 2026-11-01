@@ -23,6 +23,7 @@ from custom_components.vehicle_consumption.const import (
     SERVICE_ADD_REFUEL,
     SERVICE_IMPORT_HISTORY,
 )
+from custom_components.vehicle_consumption.tracker import HISTORY_IMPORT_VERSION
 
 from .conftest import (
     FUEL,
@@ -350,3 +351,99 @@ async def test_hourly_price_means(recorder_mock, hass: HomeAssistant, freezer: F
     # 16 L over the hours at 2.0, then the 7 L of the recorded states at 1.0.
     assert attrs["total"]["fuel"] == 23 and attrs["total"]["cost"] == 16 * 2.0 + 7 * 1.0
     assert [r["cost"] for r in attrs["refuels"]] == [13 * 1.0, 6 * 2.0]
+
+
+async def _record_levels(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    """The fuel level (%) of JOURNEY from a distinct sensor, 50 L tank: 2 % a litre, reported after the quantity."""
+    for minutes, _, liters in JOURNEY:
+        freezer.move_to(START + timedelta(minutes=minutes, seconds=2))
+        hass.states.async_set(FUEL_LEVEL, str(2 * liters), PERCENT)
+        await hass.async_block_till_done()
+    await async_wait_recording_done(hass)
+
+
+async def test_level_next_to_quantity_is_not_replayed(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    """A fuel level sensor next to the quantity is shown, not replayed: no fake refuels from it."""
+    await _record(hass, freezer, JOURNEY)
+    await _record_levels(hass, freezer)
+    await _setup(hass, freezer, **{CONF_FUEL_LEVEL: FUEL_LEVEL, CONF_TANK_CAPACITY: 50})
+    attrs = _attrs(hass)
+    assert [r["liters"] for r in attrs["refuels"]] == [13]
+    assert attrs["total"]["fuel"] == 7
+    assert [(t["distance"], t["fuel"]) for t in attrs["trips"]] == [(50, 3), (30, 2), (20, 2)]
+    assert attrs["fuel_level"] == 92 and attrs["fuel_quantity"] == 46
+
+
+async def test_same_sensor_as_quantity_and_level(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    """One sensor stored as both the quantity and the level (allowed before 0.2.2) is a quantity only."""
+    await _record(hass, freezer, JOURNEY)
+    await _setup(hass, freezer, **{CONF_FUEL_LEVEL: FUEL})
+    attrs = _attrs(hass)
+    assert [r["liters"] for r in attrs["refuels"]] == [13]
+    assert attrs["total"]["fuel"] == 7
+    assert attrs["fuel_level"] is None  # 46 L is not 46 %, and there is no tank capacity
+
+
+async def test_hourly_statistics_without_a_level_next_to_quantity(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    """A level next to the quantity is not replayed: its missing statistics do not cancel the hourly replay."""
+    from homeassistant.components.recorder.statistics import async_import_statistics
+
+    hours = [(900, 50), (930, 48), (960, 46), (960, 52), (1000, 40)]
+    first = START - timedelta(days=5)
+    for statistic_id, unit, index in ((ODOMETER, "km", 0), (FUEL, "L", 1)):
+        async_import_statistics(
+            hass,
+            _metadata(statistic_id, unit),
+            [
+                {"start": first + timedelta(hours=h), "state": row[index], "sum": row[index]}
+                for h, row in enumerate(hours)
+            ],
+        )
+    await _record(hass, freezer, JOURNEY)
+    await _record_levels(hass, freezer)
+    await _setup(hass, freezer, **{CONF_FUEL_LEVEL: FUEL_LEVEL, CONF_TANK_CAPACITY: 50})
+
+    attrs = _attrs(hass)
+    assert [(t["distance"], t["fuel"]) for t in attrs["trips"]] == [(50, 3), (30, 2), (20, 2), (40, 12), (60, 4)]
+    assert [r["liters"] for r in attrs["refuels"]] == [13, 6]
+    assert attrs["total"]["distance"] == 200
+
+
+async def test_old_import_done_again(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory, hass_storage: dict[str, Any]
+) -> None:
+    """A history imported before 0.2.2 (stored as `true`) is imported again once, manual refuels kept."""
+    await _record(hass, freezer, JOURNEY)
+    entry = await _setup(hass, freezer)
+    await hass.services.async_call(
+        DOMAIN, SERVICE_ADD_REFUEL, {"config_entry_id": entry.entry_id, "liters": 30, "cost": 55}, blocking=True
+    )
+    await hass.config_entries.async_unload(entry.entry_id)
+    key = f"{DOMAIN}.{entry.entry_id}"
+    hass_storage[key]["data"].update(history_imported=True, total={"distance": 5})
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    attrs = _attrs(hass)
+    assert attrs["total"]["distance"] == 100
+    assert sorted((r["liters"], r["source"]) for r in attrs["refuels"]) == [(13, "auto"), (30, "manual")]
+
+
+async def test_current_import_not_done_again(
+    recorder_mock, hass: HomeAssistant, freezer: FrozenDateTimeFactory, hass_storage: dict[str, Any]
+) -> None:
+    """An import of this version is stored as such: a restart does not replay it again."""
+    await _record(hass, freezer, JOURNEY)
+    entry = await _setup(hass, freezer)
+    await hass.config_entries.async_unload(entry.entry_id)
+    key = f"{DOMAIN}.{entry.entry_id}"
+    assert hass_storage[key]["data"]["history_imported"] == HISTORY_IMPORT_VERSION
+    hass_storage[key]["data"].update(total={"distance": 5})
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert _attrs(hass)["total"]["distance"] == 5

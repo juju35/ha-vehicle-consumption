@@ -269,6 +269,19 @@ async def test_fuel_level_with_capacity(hass: HomeAssistant) -> None:
     assert state_of(hass, "consumption").state == "6.0"
 
 
+async def test_level_next_to_quantity_is_shown(hass: HomeAssistant) -> None:
+    """A level next to the quantity is only shown: a change of it alone updates the card, counts nothing."""
+    states = {ODOMETER: ("10000", KM), FUEL: ("40", LITERS), FUEL_LEVEL: ("80", PERCENT)}
+    options = {CONF_ODOMETER: ODOMETER, CONF_FUEL_QUANTITY: FUEL, CONF_FUEL_LEVEL: FUEL_LEVEL, CONF_TANK_CAPACITY: 50}
+    await setup_vehicle(hass, options, states=states)
+    assert _attrs(hass)["fuel_level"] == 80
+
+    await _set(hass, FUEL_LEVEL, 70, PERCENT)
+    attrs = _attrs(hass)
+    assert attrs["fuel_level"] == 70 and attrs["fuel_quantity"] == 40
+    assert attrs["total"]["fuel"] == 0 and attrs["refuels"] == []
+
+
 async def test_electric_vehicle_charge(hass: HomeAssistant) -> None:
     states = {
         ODOMETER: ("10000", KM),

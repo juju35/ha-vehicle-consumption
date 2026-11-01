@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.4 - 2026-11-01
+
+### What's new
+- Added Italian, Dutch, European Portuguese and Polish translations: `it`, `nl`, `pt` and `pl` for the setup and options, the entities, the actions and the card with its visual editor. Brazilian Portuguese: `pt-BR` uses the European Portuguese texts, in the integration as in the card.
+
+### Changes
+- Card: the header badge is now a gauge (`mdi:gauge-low`), the icon of the projects site, for every vehicle; its colour still follows the state (driving, low level, not available). It replaced a car icon that changed with the vehicle type.
+
+## 0.2.3 - 2026-11-01
+
+### What's new
+- Added Serbian (Cyrillic and Latin) translations: `sr` and `sr-Latn` for the setup and options, the entities, the actions and the card with its visual editor. The card follows Home Assistant's language (Serbian in Latin script when Home Assistant is set to `sr-Latn`) or its `language` option; month names follow the script.
+
+## 0.2.2
+
+### Fixes
+- History import: a fuel or battery level in % set next to the fuel quantity or battery energy sensor (the default for Renault, Tesla, Kia, Stellantis, MG, BMW and others) no longer adds fake refuels or charges and inflates the consumption. The level is now only shown, the quantity does the counting, and a level without statistics no longer prevents the hourly replay.
+- The same sensor can no longer be picked for two sources (such as the fuel quantity and the fuel level); a vehicle already set up that way shows the level from the quantity correctly.
+- Vehicles imported with 0.2.0 or 0.2.1 have their history imported again once after the update, so the fixes of 0.2.1 and 0.2.2 apply to it; refuels and charges logged by hand are kept.
+- The fuel or battery level shown on the card now follows its sensor when only the level changes.
+
 ## 0.2.1
 
 ### Fixes

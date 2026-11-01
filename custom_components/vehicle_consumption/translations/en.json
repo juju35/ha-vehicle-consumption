@@ -58,6 +58,7 @@
       "no_energy_sensor": "Choose at least one fuel or battery sensor.",
       "tank_capacity_required": "The tank capacity is needed to use the fuel level.",
       "battery_capacity_required": "The battery capacity is needed to use the battery level.",
+      "duplicate_sensor": "This sensor is already used for another source.",
       "charger_needs_battery": "A home charger counter needs a battery energy or level sensor."
     },
     "abort": {
@@ -117,6 +118,7 @@
       "no_energy_sensor": "Choose at least one fuel or battery sensor.",
       "tank_capacity_required": "The tank capacity is needed to use the fuel level.",
       "battery_capacity_required": "The battery capacity is needed to use the battery level.",
+      "duplicate_sensor": "This sensor is already used for another source.",
       "charger_needs_battery": "A home charger counter needs a battery energy or level sensor."
     }
   },
