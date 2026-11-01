@@ -15,7 +15,7 @@ custom_components/vehicle_consumption/
 ├── sensor.py        # consumption (card data in attributes) + trip / month / average figures, costs, last_refuel / last_charge
 ├── entity.py        # Shared service device (name = vehicle), listener on the tracker
 ├── frontend/vehicle-consumption-card.js   # custom:vehicle-consumption-card, reads the consumption sensor attributes
-├── const.py / icons.json / services.yaml / translations/{en,fr,de,es}.json / brand/
+├── const.py / icons.json / services.yaml / translations/{en,fr,de,es,sr,sr-Latn}.json / brand/
 ```
 
 ## Rules

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3 - 2026-11-01
+
+### What's new
+- Added Serbian (Cyrillic and Latin) translations: `sr` and `sr-Latn` for the setup and options, the entities, the actions and the card with its visual editor. The card follows Home Assistant's language (Serbian in Latin script when Home Assistant is set to `sr-Latn`) or its `language` option; month names follow the script.
+
 ## 0.2.2
 
 ### Fixes

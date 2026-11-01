@@ -133,6 +133,36 @@ test('vcLang: card option, then Home Assistant, then English', () => {
   assert.equal(vcLang({ language: 'de' }, {}), 'de');
   assert.equal(vcLang({ locale: { language: 'es-ES' } }, {}), 'es');
   assert.equal(vcLang({ language: 'ja' }, {}), 'en');
+  assert.equal(vcLang({ language: 'pt-BR' }, {}), 'en');
+  // Serbian: Cyrillic by default, Latin script when Home Assistant (or the card) asks for sr-Latn.
+  assert.equal(vcLang({ language: 'sr' }, {}), 'sr');
+  assert.equal(vcLang({ locale: { language: 'sr-Latn' } }, {}), 'sr-Latn');
+  assert.equal(vcLang({ language: 'en' }, { language: 'sr-Latn' }), 'sr-Latn');
+  assert.equal(vcLang({ language: 'sr-Cyrl' }, {}), 'sr');
+});
+
+test('i18n Serbian: the Cyrillic and Latin cards say the same thing, letter for letter, each in its own script', () => {
+  const cyr = 'абвгдђежзијклљмнњопрстћуфхцчџш';
+  const lat = ['a', 'b', 'v', 'g', 'd', 'đ', 'e', 'ž', 'z', 'i', 'j', 'k', 'l', 'lj', 'm', 'n', 'nj', 'o', 'p', 'r', 's', 't', 'ć', 'u', 'f', 'h', 'c', 'č', 'dž', 'š'];
+  const map = new Map();
+  [...cyr].forEach((c, i) => {
+    map.set(c, lat[i]);
+    map.set(c.toUpperCase(), lat[i][0].toUpperCase() + lat[i].slice(1));
+  });
+  // Latin letters allowed in Cyrillic: names (Vehicle Consumption, Home Assistant), units (km) and placeholders.
+  const names = /Vehicle Consumption|Home Assistant|\bkm\b|\{\w+\}/g;
+  for (const [key, text] of Object.entries(VC_I18N.sr)) {
+    assert.equal([...text].map((c) => map.get(c) ?? c).join(''), VC_I18N['sr-Latn'][key], key);
+    assert.doesNotMatch(text.replace(names, ''), /[A-Za-z]/, `sr.${key}`);
+    assert.doesNotMatch(VC_I18N['sr-Latn'][key], /[\u0400-\u04FF]/, `sr-Latn.${key}`);
+  }
+});
+
+test('Serbian dates: month names in Cyrillic for sr, in Latin script for sr-Latn', () => {
+  const hass = { locale: { language: 'en', number_format: 'language' } };
+  assert.match(vcFormat(hass, 'sr', 'EUR').month('2026-10'), /^[\u0400-\u04FF]+$/);
+  assert.equal(vcFormat(hass, 'sr-Latn', 'EUR').month('2026-10'), 'okt');
+  assert.doesNotMatch(vcFormat(hass, 'sr-Latn', 'EUR').date('2026-10-30T08:00:00Z'), /[\u0400-\u04FF]/);
 });
 
 test('i18n: a key missing in a language falls back to English, then to the key', () => {
@@ -148,7 +178,7 @@ test('i18n: a key missing in a language falls back to English, then to the key',
 test('i18n parity: every language has exactly the English keys and placeholders', () => {
   const ph = (s) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join();
   const keys = Object.keys(VC_I18N.en).sort();
-  assert.deepEqual(Object.keys(VC_I18N).sort(), ['de', 'en', 'es', 'fr']);
+  assert.deepEqual(Object.keys(VC_I18N).sort(), ['de', 'en', 'es', 'fr', 'sr', 'sr-Latn']);
   for (const lang of Object.keys(VC_I18N)) {
     assert.deepEqual(Object.keys(VC_I18N[lang]).sort(), keys, lang);
     for (const k of keys) assert.equal(ph(VC_I18N[lang][k]), ph(VC_I18N.en[k]), `${lang}.${k}`);
