@@ -86,9 +86,10 @@ REPLAY_SHARE = 0.05
 # The sources of one poll are recorded a few seconds apart: a source first recorded this soon after the tracking
 # started still covers it (no month kept as tracked for that).
 REPLAY_SKEW = timedelta(minutes=5)
-# An hourly statistic is read at the end of its hour, but what it counts happened in that hour: its month is the
-# one of this instant before (the hour 23:00-00:00 of the last day belongs to that month, not the next one).
-HOURLY_MONTH_LAG = timedelta(microseconds=1)
+# An hourly statistic is read at the end of its hour, but what it counts happened in that hour (a UTC hour): it goes
+# to the month(s) of that hour, shared in proportion when a local month starts inside it (a time zone with a
+# half-hour or quarter-hour offset: Kolkata, St John's, Adelaide, Tehran, Kathmandu...).
+HOUR = timedelta(hours=1)
 # What a replay replaces, put back as it was when the history turns out to miss readings.
 _TRACKED_FIELDS = ("since", "total", "months", "trip", "_trip_start", "trips", "odometer", "_levels", "_charger")
 
@@ -300,13 +301,10 @@ class _Kept:
     months: dict[str, Totals]
     trips: list[Trip]
     events: dict[str, list[Refill]]  # refuels / charges from the sensors and the charger, by kind
-    # An hourly statistic read at `cut` counts the hour before it: what the replay starts there belongs to the kept
-    # months (the tracked trip, refuel or charge is kept), not to the replayed ones.
-    hourly_at_cut: bool = False
 
     def keeps(self, when: datetime) -> bool:
         """Whether a trip, refuel or charge starting at `when` is kept as tracked rather than taken from the replay."""
-        return when <= self.cut if self.hourly_at_cut else when < self.cut
+        return when < self.cut
 
 
 class ConsumptionTracker:
@@ -346,8 +344,8 @@ class ConsumptionTracker:
         self._listeners: list[CALLBACK_TYPE] = []
         # Price entity states while the history is replayed (the prices of then, not of now); None otherwise.
         self._replay_prices: dict[str, State] | None = None
-        # The month of a reading is the one of this much before it (HOURLY_MONTH_LAG while replaying hourly statistics).
-        self._month_lag = timedelta(0)
+        # While replaying an hourly statistic: the hour it counts (start, end], shared between the months it spans.
+        self._span: tuple[datetime, datetime] | None = None
         # The recorder's history has been read once (at the first start, or after an update adding it).
         self.history_imported = False
         self._reset_data(dt_util.utcnow())
@@ -473,8 +471,22 @@ class ConsumptionTracker:
 
     # ── Tracking ────────────────────────────────────────────────────────────
 
-    def _month(self, now: datetime) -> Totals:
-        key = dt_util.as_local(now - self._month_lag).strftime("%Y-%m")
+    def _months_of(self, now: datetime) -> list[tuple[Totals, float]]:
+        """The month a reading at `now` counts in (share 1); for an hourly statistic, the months of its hour."""
+        if self._span is None:
+            return [(self._month(dt_util.as_local(now).strftime("%Y-%m")), 1.0)]
+        start, end = self._span
+        out: list[tuple[Totals, float]] = []
+        at = start
+        while at < end:
+            # (at, stop]: the instant just after `at` gives the month (a span starting at a month start is in it).
+            local = dt_util.as_local(at + timedelta(microseconds=1))
+            stop = min(end, _next_month_start(local))
+            out.append((self._month(local.strftime("%Y-%m")), (stop - at) / (end - start)))
+            at = stop
+        return out
+
+    def _month(self, key: str) -> Totals:
         if key not in self.months:
             self.months[key] = Totals()
             # Oldest months go first; keys sort chronologically.
@@ -501,7 +513,8 @@ class ConsumptionTracker:
         self.trip.end = now  # last move, while driving
         self.odometer = value
         self.total.distance += delta
-        self._month(now).distance += delta
+        for month, share in self._months_of(now):
+            month.distance += delta * share
         return True
 
     def _process_level(self, kind: str, value: float, now: datetime) -> bool:
@@ -515,12 +528,11 @@ class ConsumptionTracker:
             consumed = level.ref - value
             level.ref = value
             level.consumed_since_event = True
-            month = self._month(now)
             price = self.fuel_price if kind == FUEL else self.electricity_price
-            for totals in (self.total, month):
-                setattr(totals, kind, getattr(totals, kind) + consumed)
+            for totals, share in [(self.total, 1.0), *self._months_of(now)]:
+                setattr(totals, kind, getattr(totals, kind) + consumed * share)
                 if price is not None:
-                    totals.add_cost(consumed * price)
+                    totals.add_cost(consumed * share * price)
             return True
         threshold = self.refuel_threshold if kind == FUEL else self.charge_threshold
         if value - level.ref < threshold:
@@ -793,11 +805,7 @@ class ConsumptionTracker:
         # Where the recorded states of the source sensors begin: the statistics cover the time before.
         sources = set(self.sensors.values())
         first = min(
-            (
-                when
-                for when, entity_id, state in timeline
-                if entity_id in sources and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN)
-            ),
+            (when for when, entity_id, state in timeline if entity_id in sources and _valid(state)),
             default=now,
         )
         hourly: list[tuple[datetime, str, State]] = []
@@ -888,7 +896,9 @@ class ConsumptionTracker:
         hourly_until: datetime | None = None,
         initial_prices: dict[str, State] | None = None,
     ) -> None:
-        """Start over from the first recorded state and apply every one, then the current states.
+        """Start over from the first recorded state and apply every one, then the current states (counted at the
+        first import only: with figures tracked, the tracking already counted what changed since the last recorded
+        reading).
 
         Up to `hourly_until` the readings are hourly statistics: a trip then only ends after an hour without the
         odometer moving (a trip over two hours is one trip, not two).
@@ -906,21 +916,41 @@ class ConsumptionTracker:
             self._changed()
             return
         first, covered = coverage
+        # The first recorded state of a source after its hourly statistics counts what happened since its last hour:
+        # until then, the readings are not exact to the minute.
+        inexact_until = hourly_until
+        if hourly_until is not None:
+            for entity_id in by_entity:
+                inexact_until = max(
+                    inexact_until,
+                    next((w for w, e, s in rows if e == entity_id and w > hourly_until and _valid(s)), hourly_until),
+                )
         # A source recorded only after the tracking started (even when another one was recorded from before it): the
         # replay only stands in from the first month where every source has readings from its first day, the months
         # before it (and their trips, refuels and charges) are kept as tracked. Every source recorded from before the
         # tracking: it replaces everything. Either way, never where it has less than tracked (below).
-        kept = self._kept_before(covered, hourly_until) if covered > self.since + REPLAY_SKEW else None
+        kept = self._kept_before(covered, inexact_until) if covered > self.since + REPLAY_SKEW else None
         tracked = self._snapshot()
+        nothing_tracked = self._nothing_tracked()
         manual = {kind: [e for e in level.events if e.source == "manual"] for kind, level in self._levels.items()}
         self._reset_data(first)
         self._replay_prices = dict(initial_prices or {})
         trip_gap = self.trip_gap
+        last_hour: dict[str, datetime] = {}  # per source, the end of its last hourly statistic replayed
         try:
             for when, entity_id, state in rows:
                 hourly = hourly_until is not None and when <= hourly_until
                 self.trip_gap = max(trip_gap, HOURLY_TRIP_GAP) if hourly else trip_gap
-                self._month_lag = HOURLY_MONTH_LAG if hourly else timedelta(0)
+                if hourly:
+                    self._span = (when - HOUR, when)
+                    if entity_id in by_entity:
+                        last_hour[entity_id] = when
+                elif entity_id in last_hour and _valid(state):
+                    # The first recorded state after the hours: what it counts happened since the last hour.
+                    since_hour = last_hour.pop(entity_id)
+                    self._span = (since_hour, when) if when > since_hour else None
+                else:
+                    self._span = None
                 # What the 1-minute tick would have done between two readings.
                 self._end_trip_if_stopped(when)
                 self._close_charger_session(when)
@@ -931,10 +961,13 @@ class ConsumptionTracker:
         finally:
             self._replay_prices = None
             self.trip_gap = trip_gap
-            self._month_lag = timedelta(0)
+            self._span = None
         self._end_trip_if_stopped(now)
         self._close_charger_session(now)
-        self._read_current(now)
+        if nothing_tracked:
+            self._read_current(now)  # what changed since the last recorded reading, counted now (the first import)
+        else:
+            self._rebase(now)
         if kept is not None:
             self._merge_kept(kept)
         if short := self._short_of(tracked, kept):
@@ -977,12 +1010,7 @@ class ConsumptionTracker:
                 firsts[key] = min(when, firsts.get(key, when))
                 if key not in lasts or when >= lasts[key][0]:
                     lasts[key] = (when, value)
-        nothing_tracked = not (
-            self.trips
-            or self.trip
-            or any(level.events for level in self._levels.values())
-            or any((self.total.distance, self.total.fuel, self.total.energy))
-        )
+        nothing_tracked = self._nothing_tracked()
         if missing := [self.sensors[key] for key in needed if key not in firsts]:
             _LOGGER.debug("%s: no recorded reading of %s, nothing replayed", self.name, ", ".join(missing))
             return None
@@ -999,6 +1027,31 @@ class ConsumptionTracker:
                 )
                 return None
         return min(firsts.values()), max(firsts.values())
+
+    def _nothing_tracked(self) -> bool:
+        return not (
+            self.trips
+            or self.trip
+            or any(level.events for level in self._levels.values())
+            or any((self.total.distance, self.total.fuel, self.total.energy))
+        )
+
+    def _rebase(self, now: datetime) -> None:
+        """Take the current readings of the counting sources as references, without counting what changed since their
+        last recorded reading: the tracking counted it when it happened (possibly in a month it keeps), the replay
+        cannot tell when (a source no longer recorded, within the tolerance of `_coverage`)."""
+        for key in self.sensors:
+            if key not in self._needed():
+                self._process(key, None, now)
+            elif key == CONF_ODOMETER:
+                if (value := self._reading(key)) is not None:
+                    self.odometer = value
+            else:
+                kind = FUEL if key in (CONF_FUEL_QUANTITY, CONF_FUEL_LEVEL) else ENERGY
+                value = self._fuel_now() if kind == FUEL else self._energy_now()
+                if value is not None:
+                    self._levels[kind].ref = value
+                    self._levels[kind].seen = now
 
     def _snapshot(self) -> dict[str, Any]:
         return {name: deepcopy(getattr(self, name)) for name in _TRACKED_FIELDS}
@@ -1053,11 +1106,14 @@ class ConsumptionTracker:
     def _kept_before(self, first: datetime, hourly_until: datetime | None = None) -> _Kept:
         """What a replay starting at `first` does not fully rebuild: the months before the next month start.
 
-        With hourly statistics up to `hourly_until`, one read at the next month start counts the hour before it.
+        With hourly statistics (readings not exact to the minute up to `hourly_until`), the months that start before
+        it are kept too: an hourly reading cannot split exactly what the tracking counted before the month start from
+        what came after (a UTC hour across a local midnight with a half-hour offset, a mean over the hour), and the
+        tracking has these months in full.
         """
-        local = dt_util.as_local(first)
-        year, month = (local.year + 1, 1) if local.month == 12 else (local.year, local.month + 1)
-        cut = dt_util.as_utc(local.replace(year=year, month=month, day=1, hour=0, minute=0, second=0, microsecond=0))
+        cut = _next_month_start(dt_util.as_local(first))
+        while hourly_until is not None and cut <= hourly_until:
+            cut = _next_month_start(dt_util.as_local(cut))
         key = dt_util.as_local(cut).strftime("%Y-%m")
         replaced = _sum(v for k, v in self.months.items() if k >= key)
         kept = _Kept(
@@ -1068,7 +1124,6 @@ class ConsumptionTracker:
             months={k: v for k, v in self.months.items() if k < key},
             trips=[],
             events={},
-            hourly_at_cut=hourly_until is not None and hourly_until >= cut,
         )
         kept.trips = [t for t in self.trips if kept.keeps(t.start)]
         kept.events = {
@@ -1088,8 +1143,16 @@ class ConsumptionTracker:
         self.months = {**kept.months, **{k: v for k, v in self.months.items() if k >= kept.key}}
         for old in sorted(self.months)[:-MAX_MONTHS]:
             del self.months[old]
+        # A trip kept across the cut (tracked from before it) has its part after the cut in the replay too, as a trip of
+        # its own when the replay starts in the middle of it (the first recorded reading of the odometer): not twice.
+        kept_end = max((t.end or t.start for t in kept.trips), default=None)
         self.trips = sorted(
-            [*kept.trips, *(t for t in self.trips if not kept.keeps(t.start))], key=lambda t: t.start, reverse=True
+            [
+                *kept.trips,
+                *(t for t in self.trips if not kept.keeps(t.start) and (kept_end is None or t.start > kept_end)),
+            ],
+            key=lambda t: t.start,
+            reverse=True,
         )[:MAX_TRIPS]
         for kind, level in self._levels.items():
             level.events = sorted(
@@ -1234,6 +1297,16 @@ class ConsumptionTracker:
             "refuels": [e.summary("liters") for e in self.refuels],
             "charges": [e.summary("energy") for e in self.charges],
         }
+
+
+def _valid(state: State) -> bool:
+    return state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN)
+
+
+def _next_month_start(local: datetime) -> datetime:
+    """Start of the local month after the one of `local` (a local time), in UTC."""
+    year, month = (local.year + 1, 1) if local.month == 12 else (local.year, local.month + 1)
+    return dt_util.as_utc(local.replace(year=year, month=month, day=1, hour=0, minute=0, second=0, microsecond=0))
 
 
 def _positive(value: Any) -> float | None:
