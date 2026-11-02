@@ -516,6 +516,18 @@ test('popup: electric logs a charge; plugin hybrid switches between fuel and cha
   assert.equal(hass.calls[0].data.energy, 8.2);
 });
 
+test('popup: the amount gets the focus without scrolling the dashboard', () => {
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs());
+  const calls = [];
+  const amount = { name: 'amount', addEventListener() {}, focus: (...args) => calls.push(args) };
+  card.shadowRoot.querySelector = (sel) => (sel === 'input[name="amount"]' ? amount : null);
+  card.shadowRoot.querySelectorAll = (sel) => (sel === 'input' ? [amount] : []);
+  card._openPopup();
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0][0]?.preventScroll, true);
+});
+
 test('popup: a state update while typing waits until the popup closes', () => {
   const card = makeCard();
   const hass = hassWith(fuelAttrs());

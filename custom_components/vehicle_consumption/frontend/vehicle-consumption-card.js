@@ -940,7 +940,8 @@ class VehicleConsumptionCard extends HTMLElement {
         if (ev.key === 'Enter') this._save();
       });
     }
-    root.querySelector('input[name="amount"]')?.focus?.();
+    // The amount, ready to type in, without scrolling the dashboard to the card.
+    root.querySelector('input[name="amount"]')?.focus?.({ preventScroll: true });
   }
 
   // A tank or battery gauge: { html, low }.
