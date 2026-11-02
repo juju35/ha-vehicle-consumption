@@ -4,7 +4,7 @@ Usage: python scripts/screenshots.py  (needs `pip install playwright` and `playw
 the GIFs). CHROMIUM_PATH=/path/to/chrome to use another browser. The clock is frozen so the dates stay the same.
 Every capture keeps a 16 px frame of the theme background around the card. A file is only rewritten when its decoded
 pixels change (the bytes of a PNG or a GIF can differ for the same image): an unchanged render leaves no diff to commit.
-Every channel counts; a GIF only ignores GIF_NOISE, Chromium's run-to-run noise on a few pixels of a moving edge.
+Every channel of every pixel counts, for a PNG as for a GIF: no tolerance.
 """
 
 import json
@@ -368,41 +368,16 @@ def pixels(path):
     ).stdout
 
 
-# A GIF frame of a transform animation caught mid-way can come out of Chromium 1 unit off on a few pixels of a moving
-# edge from one run to the next; the GIF palette can turn that into a few units (6 seen in CI, on 7 pixels of 1 frame).
-# A GIF is the same picture when at most GIF_NOISE["values"] channel values differ, each by GIF_NOISE["units"] at most:
-# a real change (a colour, a text, a layout) changes far more than that, and the PNGs are compared exactly.
-GIF_NOISE = {"units": 16, "values": 256}
-
-
-def same_pixels(a, b, noise=None):
+def same_pixels(a, b):
     """True when the decoded images `a` and `b` (PAM) have the same size and frames, and every channel (R, G, B and
-    alpha) of every pixel is equal, or differs within `noise` ({"units", "values"}; None: no difference allowed)."""
-    if a == b:
-        return True
-    head = a.find(b"ENDHDR\n") + 7
-    if len(a) != len(b) or not noise or head < 7 or a[:head] != b[:head]:
-        return False
-    budget = noise["values"]
-    step = 1 << 16
-    for i in range(0, len(a), step):
-        x, y = a[i : i + step], b[i : i + step]
-        if x == y:
-            continue
-        for p, q in zip(x, y, strict=True):
-            if p != q:
-                budget -= 1
-                if budget < 0 or abs(p - q) > noise["units"]:
-                    return False
-    return True
+    alpha) of every pixel is equal."""
+    return a == b
 
 
 def save(new, out):
-    """Move the new render to `out` unless `out` already shows the same pixels (a GIF: within GIF_NOISE); True when
-    written."""
+    """Move the new render to `out` unless `out` already shows exactly the same pixels; True when written."""
     new, out = Path(new), Path(out)
-    noise = GIF_NOISE if out.suffix == ".gif" else None
-    if out.exists() and same_pixels(pixels(new), pixels(out), noise):
+    if out.exists() and same_pixels(pixels(new), pixels(out)):
         new.unlink()
         return False
     new.replace(out)
