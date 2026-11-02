@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1 - 2026-11-02
+
+### Fixes
+- Trips: a drive is no longer split into several trips when the vehicle's odometer is only reported every hour or so (Renault, polled cloud APIs). A reading that comes after the trip gap goes on with the last trip when the distance it adds left no time for a stop as long as the trip gap (at most 130 km/h on average): 88 km reported an hour after the last reading continue the trip, 12 km start a new one.
+- Card: the trip being driven is listed first in "Recent trips", marked "Driving": a trip only joined the list once the trip gap had passed without the odometer moving, so the last drive seemed missing for a while.
+
 ## 1.0.0 - 2026-11-02
 
 First stable release. No change since 0.2.5.

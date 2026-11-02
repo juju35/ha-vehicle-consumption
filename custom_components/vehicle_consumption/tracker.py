@@ -59,6 +59,7 @@ from .const import (
     MAX_EVENTS,
     MAX_MONTHS,
     MAX_ODOMETER_JUMP,
+    MAX_SPEED,
     MAX_TRIPS,
     MIN_DISTANCE,
     SAVE_DELAY,
@@ -508,14 +509,32 @@ class ConsumptionTracker:
             # Still, or a small step back (rounding, mile conversion): keep the highest reading.
             return False
         if self.trip is None:
-            self._trip_start = self.total.copy()
-            self.trip = Trip(start=now, end=None, totals=Totals())
+            last = self.trips[0] if self.trips else None
+            if last is not None and self._drove_through(last, delta, now):
+                # Same drive, reported late: the stop between the two readings was shorter than `trip_gap`.
+                self.trips.pop(0)
+                self._trip_start = self.total.minus(last.totals)
+                self.trip = Trip(start=last.start, end=None, totals=Totals())
+            else:
+                self._trip_start = self.total.copy()
+                self.trip = Trip(start=now, end=None, totals=Totals())
         self.trip.end = now  # last move, while driving
         self.odometer = value
         self.total.distance += delta
         for month, share in self._months_of(now):
             month.distance += delta * share
         return True
+
+    def _drove_through(self, last: Trip, delta: float, now: datetime) -> bool:
+        """Whether `delta` km reported at `now` continue `last`, closed while the car was still driving.
+
+        An odometer polled every hour (Renault, MyPeugeot…) closes a trip between two readings of the same drive.
+        Driving `delta` km took at least `delta / MAX_SPEED` hours of the time since the trip's last move: when what is
+        left could not hold a `trip_gap` stop, the car never stopped that long and the trip goes on.
+        """
+        end = last.end or last.start
+        stopped = now - end - timedelta(hours=delta / MAX_SPEED)
+        return stopped < self.trip_gap
 
     def _process_level(self, kind: str, value: float, now: datetime) -> bool:
         level = self._levels[kind]

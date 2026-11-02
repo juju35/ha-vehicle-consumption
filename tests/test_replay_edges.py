@@ -65,7 +65,8 @@ async def test_hourly_statistics_do_not_count_the_last_hour_of_a_kept_month_twic
     tracker._replay(tracked, set(), now)
     before = _figures(tracker)
     assert before["months"] == {"2026-10": (30, 1.8, None), "2026-11": (100, 6, None)}
-    assert [d for _, d in before["trips"]] == [30, 20, 80]
+    # 80 km in the 30 min after 08:30: no stop of a trip gap in between, one drive.
+    assert [d for _, d in before["trips"]] == [30, 100]
 
     # The recorder: hourly statistics from 10 October (read at the end of each hour), the states from 5 November.
     hourly = []
