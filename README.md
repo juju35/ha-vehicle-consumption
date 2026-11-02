@@ -36,7 +36,7 @@ It comes with a **Lovelace card** showing the tank and battery gauges, the key f
 - **Lovelace card bundled with the integration**, added automatically to the dashboard resources (nothing to add by hand): fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart (consumption, distance or cost), recent trips and refuels or charges, a pulsing dot while driving, a popup to log a refuel or a charge; visual editor
 - UI setup, no YAML; English, French, German, Spanish, Italian, Dutch, Portuguese, Polish and Serbian (Cyrillic and Latin)
 
-## Compatible integrations
+## Supported integrations
 
 The odometer and the fuel and battery sensors of these integrations are **detected from their own sensor keys**, read from each integration's source code. The setup form comes prefilled; check it and change what you want.
 
