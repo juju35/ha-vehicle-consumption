@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.2.5 - 2026-11-01
+## 1.0.0 - 2026-11-02
+
+First stable release.
 
 ### Fixes
 - History import no longer wipes what was tracked. With the vehicle's sensors excluded from the recorder (or nothing recorded for them), the one-off re-import after updating from 0.2.0 / 0.2.1 reset the totals, months and trips to zero; it now leaves them as they are. When the recorder starts after the tracking did (and with the `import_history` action over a few `days`), the months it does not cover from their first day keep their figures, trips, refuels and charges, and the total adds them up.
