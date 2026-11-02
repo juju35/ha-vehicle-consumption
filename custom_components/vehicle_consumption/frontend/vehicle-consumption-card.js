@@ -773,9 +773,18 @@ class VehicleConsumptionCard extends HTMLElement {
     if (typeof ResizeObserver === 'function') {
       this._ro ??= new ResizeObserver((entries) => {
         const width = Math.round(entries[entries.length - 1]?.contentRect?.width || 0);
+        // The last width seen: a frame already asked for renders at it, or not at all if it came back.
+        if (width > 0) this._nextWidth = width;
         if (width > 0 && Math.abs(width - (this._width || 0)) >= 8) {
-          this._width = width;
-          this._render();
+          // Re-rendered at the next frame, not in this callback: a re-render there resizes what is observed in the
+          // same frame ("ResizeObserver loop completed with undelivered notifications", at every load). Several
+          // resizes in one frame: one render, at the last width, and none if it came back to the rendered one.
+          this._frame ||= requestAnimationFrame(() => {
+            this._frame = 0;
+            if (Math.abs(this._nextWidth - (this._width || 0)) < 8) return;
+            this._width = this._nextWidth;
+            this._render();
+          });
         } else {
           // A few pixels: no re-render, but the pill's label may now fit, or no longer.
           this._fitPill();
@@ -787,6 +796,8 @@ class VehicleConsumptionCard extends HTMLElement {
 
   disconnectedCallback() {
     this._ro?.disconnect();
+    if (this._frame) cancelAnimationFrame(this._frame);
+    this._frame = 0;
     document.removeEventListener('click', this._onDocClick);
     document.removeEventListener('keydown', this._onKey);
   }
@@ -902,12 +913,16 @@ class VehicleConsumptionCard extends HTMLElement {
   }
 
   // The whole label while it fits: the title (flex basis 0) gives its room down to 4 characters before the pill
-  // shrinks, so a cut label means the room is really missing; then only the dot. Not laid out (hidden): the label.
+  // shrinks, so a cut label means the room is really missing; then tighter header gaps, then only the dot. Each
+  // step is measured, so a wider card never shows less (a dot) than a narrower one. Not laid out: the label.
   _fitPill() {
     const pill = this.shadowRoot?.querySelector('.pill');
     if (!pill?.classList) return;
-    pill.classList.remove('dot');
-    if (pill.scrollWidth > pill.clientWidth) pill.classList.add('dot');
+    const cut = () => pill.scrollWidth > pill.clientWidth;
+    pill.classList.remove('tight', 'dot');
+    if (!cut()) return;
+    pill.classList.add('tight');
+    if (cut()) pill.classList.add('dot');
   }
 
   _bind() {
@@ -1260,11 +1275,10 @@ class VehicleConsumptionCard extends HTMLElement {
       .pill { flex: 0 1 auto; min-width: 0; max-width: 50%; overflow: hidden; text-overflow: ellipsis; font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 999px; white-space: nowrap;
               color: var(--ci); background: color-mix(in srgb, var(--c) 14%, transparent); font-variant-numeric: tabular-nums; }
       .pdot { display: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
-      /* Narrow card: tighter header gaps, so the whole label still fits next to a 4-character title. */
-      @container (max-width: 250px) {
-        .head, .title { gap: 6px; }
-        .pill { padding: 1px 6px; }
-      }
+      /* Tighter header gaps once the whole label no longer fits with the normal ones (measured by _fitPill, not a
+         container width: a fixed width let a label that fitted tight just under it turn into a dot just over it). */
+      .head:has(.pill.tight), .head:has(.pill.tight) .title { gap: 6px; }
+      .pill.tight { padding: 1px 6px; }
       /* Only the coloured dot (the text stays in title / aria-label) once the whole label no longer fits next to a
          4-character title: measured on the label itself at each render and resize (_fitPill), so a longer label
          (kWh/100 km, a translation) or a driving title turns into a dot only when the room is really missing. */

@@ -38,8 +38,21 @@ class FakeResizeObserver {
     for (const target of this.targets) this.cb([{ target, contentRect: { width } }]);
   }
 }
+// Animation frames: queued, run by `nextFrame()`.
+let frames = new Map();
+let frameId = 0;
+const nextFrame = () => {
+  const due = frames;
+  frames = new Map();
+  for (const fn of due.values()) fn();
+};
 const context = {
   ResizeObserver: FakeResizeObserver,
+  requestAnimationFrame: (fn) => {
+    frames.set(++frameId, fn);
+    return frameId;
+  },
+  cancelAnimationFrame: (id) => frames.delete(id),
   HTMLElement: class {},
   customElements: { get: () => true, define() {} },
   window: {},
@@ -714,21 +727,35 @@ test('width: the card keeps a width in a parent sized by its content, and still 
   assert.doesNotMatch(css, /contain-intrinsic/);
 });
 
-test('narrow: 8 of 12 columns at least, tighter header gaps under 250 px', () => {
+test('narrow: 8 of 12 columns at least, tighter header gaps when the label needs them (measured, no width)', () => {
   assert.equal(makeCard().getGridOptions().min_columns, 8);
-  assert.match(styles(), /@container \(max-width: 250px\) \{\s*\.head, \.title \{ gap: 6px; \}/);
+  assert.match(styles(), /\.head:has\(\.pill\.tight\), \.head:has\(\.pill\.tight\) \.title \{ gap: 6px; \}/);
+  assert.match(styles(), /\.pill\.tight \{ padding: 1px 6px; \}/);
+  // A container width for them let a label fitting tight just under it turn into a dot just over it (277-278 px).
+  assert.doesNotMatch(styles(), /@container \(max-width: \d+px\) \{\s*\.head/);
 });
 
-// A pill stand-in: its label is `need` px wide in a box of `room` px (what the flex layout leaves it).
-const fakePill = (need, room) => {
+// A pill stand-in: its label is `need` px wide in a box of `room` px (what the flex layout leaves it), `tight` px
+// more with the tighter header gaps.
+const fakePill = (need, room, tight = 0) => {
   const classes = new Set();
   return {
     classes,
-    classList: { add: (c) => classes.add(c), remove: (c) => classes.delete(c) },
+    classList: {
+      add: (...names) => {
+        for (const name of names) classes.add(name);
+      },
+      remove: (...names) => {
+        for (const name of names) classes.delete(name);
+      },
+    },
     get scrollWidth() {
       return classes.has('dot') ? 18 : need;
     },
-    clientWidth: room,
+    get clientWidth() {
+      return this.room + (classes.has('tight') ? tight : 0);
+    },
+    room,
   };
 };
 const cardWithPill = (pill) => {
@@ -746,7 +773,15 @@ test('pill: the whole label while it fits, else only the dot (measured on the la
   // The same room with a label that fits (L/100 km): the whole label.
   const fits = fakePill(90, 95);
   cardWithPill(fits)._fitPill();
-  assert.ok(!fits.classes.has('dot'));
+  assert.ok(!fits.classes.has('dot') && !fits.classes.has('tight'));
+  // Cut with the normal gaps, whole with the tighter ones: the label, tight, not the dot.
+  const tight = fakePill(101, 95, 8);
+  cardWithPill(tight)._fitPill();
+  assert.ok(tight.classes.has('tight') && !tight.classes.has('dot'));
+  // Measured again from the normal gaps at each call: room again, the normal gaps.
+  tight.room = 110;
+  cardWithPill(tight)._fitPill();
+  assert.ok(!tight.classes.has('tight') && !tight.classes.has('dot'));
 });
 
 test('pill: a resize of a few pixels (no re-render) measures it again, both ways', () => {
@@ -755,13 +790,14 @@ test('pill: a resize of a few pixels (no re-render) measures it again, both ways
   card.connectedCallback();
   const ro = observers[observers.length - 1];
   ro.fire(240);
+  nextFrame();
   card._fitPill();
   assert.ok(pill.classes.has('dot'));
   // 5 px wider: under the re-render step, but the label now fits.
-  pill.clientWidth = 101;
+  pill.room = 101;
   ro.fire(245);
   assert.ok(!pill.classes.has('dot'));
-  pill.clientWidth = 99;
+  pill.room = 99;
   ro.fire(242);
   assert.ok(pill.classes.has('dot'));
   card.disconnectedCallback();
@@ -808,6 +844,7 @@ test('chart: drawn at the width of the card, so its labels keep their size', () 
   const ro = observers.at(-1);
   assert.equal(ro.targets[0], card);
   ro.fire(230);
+  nextFrame();
   // 230 px card: 12 px card padding and 10 px chart padding on each side.
   assert.match(html(card), /viewBox="0 0 186 112"/);
   card.shadowRoot.innerHTML = 'kept';
@@ -820,10 +857,42 @@ test('chart: drawn at the width of the card, so its labels keep their size', () 
   narrow.hass = hassWith(fuelAttrs());
   narrow.connectedCallback();
   observers.at(-1).fire(230);
+  nextFrame();
   const out = html(narrow);
   assert.equal((out.match(/class="ml/g) || []).length, 6);
   assert.equal((out.match(/class="bv/g) || []).length, 1);
   narrow.disconnectedCallback();
+});
+
+test('resize: re-rendered at the next frame, never in the observer callback, once, only if the width changed', () => {
+  // A render in the callback resized the observed card in the same frame: "ResizeObserver loop completed with
+  // undelivered notifications" at every load.
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs());
+  let renders = 0;
+  const render = card._render.bind(card);
+  card._render = () => {
+    renders += 1;
+    render();
+  };
+  card.connectedCallback();
+  const ro = observers.at(-1);
+  ro.fire(300);
+  ro.fire(320);
+  assert.equal(renders, 0);
+  nextFrame();
+  assert.equal(renders, 1);
+  assert.match(html(card), /viewBox="0 0 276 112"/);
+  // Out and back within one frame: nothing to render.
+  ro.fire(400);
+  ro.fire(321);
+  nextFrame();
+  assert.equal(renders, 1);
+  // Removed before the frame: no render.
+  ro.fire(500);
+  card.disconnectedCallback();
+  nextFrame();
+  assert.equal(renders, 1);
 });
 
 test('not set up, unavailable or not found: each says so, with the sensor', () => {
