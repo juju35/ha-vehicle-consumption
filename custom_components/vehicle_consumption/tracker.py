@@ -946,9 +946,11 @@ class ConsumptionTracker:
                     if entity_id in by_entity:
                         last_hour[entity_id] = when
                 elif entity_id in last_hour and _valid(state):
-                    # The first recorded state after the hours: what it counts happened since the last hour.
+                    # The first recorded state after the hours: what it counts happened since the last hour, but a
+                    # source with no recorded state while the car was parked (an odometer reported at the end of a
+                    # trip) can come days later: only the hour before it is shared, never the days since that hour.
                     since_hour = last_hour.pop(entity_id)
-                    self._span = (since_hour, when) if when > since_hour else None
+                    self._span = (max(since_hour, when - HOUR), when) if when > since_hour else None
                 else:
                     self._span = None
                 # What the 1-minute tick would have done between two readings.
