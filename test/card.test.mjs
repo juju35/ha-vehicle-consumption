@@ -1019,3 +1019,23 @@ test('times follow the 12 / 24 h setting of Home Assistant', () => {
   assert.ok(at('12', 'fr').replace(/\s/g, ' ').endsWith(h12.replace(/\s/g, ' ')), at('12', 'fr'));
   assert.match(at('language'), /PM/);
 });
+
+test('trips: the trip being driven is listed first, marked as driving, and counted', () => {
+  const card = makeCard();
+  const trip = { start: '2026-11-02T08:32:00+01:00', end: null, distance: 20, fuel_consumption: 5, cost: 1.99 };
+  card.hass = hassWith(fuelAttrs({ driving: true, trip }));
+  card._toggle('trips');
+  card._render();
+  const section = html(card).split('data-section="trips"')[1].split('</section>')[0];
+  const rows = section.split('class="row').slice(1);
+  assert.equal(rows.length, 2);
+  assert.match(rows[0], /20.0 km · Driving/);
+  assert.doesNotMatch(rows[1], /Driving/);
+  assert.match(section, />2</);
+
+  // Parked: the last trip is only in the list once, not as a trip being driven.
+  card.hass = hassWith(fuelAttrs());
+  card._render();
+  const parked = html(card).split('data-section="trips"')[1].split('</section>')[0];
+  assert.equal(parked.split('class="row').length - 1, 1);
+});

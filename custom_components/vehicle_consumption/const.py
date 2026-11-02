@@ -6,7 +6,7 @@ from datetime import timedelta
 from typing import Final
 
 DOMAIN: Final = "vehicle_consumption"
-VERSION: Final = "1.0.0"
+VERSION: Final = "1.0.1"
 
 # Entry data
 CONF_DEVICE_ID: Final = "device_id"
@@ -57,6 +57,8 @@ MAX_CHARGER_STEP: Final = 250.0
 MIN_DISTANCE: Final = 5.0
 # An odometer jump above this (km) is a sensor reset or a replaced car, not a drive: not counted.
 MAX_ODOMETER_JUMP: Final = 2000.0
+# Highest average speed (km/h) between two odometer readings: what a gap longer than the trip gap can hide of driving.
+MAX_SPEED: Final = 130.0
 
 MAX_MONTHS: Final = 24
 MAX_TRIPS: Final = 20

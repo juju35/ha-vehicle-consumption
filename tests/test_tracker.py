@@ -170,12 +170,34 @@ async def test_trips(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> Non
     assert state_of(hass, "distance_trip").state == "50.0"
     assert state_of(hass, "fuel_consumption_trip").state == "6.0"
 
-    # Second trip: newest first
+    # Second trip, after a real stop: newest first
+    freezer.tick(timedelta(hours=2))
     await _drive(hass, 10150, 31)
     await _stop(hass, freezer)
     trips = _attrs(hass)["trips"]
     assert [t["distance"] for t in trips] == [100, 50]
     assert trips[0]["fuel_consumption"] == 6
+
+
+async def test_trip_reported_late_goes_on(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    """An odometer polled every hour: a reading that could not leave a trip-gap stop continues the last trip."""
+    await setup_vehicle(hass, {CONF_ODOMETER: ODOMETER, CONF_FUEL_QUANTITY: FUEL, CONF_TRIP_GAP: 30})
+    await _drive(hass, 10007, 39.6)
+    await _stop(hass, freezer, 60)
+    assert _attrs(hass)["trips"][0]["distance"] == 7  # closed after 30 min without a reading
+    start = _attrs(hass)["trips"][0]["start"]
+
+    # 88 km in the next hour: at least 41 min of driving at 130 km/h, under 30 min left to have stopped.
+    await _drive(hass, 10095, 34.4)
+    attrs = _attrs(hass)
+    assert attrs["driving"] and attrs["trips"] == []
+    assert attrs["trip"]["start"] == start and attrs["trip"]["distance"] == 95 and attrs["trip"]["fuel"] == 5.6
+
+    # 12 km in the hour after: could have stopped long enough, a trip of its own.
+    await _stop(hass, freezer, 60)
+    await _drive(hass, 10107, 33.6)
+    await _stop(hass, freezer, 31)
+    assert [t["distance"] for t in _attrs(hass)["trips"]] == [12, 95]
 
 
 async def test_months(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
@@ -362,7 +384,7 @@ async def test_restart_safe(hass: HomeAssistant, freezer: FrozenDateTimeFactory)
     """Everything survives a reload, and what changed while unloaded is caught up."""
     entry = await setup_vehicle(hass, {CONF_ODOMETER: ODOMETER, CONF_FUEL_QUANTITY: FUEL, CONF_FUEL_PRICE: 2.0})
     await _drive(hass, 10100, 34)
-    await _stop(hass, freezer)
+    await _stop(hass, freezer, 120)
     await _set(hass, FUEL, 54, LITERS)
     await _drive(hass, 10120, 53)  # a trip in progress
     before = _attrs(hass)

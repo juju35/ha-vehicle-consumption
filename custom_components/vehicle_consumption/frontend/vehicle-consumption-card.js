@@ -5,7 +5,7 @@
  * Served and added to the dashboard resources by the integration.
  * https://github.com/juju35/ha-vehicle-consumption
  */
-var VEHICLE_CONSUMPTION_CARD_VERSION = '1.0.0';
+var VEHICLE_CONSUMPTION_CARD_VERSION = '1.0.1';
 
 const VC_I18N = {
   en: {
@@ -1063,15 +1063,18 @@ class VehicleConsumptionCard extends HTMLElement {
     const c = this._config;
     const out = [];
     if (c.trips !== false) {
-      const trips = (Array.isArray(a.trips) ? a.trips : []).slice(0, VC_ROWS);
-      const rows = trips.map((t) => {
+      // The trip being driven first: it only joins the list once `trip_gap` has passed without a move.
+      const open = a.driving && a.trip && vcFinite(a.trip.distance) && a.trip.distance > 0 ? [{ ...a.trip, open: true }] : [];
+      const all = [...open, ...(Array.isArray(a.trips) ? a.trips : [])];
+      const rows = all.slice(0, VC_ROWS).map((t) => {
         // A plug-in hybrid has two: one a line, so the column stays narrow.
         const cons = this._cons(t, kind, f)
           .filter((l) => l.v !== VC_DASH)
           .map((l) => `${l.v} ${l.unit}`);
-        return this._row(f.date(t.start), vcFinite(t.distance) ? `${f.num(t.distance, 1)} km` : VC_DASH, cons.length ? cons : VC_DASH, f.money(t.cost));
+        const sub = [vcFinite(t.distance) ? `${f.num(t.distance, 1)} km` : '', t.open ? this._t('driving') : ''].filter(Boolean).join(' · ');
+        return this._row(f.date(t.start), sub || VC_DASH, cons.length ? cons : VC_DASH, f.money(t.cost));
       });
-      out.push(this._section('trips', 'mdi:map-marker-path', this._t('recent_trips'), a.trips?.length || 0, rows, 'no_trips'));
+      out.push(this._section('trips', 'mdi:map-marker-path', this._t('recent_trips'), all.length, rows, 'no_trips'));
     }
     if (c.refuels !== false) {
       const t = vcTracks(kind);
