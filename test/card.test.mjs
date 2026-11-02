@@ -528,6 +528,23 @@ test('popup: the amount gets the focus without scrolling the dashboard', () => {
   assert.equal(calls[0][0]?.preventScroll, true);
 });
 
+test('popup: opening brings it into view (nearest), a re-render after a mode change does not scroll', () => {
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs({ kind: 'plugin_hybrid', battery_level: 40 }));
+  const scrolls = [];
+  const focuses = [];
+  const sheet = { scrollIntoView: (...args) => scrolls.push(args) };
+  const amount = { name: 'amount', addEventListener() {}, focus: (...args) => focuses.push(args) };
+  const query = card.shadowRoot.querySelector.bind(card.shadowRoot);
+  card.shadowRoot.querySelector = (sel) => (sel === '.sheet' ? sheet : sel === 'input[name="amount"]' ? amount : query(sel));
+  card._openPopup();
+  assert.deepEqual(JSON.parse(JSON.stringify(scrolls)), [[{ block: 'nearest' }]]);
+  card._setMode('charge');
+  assert.equal(scrolls.length, 1);
+  assert.equal(focuses.length, 2);
+  assert.ok(focuses.every((args) => args[0]?.preventScroll === true));
+});
+
 test('popup: a state update while typing waits until the popup closes', () => {
   const card = makeCard();
   const hass = hassWith(fuelAttrs());

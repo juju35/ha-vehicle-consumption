@@ -940,7 +940,8 @@ class VehicleConsumptionCard extends HTMLElement {
         if (ev.key === 'Enter') this._save();
       });
     }
-    // The amount, ready to type in, without scrolling the dashboard to the card.
+    // The amount, ready to type in, without scrolling the dashboard to the card (a re-render: mode, error); the
+    // opening brings the popup into view itself (`_openPopup`).
     root.querySelector('input[name="amount"]')?.focus?.({ preventScroll: true });
   }
 
@@ -1153,6 +1154,9 @@ class VehicleConsumptionCard extends HTMLElement {
     this._popup = { mode: kind === 'electric' ? 'charge' : 'refuel', values: {}, error: '', busy: false };
     document.addEventListener('keydown', this._onKey);
     this._render(true);
+    // Opened from the keyboard with the card scrolled out of view: the popup is brought into view (as little as
+    // needed). Only here: the focus given back after a re-render (`_bind`) never scrolls the dashboard.
+    this.shadowRoot?.querySelector?.('.sheet')?.scrollIntoView?.({ block: 'nearest' });
   }
 
   _closePopup() {
