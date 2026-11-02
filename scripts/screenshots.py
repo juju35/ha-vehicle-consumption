@@ -2,7 +2,9 @@
 
 Usage: python scripts/screenshots.py  (needs `pip install playwright` and `playwright install chromium`, and ffmpeg for
 the GIFs). CHROMIUM_PATH=/path/to/chrome to use another browser. The clock is frozen so the dates stay the same.
-Every capture keeps a 16 px frame of the theme background around the card.
+Every capture keeps a 16 px frame of the theme background around the card. A file is only rewritten when its decoded
+pixels change (the bytes of a PNG or a GIF can differ for the same image): an unchanged render leaves no diff to commit.
+Every channel counts; a GIF only ignores GIF_NOISE, Chromium's run-to-run noise on a few pixels of a moving edge.
 """
 
 import json
@@ -343,6 +345,70 @@ GIFS = [{**g, "theme": "light"} for g in LIGHT_GIFS] + [
 ]
 
 
+def pixels(path):
+    """The decoded RGBA pixels of an image, every frame of a GIF, each with its size (PAM): not the encoded bytes."""
+    return subprocess.run(
+        [
+            FFMPEG,
+            "-nostdin",
+            "-v",
+            "error",
+            "-i",
+            str(path),
+            "-f",
+            "image2pipe",
+            "-c:v",
+            "pam",
+            "-pix_fmt",
+            "rgba",
+            "-",
+        ],
+        check=True,
+        capture_output=True,
+    ).stdout
+
+
+# A GIF frame of a transform animation caught mid-way can come out of Chromium 1 unit off on a few pixels of a moving
+# edge from one run to the next; the GIF palette can turn that into a few units (6 seen in CI, on 7 pixels of 1 frame).
+# A GIF is the same picture when at most GIF_NOISE["values"] channel values differ, each by GIF_NOISE["units"] at most:
+# a real change (a colour, a text, a layout) changes far more than that, and the PNGs are compared exactly.
+GIF_NOISE = {"units": 16, "values": 256}
+
+
+def same_pixels(a, b, noise=None):
+    """True when the decoded images `a` and `b` (PAM) have the same size and frames, and every channel (R, G, B and
+    alpha) of every pixel is equal, or differs within `noise` ({"units", "values"}; None: no difference allowed)."""
+    if a == b:
+        return True
+    head = a.find(b"ENDHDR\n") + 7
+    if len(a) != len(b) or not noise or head < 7 or a[:head] != b[:head]:
+        return False
+    budget = noise["values"]
+    step = 1 << 16
+    for i in range(0, len(a), step):
+        x, y = a[i : i + step], b[i : i + step]
+        if x == y:
+            continue
+        for p, q in zip(x, y, strict=True):
+            if p != q:
+                budget -= 1
+                if budget < 0 or abs(p - q) > noise["units"]:
+                    return False
+    return True
+
+
+def save(new, out):
+    """Move the new render to `out` unless `out` already shows the same pixels (a GIF: within GIF_NOISE); True when
+    written."""
+    new, out = Path(new), Path(out)
+    noise = GIF_NOISE if out.suffix == ".gif" else None
+    if out.exists() and same_pixels(pixels(new), pixels(out), noise):
+        new.unlink()
+        return False
+    new.replace(out)
+    return True
+
+
 def page_html(theme):
     variables = "".join(f"{k}:{v};" for k, v in {**THEMES[theme], **COMMON}.items())
     return f"""<!doctype html><html><head><meta charset="utf-8"><style>
@@ -400,7 +466,9 @@ def animate(browser, shot, *, fps=20):
         for i in range(frames + hold):
             page.evaluate(
                 """([t, names]) => {
-                    for (const a of document.getAnimations()) {
+                    // The card's animations live in its shadow root: document.getAnimations() does not list them.
+                    const roots = [document, ...[...document.querySelectorAll("*")].flatMap((e) => e.shadowRoot || [])];
+                    for (const a of roots.flatMap((r) => r.getAnimations())) {
                         a.pause();
                         a.currentTime = names.includes(a.animationName) ? t : 100000;
                     }
@@ -409,7 +477,7 @@ def animate(browser, shot, *, fps=20):
             )
             page.screenshot(path=f"{frame_dir}/f{i:03d}.png", clip=clip)
         page.close()
-        out = str(ROOT / "screenshots" / f"{shot['file']}.gif")
+        out = f"{frame_dir}/out.gif"
         subprocess.run(
             [
                 FFMPEG,
@@ -428,7 +496,8 @@ def animate(browser, shot, *, fps=20):
             ],
             check=True,
         )
-    print(f"screenshots/{shot['file']}.gif")
+        written = save(out, ROOT / "screenshots" / f"{shot['file']}.gif")
+    print(f"screenshots/{shot['file']}.gif" + ("" if written else " (unchanged)"))
 
 
 def main():
@@ -438,8 +507,10 @@ def main():
         for shot in SHOTS:
             page, clip = open_card(browser, shot)
             path = ROOT / "screenshots" / f"{shot['file']}.png"
-            page.screenshot(path=str(path), clip=clip, animations="disabled")
-            print(path.relative_to(ROOT))
+            with tempfile.TemporaryDirectory() as tmp:
+                page.screenshot(path=f"{tmp}/new.png", clip=clip, animations="disabled")
+                written = save(f"{tmp}/new.png", path)
+            print(path.relative_to(ROOT), "" if written else "(unchanged)")
             page.close()
         for shot in GIFS:
             animate(browser, shot)

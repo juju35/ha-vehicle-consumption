@@ -15,7 +15,7 @@
       },
       "sensors": {
         "title": "Sensors of {name}",
-        "description": "{found} sensors were found automatically: check them. The odometer is required, plus at least one fuel or battery sensor.",
+        "description": "Sensors found automatically: {found}. Check them. The odometer is required, plus at least one fuel or battery sensor.",
         "data": {
           "odometer": "Odometer",
           "fuel_quantity": "Fuel quantity",
@@ -237,7 +237,7 @@
       "description": "Rebuilds the trips, months, refuels and charges of the vehicle from what Home Assistant recorded of its sensors (as far back as the recorder keeps it). Manual refuels and charges are kept.",
       "fields": {
         "config_entry_id": { "name": "Vehicle", "description": "The vehicle whose history is imported." },
-        "days": { "name": "Days", "description": "How far back to rebuild (60 by default). The recorded states are used where the recorder still has them (10 days by default), the hourly statistics of the sensors before." }
+        "days": { "name": "Days", "description": "How far back to rebuild (60 by default). The recorded states are used where the recorder still has them (10 days by default), the hourly statistics of the sensors before. Months the history does not fully cover keep what was tracked." }
       }
     }
   },

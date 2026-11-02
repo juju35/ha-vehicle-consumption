@@ -15,7 +15,7 @@
       },
       "sensors": {
         "title": "Sensoren van {name}",
-        "description": "Er zijn automatisch {found} sensoren gevonden: controleer ze. De kilometerstand is verplicht, plus minstens één brandstof- of accusensor.",
+        "description": "Automatisch gevonden sensoren: {found}. Controleer ze. De kilometerstand is verplicht, plus minstens één brandstof- of accusensor.",
         "data": {
           "odometer": "Kilometerstand",
           "fuel_quantity": "Hoeveelheid brandstof",
@@ -237,7 +237,7 @@
       "description": "Bouwt de ritten, maanden, tankbeurten en laadbeurten van het voertuig opnieuw op uit wat Home Assistant van zijn sensoren heeft vastgelegd (zo ver terug als de recorder het bewaart). Handmatig ingevoerde tank- en laadbeurten blijven behouden.",
       "fields": {
         "config_entry_id": { "name": "Voertuig", "description": "Het voertuig waarvan de geschiedenis wordt geïmporteerd." },
-        "days": { "name": "Dagen", "description": "Hoe ver terug opnieuw op te bouwen (standaard 60). De vastgelegde statussen worden gebruikt waar de recorder ze nog heeft (standaard 10 dagen), daarvoor de uurstatistieken van de sensoren." }
+        "days": { "name": "Dagen", "description": "Hoe ver terug opnieuw op te bouwen (standaard 60). De vastgelegde statussen worden gebruikt waar de recorder ze nog heeft (standaard 10 dagen), daarvoor de uurstatistieken van de sensoren. Maanden die de geschiedenis niet volledig dekt, behouden de al bijgehouden gegevens." }
       }
     }
   },
