@@ -1,6 +1,4 @@
-"""Randomized property test of the history import, written independently of tests/test_replay_property.py.
-
-Randomized property test of the history import, end to end through `async_import_history` with a fake recorder
+"""Randomized property test of the history import, end to end through `async_import_history` with a fake recorder
 (states with purge, hourly long-term statistics compiled from the recorded states, UTC hours).
 
 Per scenario (seeded): a time zone, two vehicles (fuel car A, EV B) on 45-110 days of truth readings every 5 min
@@ -17,9 +15,11 @@ trips do not overlap.
 
 Hourly statistics cannot place what happened inside one hour: where a local month starts inside a UTC hour (a
 half-hour or quarter-hour offset) or next to an hour of means (a level as a `measurement` sensor), the import shares
-that hour between the two months. There, and only for months rebuilt from those hours (the tracking never has them:
-an import keeps the tracked months that start in the hourly statistics), a month may differ from the perfect tracker
-by what was driven / used in that window ("slack"); the total, every tracked figure and the trips stay exact.
+that hour between the two months. Only the two months on either side of such a month start get a margin ("slack"):
+what the truth drove / used in that window. It applies whether the month was tracked or not, since an import with
+every source recorded from before the tracking rebuilds the tracked months of the hourly era from the hours, and a
+later import that keeps months carries that figure over. Every other month (all of them in a whole-hour time zone
+with `state` statistics), the total, the tracked figures (nothing lost) and the trips get no margin.
 V12_N scenarios (default 100), from seed V12_SEED; V12_TZ: the time zones; V12_OUT: a file for the summary.
 """
 
