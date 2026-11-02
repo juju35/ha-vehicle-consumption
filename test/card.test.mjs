@@ -686,7 +686,8 @@ test('header: the title keeps a few letters, the pill shrinks and turns into a d
   for (const p of ['flex: 0 1 auto', 'min-width: 0', 'max-width: 50%', 'overflow: hidden', 'text-overflow: ellipsis']) {
     assert.ok(pill.includes(p), p);
   }
-  assert.match(styles(), /@container \(max-width: \d+px\) \{[^@]*\.pill \.ptxt \{ display: none; \}/);
+  assert.match(rule('.pill.dot .ptxt'), /display: none/);
+  assert.match(rule('.pill.dot .pdot'), /display: block/);
   for (const sel of ['.icon-btn', '.badge']) assert.match(rule(sel), /flex: none/);
   const card = makeCard();
   card.hass = hassWith(fuelAttrs());
@@ -713,14 +714,57 @@ test('width: the card keeps a width in a parent sized by its content, and still 
   assert.doesNotMatch(css, /contain-intrinsic/);
 });
 
-test('narrow: 8 of 12 columns at least, and the pill turns into a dot sooner while driving', () => {
+test('narrow: 8 of 12 columns at least, tighter header gaps under 250 px', () => {
   assert.equal(makeCard().getGridOptions().min_columns, 8);
-  const at = (sel) => {
-    const m = styles().match(new RegExp(`@container \\(max-width: (\\d+)px\\) \\{ ${sel.replace(/\./g, '\\.')} \\{ padding: 5px; \\}`));
-    assert.ok(m, sel);
-    return Number(m[1]);
+  assert.match(styles(), /@container \(max-width: 250px\) \{\s*\.head, \.title \{ gap: 6px; \}/);
+});
+
+// A pill stand-in: its label is `need` px wide in a box of `room` px (what the flex layout leaves it).
+const fakePill = (need, room) => {
+  const classes = new Set();
+  return {
+    classes,
+    classList: { add: (c) => classes.add(c), remove: (c) => classes.delete(c) },
+    get scrollWidth() {
+      return classes.has('dot') ? 18 : need;
+    },
+    clientWidth: room,
   };
-  assert.ok(at('ha-card.lvl-drive .pill') > at('.pill'));
+};
+const cardWithPill = (pill) => {
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs());
+  card.shadowRoot.querySelector = (sel) => (sel === '.pill' ? pill : null);
+  return card;
+};
+
+test('pill: the whole label while it fits, else only the dot (measured on the label, any length)', () => {
+  // A long label (kWh/100 km) cut by 6 px: only the dot, not a label cut with an ellipsis.
+  const cut = fakePill(101, 95);
+  cardWithPill(cut)._fitPill();
+  assert.ok(cut.classes.has('dot'));
+  // The same room with a label that fits (L/100 km): the whole label.
+  const fits = fakePill(90, 95);
+  cardWithPill(fits)._fitPill();
+  assert.ok(!fits.classes.has('dot'));
+});
+
+test('pill: a resize of a few pixels (no re-render) measures it again, both ways', () => {
+  const pill = fakePill(101, 95);
+  const card = cardWithPill(pill);
+  card.connectedCallback();
+  const ro = observers[observers.length - 1];
+  ro.fire(240);
+  card._fitPill();
+  assert.ok(pill.classes.has('dot'));
+  // 5 px wider: under the re-render step, but the label now fits.
+  pill.clientWidth = 101;
+  ro.fire(245);
+  assert.ok(!pill.classes.has('dot'));
+  pill.clientWidth = 99;
+  ro.fire(242);
+  assert.ok(pill.classes.has('dot'));
+  card.disconnectedCallback();
 });
 
 test('contrast: coloured texts use an ink mixed with the text colour, ≥ 4.5:1 in light and dark', () => {

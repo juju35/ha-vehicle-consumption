@@ -776,6 +776,9 @@ class VehicleConsumptionCard extends HTMLElement {
         if (width > 0 && Math.abs(width - (this._width || 0)) >= 8) {
           this._width = width;
           this._render();
+        } else {
+          // A few pixels: no re-render, but the pill's label may now fit, or no longer.
+          this._fitPill();
         }
       });
       this._ro.observe(this);
@@ -843,6 +846,7 @@ class VehicleConsumptionCard extends HTMLElement {
         </div>
         <div class="empty">${vcEsc(this._t(`${why}_hint`, { entity }))}</div>
       </ha-card>`;
+      this._fitPill();
       return;
     }
 
@@ -888,12 +892,22 @@ class VehicleConsumptionCard extends HTMLElement {
       </ha-card>`;
 
     this._bind();
+    this._fitPill();
   }
 
   // The header pill: its text, or only its coloured dot on a narrow card (the text stays in the tooltip and label).
   _pill(text) {
     const t = vcEsc(text);
     return `<div class="pill" title="${t}" aria-label="${t}"><span class="pdot"></span><span class="ptxt">${t}</span></div>`;
+  }
+
+  // The whole label while it fits: the title (flex basis 0) gives its room down to 4 characters before the pill
+  // shrinks, so a cut label means the room is really missing; then only the dot. Not laid out (hidden): the label.
+  _fitPill() {
+    const pill = this.shadowRoot?.querySelector('.pill');
+    if (!pill?.classList) return;
+    pill.classList.remove('dot');
+    if (pill.scrollWidth > pill.clientWidth) pill.classList.add('dot');
   }
 
   _bind() {
@@ -1246,18 +1260,17 @@ class VehicleConsumptionCard extends HTMLElement {
       .pill { flex: 0 1 auto; min-width: 0; max-width: 50%; overflow: hidden; text-overflow: ellipsis; font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 999px; white-space: nowrap;
               color: var(--ci); background: color-mix(in srgb, var(--c) 14%, transparent); font-variant-numeric: tabular-nums; }
       .pdot { display: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+      /* Narrow card: tighter header gaps, so the whole label still fits next to a 4-character title. */
+      @container (max-width: 250px) {
+        .head, .title { gap: 6px; }
+        .pill { padding: 1px 6px; }
+      }
       /* Only the coloured dot (the text stays in title / aria-label) once the whole label no longer fits next to a
-         4-character title: below 214 px of content, 232 px while driving (the title then also holds the drive dot). */
-      @container (max-width: 213px) {
-        .pill { padding: 5px; }
-        .pill .ptxt { display: none; }
-        .pill .pdot { display: block; }
-      }
-      @container (max-width: 231px) {
-        ha-card.lvl-drive .pill { padding: 5px; }
-        ha-card.lvl-drive .pill .ptxt { display: none; }
-        ha-card.lvl-drive .pill .pdot { display: block; }
-      }
+         4-character title: measured on the label itself at each render and resize (_fitPill), so a longer label
+         (kWh/100 km, a translation) or a driving title turns into a dot only when the room is really missing. */
+      .pill.dot { padding: 5px; }
+      .pill.dot .ptxt { display: none; }
+      .pill.dot .pdot { display: block; }
       .icon-btn { all: unset; cursor: pointer; flex: none; width: 26px; height: 26px; border-radius: 50%;
                   display: grid; place-items: center; color: var(--secondary-text-color); }
       .icon-btn:hover { background: color-mix(in srgb, var(--secondary-text-color) 14%, transparent); color: var(--primary-text-color); }
