@@ -211,8 +211,8 @@ An import never replaces what was tracked with less:
 
 - **A source missing from the history**: when the odometer or a fuel or battery sensor that does the counting has no usable recorded reading (excluded from the recorder, only `unavailable` or `unknown`, new or just changed), the import changes nothing.
 - **A source no longer recorded**: when a source's current reading is not its last recorded one (excluded from the recorder since), the import changes nothing, as long as something is already tracked.
-- **Partly covered months**: the replay only stands in from the month after the one where *every* counting source has its first recorded reading; the months before keep their trips, figures, refuels and charges as tracked, even when one source was recorded from before the tracking started.
-- **Less than tracked**: if the replay still ends with less distance (by more than 1 km), fuel or energy (by more than 1 L / kWh and 5 %) than tracked, in total, in any month or in the trips, the recorder has a gap: everything stays as tracked and a warning is logged.
+- **Partly covered months**: the replay only stands in from the month after the one where *every* counting source has its first recorded reading; the months before keep their trips, figures, refuels and charges as tracked, even when one source was recorded from before the tracking started (a source first recorded within 5 minutes of the tracking start, the same poll, covers it). When every source was recorded from before the tracking started, the replay stands in for all of it.
+- **Less than tracked**: if the replay still ends with less distance (by more than 1 km), fuel or energy (by more than 1 L / kWh and 5 %) than tracked, in total, in any month or in the trips, the recorder has a gap: everything stays as tracked and a warning is logged. The same goes for the cost: a tracked cost is never replaced by none (a price sensor excluded from the recorder and not available yet when the import runs) nor by less (by more than 1 and 5 %).
 
 The charger counter is optional and is not required for an import.
 

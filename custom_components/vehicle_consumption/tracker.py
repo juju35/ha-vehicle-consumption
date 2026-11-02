@@ -83,6 +83,9 @@ HISTORY_IMPORT_VERSION = 2
 # readings and the tracked figures stay. The distance comes from the odometer, exact in both: no share.
 REPLAY_TOLERANCE = 1.0
 REPLAY_SHARE = 0.05
+# The sources of one poll are recorded a few seconds apart: a source first recorded this soon after the tracking
+# started still covers it (no month kept as tracked for that).
+REPLAY_SKEW = timedelta(minutes=5)
 # What a replay replaces, put back as it was when the history turns out to miss readings.
 _TRACKED_FIELDS = ("since", "total", "months", "trip", "_trip_start", "trips", "odometer", "_levels", "_charger")
 
@@ -891,11 +894,11 @@ class ConsumptionTracker:
             self._changed()
             return
         first, covered = coverage
-        # The tracking started before the recorded readings: the replay only stands in from the first month where
-        # every source has readings from its first day, the months before it (and their trips, refuels and charges)
-        # are kept as tracked. Otherwise (recorded from before the tracking) it replaces everything, unless it has
-        # less than tracked somewhere: a source recorded only after the tracking started is caught there (below).
-        kept = self._kept_before(covered) if first > self.since else None
+        # A source recorded only after the tracking started (even when another one was recorded from before it): the
+        # replay only stands in from the first month where every source has readings from its first day, the months
+        # before it (and their trips, refuels and charges) are kept as tracked. Every source recorded from before the
+        # tracking: it replaces everything. Either way, never where it has less than tracked (below).
+        kept = self._kept_before(covered) if covered > self.since + REPLAY_SKEW else None
         tracked = self._snapshot()
         manual = {kind: [e for e in level.events if e.source == "manual"] for kind, level in self._levels.items()}
         self._reset_data(first)
@@ -991,7 +994,7 @@ class ConsumptionTracker:
             setattr(self, name, value)
 
     def _short_of(self, tracked: dict[str, Any], kept: _Kept | None) -> str | None:
-        """What the replay counts less of than the tracking did (distance, fuel or energy), if anything.
+        """What the replay counts less of than the tracking did (distance, fuel, energy or cost), if anything.
 
         Compared: the total, every month (except one dropped as the oldest of a full list) and the distance of the
         trips the replay rebuilt (from `kept.cut`, within what both lists still hold).
@@ -1003,6 +1006,12 @@ class ConsumptionTracker:
                 share = 0.0 if name == "distance" else before * REPLAY_SHARE
                 if getattr(new, name) < before - max(REPLAY_TOLERANCE, share):
                     return name
+            # A tracked cost is never replaced by none (no price recorded and none available at the import: a price
+            # sensor excluded from the recorder or not ready yet) nor by less, with the fuel's tolerance.
+            if old.cost is not None and (
+                new.cost is None or new.cost < old.cost - max(REPLAY_TOLERANCE, old.cost * REPLAY_SHARE)
+            ):
+                return "cost"
             return None
 
         if found := short(self.total, tracked["total"]):
