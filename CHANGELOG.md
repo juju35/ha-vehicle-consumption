@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.2.5 - 2026-11-01
+
+### Fixes
+- History import no longer wipes what was tracked. With the vehicle's sensors excluded from the recorder (or nothing recorded for them), the one-off re-import after updating from 0.2.0 / 0.2.1 reset the totals, months and trips to zero; it now leaves them as they are. When the recorder starts after the tracking did (and with the `import_history` action over a few `days`), the months it does not cover from their first day keep their figures, trips, refuels and charges, and the total adds them up.
+- History import (the one-off re-import and the `import_history` action) never replaces tracked figures with a partial history either: it changes nothing when the odometer or a fuel / battery sensor has no usable recorded reading (excluded from the recorder, only `unavailable`, new or just changed) or is no longer recorded; it only replays the months that every counting source covers from their first day, also when one of them was recorded from before the tracking started; and when the replay still has less distance, fuel, energy or cost than tracked (a gap in the recorder, or a price sensor excluded from the recorder and not available yet: no cost), everything stays as tracked and a warning is logged.
+- History import from the hourly statistics (beyond the 10 days of recorded states, or with the `import_history` action) no longer counts the last hour of a month twice when that month keeps its tracked figures and the next one is replayed: a drive on the last evening of the month was added to both months, and its trip listed twice. This also holds in time zones with a half-hour or quarter-hour offset (India, Iran, Nepal, Newfoundland, South Australia...), where the UTC hour across midnight was counted in full in the next month, and for a fuel or battery sensor whose statistics are hourly means: such an hour is now shared between the two months in proportion. When a counting sensor was only recorded after the tracking started, the months before it, those in the hourly statistics included, keep their tracked figures. When every counting sensor was recorded from before the tracking, the import rebuilds every month from the history: the total is exact, and a month start inside a shared hour may move up to what was driven or used in that hour from one month to the next.
+- History import no longer lists a drive across the end of a month twice when the odometer was only recorded from the middle of it (Home Assistant restarted during the drive).
+- History import never shortens the trip being driven: when a sensor was recorded only from the middle of it (Home Assistant restarted during the drive), the trip keeps its start and distance as tracked.
+- Setup: the sensors step says "Sensors found automatically: 2" instead of "1 sensors were found".
+- Card: on a narrow column, the vehicle name stays visible: the average consumption pill keeps its whole value while it fits, then tightens the header spacing, then shows only its coloured dot (the value stays in its tooltip), never a cut value: the fit is measured on the value itself, so a kWh/100 km value or a driving title also keeps it whole as long as there is room, and a wider card never shows less than a narrower one. The card now takes at least 8 of the 12 columns of a section (6 cut the values on a phone). The KPI tiles put the unit under the value and wrap long labels instead of cutting them.
+- Card: the trips of a plug-in hybrid show one consumption a line, so the date and distance no longer disappear and the values no longer overflow the card.
+- Card: the monthly chart is drawn at the card's width, so its month names and values keep a readable size on a narrow card. It is redrawn at the next frame after a resize, so the browser no longer logs "ResizeObserver loop completed with undelivered notifications" at each load.
+- Card: coloured texts (the average pill, a low tank or battery, refuels logged by hand, the current month of the chart, the add popup) are darker in light themes and lighter in dark ones, for a readable contrast.
+- Card: an unavailable sensor (Home Assistant starting, the integration reloading) or a wrong `entity` now says so, with the sensor, instead of "Not set up", also when the card picks the vehicle on its own (no `entity`).
+- Card: in a layout-card, a grid card column sized `auto` or any parent sized by its content, the card no longer collapses to a thin strip, and it still shrinks in a `1fr` column without overflowing, also when a wrapper (a `div`, the dashboard's card container) sits between the grid and the card.
+- Card: the refuel / charge popup puts the cursor in the amount without scrolling the dashboard when the card redraws; opened from the keyboard with the card scrolled out of view, it is brought into view.
+- Card: the trips, refuels and charges counters read "5/6" when only the last 5 rows are listed.
+- Card: times follow Home Assistant's 12 / 24-hour setting.
+- Card editor: "Chart shows" and "Months in the chart" are hidden while the chart is turned off.
+
 ## 0.2.4 - 2026-11-01
 
 ### What's new

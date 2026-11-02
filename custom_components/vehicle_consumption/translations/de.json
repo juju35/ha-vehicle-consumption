@@ -15,7 +15,7 @@
       },
       "sensors": {
         "title": "Sensoren von {name}",
-        "description": "{found} Sensoren wurden automatisch gefunden: Bitte prüfen. Der Kilometerzähler ist erforderlich, dazu mindestens ein Kraftstoff- oder Batteriesensor.",
+        "description": "Automatisch gefundene Sensoren: {found}. Bitte prüfen. Der Kilometerzähler ist erforderlich, dazu mindestens ein Kraftstoff- oder Batteriesensor.",
         "data": {
           "odometer": "Kilometerzähler",
           "fuel_quantity": "Kraftstoffmenge",
@@ -237,7 +237,7 @@
       "description": "Erstellt die Fahrten, Monate, Tankvorgänge und Ladevorgänge des Fahrzeugs neu aus dem, was Home Assistant von seinen Sensoren aufgezeichnet hat (so weit zurück, wie der Recorder es aufbewahrt). Manuell erfasste Tank- und Ladevorgänge bleiben erhalten.",
       "fields": {
         "config_entry_id": { "name": "Fahrzeug", "description": "Das Fahrzeug, dessen Verlauf importiert wird." },
-        "days": { "name": "Tage", "description": "Wie weit zurück neu aufgebaut wird (standardmäßig 60). Wo der Recorder die Zustände noch hat (standardmäßig 10 Tage), werden sie verwendet, davor die stündlichen Statistiken der Sensoren." }
+        "days": { "name": "Tage", "description": "Wie weit zurück neu aufgebaut wird (standardmäßig 60). Wo der Recorder die Zustände noch hat (standardmäßig 10 Tage), werden sie verwendet, davor die stündlichen Statistiken der Sensoren. Monate, die der Verlauf nicht vollständig abdeckt, behalten die erfassten Werte." }
       }
     }
   },

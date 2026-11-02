@@ -15,7 +15,7 @@
       },
       "sensors": {
         "title": "Sensori di {name}",
-        "description": "{found} sensori sono stati trovati automaticamente: verificali. Il contachilometri è obbligatorio, oltre ad almeno un sensore di carburante o di batteria.",
+        "description": "Sensori trovati automaticamente: {found}. Verificali. Il contachilometri è obbligatorio, oltre ad almeno un sensore di carburante o di batteria.",
         "data": {
           "odometer": "Contachilometri",
           "fuel_quantity": "Quantità di carburante",
@@ -237,7 +237,7 @@
       "description": "Ricostruisce i viaggi, i mesi, i rifornimenti e le ricariche del veicolo da ciò che Home Assistant ha registrato dei suoi sensori (fin dove il registratore lo conserva). I rifornimenti e le ricariche inseriti a mano vengono mantenuti.",
       "fields": {
         "config_entry_id": { "name": "Veicolo", "description": "Il veicolo di cui viene importato lo storico." },
-        "days": { "name": "Giorni", "description": "Quanto indietro ricostruire (60 per impostazione predefinita). Vengono usati gli stati registrati dove il registratore li ha ancora (10 giorni per impostazione predefinita), prima le statistiche orarie dei sensori." }
+        "days": { "name": "Giorni", "description": "Quanto indietro ricostruire (60 per impostazione predefinita). Vengono usati gli stati registrati dove il registratore li ha ancora (10 giorni per impostazione predefinita), prima le statistiche orarie dei sensori. I mesi che la cronologia non copre per intero mantengono i dati già registrati." }
       }
     }
   },
