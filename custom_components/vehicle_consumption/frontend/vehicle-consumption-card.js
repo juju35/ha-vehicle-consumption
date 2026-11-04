@@ -1280,12 +1280,13 @@ function vcFormat(hass, lang, currency) {
   const cur = /^[A-Z]{3}$/.test(String(currency || '')) ? currency : null;
   const num = (v, digits = 1) =>
     vcFinite(v) ? nf({ minimumFractionDigits: digits, maximumFractionDigits: digits }).format(Number(v)) : VC_DASH;
+  // narrowSymbol: Romanian, Hungarian and Ukrainian would otherwise print "0,107 EUR", too wide for the cost tile.
   const money = (v, digits = 2) => {
     if (!vcFinite(v)) return VC_DASH;
     if (!cur) return num(v, digits);
-    return nf({ style: 'currency', currency: cur, minimumFractionDigits: digits, maximumFractionDigits: digits }).format(Number(v));
+    return nf({ style: 'currency', currency: cur, currencyDisplay: 'narrowSymbol', minimumFractionDigits: digits, maximumFractionDigits: digits }).format(Number(v));
   };
-  const symbol = () => (cur ? nf({ style: 'currency', currency: cur }).formatToParts(0).find((p) => p.type === 'currency')?.value || cur : '');
+  const symbol = () => (cur ? nf({ style: 'currency', currency: cur, currencyDisplay: 'narrowSymbol' }).formatToParts(0).find((p) => p.type === 'currency')?.value || cur : '');
   // Home Assistant's full locale (pt-BR, de-CH) when it resolves to the card language, the card language otherwise
   // (a card set to sr keeps Cyrillic month names under a Home Assistant in sr-Latn).
   const haLang = String(loc.language || hass?.language || '');

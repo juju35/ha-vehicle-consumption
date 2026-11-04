@@ -246,6 +246,10 @@ test('formatting follows the locale; currency through Intl; missing values are a
   assert.equal(fr.month('2026-10'), 'oct');
   const en = vcFormat({ locale: { language: 'en', number_format: 'language' } }, 'en', 'EUR');
   assert.equal(en.money(0.107, 3), '€0.107');
+  // Romanian, Hungarian and Ukrainian get the € sign too, not Intl's default "EUR" code.
+  for (const lang of ['ro', 'hu', 'uk']) {
+    assert.match(vcFormat({ locale: { language: lang, number_format: 'language' } }, lang, 'EUR').money(0.107, 3), /0,107\s€/);
+  }
   assert.equal(en.num(48210.4, 0), '48,210');
   assert.equal(en.month('2026-01'), 'Jan');
   assert.equal(vcFormat({ locale: { language: 'en' } }, 'de', 'EUR').month('2026-03'), 'Mär');
