@@ -9,6 +9,7 @@ Every channel of every pixel counts, for a PNG as for a GIF: no tolerance.
 
 import json
 import os
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -380,7 +381,8 @@ def save(new, out):
     if out.exists() and same_pixels(pixels(new), pixels(out)):
         new.unlink()
         return False
-    new.replace(out)
+    # shutil.move: the render may sit in /tmp on another filesystem, where Path.replace fails (EXDEV)
+    shutil.move(new, out)
     return True
 
 
