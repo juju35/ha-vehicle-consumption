@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.0 - 2026-11-04
+
+### What's new
+- A year of history: trips, refuels and charges are kept for 365 days instead of the last 20 (months still for 24 months). The attributes keep listing the newest 20, with `trip_count`, `refuel_count` and `charge_count` for the whole year, shown as the section counts of the card.
+- The days of the last 365 that are not counted yet are added from the recorder's history at every start of Home Assistant and every reload of the vehicle: what came before the tracking started (an import over 60 days included) is replayed and added before the tracked figures, which stay exactly as they are. Each period is read once.
+- The history import (on its own when a vehicle is added, and the `import_history` action) now covers 365 days by default (60 before).
+
 ## 1.0.2 - 2026-11-04
 
 ### What's new

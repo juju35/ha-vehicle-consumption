@@ -6,7 +6,7 @@ from datetime import timedelta
 from typing import Final
 
 DOMAIN: Final = "vehicle_consumption"
-VERSION: Final = "1.0.2"
+VERSION: Final = "1.1.0"
 
 # Entry data
 CONF_DEVICE_ID: Final = "device_id"
@@ -61,6 +61,11 @@ MAX_ODOMETER_JUMP: Final = 2000.0
 MAX_SPEED: Final = 130.0
 
 MAX_MONTHS: Final = 24
+# Trips, refuels and charges are kept this many days (and months for 24 months); the history is rebuilt over as long.
+HISTORY_DAYS: Final = 365
+# Safety cap on what is stored of each list, whatever the days kept.
+MAX_STORED: Final = 5000
+# How many of the newest trips, refuels and charges are listed in the attributes (the card shows a few).
 MAX_TRIPS: Final = 20
 MAX_EVENTS: Final = 20
 
@@ -76,7 +81,7 @@ SERVICE_ADD_CHARGE: Final = "add_charge"
 SERVICE_RESET_STATISTICS: Final = "reset_statistics"
 SERVICE_IMPORT_HISTORY: Final = "import_history"
 # How far back the history is read by default (days): the recorded states first, the hourly statistics before.
-DEFAULT_HISTORY_DAYS: Final = 60
+DEFAULT_HISTORY_DAYS: Final = HISTORY_DAYS
 MAX_HISTORY_DAYS: Final = 730
 ATTR_DAYS: Final = "days"
 ATTR_CONFIG_ENTRY_ID: Final = "config_entry_id"

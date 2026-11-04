@@ -52,6 +52,7 @@ from .const import (
     DEFAULT_HISTORY_DAYS,
     DEFAULT_REFUEL_THRESHOLD,
     DEFAULT_TRIP_GAP,
+    HISTORY_DAYS,
     KIND_ELECTRIC,
     KIND_FUEL,
     KIND_PLUGIN_HYBRID,
@@ -60,6 +61,7 @@ from .const import (
     MAX_MONTHS,
     MAX_ODOMETER_JUMP,
     MAX_SPEED,
+    MAX_STORED,
     MAX_TRIPS,
     MIN_DISTANCE,
     SAVE_DELAY,
@@ -118,6 +120,11 @@ def _iso(value: datetime | None) -> str | None:
 
 def _time(value: Any) -> datetime | None:
     return dt_util.parse_datetime(str(value)) if value else None
+
+
+def _retention_cut() -> datetime:
+    """Oldest time a trip, a refuel or a charge is kept for: `HISTORY_DAYS` ago."""
+    return dt_util.utcnow() - timedelta(days=HISTORY_DAYS)
 
 
 _DISTANCE_FACTORS: dict[str | None, float] = {"mi": KM_PER_MILE, "m": 0.001}
@@ -308,6 +315,16 @@ class _Kept:
         return when < self.cut
 
 
+@dataclass(slots=True)
+class _History:
+    """What the recorder has of the sources over a period, in replay order."""
+
+    rows: list[tuple[datetime, str, State]]
+    prices: set[str]
+    hourly_until: datetime | None
+    initial_prices: dict[str, State]
+
+
 class ConsumptionTracker:
     """Distance, consumption, cost, trips, months, refuels and charges of one vehicle."""
 
@@ -349,6 +366,8 @@ class ConsumptionTracker:
         self._span: tuple[datetime, datetime] | None = None
         # The recorder's history has been read once (at the first start, or after an update adding it).
         self.history_imported = False
+        # Oldest time the recorder's history was read from: nothing older is ever asked for again.
+        self.history_from: datetime | None = None
         self._reset_data(dt_util.utcnow())
         self._shown_month = self.month_totals()[0]
 
@@ -587,7 +606,7 @@ class ConsumptionTracker:
                     source=SOURCE_AUTO,
                 ),
             )
-            del level.events[MAX_EVENTS:]
+            self._prune()
         level.consumed_since_event = False
         return True
 
@@ -632,7 +651,7 @@ class ConsumptionTracker:
         else:
             session.time, session.amount, session.cost, session.price = now, amount, cost, price
         events.sort(key=lambda e: e.time, reverse=True)
-        del events[MAX_EVENTS:]
+        self._prune()
         return True
 
     def _close_charger_session(self, now: datetime) -> bool:
@@ -669,8 +688,15 @@ class ConsumptionTracker:
         self.trip = None
         if trip.totals.distance > 0:
             self.trips.insert(0, trip)
-            del self.trips[MAX_TRIPS:]
+            self._prune()
         return True
+
+    def _prune(self) -> None:
+        """Drop the trips, refuels and charges older than `HISTORY_DAYS` (lists newest first)."""
+        cut = _retention_cut()
+        self.trips[:] = [t for t in self.trips if (t.end or t.start) >= cut][:MAX_STORED]
+        for level in self._levels.values():
+            level.events[:] = [e for e in level.events if e.time >= cut][:MAX_STORED]
 
     def _changed(self) -> None:
         self._store.async_delay_save(self._dump, SAVE_DELAY)
@@ -754,7 +780,7 @@ class ConsumptionTracker:
             )
         )
         events.sort(key=lambda e: e.time, reverse=True)
-        del events[MAX_EVENTS:]
+        self._prune()
         self._changed()
 
     @callback
@@ -786,19 +812,55 @@ class ConsumptionTracker:
         """
         if "recorder" not in self.hass.config.components:
             return False
+        now = dt_util.utcnow()
+        start = now - timedelta(days=days)
+        history = await self._async_history(start, None)
+        self._replay(
+            history.rows,
+            history.prices,
+            dt_util.utcnow(),
+            hourly_until=history.hourly_until,
+            initial_prices=history.initial_prices,
+        )
+        self.history_from = min(start, self.history_from or start)
+        self._changed()
+        return True
+
+    async def async_backfill_history(self) -> bool:
+        """Count the days of the last `HISTORY_DAYS` the tracking does not cover yet, from the recorder's history.
+
+        Only what came before the tracking started (`since`) is replayed: the figures tracked since are kept as they
+        are and the replayed ones added before them (months, total, trips, refuels and charges). Each period is read
+        once (`history_from`): the recorder never gains readings older than what it was asked for. True when
+        something was added.
+        """
+        if "recorder" not in self.hass.config.components:
+            return False
+        start = _retention_cut()
+        end = min(self.since, self.history_from or self.since)
+        if end - start < HOUR:
+            return False
+        history = await self._async_history(start, end)
+        added = self._backfill(history.rows, history.prices, end, history.hourly_until, history.initial_prices)
+        self.history_from = min(start, self.history_from or start)
+        self._changed()
+        _LOGGER.debug("%s: history before %s %s", self.name, end, "added" if added else "not available")
+        return added
+
+    async def _async_history(self, start: datetime, end: datetime | None) -> _History:
+        """The recorded states of the sources and prices in [start, end) (end None: now), hourly statistics before."""
         from homeassistant.components.recorder import get_instance, history, statistics  # noqa: PLC0415
 
         recorder = get_instance(self.hass)
         prices = {e for e in (self.fuel_price_entity, self.electricity_price_entity) if e}
         entity_ids = sorted(set(self.sensors.values()) | prices)
-        now = dt_util.utcnow()
-        start = now - timedelta(days=days)
+        until = end or dt_util.utcnow()
         states = await recorder.async_add_executor_job(
             partial(
                 history.get_significant_states,
                 self.hass,
                 start,
-                None,
+                end,
                 entity_ids,
                 include_start_time_state=False,
                 significant_changes_only=False,
@@ -813,19 +875,24 @@ class ConsumptionTracker:
                     history.get_significant_states,
                     self.hass,
                     start,
-                    None,
+                    end,
                     sorted(prices),
                     include_start_time_state=True,
                     significant_changes_only=False,
                     no_attributes=False,
                 )
             )
-        timeline = [(state.last_updated, entity_id, state) for entity_id, rows in states.items() for state in rows]
+        timeline = [
+            (state.last_updated, entity_id, state)
+            for entity_id, rows in states.items()
+            for state in rows
+            if state.last_updated < until
+        ]
         # Where the recorded states of the source sensors begin: the statistics cover the time before.
         sources = set(self.sensors.values())
         first = min(
             (when for when, entity_id, state in timeline if entity_id in sources and _valid(state)),
-            default=now,
+            default=until,
         )
         hourly: list[tuple[datetime, str, State]] = []
         if first - start > timedelta(hours=1):
@@ -857,15 +924,13 @@ class ConsumptionTracker:
                 initial_prices[entity_id] = first_price
             elif current := self.hass.states.get(entity_id):
                 initial_prices[entity_id] = current
-        self._replay(
-            [*hourly, *timeline],
-            prices,
-            dt_util.utcnow(),
+        _LOGGER.debug("%s: %d hourly statistics and %d recorded states read", self.name, len(hourly), len(timeline))
+        return _History(
+            rows=[*hourly, *timeline],
+            prices=prices,
             hourly_until=hourly[-1][0] if hourly else None,
             initial_prices=initial_prices,
         )
-        _LOGGER.debug("%s: %d hourly statistics and %d recorded states replayed", self.name, len(hourly), len(timeline))
-        return True
 
     def _statistic_states(
         self, rows: dict[str, list[Any]], recorded: dict[str, list[State]], before: datetime
@@ -953,6 +1018,43 @@ class ConsumptionTracker:
         nothing_tracked = self._nothing_tracked()
         manual = {kind: [e for e in level.events if e.source == "manual"] for kind, level in self._levels.items()}
         self._reset_data(first)
+        self._apply_rows(rows, prices, hourly_until, initial_prices)
+        self._end_trip_if_stopped(now)
+        self._close_charger_session(now)
+        if nothing_tracked:
+            self._read_current(now)  # what changed since the last recorded reading, counted now (the first import)
+        else:
+            self._rebase(now)
+        if kept is not None:
+            self._merge_kept(kept)
+        if short := self._short_of(tracked, kept):
+            # Less than tracked somewhere: the history misses readings (a gap in the recorder). Never replaced.
+            _LOGGER.warning(
+                "%s: the recorded history has less %s than tracked, the tracked figures are kept", self.name, short
+            )
+            self._restore(tracked)
+            self.history_imported = True
+            self._changed()
+            return
+        for kind, events in manual.items():
+            level_events = self._levels[kind].events
+            level_events.extend(events)
+            level_events.sort(key=lambda e: e.time, reverse=True)
+        self._prune()
+        self.history_imported = True
+        self._changed()
+
+    def _apply_rows(
+        self,
+        rows: list[tuple[datetime, str, State]],
+        prices: set[str],
+        hourly_until: datetime | None,
+        initial_prices: dict[str, State] | None,
+    ) -> None:
+        """Process the readings in order, as the live tracking would have, at the prices recorded then."""
+        by_entity: dict[str, list[str]] = {}
+        for key, entity_id in self.sensors.items():
+            by_entity.setdefault(entity_id, []).append(key)
         self._replay_prices = dict(initial_prices or {})
         trip_gap = self.trip_gap
         last_hour: dict[str, datetime] = {}  # per source, the end of its last hourly statistic replayed
@@ -983,30 +1085,60 @@ class ConsumptionTracker:
             self._replay_prices = None
             self.trip_gap = trip_gap
             self._span = None
-        self._end_trip_if_stopped(now)
-        self._close_charger_session(now)
-        if nothing_tracked:
-            self._read_current(now)  # what changed since the last recorded reading, counted now (the first import)
-        else:
-            self._rebase(now)
-        if kept is not None:
-            self._merge_kept(kept)
-        if short := self._short_of(tracked, kept):
-            # Less than tracked somewhere: the history misses readings (a gap in the recorder). Never replaced.
-            _LOGGER.warning(
-                "%s: the recorded history has less %s than tracked, the tracked figures are kept", self.name, short
-            )
+
+    @callback
+    def _backfill(
+        self,
+        rows: list[tuple[datetime, str, State]],
+        prices: set[str],
+        end: datetime,
+        hourly_until: datetime | None = None,
+        initial_prices: dict[str, State] | None = None,
+    ) -> bool:
+        """Add what the readings before `end` (where the tracking starts) count, before the tracked figures.
+
+        The tracked figures stay exactly as they are; the replayed ones (from the first reading of every source to
+        `end`) are added to the total and their months, their trips, refuels and charges listed before the tracked
+        ones. A trip still open at `end` is closed there: the tracking starts a trip of its own. False (nothing
+        changes) when a counting source has no reading before `end`.
+        """
+        rows = [row for row in rows if row[0] < end]
+        keys: dict[str, list[str]] = {}
+        for key in self._needed():
+            keys.setdefault(self.sensors[key], []).append(key)
+        firsts: dict[str, datetime] = {}
+        for when, entity_id, state in rows:
+            for key in keys.get(entity_id, ()):
+                if key not in firsts and self._reading(key, state) is not None:
+                    firsts[key] = when
+        if not keys or len(firsts) < sum(len(k) for k in keys.values()):
+            return False
+        tracked = self._snapshot()
+        self._reset_data(min(firsts.values()))
+        try:
+            self._apply_rows(rows, prices, hourly_until, initial_prices)
+            self._end_trip_if_stopped(end)
+            if self.trip is not None and self.trip.end is not None:
+                self._end_trip_if_stopped(self.trip.end + self.trip_gap)
+            first, total, months, trips = self.since, self.total, self.months, self.trips
+            events = {kind: [e for e in level.events if e.time < end] for kind, level in self._levels.items()}
+        finally:
             self._restore(tracked)
-            self.history_imported = True
-            self._changed()
-            return
-        for kind, events in manual.items():
-            level_events = self._levels[kind].events
-            level_events.extend(events)
-            level_events.sort(key=lambda e: e.time, reverse=True)
-            del level_events[MAX_EVENTS:]
-        self.history_imported = True
-        self._changed()
+        if not (trips or any(events.values()) or any((total.distance, total.fuel, total.energy))):
+            return False
+        self.since = min(first, self.since)
+        self.total = _plus(self.total, total)
+        # The open trip's figures are the total minus its start: both move by what is added.
+        self._trip_start = _plus(self._trip_start, total)
+        for key, month in months.items():
+            self.months[key] = _plus(self.months.get(key, Totals()), month)
+        for old in sorted(self.months)[:-MAX_MONTHS]:
+            del self.months[old]
+        self.trips = sorted([*self.trips, *trips], key=lambda t: t.start, reverse=True)
+        for kind, level in self._levels.items():
+            level.events = sorted([*level.events, *events[kind]], key=lambda e: e.time, reverse=True)
+        self._prune()
+        return True
 
     def _needed(self) -> list[str]:
         """The sources the figures are made of: the odometer and every fuel or battery sensor that is replayed."""
@@ -1109,9 +1241,10 @@ class ConsumptionTracker:
         for key, old in tracked["months"].items():
             if key >= oldest and (found := short(self.months.get(key, Totals()), old)):
                 return found
-        floor = kept.cut if kept else datetime.min.replace(tzinfo=dt_util.UTC)
+        # Only the trips both lists keep: from the retention cut (and the safety cap when a list reaches it).
+        floor = max(kept.cut if kept else datetime.min.replace(tzinfo=dt_util.UTC), _retention_cut())
         for trips in (tracked["trips"], self.trips):
-            if len(trips) >= MAX_TRIPS:
+            if len(trips) >= MAX_STORED:
                 floor = max(floor, trips[-1].start)
 
         def driven(trips: list[Trip], trip: Trip | None, total: Totals, start: Totals) -> Totals:
@@ -1174,13 +1307,14 @@ class ConsumptionTracker:
             ],
             key=lambda t: t.start,
             reverse=True,
-        )[:MAX_TRIPS]
+        )
         for kind, level in self._levels.items():
             level.events = sorted(
                 [*kept.events[kind], *(e for e in level.events if not kept.keeps(e.time))],
                 key=lambda e: e.time,
                 reverse=True,
-            )[:MAX_EVENTS]
+            )
+        self._prune()
 
     # ── Storage ─────────────────────────────────────────────────────────────
 
@@ -1193,6 +1327,7 @@ class ConsumptionTracker:
             except (KeyError, TypeError, ValueError, AttributeError):
                 _LOGGER.exception("Stored data of %s could not be read; starting again", self.name)
                 self._reset_data(now)
+        self._prune()  # what got older than the days kept while stopped
         # A trip still open in the store ended while Home Assistant was stopped (once the gap has passed).
         updated = self._end_trip_if_stopped(now)
         updated |= self._close_charger_session(now)
@@ -1224,6 +1359,7 @@ class ConsumptionTracker:
         self.history_imported = (
             isinstance(imported, int) and not isinstance(imported, bool) and imported >= HISTORY_IMPORT_VERSION
         )
+        self.history_from = _time(data.get("history_from"))
 
     def _dump(self) -> dict[str, Any]:
         return {
@@ -1244,6 +1380,7 @@ class ConsumptionTracker:
             },
             "charger": self._charger.dump(),
             "history_imported": HISTORY_IMPORT_VERSION if self.history_imported else 0,
+            "history_from": _iso(self.history_from),
         }
 
     async def async_save(self) -> None:
@@ -1314,9 +1451,13 @@ class ConsumptionTracker:
             "month": {"month": month_key, **month.summary()},
             "total": {"since": self.since.isoformat(), **self.total.summary()},
             "months": self.months_summary(),
-            "trips": [t.summary() for t in self.trips],
-            "refuels": [e.summary("liters") for e in self.refuels],
-            "charges": [e.summary("energy") for e in self.charges],
+            "trips": [t.summary() for t in self.trips[:MAX_TRIPS]],
+            "refuels": [e.summary("liters") for e in self.refuels[:MAX_EVENTS]],
+            "charges": [e.summary("energy") for e in self.charges[:MAX_EVENTS]],
+            # Everything kept (`HISTORY_DAYS`): the lists above only hold the newest.
+            "trip_count": len(self.trips),
+            "refuel_count": len(self.refuels),
+            "charge_count": len(self.charges),
         }
 
 

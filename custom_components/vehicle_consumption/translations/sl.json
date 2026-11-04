@@ -237,7 +237,7 @@
       "description": "Znova sestavi vožnje, mesece, točenja goriva in polnjenja vozila iz tega, kar je Home Assistant zabeležil za njegove senzorje (tako daleč nazaj, kot jih hrani snemalnik). Ročno vnesena točenja goriva in polnjenja se ohranijo.",
       "fields": {
         "config_entry_id": { "name": "Vozilo", "description": "Vozilo, katerega zgodovina se uvozi." },
-        "days": { "name": "Dnevi", "description": "Kako daleč nazaj naj se obnovi (privzeto 60). Zabeležena stanja se uporabijo tam, kjer jih snemalnik še hrani (privzeto 10 dni), pred tem pa urna statistika senzorjev. Meseci, ki jih zgodovina ne pokriva v celoti, ohranijo spremljane podatke." }
+        "days": { "name": "Dnevi", "description": "Kako daleč nazaj naj se obnovi (privzeto 365). Zabeležena stanja se uporabijo tam, kjer jih snemalnik še hrani (privzeto 10 dni), pred tem pa urna statistika senzorjev. Meseci, ki jih zgodovina ne pokriva v celoti, ohranijo spremljane podatke." }
       }
     }
   },

@@ -237,7 +237,7 @@
       "description": "Genopbygger køretøjets ture, måneder, tankninger og opladninger ud fra det, Home Assistant har optaget fra dets sensorer (så langt tilbage som optageren gemmer det). Manuelle tankninger og opladninger bevares.",
       "fields": {
         "config_entry_id": { "name": "Køretøj", "description": "Køretøjet, hvis historik importeres." },
-        "days": { "name": "Dage", "description": "Hvor langt tilbage der genopbygges (60 som standard). De optagede tilstande bruges, hvor optageren stadig har dem (10 dage som standard), og før det sensorernes timestatistik. Måneder, som historikken ikke dækker helt, beholder det, der blev registreret." }
+        "days": { "name": "Dage", "description": "Hvor langt tilbage der genopbygges (365 som standard). De optagede tilstande bruges, hvor optageren stadig har dem (10 dage som standard), og før det sensorernes timestatistik. Måneder, som historikken ikke dækker helt, beholder det, der blev registreret." }
       }
     }
   },
