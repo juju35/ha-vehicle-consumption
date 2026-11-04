@@ -5,13 +5,13 @@
 [![Validate](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/validate.yml/badge.svg)](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/validate.yml)
 [![Lint](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/lint.yml/badge.svg)](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/lint.yml)
 [![Release](https://img.shields.io/github/v/release/juju35/ha-vehicle-consumption)](https://github.com/juju35/ha-vehicle-consumption/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/juju35/ha-vehicle-consumption/blob/main/LICENSE)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/julienstep9)
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="custom_components/vehicle_consumption/brand/dark_logo.png">
-    <img src="custom_components/vehicle_consumption/brand/logo.png" alt="Vehicle Consumption" height="64">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/custom_components/vehicle_consumption/brand/dark_logo.png">
+    <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/custom_components/vehicle_consumption/brand/logo.png" alt="Vehicle Consumption" height="64">
   </picture>
 </p>
 
@@ -262,35 +262,35 @@ The card animates in three places, and stays still with `prefers-reduced-motion`
 
   | Light | Dark |
   |---|---|
-  | ![gauge animation](screenshots/gauge.gif) | ![gauge animation dark](screenshots/gauge-dark.gif) |
+  | ![gauge animation](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/gauge.gif) | ![gauge animation dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/gauge-dark.gif) |
 
 - **Chart**: the monthly bars grow from the bottom, the current month in the accent colour
 
   | Light | Dark |
   |---|---|
-  | ![chart animation](screenshots/chart.gif) | ![chart animation dark](screenshots/chart-dark.gif) |
+  | ![chart animation](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/chart.gif) | ![chart animation dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/chart-dark.gif) |
 
 - **Driving**: while a trip is in progress, a dot pulses in the header
 
   | Light | Dark |
   |---|---|
-  | ![driving animation](screenshots/driving.gif) | ![driving animation dark](screenshots/driving-dark.gif) |
+  | ![driving animation](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/driving.gif) | ![driving animation dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/driving-dark.gif) |
 
 | Fuel car | Electric car |
 |---|---|
-| ![fuel](screenshots/card-fuel.png) | ![electric](screenshots/card-ev.png) |
-| ![fuel dark](screenshots/card-fuel-dark.png) | ![electric dark](screenshots/card-ev-dark.png) |
+| ![fuel](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-fuel.png) | ![electric](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-ev.png) |
+| ![fuel dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-fuel-dark.png) | ![electric dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-ev-dark.png) |
 
 | Plug-in hybrid | Add a refuel |
 |---|---|
-| ![plug-in hybrid](screenshots/card-hybrid.png) | ![add a refuel](screenshots/popup.png) |
-| ![plug-in hybrid dark](screenshots/card-hybrid-dark.png) | ![add a refuel dark](screenshots/popup-dark.png) |
+| ![plug-in hybrid](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-hybrid.png) | ![add a refuel](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/popup.png) |
+| ![plug-in hybrid dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-hybrid-dark.png) | ![add a refuel dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/popup-dark.png) |
 
 Recent trips and refuels unfolded:
 
 | Light | Dark |
 |---|---|
-| ![sections](screenshots/card-sections.png) | ![sections dark](screenshots/card-sections-dark.png) |
+| ![sections](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-sections.png) | ![sections dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-sections-dark.png) |
 
 ## How it works
 
@@ -317,7 +317,7 @@ python scripts/screenshots.py  # renders the card with mock vehicles into screen
 ### Releasing
 
 1. Bump the version in `custom_components/vehicle_consumption/manifest.json`, `const.py` (`VERSION`) and the card (`VEHICLE_CONSUMPTION_CARD_VERSION`)
-2. Add a `## <version>` section at the top of [CHANGELOG.md](CHANGELOG.md)
+2. Add a `## <version>` section at the top of [CHANGELOG.md](https://github.com/juju35/ha-vehicle-consumption/blob/main/CHANGELOG.md)
 3. Push to `main`: the **Release** workflow creates the tag and the GitHub release with the changelog section as notes, and attaches `vehicle_consumption.zip`
 
 ## Translations
@@ -353,7 +353,7 @@ Contributions for additional languages are welcome!
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/juju35/ha-vehicle-consumption/blob/main/LICENSE)
 
 ## Support
 
