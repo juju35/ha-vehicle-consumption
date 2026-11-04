@@ -11,7 +11,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/custom_components/vehicle_consumption/brand/dark_logo.png">
-    <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/custom_components/vehicle_consumption/brand/logo.png" alt="Vehicle Consumption" height="64">
+    <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/custom_components/vehicle_consumption/brand/logo.png" alt="Vehicle Consumption" height="64" width="400">
   </picture>
 </p>
 
@@ -23,7 +23,7 @@ It comes with a **Lovelace card** showing the tank and battery gauges, the key f
 
 | Fuel car | Electric car |
 |---|---|
-| ![Vehicle Consumption card, fuel car](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-fuel.png) | ![Vehicle Consumption card, electric car](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-ev.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-fuel.png" alt="Vehicle Consumption card, fuel car" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-ev.png" alt="Vehicle Consumption card, electric car" width="400"> |
 
 ## Features
 
@@ -262,35 +262,35 @@ The card animates in three places, and stays still with `prefers-reduced-motion`
 
   | Light | Dark |
   |---|---|
-  | ![gauge animation](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/gauge.gif) | ![gauge animation dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/gauge-dark.gif) |
+  | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/gauge.gif" alt="gauge animation" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/gauge-dark.gif" alt="gauge animation dark" width="400"> |
 
 - **Chart**: the monthly bars grow from the bottom, the current month in the accent colour
 
   | Light | Dark |
   |---|---|
-  | ![chart animation](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/chart.gif) | ![chart animation dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/chart-dark.gif) |
+  | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/chart.gif" alt="chart animation" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/chart-dark.gif" alt="chart animation dark" width="400"> |
 
 - **Driving**: while a trip is in progress, a dot pulses in the header
 
   | Light | Dark |
   |---|---|
-  | ![driving animation](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/driving.gif) | ![driving animation dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/driving-dark.gif) |
+  | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/driving.gif" alt="driving animation" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/driving-dark.gif" alt="driving animation dark" width="400"> |
 
 | Fuel car | Electric car |
 |---|---|
-| ![fuel](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-fuel.png) | ![electric](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-ev.png) |
-| ![fuel dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-fuel-dark.png) | ![electric dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-ev-dark.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-fuel.png" alt="fuel" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-ev.png" alt="electric" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-fuel-dark.png" alt="fuel dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-ev-dark.png" alt="electric dark" width="400"> |
 
 | Plug-in hybrid | Add a refuel |
 |---|---|
-| ![plug-in hybrid](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-hybrid.png) | ![add a refuel](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/popup.png) |
-| ![plug-in hybrid dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-hybrid-dark.png) | ![add a refuel dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/popup-dark.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-hybrid.png" alt="plug-in hybrid" width="374"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/popup.png" alt="add a refuel" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-hybrid-dark.png" alt="plug-in hybrid dark" width="374"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/popup-dark.png" alt="add a refuel dark" width="400"> |
 
 Recent trips and refuels unfolded:
 
 | Light | Dark |
 |---|---|
-| ![sections](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-sections.png) | ![sections dark](https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-sections-dark.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-sections.png" alt="sections" width="316"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-sections-dark.png" alt="sections dark" width="316"> |
 
 ## How it works
 
