@@ -171,6 +171,12 @@ test('vcLang: card option, then Home Assistant, then English', () => {
   assert.equal(vcLang({ language: 'pt' }, {}), 'pt');
   assert.equal(vcLang({ language: 'pt-BR' }, {}), 'pt');
   assert.equal(vcLang({ locale: { language: 'pl-PL' } }, {}), 'pl');
+  // Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Irish, Slovak, Czech, Slovenian, Maltese,
+  // Latvian and Greek: region dropped.
+  for (const [code, full] of Object.entries({ ro: 'ro-RO', da: 'da-DK', sv: 'sv-FI', bg: 'bg-BG', ru: 'ru-RU', uk: 'uk-UA', hu: 'hu-HU', ga: 'ga-IE', sk: 'sk-SK', cs: 'cs-CZ', sl: 'sl-SI', mt: 'mt-MT', lv: 'lv-LV', el: 'el-GR' })) {
+    assert.equal(vcLang({ language: code }, {}), code);
+    assert.equal(vcLang({ locale: { language: full } }, {}), code);
+  }
   // Serbian: Cyrillic by default, Latin script when Home Assistant (or the card) asks for sr-Latn.
   assert.equal(vcLang({ language: 'sr' }, {}), 'sr');
   assert.equal(vcLang({ locale: { language: 'sr-Latn' } }, {}), 'sr-Latn');
@@ -212,7 +218,10 @@ test('i18n: a key missing in a language falls back to English, then to the key',
   delete VC_I18N.en._probe;
 });
 
-const VC_LANGS = ['de', 'en', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'sr', 'sr-Latn'];
+const VC_LANGS = [
+  'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fr', 'ga', 'hu', 'it', 'lv',
+  'mt', 'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sr', 'sr-Latn', 'sv', 'uk',
+];
 
 test('i18n parity: every language has exactly the English keys and placeholders, and no empty text', () => {
   const ph = (s) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join();
@@ -620,6 +629,20 @@ test('editor: the language picker offers every language of the card', () => {
   assert.equal(labels.nl, 'Nederlands');
   assert.equal(labels.pt, 'Português (Portugal)');
   assert.equal(labels.pl, 'Polski');
+  assert.equal(labels.ro, 'Română');
+  assert.equal(labels.da, 'Dansk');
+  assert.equal(labels.sv, 'Svenska');
+  assert.equal(labels.bg, 'Български');
+  assert.equal(labels.ru, 'Русский');
+  assert.equal(labels.uk, 'Українська');
+  assert.equal(labels.hu, 'Magyar');
+  assert.equal(labels.ga, 'Gaeilge');
+  assert.equal(labels.sk, 'Slovenčina');
+  assert.equal(labels.cs, 'Čeština');
+  assert.equal(labels.sl, 'Slovenščina');
+  assert.equal(labels.mt, 'Malti');
+  assert.equal(labels.lv, 'Latviešu');
+  assert.equal(labels.el, 'Ελληνικά');
 });
 
 // Two vehicles: "Family car" (fuel) and "City EV" (electric), the EV listed last in the registry.

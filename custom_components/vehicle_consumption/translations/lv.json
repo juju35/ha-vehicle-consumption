@@ -1,0 +1,255 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vehicle Consumption",
+        "description": "Izvēlieties transportlīdzekli: tā odometra, degvielas un akumulatora sensori tiek meklēti šajā ierīcē.",
+        "data": {
+          "device_id": "Transportlīdzeklis",
+          "name": "Nosaukums"
+        },
+        "data_description": {
+          "device_id": "Transportlīdzekļa integrācijas ierīce (Renault, Tesla, Kia, Volkswagen, OBD adapteris…).",
+          "name": "Tiek rādīts kartītē un entītijās. Atstājiet tukšu, lai izmantotu ierīces nosaukumu."
+        }
+      },
+      "sensors": {
+        "title": "{name} sensori",
+        "description": "Automātiski atrastie sensori: {found}. Pārbaudiet tos. Odometrs ir obligāts, kā arī vismaz viens degvielas vai akumulatora sensors.",
+        "data": {
+          "odometer": "Odometrs",
+          "fuel_quantity": "Degvielas daudzums",
+          "fuel_level": "Degvielas līmenis",
+          "battery_energy": "Akumulatora enerģija",
+          "battery_level": "Akumulatora līmenis",
+          "tank_capacity": "Bākas tilpums",
+          "battery_capacity": "Lietojamā akumulatora ietilpība",
+          "charger_energy": "Mājas uzlādes stacijas enerģija"
+        },
+        "data_description": {
+          "odometer": "Transportlīdzekļa kopējais nobraukums (km vai mi).",
+          "fuel_quantity": "Bākā atlikusī degviela (L vai gal).",
+          "fuel_level": "Bākā atlikusī degviela (%). Nepieciešams bākas tilpums, ja nav degvielas daudzuma sensora.",
+          "battery_energy": "Vilces akumulatorā atlikusī enerģija (kWh vai Wh).",
+          "battery_level": "Vilces akumulatora uzlādes līmenis (%). Nepieciešama akumulatora ietilpība, ja nav akumulatora enerģijas sensora.",
+          "tank_capacity": "Pārvērš degvielas līmeni litros.",
+          "battery_capacity": "Pārvērš akumulatora līmeni kWh.",
+          "charger_energy": "Jūsu mājas uzlādes stacijas enerģijas skaitītājs (evcc, Wallbox, Easee, Zaptec, Ohme…): uzlādes mājās tiek mērītas pie uzlādes stacijas, ieskaitot zudumus. Nepieciešams akumulatora sensors."
+        }
+      },
+      "prices": {
+        "title": "{name} cenas",
+        "description": "Tiek izmantotas, lai aprēķinātu katra brauciena un katra mēneša izmaksas. Cenas sensoram (degvielas uzpildes stacija, elektroenerģijas tarifs) ir prioritāte pār fiksēto cenu; ja nav neviena no tiem, izmaksas netiek rādītas.",
+        "data": {
+          "fuel_price_entity": "Degvielas cenas sensors",
+          "fuel_price": "Fiksētā degvielas cena",
+          "electricity_price_entity": "Elektroenerģijas cenas sensors",
+          "electricity_price": "Fiksētā elektroenerģijas cena"
+        },
+        "data_description": {
+          "fuel_price_entity": "Cena par litru (vai par galonu), kas seko uzpildes stacijas cenām.",
+          "fuel_price": "Cena par litru, tiek izmantota, ja nav cenas sensora vai tas nav pieejams.",
+          "electricity_price_entity": "Jūsu tarifa cena par kWh.",
+          "electricity_price": "Cena par kWh, tiek izmantota, ja nav cenas sensora vai tas nav pieejams."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Izvēlieties vismaz vienu degvielas vai akumulatora sensoru.",
+      "tank_capacity_required": "Lai izmantotu degvielas līmeni, nepieciešams bākas tilpums.",
+      "battery_capacity_required": "Lai izmantotu akumulatora līmeni, nepieciešama akumulatora ietilpība.",
+      "duplicate_sensor": "Šis sensors jau tiek izmantots citam avotam.",
+      "charger_needs_battery": "Mājas uzlādes stacijas skaitītājam nepieciešams akumulatora enerģijas vai līmeņa sensors."
+    },
+    "abort": {
+      "already_configured": "Šis transportlīdzeklis jau ir konfigurēts."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Transportlīdzekļa sensori",
+        "description": "Odometrs ir obligāts, kā arī vismaz viens degvielas vai akumulatora sensors.",
+        "data": {
+          "odometer": "Odometrs",
+          "fuel_quantity": "Degvielas daudzums",
+          "fuel_level": "Degvielas līmenis",
+          "battery_energy": "Akumulatora enerģija",
+          "battery_level": "Akumulatora līmenis",
+          "tank_capacity": "Bākas tilpums",
+          "battery_capacity": "Lietojamā akumulatora ietilpība",
+          "charger_energy": "Mājas uzlādes stacijas enerģija"
+        },
+        "data_description": {
+          "odometer": "Transportlīdzekļa kopējais nobraukums (km vai mi).",
+          "fuel_quantity": "Bākā atlikusī degviela (L vai gal).",
+          "fuel_level": "Bākā atlikusī degviela (%). Nepieciešams bākas tilpums, ja nav degvielas daudzuma sensora.",
+          "battery_energy": "Vilces akumulatorā atlikusī enerģija (kWh vai Wh).",
+          "battery_level": "Vilces akumulatora uzlādes līmenis (%). Nepieciešama akumulatora ietilpība, ja nav akumulatora enerģijas sensora.",
+          "tank_capacity": "Pārvērš degvielas līmeni litros.",
+          "battery_capacity": "Pārvērš akumulatora līmeni kWh.",
+          "charger_energy": "Jūsu mājas uzlādes stacijas enerģijas skaitītājs (evcc, Wallbox, Easee, Zaptec, Ohme…): uzlādes mājās tiek mērītas pie uzlādes stacijas, ieskaitot zudumus. Nepieciešams akumulatora sensors."
+        }
+      },
+      "prices": {
+        "title": "Cenas un noteikšana",
+        "description": "Cenas sensoram ir prioritāte pār fiksēto cenu. Sliekšņi atšķir degvielas uzpildi vai uzlādi no sensoru trokšņa.",
+        "data": {
+          "fuel_price_entity": "Degvielas cenas sensors",
+          "fuel_price": "Fiksētā degvielas cena",
+          "electricity_price_entity": "Elektroenerģijas cenas sensors",
+          "electricity_price": "Fiksētā elektroenerģijas cena",
+          "trip_gap": "Brauciena beigas pēc",
+          "refuel_threshold": "Uzpildes slieksnis",
+          "charge_threshold": "Uzlādes slieksnis"
+        },
+        "data_description": {
+          "fuel_price_entity": "Cena par litru (vai par galonu), kas seko uzpildes stacijas cenām.",
+          "fuel_price": "Cena par litru, tiek izmantota, ja nav cenas sensora vai tas nav pieejams.",
+          "electricity_price_entity": "Jūsu tarifa cena par kWh.",
+          "electricity_price": "Cena par kWh, tiek izmantota, ja nav cenas sensora vai tas nav pieejams.",
+          "trip_gap": "Brauciens beidzas, kad odometrs tik ilgi nav mainījies.",
+          "refuel_threshold": "Degvielas pieaugums vismaz par šo daudzumu ir uzpilde; mazāki pieaugumi tiek ignorēti.",
+          "charge_threshold": "Akumulatora pieaugums vismaz par šo daudzumu ir uzlāde; mazāki pieaugumi tiek ignorēti."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Izvēlieties vismaz vienu degvielas vai akumulatora sensoru.",
+      "tank_capacity_required": "Lai izmantotu degvielas līmeni, nepieciešams bākas tilpums.",
+      "battery_capacity_required": "Lai izmantotu akumulatora līmeni, nepieciešama akumulatora ietilpība.",
+      "duplicate_sensor": "Šis sensors jau tiek izmantots citam avotam.",
+      "charger_needs_battery": "Mājas uzlādes stacijas skaitītājam nepieciešams akumulatora enerģijas vai līmeņa sensors."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "consumption": {
+        "name": "Patēriņš",
+        "state_attributes": {
+          "vehicle": { "name": "Transportlīdzeklis" },
+          "entry_id": { "name": "Ieraksta ID" },
+          "kind": {
+            "name": "Enerģija",
+            "state": {
+              "fuel": "Degviela",
+              "electric": "Elektriskais",
+              "plugin_hybrid": "Uzlādējams hibrīds"
+            }
+          },
+          "currency": { "name": "Valūta" },
+          "odometer": { "name": "Odometrs" },
+          "fuel_quantity": { "name": "Degvielas daudzums" },
+          "fuel_level": { "name": "Degvielas līmenis" },
+          "tank_capacity": { "name": "Bākas tilpums" },
+          "battery_energy": { "name": "Akumulatora enerģija" },
+          "battery_level": { "name": "Akumulatora līmenis" },
+          "battery_capacity": { "name": "Akumulatora ietilpība" },
+          "fuel_price": { "name": "Degvielas cena" },
+          "electricity_price": { "name": "Elektroenerģijas cena" },
+          "driving": { "name": "Brauc" },
+          "trip": { "name": "Brauciens" },
+          "month": { "name": "Mēnesis" },
+          "total": { "name": "Kopā" },
+          "months": { "name": "Mēneši" },
+          "trips": { "name": "Braucieni" },
+          "refuels": { "name": "Uzpildes" },
+          "charges": { "name": "Uzlādes" }
+        }
+      },
+      "fuel_consumption_trip": { "name": "Brauciena degvielas patēriņš" },
+      "fuel_consumption_month": { "name": "Degvielas patēriņš šomēnes" },
+      "fuel_consumption_average": { "name": "Vidējais degvielas patēriņš" },
+      "energy_consumption_trip": { "name": "Brauciena enerģijas patēriņš" },
+      "energy_consumption_month": { "name": "Enerģijas patēriņš šomēnes" },
+      "energy_consumption_average": { "name": "Vidējais enerģijas patēriņš" },
+      "distance_trip": { "name": "Brauciena attālums" },
+      "distance_month": { "name": "Attālums šomēnes" },
+      "fuel_used_month": { "name": "Šomēnes izmantotā degviela" },
+      "energy_used_month": { "name": "Šomēnes izmantotā enerģija" },
+      "cost_month": { "name": "Izmaksas šomēnes" },
+      "cost_per_km": { "name": "Izmaksas par km" },
+      "last_refuel": {
+        "name": "Pēdējā uzpilde",
+        "state_attributes": {
+          "liters": { "name": "Litri" },
+          "cost": { "name": "Izmaksas" },
+          "odometer": { "name": "Odometrs" },
+          "source": {
+            "name": "Avots",
+            "state": {
+              "auto": "Noteikta",
+              "manual": "Manuāla"
+            }
+          }
+        }
+      },
+      "last_charge": {
+        "name": "Pēdējā uzlāde",
+        "state_attributes": {
+          "energy": { "name": "Enerģija" },
+          "cost": { "name": "Izmaksas" },
+          "odometer": { "name": "Odometrs" },
+          "source": {
+            "name": "Avots",
+            "state": {
+              "auto": "Noteikta",
+              "manual": "Manuāla",
+              "charger": "Mājas uzlādes stacija"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "add_refuel": {
+      "name": "Pievienot uzpildi",
+      "description": "Manuāli reģistrē degvielas uzpildi. Tā tiek rādīta kopā ar noteiktajām; patēriņš joprojām tiek aprēķināts no sensoriem.",
+      "fields": {
+        "config_entry_id": { "name": "Transportlīdzeklis", "description": "Transportlīdzeklis, kuram tika uzpildīta degviela." },
+        "liters": { "name": "Litri", "description": "Uzpildītā degviela." },
+        "cost": { "name": "Kopējās izmaksas", "description": "Samaksātā summa. Ja nav norādīta, tiek aprēķināta no cenas." },
+        "price": { "name": "Cena par litru", "description": "Ja nav norādīta, tiek aprēķināta no kopējām izmaksām; ja nav norādīts neviens, tiek izmantota pašreizējā cena." },
+        "odometer": { "name": "Odometrs", "description": "Odometra rādījums (km). Ja nav norādīts, pēdējais zināmais rādījums." }
+      }
+    },
+    "add_charge": {
+      "name": "Pievienot uzlādi",
+      "description": "Manuāli reģistrē uzlādi. Tā tiek rādīta kopā ar noteiktajām; patēriņš joprojām tiek aprēķināts no sensoriem.",
+      "fields": {
+        "config_entry_id": { "name": "Transportlīdzeklis", "description": "Transportlīdzeklis, kas tika uzlādēts." },
+        "energy": { "name": "Enerģija", "description": "Uzlādētā enerģija (kWh)." },
+        "cost": { "name": "Kopējās izmaksas", "description": "Samaksātā summa. Ja nav norādīta, tiek aprēķināta no cenas." },
+        "price": { "name": "Cena par kWh", "description": "Ja nav norādīta, tiek aprēķināta no kopējām izmaksām; ja nav norādīts neviens, tiek izmantota pašreizējā cena." },
+        "odometer": { "name": "Odometrs", "description": "Odometra rādījums (km). Ja nav norādīts, pēdējais zināmais rādījums." }
+      }
+    },
+    "reset_statistics": {
+      "name": "Atiestatīt statistiku",
+      "description": "Notīra transportlīdzekļa braucienus, mēnešus, uzpildes, uzlādes un kopsummas; uzskaite sākas no jauna no pašreizējiem rādījumiem.",
+      "fields": {
+        "config_entry_id": { "name": "Transportlīdzeklis", "description": "Transportlīdzeklis, kura statistika tiek notīrīta." }
+      }
+    },
+    "import_history": {
+      "name": "Importēt vēsturi",
+      "description": "Atjauno transportlīdzekļa braucienus, mēnešus, uzpildes un uzlādes no tā, ko Home Assistant ir ierakstījis par tā sensoriem (tik tālu pagātnē, cik ilgi to glabā ierakstītājs). Manuāli ievadītās uzpildes un uzlādes tiek saglabātas.",
+      "fields": {
+        "config_entry_id": { "name": "Transportlīdzeklis", "description": "Transportlīdzeklis, kura vēsture tiek importēta." },
+        "days": { "name": "Dienas", "description": "Cik tālu pagātnē atjaunot (pēc noklusējuma 60). Ierakstītie stāvokļi tiek izmantoti tur, kur ierakstītājs tos vēl glabā (pēc noklusējuma 10 dienas), pirms tam sensoru stundas statistika. Mēneši, kurus vēsture pilnībā nesedz, saglabā uzskaitīto." }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Nav Vehicle Consumption ieraksta ar ID {entry_id}."
+    },
+    "not_loaded": {
+      "message": "Vehicle Consumption transportlīdzeklim {name} nav ielādēts."
+    },
+    "no_recorder": {
+      "message": "Ierakstītājs nav iestatīts: nav vēstures, ko importēt."
+    }
+  }
+}
