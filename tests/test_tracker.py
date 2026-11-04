@@ -261,11 +261,21 @@ async def test_price_entity_wins_over_fixed(hass: HomeAssistant) -> None:
     await _drive(hass, 10200, 28)
     assert _attrs(hass)["total"]["cost"] == 9.0 + 6 * 1.9
 
-    # Price sensor unavailable: back to the fixed price
-    await _set(hass, FUEL_PRICE, "unavailable", {})
-    assert _attrs(hass)["fuel_price"] == 2.0
+    # Price sensor unknown (a best price with no station for now): its last price stays, never nothing
+    await _set(hass, FUEL_PRICE, "unknown", {})
+    assert _attrs(hass)["fuel_price"] == 1.9
     await _drive(hass, 10300, 22)
-    assert _attrs(hass)["total"]["cost"] == round(9.0 + 6 * 1.9 + 12, 2)
+    assert _attrs(hass)["total"]["cost"] == round(9.0 + 6 * 1.9 + 6 * 1.9, 2)
+
+
+async def test_price_entity_never_known(hass: HomeAssistant) -> None:
+    """A price sensor that never had a price: the fixed price, else no cost."""
+    states = {ODOMETER: ("10000", KM), FUEL: ("40", LITERS), FUEL_PRICE: ("unknown", {})}
+    options = {CONF_ODOMETER: ODOMETER, CONF_FUEL_QUANTITY: FUEL, CONF_FUEL_PRICE_ENTITY: FUEL_PRICE}
+    await setup_vehicle(hass, {**options, CONF_FUEL_PRICE: 2.0}, states=states)
+    assert _attrs(hass)["fuel_price"] == 2.0
+    await _drive(hass, 10100, 34)
+    assert _attrs(hass)["total"]["cost"] == 12.0
 
 
 async def test_price_per_gallon(hass: HomeAssistant) -> None:
@@ -467,3 +477,30 @@ async def test_month_rolls_over_while_parked(hass: HomeAssistant, freezer: Froze
     assert state_of(hass, "distance_month").state == "0.0"
     assert state_of(hass, "fuel_used_month").state == "0.0"
     assert _attrs(hass)["month"]["month"] == "2026-10"
+
+
+async def test_last_price_survives_a_restart(hass: HomeAssistant) -> None:
+    """The last valid price is stored: a price sensor still unknown after a restart keeps it."""
+    states = {ODOMETER: ("10000", KM), FUEL: ("40", LITERS), FUEL_PRICE: ("1.8", {"unit_of_measurement": "EUR/L"})}
+    options = {CONF_ODOMETER: ODOMETER, CONF_FUEL_QUANTITY: FUEL, CONF_FUEL_PRICE_ENTITY: FUEL_PRICE}
+    entry = await setup_vehicle(hass, options, states=states)
+    assert _attrs(hass)["fuel_price"] == 1.8
+    await hass.config_entries.async_unload(entry.entry_id)
+    hass.states.async_set(FUEL_PRICE, "unknown", {})
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    assert _attrs(hass)["fuel_price"] == 1.8
+    await _drive(hass, 10100, 34)
+    assert _attrs(hass)["total"]["cost"] == round(6 * 1.8, 2)
+
+
+async def test_readings_shown_follow_a_sensor_back(hass: HomeAssistant) -> None:
+    """A source back after a restart with the reading already tracked still refreshes the gauge shown."""
+    entry = await setup_vehicle(hass)
+    await hass.config_entries.async_unload(entry.entry_id)
+    hass.states.async_set(FUEL, "unavailable", {})
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    assert _attrs(hass)["fuel_quantity"] is None
+    await _set(hass, FUEL, "40", LITERS)  # the level the tracking already has: nothing counted
+    assert _attrs(hass)["fuel_quantity"] == 40

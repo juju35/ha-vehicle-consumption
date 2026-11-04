@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.2 - 2026-11-04
+
+### Fixes
+- Cost: a price sensor going `unknown` or `unavailable` (a best-price sensor with no station for that fuel for a while) no longer leaves the fuel used meanwhile without a cost (trips at 0.00 €): its last price is used until it comes back, and kept across restarts. The fixed price is only used when the sensor never had a price.
+- Card: the fuel and battery gauges were empty after a restart when the vehicle's sensors came back after the integration with the reading already tracked; they now follow every change of the sensors.
+
+### Tests
+- No more "Lingering timer" now and then on Home Assistant 2024.12: the background tasks of a test finish before Home Assistant stops.
+
 ## 1.1.1 - 2026-11-04
 
 ### Fixes
