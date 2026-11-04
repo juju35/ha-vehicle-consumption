@@ -100,8 +100,8 @@ import_history:
         config_entry:
           integration: vehicle_consumption
     days:
-      default: 60
-      example: 60
+      default: 365
+      example: 365
       selector:
         number:
           min: 1

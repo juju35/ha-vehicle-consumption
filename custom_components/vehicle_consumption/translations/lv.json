@@ -237,7 +237,7 @@
       "description": "Atjauno transportlīdzekļa braucienus, mēnešus, uzpildes un uzlādes no tā, ko Home Assistant ir ierakstījis par tā sensoriem (tik tālu pagātnē, cik ilgi to glabā ierakstītājs). Manuāli ievadītās uzpildes un uzlādes tiek saglabātas.",
       "fields": {
         "config_entry_id": { "name": "Transportlīdzeklis", "description": "Transportlīdzeklis, kura vēsture tiek importēta." },
-        "days": { "name": "Dienas", "description": "Cik tālu pagātnē atjaunot (pēc noklusējuma 60). Ierakstītie stāvokļi tiek izmantoti tur, kur ierakstītājs tos vēl glabā (pēc noklusējuma 10 dienas), pirms tam sensoru stundas statistika. Mēneši, kurus vēsture pilnībā nesedz, saglabā uzskaitīto." }
+        "days": { "name": "Dienas", "description": "Cik tālu pagātnē atjaunot (pēc noklusējuma 365). Ierakstītie stāvokļi tiek izmantoti tur, kur ierakstītājs tos vēl glabā (pēc noklusējuma 10 dienas), pirms tam sensoru stundas statistika. Mēneši, kurus vēsture pilnībā nesedz, saglabā uzskaitīto." }
       }
     }
   },

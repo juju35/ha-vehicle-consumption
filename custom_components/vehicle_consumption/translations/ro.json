@@ -237,7 +237,7 @@
       "description": "Reconstruiește călătoriile, lunile, alimentările și încărcările vehiculului din ce a înregistrat Home Assistant despre senzorii săi (cât de departe în trecut le păstrează înregistratorul). Alimentările și încărcările introduse manual sunt păstrate.",
       "fields": {
         "config_entry_id": { "name": "Vehicul", "description": "Vehiculul al cărui istoric este importat." },
-        "days": { "name": "Zile", "description": "Cât de departe în trecut se reconstruiește (60 implicit). Stările înregistrate sunt folosite acolo unde înregistratorul le mai are (10 zile implicit), iar înainte de asta statisticile orare ale senzorilor. Lunile pe care istoricul nu le acoperă complet păstrează ce a fost urmărit." }
+        "days": { "name": "Zile", "description": "Cât de departe în trecut se reconstruiește (365 implicit). Stările înregistrate sunt folosite acolo unde înregistratorul le mai are (10 zile implicit), iar înainte de asta statisticile orare ale senzorilor. Lunile pe care istoricul nu le acoperă complet păstrează ce a fost urmărit." }
       }
     }
   },

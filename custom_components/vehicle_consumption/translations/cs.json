@@ -237,7 +237,7 @@
       "description": "Znovu sestaví jízdy, měsíce, tankování a nabíjení vozidla z toho, co Home Assistant zaznamenal z jeho senzorů (tak daleko do minulosti, jak to zapisovač uchovává). Ručně zadaná tankování a nabíjení zůstanou zachována.",
       "fields": {
         "config_entry_id": { "name": "Vozidlo", "description": "Vozidlo, jehož historie se importuje." },
-        "days": { "name": "Dny", "description": "Jak daleko do minulosti se má obnovit (výchozí 60). Zaznamenané stavy se použijí tam, kde je zapisovač ještě má (výchozí 10 dní), předtím hodinové statistiky senzorů. Měsíce, které historie nepokrývá úplně, si ponechají sledované údaje." }
+        "days": { "name": "Dny", "description": "Jak daleko do minulosti se má obnovit (výchozí 365). Zaznamenané stavy se použijí tam, kde je zapisovač ještě má (výchozí 10 dní), předtím hodinové statistiky senzorů. Měsíce, které historie nepokrývá úplně, si ponechají sledované údaje." }
       }
     }
   },

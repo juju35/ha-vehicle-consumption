@@ -5,7 +5,7 @@
  * Served and added to the dashboard resources by the integration.
  * https://github.com/juju35/ha-vehicle-consumption
  */
-var VEHICLE_CONSUMPTION_CARD_VERSION = '1.0.2';
+var VEHICLE_CONSUMPTION_CARD_VERSION = '1.1.0';
 
 const VC_I18N = {
   en: {
@@ -1735,7 +1735,9 @@ class VehicleConsumptionCard extends HTMLElement {
         const sub = [vcFinite(t.distance) ? `${f.num(t.distance, 1)} km` : '', t.open ? this._t('driving') : ''].filter(Boolean).join(' · ');
         return this._row(f.date(t.start), sub || VC_DASH, cons.length ? cons : VC_DASH, f.money(t.cost));
       });
-      out.push(this._section('trips', 'mdi:map-marker-path', this._t('recent_trips'), all.length, rows, 'no_trips'));
+      // The count of everything kept (a year): the list only holds the newest.
+      const count = open.length + (vcFinite(a.trip_count) ? a.trip_count : all.length - open.length);
+      out.push(this._section('trips', 'mdi:map-marker-path', this._t('recent_trips'), count, rows, 'no_trips'));
     }
     if (c.refuels !== false) {
       const t = vcTracks(kind);
@@ -1747,8 +1749,8 @@ class VehicleConsumptionCard extends HTMLElement {
             .join(' · ');
           return this._row(f.date(e.time), sub || VC_DASH, vcFinite(e[key]) ? `${f.num(e[key], 1)} ${unit}` : VC_DASH, f.money(e.cost), e.source === 'manual');
         });
-      if (t.fuel) out.push(this._section('refuels', 'mdi:gas-station', this._t('refuels'), a.refuels?.length || 0, events(a.refuels, 'liters', 'L'), 'no_refuels'));
-      if (t.energy) out.push(this._section('charges', 'mdi:ev-station', this._t('charges'), a.charges?.length || 0, events(a.charges, 'energy', 'kWh'), 'no_charges'));
+      if (t.fuel) out.push(this._section('refuels', 'mdi:gas-station', this._t('refuels'), vcFinite(a.refuel_count) ? a.refuel_count : a.refuels?.length || 0, events(a.refuels, 'liters', 'L'), 'no_refuels'));
+      if (t.energy) out.push(this._section('charges', 'mdi:ev-station', this._t('charges'), vcFinite(a.charge_count) ? a.charge_count : a.charges?.length || 0, events(a.charges, 'energy', 'kWh'), 'no_charges'));
     }
     return out.length ? `<div class="sections">${out.join('')}</div>` : '';
   }

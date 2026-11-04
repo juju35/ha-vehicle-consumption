@@ -172,13 +172,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: VehicleConsumptionConfig
     entry.async_on_unload(tracker.async_listen())
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_reload))
-    if not tracker.history_imported:
-        # Once per vehicle: what the sensors recorded before the integration was there (trips, refuels…).
-        entry.async_create_background_task(hass, _async_first_import(hass, tracker), f"{DOMAIN} history import")
+    # At every start and reload: the first time, what the sensors recorded before the integration was there (trips,
+    # refuels…); then only the days of the last year the tracking does not cover yet, the tracked ones untouched.
+    entry.async_create_background_task(hass, _async_import(hass, tracker), f"{DOMAIN} history import")
     return True
 
 
-async def _async_first_import(hass: HomeAssistant, tracker: ConsumptionTracker) -> None:
+async def _async_import(hass: HomeAssistant, tracker: ConsumptionTracker) -> None:
     """Read the recorder's history once it is up; a failure leaves the live tracking as it is."""
     if hass.state is not CoreState.running:
         started = hass.loop.create_future()
@@ -189,7 +189,10 @@ async def _async_first_import(hass: HomeAssistant, tracker: ConsumptionTracker) 
             if not started.done():
                 unsub()
     try:
-        await tracker.async_import_history()
+        if tracker.history_imported:
+            await tracker.async_backfill_history()
+        else:
+            await tracker.async_import_history()
     except Exception:  # noqa: BLE001 - the history is a bonus, never a reason to stop tracking
         _LOGGER.exception("Could not import the history of %s", tracker.name)
 

@@ -237,7 +237,7 @@
       "description": "Bygger upp fordonets resor, månader, tankningar och laddningar på nytt från det som Home Assistant har registrerat för dess sensorer (så långt tillbaka som inspelaren sparar det). Manuellt registrerade tankningar och laddningar behålls.",
       "fields": {
         "config_entry_id": { "name": "Fordon", "description": "Fordonet vars historik importeras." },
-        "days": { "name": "Dagar", "description": "Hur långt bakåt som byggs upp (60 som standard). De registrerade tillstånden används där inspelaren fortfarande har dem (10 dagar som standard), och före det sensorernas timstatistik. Månader som historiken inte täcker helt behåller det som följdes upp." }
+        "days": { "name": "Dagar", "description": "Hur långt bakåt som byggs upp (365 som standard). De registrerade tillstånden används där inspelaren fortfarande har dem (10 dagar som standard), och före det sensorernas timstatistik. Månader som historiken inte täcker helt behåller det som följdes upp." }
       }
     }
   },
