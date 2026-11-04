@@ -906,7 +906,7 @@ test('chart: drawn at the width of the card, so its labels keep their size', () 
   assert.equal(html(card), 'kept');
   card.disconnectedCallback();
   assert.equal(ro.targets.length, 0);
-  // Twelve months on a narrow card: every other month name, the values only for the current month.
+  // Twelve months on a narrow card: every other month name, the values only for the current month (no room).
   const narrow = makeCard({ months: 12 });
   narrow.hass = hassWith(fuelAttrs());
   narrow.connectedCallback();
@@ -916,6 +916,16 @@ test('chart: drawn at the width of the card, so its labels keep their size', () 
   assert.equal((out.match(/class="ml/g) || []).length, 6);
   assert.equal((out.match(/class="bv/g) || []).length, 1);
   narrow.disconnectedCallback();
+  // A phone (360 px card): twelve values, one a bar.
+  const phone = makeCard({ months: 12 });
+  phone.hass = hassWith(fuelAttrs());
+  phone.connectedCallback();
+  observers.at(-1).fire(360);
+  nextFrame();
+  const bars = (html(phone).match(/class="bar(?! stub)/g) || []).length;
+  assert.ok(bars > 1);
+  assert.equal((html(phone).match(/class="bv/g) || []).length, bars);
+  phone.disconnectedCallback();
 });
 
 test('resize: re-rendered at the next frame, never in the observer callback, once, only if the width changed', () => {

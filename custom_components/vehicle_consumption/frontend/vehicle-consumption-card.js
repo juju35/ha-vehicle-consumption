@@ -5,7 +5,7 @@
  * Served and added to the dashboard resources by the integration.
  * https://github.com/juju35/ha-vehicle-consumption
  */
-var VEHICLE_CONSUMPTION_CARD_VERSION = '1.1.0';
+var VEHICLE_CONSUMPTION_CARD_VERSION = '1.1.1';
 
 const VC_I18N = {
   en: {
@@ -1689,9 +1689,13 @@ class VehicleConsumptionCard extends HTMLElement {
     const H = base + 18;
     const slot = W / n;
     const bw = Math.min(30, slot * 0.58);
-    // Narrow slots: every other month name (the current one kept), the value of the current month only.
+    // Narrow slots: every other month name (the current one kept). Every bar has its value as long as the longest one
+    // fits its slot (about 0.6 em a character, tabular figures), down to 8 px; narrower, the current month's only.
     const named = (i) => slot >= 24 || (n - 1 - i) % 2 === 0;
-    const valued = (i) => slot >= 28 || i === n - 1;
+    const longest = Math.max(1, ...values.map((v) => (v != null && v > 0 ? label(v).length : 0)));
+    const fs = Math.min(9.5, (slot - 2) / (longest * 0.6));
+    const valued = (i) => fs >= 8 || i === n - 1;
+    const vstyle = fs >= 8 && fs < 9.5 ? ` style="font-size:${fs.toFixed(1)}px"` : '';
     const bars = keys
       .map((k, i) => {
         const v = values[i];
@@ -1705,7 +1709,7 @@ class VehicleConsumptionCard extends HTMLElement {
         }
         const h = Math.max(4, (v / max) * plot);
         return `<g class="col"><rect class="bar${now ? ' now' : ''}" style="--i:${i}" x="${x.toFixed(1)}" y="${(base - h).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="4"><title>${vcEsc(`${name}: ${label(v)} ${metric === 'cost' ? '' : unit}`.trim())}</title></rect>
-            ${valued(i) ? `<text class="bv${now ? ' now' : ''}" x="${cx}" y="${(base - h - 4).toFixed(1)}">${vcEsc(label(v))}</text>` : ''}
+            ${valued(i) ? `<text class="bv${now ? ' now' : ''}"${vstyle} x="${cx}" y="${(base - h - 4).toFixed(1)}">${vcEsc(label(v))}</text>` : ''}
             ${named(i) ? `<text class="ml${now ? ' now' : ''}" x="${cx}" y="${H - 4}">${vcEsc(name)}</text>` : ''}</g>`;
       })
       .join('');

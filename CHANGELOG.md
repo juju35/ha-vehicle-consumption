@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1 - 2026-11-04
+
+### Fixes
+- Card: the monthly chart shows the value of every month again on a phone, not only the current month's. The values are shown on every bar as long as they fit (down to 8 px), and only on the current month on very narrow cards.
+
 ## 1.1.0 - 2026-11-04
 
 ### What's new
