@@ -362,6 +362,10 @@ class ConsumptionTracker:
         self._listeners: list[CALLBACK_TYPE] = []
         # Price entity states while the history is replayed (the prices of then, not of now); None otherwise.
         self._replay_prices: dict[str, State] | None = None
+        # Last valid price of each price entity (per L / kWh): stands in while the entity is unknown or unavailable (a
+        # best-price sensor with no station for a while, a restart). Stored; while replaying, the replay's own.
+        self._known_prices: dict[str, float] = {}
+        self._replay_known: dict[str, float] = {}
         # While replaying an hourly statistic: the hour it counts (start, end], shared between the months it spans.
         self._span: tuple[datetime, datetime] | None = None
         # The recorder's history has been read once (at the first start, or after an update adding it).
@@ -415,21 +419,24 @@ class ConsumptionTracker:
         return self._price(self.electricity_price_entity, self.fixed_electricity_price, None)
 
     def _price(self, entity_id: str | None, fixed: float | None, per_gallon: float | None) -> float | None:
+        if entity_id is None:
+            return fixed
         if self._replay_prices is not None:
-            state = self._replay_prices.get(entity_id) if entity_id else None
+            state, known = self._replay_prices.get(entity_id), self._replay_known
         else:
-            state = self.hass.states.get(entity_id) if entity_id else None
-        if state is not None:
-            price = _float(state.state)
-            if price is not None and price >= 0:
-                unit = str(state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) or "")
-                # A price per US gallon becomes a price per litre; per MWh, per kWh.
-                if per_gallon and unit.endswith("/gal"):
-                    price /= per_gallon
-                elif not per_gallon and unit.endswith("/MWh"):
-                    price /= 1000
-                return price
-        return fixed
+            state, known = self.hass.states.get(entity_id), self._known_prices
+        price = _float(state.state) if state is not None else None
+        if price is None or price < 0:
+            # Unknown or unavailable for now: the entity's last price, else the fixed one.
+            return known.get(entity_id, fixed)
+        unit = str(state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) or "")
+        # A price per US gallon becomes a price per litre; per MWh, per kWh.
+        if per_gallon and unit.endswith("/gal"):
+            price /= per_gallon
+        elif not per_gallon and unit.endswith("/MWh"):
+            price /= 1000
+        known[entity_id] = price
+        return price
 
     # ── Readings ────────────────────────────────────────────────────────────
 
@@ -720,8 +727,10 @@ class ConsumptionTracker:
                 updated |= self._process(key, event.data["new_state"], now)
             if updated:
                 self._changed()
-            elif entity_id in prices or any(key in self._shown_only for key in keys):
-                self._notify_listeners()  # the current price or level is shown, nothing to store
+            else:
+                # Nothing counted, but the readings and prices shown follow (a sensor back after a restart, a price:
+                # read by the entities, its last valid value is kept for when it turns unknown).
+                self._notify_listeners()
 
         @callback
         def tick(now: datetime) -> None:
@@ -1056,6 +1065,7 @@ class ConsumptionTracker:
         for key, entity_id in self.sensors.items():
             by_entity.setdefault(entity_id, []).append(key)
         self._replay_prices = dict(initial_prices or {})
+        self._replay_known = {}
         trip_gap = self.trip_gap
         last_hour: dict[str, datetime] = {}  # per source, the end of its last hourly statistic replayed
         try:
@@ -1360,6 +1370,9 @@ class ConsumptionTracker:
             isinstance(imported, int) and not isinstance(imported, bool) and imported >= HISTORY_IMPORT_VERSION
         )
         self.history_from = _time(data.get("history_from"))
+        self._known_prices = {
+            str(k): price for k, v in (data.get("prices") or {}).items() if (price := _float(v)) is not None
+        }
 
     def _dump(self) -> dict[str, Any]:
         return {
@@ -1381,6 +1394,7 @@ class ConsumptionTracker:
             "charger": self._charger.dump(),
             "history_imported": HISTORY_IMPORT_VERSION if self.history_imported else 0,
             "history_from": _iso(self.history_from),
+            "prices": dict(self._known_prices),
         }
 
     async def async_save(self) -> None:

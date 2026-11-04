@@ -43,6 +43,19 @@ def auto_enable_custom_integrations(request: pytest.FixtureRequest):
     yield
 
 
+@pytest.fixture(autouse=True)
+async def settle_before_teardown(request: pytest.FixtureRequest):
+    """Let the background tasks of a test finish before Home Assistant stops.
+
+    `http` (a dependency) saves its store from a background task once its server started: a test ending before it
+    ran (a config flow test) had it run during the final write at teardown, which leaves a delayed-write timer
+    behind on Home Assistant 2024.12 ("Lingering timer", one run in a few).
+    """
+    yield
+    if "hass" in request.fixturenames:
+        await request.getfixturevalue("hass").async_block_till_done(wait_background_tasks=True)
+
+
 class _DeprecationRecorder(logging.Handler):
     """Collects Home Assistant deprecation reports that name this integration."""
 
