@@ -171,9 +171,9 @@ test('vcLang: card option, then Home Assistant, then English', () => {
   assert.equal(vcLang({ language: 'pt' }, {}), 'pt');
   assert.equal(vcLang({ language: 'pt-BR' }, {}), 'pt');
   assert.equal(vcLang({ locale: { language: 'pl-PL' } }, {}), 'pl');
-  // Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Irish, Slovak, Czech, Slovenian, Maltese,
-  // Latvian and Greek: region dropped.
-  for (const [code, full] of Object.entries({ ro: 'ro-RO', da: 'da-DK', sv: 'sv-FI', bg: 'bg-BG', ru: 'ru-RU', uk: 'uk-UA', hu: 'hu-HU', ga: 'ga-IE', sk: 'sk-SK', cs: 'cs-CZ', sl: 'sl-SI', mt: 'mt-MT', lv: 'lv-LV', el: 'el-GR' })) {
+  // Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian
+  // and Greek: region dropped.
+  for (const [code, full] of Object.entries({ ro: 'ro-RO', da: 'da-DK', sv: 'sv-FI', bg: 'bg-BG', ru: 'ru-RU', uk: 'uk-UA', hu: 'hu-HU', sk: 'sk-SK', cs: 'cs-CZ', sl: 'sl-SI', lv: 'lv-LV', el: 'el-GR' })) {
     assert.equal(vcLang({ language: code }, {}), code);
     assert.equal(vcLang({ locale: { language: full } }, {}), code);
   }
@@ -219,8 +219,8 @@ test('i18n: a key missing in a language falls back to English, then to the key',
 });
 
 const VC_LANGS = [
-  'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fr', 'ga', 'hu', 'it', 'lv',
-  'mt', 'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sr', 'sr-Latn', 'sv', 'uk',
+  'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fr', 'hu', 'it', 'lv',
+  'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sr', 'sr-Latn', 'sv', 'uk',
 ];
 
 test('i18n parity: every language has exactly the English keys and placeholders, and no empty text', () => {
@@ -636,11 +636,9 @@ test('editor: the language picker offers every language of the card', () => {
   assert.equal(labels.ru, 'Русский');
   assert.equal(labels.uk, 'Українська');
   assert.equal(labels.hu, 'Magyar');
-  assert.equal(labels.ga, 'Gaeilge');
   assert.equal(labels.sk, 'Slovenčina');
   assert.equal(labels.cs, 'Čeština');
   assert.equal(labels.sl, 'Slovenščina');
-  assert.equal(labels.mt, 'Malti');
   assert.equal(labels.lv, 'Latviešu');
   assert.equal(labels.el, 'Ελληνικά');
 });

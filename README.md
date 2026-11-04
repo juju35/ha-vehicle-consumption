@@ -35,7 +35,7 @@ It comes with a **Lovelace card** showing the tank and battery gauges, the key f
 - **History** kept across restarts: the last 24 months, 20 trips, 20 refuels and 20 charges
 - **Actions** to log a refuel or a charge by hand (`add_refuel`, `add_charge`) to start over (`reset_statistics`) or to rebuild everything from the recorded history (`import_history`)
 - **Lovelace card bundled with the integration**, added automatically to the dashboard resources (nothing to add by hand): fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart (consumption, distance or cost), recent trips and refuels or charges, a pulsing dot while driving, a popup to log a refuel or a charge; visual editor
-- UI setup, no YAML; English, French, German, Spanish, Italian, Dutch, Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Irish, Slovak, Czech, Slovenian, Maltese, Latvian, Greek and Serbian (Cyrillic and Latin)
+- UI setup, no YAML; English, French, German, Spanish, Italian, Dutch, Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian, Greek and Serbian (Cyrillic and Latin)
 
 ## Supported integrations
 
@@ -243,7 +243,7 @@ entity: sensor.my_car_consumption
 | `trips` | `true` | **Recent trips** section |
 | `refuels` | `true` | **Refuels** / **Charges** section |
 | `add_button` | `true` | **+** button in the header to log a refuel or a charge |
-| `language` | Auto | Force language: `en`, `fr`, `de`, `es`, `it`, `nl`, `pt`, `pl`, `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `ga`, `sk`, `cs`, `sl`, `mt`, `lv`, `el`, `sr` (Serbian, Cyrillic) or `sr-Latn` (Serbian, Latin) |
+| `language` | Auto | Force language: `en`, `fr`, `de`, `es`, `it`, `nl`, `pt`, `pl`, `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv`, `el`, `sr` (Serbian, Cyrillic) or `sr-Latn` (Serbian, Latin) |
 
 In the visual editor, **Vehicle** lists every vehicle set up in Vehicle Consumption, by name: nothing to look up, and a vehicle added later shows up in the list. The card picker previews the card with your first vehicle.
 
@@ -338,11 +338,9 @@ The integration and the card follow the language of Home Assistant (Serbian in L
 | Русский | `ru` |
 | Українська | `uk` |
 | Magyar | `hu` |
-| Gaeilge | `ga` |
 | Slovenčina | `sk` |
 | Čeština | `cs` |
 | Slovenščina | `sl` |
-| Malti | `mt` |
 | Latviešu | `lv` |
 | Ελληνικά | `el` |
 | Српски (Serbian, Cyrillic) | `sr` |

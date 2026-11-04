@@ -30,7 +30,7 @@ def _load(lang: str) -> dict[str, str]:
 LANGUAGES = {
     "en", "fr", "de", "es", "it", "nl", "pt", "pt-BR", "pl",
     "ro", "da", "sv", "bg", "ru", "uk", "hu",
-    "ga", "sk", "cs", "sl", "mt", "lv", "el",
+    "sk", "cs", "sl", "lv", "el",
     "sr", "sr-Latn",
 }  # fmt: skip
 
@@ -52,7 +52,7 @@ def test_parity(lang: str) -> None:
 
 
 def test_exact_languages() -> None:
-    """No other language is shipped (the card has the same 24; pt-BR is the integration's copy of pt)."""
+    """No other language is shipped (the card has the same 22; pt-BR is the integration's copy of pt)."""
     assert {p.stem for p in TRANSLATIONS.glob("*.json")} == LANGUAGES
 
 
