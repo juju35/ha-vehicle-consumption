@@ -1,0 +1,255 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vehicle Consumption",
+        "description": "Välj fordonet: dess sensorer för vägmätare, bränsle och batteri söks på den här enheten.",
+        "data": {
+          "device_id": "Fordon",
+          "name": "Namn"
+        },
+        "data_description": {
+          "device_id": "Enhet från fordonets integration (Renault, Tesla, Kia, Volkswagen, OBD-dongel…).",
+          "name": "Visas på kortet och entiteterna. Lämna tomt för att använda enhetens namn."
+        }
+      },
+      "sensors": {
+        "title": "Sensorer för {name}",
+        "description": "Sensorer som hittades automatiskt: {found}. Kontrollera dem. Vägmätaren krävs, samt minst en bränsle- eller batterisensor.",
+        "data": {
+          "odometer": "Vägmätare",
+          "fuel_quantity": "Bränslemängd",
+          "fuel_level": "Bränslenivå",
+          "battery_energy": "Batterienergi",
+          "battery_level": "Batterinivå",
+          "tank_capacity": "Tankvolym",
+          "battery_capacity": "Användbar batterikapacitet",
+          "charger_energy": "Hemmaladdarens energi"
+        },
+        "data_description": {
+          "odometer": "Fordonets totala körsträcka (km eller mi).",
+          "fuel_quantity": "Bränsle kvar i tanken (L eller gal).",
+          "fuel_level": "Bränsle kvar i tanken (%). Kräver tankvolymen när det inte finns någon sensor för bränslemängd.",
+          "battery_energy": "Energi kvar i drivbatteriet (kWh eller Wh).",
+          "battery_level": "Drivbatteriets laddningsnivå (%). Kräver batterikapaciteten när det inte finns någon sensor för batterienergi.",
+          "tank_capacity": "Räknar om bränslenivån till liter.",
+          "battery_capacity": "Räknar om batterinivån till kWh.",
+          "charger_energy": "Energimätare för din hemmaladdare (evcc, Wallbox, Easee, Zaptec, Ohme…): laddningar hemma mäts vid laddaren, förluster inräknade. Kräver en batterisensor."
+        }
+      },
+      "prices": {
+        "title": "Priser för {name}",
+        "description": "Används för att räkna ut kostnaden för varje resa och månad. En prissensor (bensinstation, eltariff) går före det fasta priset; utan någon av dem visas inga kostnader.",
+        "data": {
+          "fuel_price_entity": "Sensor för bränslepris",
+          "fuel_price": "Fast bränslepris",
+          "electricity_price_entity": "Sensor för elpris",
+          "electricity_price": "Fast elpris"
+        },
+        "data_description": {
+          "fuel_price_entity": "Pris per liter (eller per gallon) som följer stationens priser.",
+          "fuel_price": "Pris per liter, används när det inte finns någon prissensor eller den inte är tillgänglig.",
+          "electricity_price_entity": "Pris per kWh enligt ditt elavtal.",
+          "electricity_price": "Pris per kWh, används när det inte finns någon prissensor eller den inte är tillgänglig."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Välj minst en bränsle- eller batterisensor.",
+      "tank_capacity_required": "Tankvolymen behövs för att använda bränslenivån.",
+      "battery_capacity_required": "Batterikapaciteten behövs för att använda batterinivån.",
+      "duplicate_sensor": "Den här sensorn används redan för en annan källa.",
+      "charger_needs_battery": "En mätare för hemmaladdaren kräver en sensor för batterienergi eller batterinivå."
+    },
+    "abort": {
+      "already_configured": "Det här fordonet är redan konfigurerat."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Fordonets sensorer",
+        "description": "Vägmätaren krävs, samt minst en bränsle- eller batterisensor.",
+        "data": {
+          "odometer": "Vägmätare",
+          "fuel_quantity": "Bränslemängd",
+          "fuel_level": "Bränslenivå",
+          "battery_energy": "Batterienergi",
+          "battery_level": "Batterinivå",
+          "tank_capacity": "Tankvolym",
+          "battery_capacity": "Användbar batterikapacitet",
+          "charger_energy": "Hemmaladdarens energi"
+        },
+        "data_description": {
+          "odometer": "Fordonets totala körsträcka (km eller mi).",
+          "fuel_quantity": "Bränsle kvar i tanken (L eller gal).",
+          "fuel_level": "Bränsle kvar i tanken (%). Kräver tankvolymen när det inte finns någon sensor för bränslemängd.",
+          "battery_energy": "Energi kvar i drivbatteriet (kWh eller Wh).",
+          "battery_level": "Drivbatteriets laddningsnivå (%). Kräver batterikapaciteten när det inte finns någon sensor för batterienergi.",
+          "tank_capacity": "Räknar om bränslenivån till liter.",
+          "battery_capacity": "Räknar om batterinivån till kWh.",
+          "charger_energy": "Energimätare för din hemmaladdare (evcc, Wallbox, Easee, Zaptec, Ohme…): laddningar hemma mäts vid laddaren, förluster inräknade. Kräver en batterisensor."
+        }
+      },
+      "prices": {
+        "title": "Priser och identifiering",
+        "description": "En prissensor går före det fasta priset. Tröskelvärdena skiljer en tankning eller en laddning från brus i sensorerna.",
+        "data": {
+          "fuel_price_entity": "Sensor för bränslepris",
+          "fuel_price": "Fast bränslepris",
+          "electricity_price_entity": "Sensor för elpris",
+          "electricity_price": "Fast elpris",
+          "trip_gap": "Resan slutar efter",
+          "refuel_threshold": "Tröskel för tankning",
+          "charge_threshold": "Tröskel för laddning"
+        },
+        "data_description": {
+          "fuel_price_entity": "Pris per liter (eller per gallon) som följer stationens priser.",
+          "fuel_price": "Pris per liter, används när det inte finns någon prissensor eller den inte är tillgänglig.",
+          "electricity_price_entity": "Pris per kWh enligt ditt elavtal.",
+          "electricity_price": "Pris per kWh, används när det inte finns någon prissensor eller den inte är tillgänglig.",
+          "trip_gap": "En resa slutar när vägmätaren inte har rört sig så här länge.",
+          "refuel_threshold": "En ökning av bränslet med minst så här mycket är en tankning; mindre ökningar ignoreras.",
+          "charge_threshold": "En ökning av batteriet med minst så här mycket är en laddning; mindre ökningar ignoreras."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Välj minst en bränsle- eller batterisensor.",
+      "tank_capacity_required": "Tankvolymen behövs för att använda bränslenivån.",
+      "battery_capacity_required": "Batterikapaciteten behövs för att använda batterinivån.",
+      "duplicate_sensor": "Den här sensorn används redan för en annan källa.",
+      "charger_needs_battery": "En mätare för hemmaladdaren kräver en sensor för batterienergi eller batterinivå."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "consumption": {
+        "name": "Förbrukning",
+        "state_attributes": {
+          "vehicle": { "name": "Fordon" },
+          "entry_id": { "name": "Post-ID" },
+          "kind": {
+            "name": "Energi",
+            "state": {
+              "fuel": "Bränsle",
+              "electric": "El",
+              "plugin_hybrid": "Laddhybrid"
+            }
+          },
+          "currency": { "name": "Valuta" },
+          "odometer": { "name": "Vägmätare" },
+          "fuel_quantity": { "name": "Bränslemängd" },
+          "fuel_level": { "name": "Bränslenivå" },
+          "tank_capacity": { "name": "Tankvolym" },
+          "battery_energy": { "name": "Batterienergi" },
+          "battery_level": { "name": "Batterinivå" },
+          "battery_capacity": { "name": "Batterikapacitet" },
+          "fuel_price": { "name": "Bränslepris" },
+          "electricity_price": { "name": "Elpris" },
+          "driving": { "name": "Kör" },
+          "trip": { "name": "Resa" },
+          "month": { "name": "Månad" },
+          "total": { "name": "Totalt" },
+          "months": { "name": "Månader" },
+          "trips": { "name": "Resor" },
+          "refuels": { "name": "Tankningar" },
+          "charges": { "name": "Laddningar" }
+        }
+      },
+      "fuel_consumption_trip": { "name": "Bränsleförbrukning för resan" },
+      "fuel_consumption_month": { "name": "Bränsleförbrukning denna månad" },
+      "fuel_consumption_average": { "name": "Genomsnittlig bränsleförbrukning" },
+      "energy_consumption_trip": { "name": "Energiförbrukning för resan" },
+      "energy_consumption_month": { "name": "Energiförbrukning denna månad" },
+      "energy_consumption_average": { "name": "Genomsnittlig energiförbrukning" },
+      "distance_trip": { "name": "Resans sträcka" },
+      "distance_month": { "name": "Sträcka denna månad" },
+      "fuel_used_month": { "name": "Bränsle använt denna månad" },
+      "energy_used_month": { "name": "Energi använd denna månad" },
+      "cost_month": { "name": "Kostnad denna månad" },
+      "cost_per_km": { "name": "Kostnad per km" },
+      "last_refuel": {
+        "name": "Senaste tankning",
+        "state_attributes": {
+          "liters": { "name": "Liter" },
+          "cost": { "name": "Kostnad" },
+          "odometer": { "name": "Vägmätare" },
+          "source": {
+            "name": "Källa",
+            "state": {
+              "auto": "Identifierad",
+              "manual": "Manuell"
+            }
+          }
+        }
+      },
+      "last_charge": {
+        "name": "Senaste laddning",
+        "state_attributes": {
+          "energy": { "name": "Energi" },
+          "cost": { "name": "Kostnad" },
+          "odometer": { "name": "Vägmätare" },
+          "source": {
+            "name": "Källa",
+            "state": {
+              "auto": "Identifierad",
+              "manual": "Manuell",
+              "charger": "Hemmaladdare"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "add_refuel": {
+      "name": "Lägg till en tankning",
+      "description": "Registrerar en tankning manuellt. Den listas tillsammans med de identifierade; förbrukningen beräknas fortfarande från sensorerna.",
+      "fields": {
+        "config_entry_id": { "name": "Fordon", "description": "Fordonet som tankades." },
+        "liters": { "name": "Liter", "description": "Tankat bränsle." },
+        "cost": { "name": "Total kostnad", "description": "Betalt belopp. Räknas ut från priset om det utelämnas." },
+        "price": { "name": "Pris per liter", "description": "Räknas ut från den totala kostnaden om det utelämnas; det aktuella priset om båda utelämnas." },
+        "odometer": { "name": "Vägmätare", "description": "Vägmätarställning (km). Den senast kända ställningen om den utelämnas." }
+      }
+    },
+    "add_charge": {
+      "name": "Lägg till en laddning",
+      "description": "Registrerar en laddning manuellt. Den listas tillsammans med de identifierade; förbrukningen beräknas fortfarande från sensorerna.",
+      "fields": {
+        "config_entry_id": { "name": "Fordon", "description": "Fordonet som laddades." },
+        "energy": { "name": "Energi", "description": "Tillförd energi (kWh)." },
+        "cost": { "name": "Total kostnad", "description": "Betalt belopp. Räknas ut från priset om det utelämnas." },
+        "price": { "name": "Pris per kWh", "description": "Räknas ut från den totala kostnaden om det utelämnas; det aktuella priset om båda utelämnas." },
+        "odometer": { "name": "Vägmätare", "description": "Vägmätarställning (km). Den senast kända ställningen om den utelämnas." }
+      }
+    },
+    "reset_statistics": {
+      "name": "Nollställ statistik",
+      "description": "Rensar fordonets resor, månader, tankningar, laddningar och totaler; uppföljningen börjar om från de aktuella värdena.",
+      "fields": {
+        "config_entry_id": { "name": "Fordon", "description": "Fordonet vars statistik rensas." }
+      }
+    },
+    "import_history": {
+      "name": "Importera historik",
+      "description": "Bygger upp fordonets resor, månader, tankningar och laddningar på nytt från det som Home Assistant har registrerat för dess sensorer (så långt tillbaka som inspelaren sparar det). Manuellt registrerade tankningar och laddningar behålls.",
+      "fields": {
+        "config_entry_id": { "name": "Fordon", "description": "Fordonet vars historik importeras." },
+        "days": { "name": "Dagar", "description": "Hur långt bakåt som byggs upp (60 som standard). De registrerade tillstånden används där inspelaren fortfarande har dem (10 dagar som standard), och före det sensorernas timstatistik. Månader som historiken inte täcker helt behåller det som följdes upp." }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Ingen Vehicle Consumption-post med ID {entry_id}."
+    },
+    "not_loaded": {
+      "message": "Vehicle Consumption för {name} är inte inläst."
+    },
+    "no_recorder": {
+      "message": "Inspelaren är inte konfigurerad: det finns ingen historik att importera."
+    }
+  }
+}

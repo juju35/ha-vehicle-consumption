@@ -27,11 +27,16 @@ def _load(lang: str) -> dict[str, str]:
     return _flatten(json.loads((TRANSLATIONS / f"{lang}.json").read_text(encoding="utf-8")))
 
 
-LANGUAGES = {"en", "fr", "de", "es", "it", "nl", "pt", "pt-BR", "pl", "sr", "sr-Latn"}
+LANGUAGES = {
+    "en", "fr", "de", "es", "it", "nl", "pt", "pt-BR", "pl",
+    "ro", "da", "sv", "bg", "ru", "uk", "hu",
+    "sk", "cs", "sl", "lv", "el",
+    "sr", "sr-Latn",
+}  # fmt: skip
 
 
 def test_languages() -> None:
-    """English, French, German, Spanish, Italian, Dutch, Portuguese, Polish and Serbian (both scripts) are shipped."""
+    """Every language of the card is shipped, Serbian in both scripts."""
     assert {p.stem for p in TRANSLATIONS.glob("*.json")} >= LANGUAGES
 
 
@@ -47,7 +52,7 @@ def test_parity(lang: str) -> None:
 
 
 def test_exact_languages() -> None:
-    """No other language is shipped (the card has the same ten; pt-BR is the integration's copy of pt)."""
+    """No other language is shipped (the card has the same 22; pt-BR is the integration's copy of pt)."""
     assert {p.stem for p in TRANSLATIONS.glob("*.json")} == LANGUAGES
 
 

@@ -171,6 +171,12 @@ test('vcLang: card option, then Home Assistant, then English', () => {
   assert.equal(vcLang({ language: 'pt' }, {}), 'pt');
   assert.equal(vcLang({ language: 'pt-BR' }, {}), 'pt');
   assert.equal(vcLang({ locale: { language: 'pl-PL' } }, {}), 'pl');
+  // Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian
+  // and Greek: region dropped.
+  for (const [code, full] of Object.entries({ ro: 'ro-RO', da: 'da-DK', sv: 'sv-FI', bg: 'bg-BG', ru: 'ru-RU', uk: 'uk-UA', hu: 'hu-HU', sk: 'sk-SK', cs: 'cs-CZ', sl: 'sl-SI', lv: 'lv-LV', el: 'el-GR' })) {
+    assert.equal(vcLang({ language: code }, {}), code);
+    assert.equal(vcLang({ locale: { language: full } }, {}), code);
+  }
   // Serbian: Cyrillic by default, Latin script when Home Assistant (or the card) asks for sr-Latn.
   assert.equal(vcLang({ language: 'sr' }, {}), 'sr');
   assert.equal(vcLang({ locale: { language: 'sr-Latn' } }, {}), 'sr-Latn');
@@ -212,7 +218,10 @@ test('i18n: a key missing in a language falls back to English, then to the key',
   delete VC_I18N.en._probe;
 });
 
-const VC_LANGS = ['de', 'en', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'sr', 'sr-Latn'];
+const VC_LANGS = [
+  'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fr', 'hu', 'it', 'lv',
+  'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sr', 'sr-Latn', 'sv', 'uk',
+];
 
 test('i18n parity: every language has exactly the English keys and placeholders, and no empty text', () => {
   const ph = (s) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join();
@@ -237,6 +246,10 @@ test('formatting follows the locale; currency through Intl; missing values are a
   assert.equal(fr.month('2026-10'), 'oct');
   const en = vcFormat({ locale: { language: 'en', number_format: 'language' } }, 'en', 'EUR');
   assert.equal(en.money(0.107, 3), '€0.107');
+  // Romanian, Hungarian and Ukrainian get the € sign too, not Intl's default "EUR" code.
+  for (const lang of ['ro', 'hu', 'uk']) {
+    assert.match(vcFormat({ locale: { language: lang, number_format: 'language' } }, lang, 'EUR').money(0.107, 3), /0,107\s€/);
+  }
   assert.equal(en.num(48210.4, 0), '48,210');
   assert.equal(en.month('2026-01'), 'Jan');
   assert.equal(vcFormat({ locale: { language: 'en' } }, 'de', 'EUR').month('2026-03'), 'Mär');
@@ -620,6 +633,18 @@ test('editor: the language picker offers every language of the card', () => {
   assert.equal(labels.nl, 'Nederlands');
   assert.equal(labels.pt, 'Português (Portugal)');
   assert.equal(labels.pl, 'Polski');
+  assert.equal(labels.ro, 'Română');
+  assert.equal(labels.da, 'Dansk');
+  assert.equal(labels.sv, 'Svenska');
+  assert.equal(labels.bg, 'Български');
+  assert.equal(labels.ru, 'Русский');
+  assert.equal(labels.uk, 'Українська');
+  assert.equal(labels.hu, 'Magyar');
+  assert.equal(labels.sk, 'Slovenčina');
+  assert.equal(labels.cs, 'Čeština');
+  assert.equal(labels.sl, 'Slovenščina');
+  assert.equal(labels.lv, 'Latviešu');
+  assert.equal(labels.el, 'Ελληνικά');
 });
 
 // Two vehicles: "Family car" (fuel) and "City EV" (electric), the EV listed last in the registry.

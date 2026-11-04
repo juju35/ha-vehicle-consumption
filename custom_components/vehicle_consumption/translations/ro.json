@@ -1,0 +1,255 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vehicle Consumption",
+        "description": "Alege vehiculul: senzorii săi de kilometraj, combustibil și baterie sunt căutați pe acest dispozitiv.",
+        "data": {
+          "device_id": "Vehicul",
+          "name": "Nume"
+        },
+        "data_description": {
+          "device_id": "Dispozitivul integrării vehiculului (Renault, Tesla, Kia, Volkswagen, adaptor OBD…).",
+          "name": "Afișat pe card și pe entități. Lasă gol pentru a folosi numele dispozitivului."
+        }
+      },
+      "sensors": {
+        "title": "Senzorii pentru {name}",
+        "description": "Senzori găsiți automat: {found}. Verifică-i. Kilometrajul este obligatoriu, plus cel puțin un senzor de combustibil sau de baterie.",
+        "data": {
+          "odometer": "Kilometraj",
+          "fuel_quantity": "Cantitate de combustibil",
+          "fuel_level": "Nivel de combustibil",
+          "battery_energy": "Energia bateriei",
+          "battery_level": "Nivelul bateriei",
+          "tank_capacity": "Capacitatea rezervorului",
+          "battery_capacity": "Capacitatea utilă a bateriei",
+          "charger_energy": "Energia încărcătorului de acasă"
+        },
+        "data_description": {
+          "odometer": "Distanța totală parcursă de vehicul (km sau mi).",
+          "fuel_quantity": "Combustibilul rămas în rezervor (L sau gal).",
+          "fuel_level": "Combustibilul rămas în rezervor (%). Necesită capacitatea rezervorului când nu există un senzor de cantitate de combustibil.",
+          "battery_energy": "Energia rămasă în bateria de tracțiune (kWh sau Wh).",
+          "battery_level": "Starea de încărcare a bateriei de tracțiune (%). Necesită capacitatea bateriei când nu există un senzor de energie a bateriei.",
+          "tank_capacity": "Transformă nivelul de combustibil în litri.",
+          "battery_capacity": "Transformă nivelul bateriei în kWh.",
+          "charger_energy": "Contorul de energie al încărcătorului tău de acasă (evcc, Wallbox, Easee, Zaptec, Ohme…): încărcările de acasă sunt măsurate la încărcător, cu tot cu pierderi. Necesită un senzor de baterie."
+        }
+      },
+      "prices": {
+        "title": "Prețuri pentru {name}",
+        "description": "Folosite pentru a calcula costul fiecărei călătorii și al fiecărei luni. Un senzor de preț (stație de alimentare, tarif la electricitate) are prioritate față de prețul fix; fără niciunul dintre ele, costurile nu sunt afișate.",
+        "data": {
+          "fuel_price_entity": "Senzor de preț al combustibilului",
+          "fuel_price": "Preț fix al combustibilului",
+          "electricity_price_entity": "Senzor de preț al electricității",
+          "electricity_price": "Preț fix al electricității"
+        },
+        "data_description": {
+          "fuel_price_entity": "Prețul pe litru (sau pe galon) care urmează prețurile de la stație.",
+          "fuel_price": "Prețul pe litru, folosit când nu există un senzor de preț sau acesta nu este disponibil.",
+          "electricity_price_entity": "Prețul pe kWh al tarifului tău.",
+          "electricity_price": "Prețul pe kWh, folosit când nu există un senzor de preț sau acesta nu este disponibil."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Alege cel puțin un senzor de combustibil sau de baterie.",
+      "tank_capacity_required": "Capacitatea rezervorului este necesară pentru a folosi nivelul de combustibil.",
+      "battery_capacity_required": "Capacitatea bateriei este necesară pentru a folosi nivelul bateriei.",
+      "duplicate_sensor": "Acest senzor este deja folosit pentru o altă sursă.",
+      "charger_needs_battery": "Un contor al încărcătorului de acasă necesită un senzor de energie sau de nivel al bateriei."
+    },
+    "abort": {
+      "already_configured": "Acest vehicul este deja configurat."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Senzorii vehiculului",
+        "description": "Kilometrajul este obligatoriu, plus cel puțin un senzor de combustibil sau de baterie.",
+        "data": {
+          "odometer": "Kilometraj",
+          "fuel_quantity": "Cantitate de combustibil",
+          "fuel_level": "Nivel de combustibil",
+          "battery_energy": "Energia bateriei",
+          "battery_level": "Nivelul bateriei",
+          "tank_capacity": "Capacitatea rezervorului",
+          "battery_capacity": "Capacitatea utilă a bateriei",
+          "charger_energy": "Energia încărcătorului de acasă"
+        },
+        "data_description": {
+          "odometer": "Distanța totală parcursă de vehicul (km sau mi).",
+          "fuel_quantity": "Combustibilul rămas în rezervor (L sau gal).",
+          "fuel_level": "Combustibilul rămas în rezervor (%). Necesită capacitatea rezervorului când nu există un senzor de cantitate de combustibil.",
+          "battery_energy": "Energia rămasă în bateria de tracțiune (kWh sau Wh).",
+          "battery_level": "Starea de încărcare a bateriei de tracțiune (%). Necesită capacitatea bateriei când nu există un senzor de energie a bateriei.",
+          "tank_capacity": "Transformă nivelul de combustibil în litri.",
+          "battery_capacity": "Transformă nivelul bateriei în kWh.",
+          "charger_energy": "Contorul de energie al încărcătorului tău de acasă (evcc, Wallbox, Easee, Zaptec, Ohme…): încărcările de acasă sunt măsurate la încărcător, cu tot cu pierderi. Necesită un senzor de baterie."
+        }
+      },
+      "prices": {
+        "title": "Prețuri și detectare",
+        "description": "Un senzor de preț are prioritate față de prețul fix. Pragurile deosebesc o alimentare sau o încărcare de zgomotul senzorilor.",
+        "data": {
+          "fuel_price_entity": "Senzor de preț al combustibilului",
+          "fuel_price": "Preț fix al combustibilului",
+          "electricity_price_entity": "Senzor de preț al electricității",
+          "electricity_price": "Preț fix al electricității",
+          "trip_gap": "Sfârșitul călătoriei după",
+          "refuel_threshold": "Prag de alimentare",
+          "charge_threshold": "Prag de încărcare"
+        },
+        "data_description": {
+          "fuel_price_entity": "Prețul pe litru (sau pe galon) care urmează prețurile de la stație.",
+          "fuel_price": "Prețul pe litru, folosit când nu există un senzor de preț sau acesta nu este disponibil.",
+          "electricity_price_entity": "Prețul pe kWh al tarifului tău.",
+          "electricity_price": "Prețul pe kWh, folosit când nu există un senzor de preț sau acesta nu este disponibil.",
+          "trip_gap": "O călătorie se încheie când kilometrajul nu s-a modificat timp de această durată.",
+          "refuel_threshold": "O creștere a combustibilului de cel puțin această valoare este o alimentare; creșterile mai mici sunt ignorate.",
+          "charge_threshold": "O creștere a bateriei de cel puțin această valoare este o încărcare; creșterile mai mici sunt ignorate."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Alege cel puțin un senzor de combustibil sau de baterie.",
+      "tank_capacity_required": "Capacitatea rezervorului este necesară pentru a folosi nivelul de combustibil.",
+      "battery_capacity_required": "Capacitatea bateriei este necesară pentru a folosi nivelul bateriei.",
+      "duplicate_sensor": "Acest senzor este deja folosit pentru o altă sursă.",
+      "charger_needs_battery": "Un contor al încărcătorului de acasă necesită un senzor de energie sau de nivel al bateriei."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "consumption": {
+        "name": "Consum",
+        "state_attributes": {
+          "vehicle": { "name": "Vehicul" },
+          "entry_id": { "name": "ID-ul intrării" },
+          "kind": {
+            "name": "Energie",
+            "state": {
+              "fuel": "Combustibil",
+              "electric": "Electric",
+              "plugin_hybrid": "Hibrid plug-in"
+            }
+          },
+          "currency": { "name": "Monedă" },
+          "odometer": { "name": "Kilometraj" },
+          "fuel_quantity": { "name": "Cantitate de combustibil" },
+          "fuel_level": { "name": "Nivel de combustibil" },
+          "tank_capacity": { "name": "Capacitatea rezervorului" },
+          "battery_energy": { "name": "Energia bateriei" },
+          "battery_level": { "name": "Nivelul bateriei" },
+          "battery_capacity": { "name": "Capacitatea bateriei" },
+          "fuel_price": { "name": "Prețul combustibilului" },
+          "electricity_price": { "name": "Prețul electricității" },
+          "driving": { "name": "În mers" },
+          "trip": { "name": "Călătorie" },
+          "month": { "name": "Lună" },
+          "total": { "name": "Total" },
+          "months": { "name": "Luni" },
+          "trips": { "name": "Călătorii" },
+          "refuels": { "name": "Alimentări" },
+          "charges": { "name": "Încărcări" }
+        }
+      },
+      "fuel_consumption_trip": { "name": "Consum de combustibil în călătorie" },
+      "fuel_consumption_month": { "name": "Consum de combustibil luna aceasta" },
+      "fuel_consumption_average": { "name": "Consum mediu de combustibil" },
+      "energy_consumption_trip": { "name": "Consum de energie în călătorie" },
+      "energy_consumption_month": { "name": "Consum de energie luna aceasta" },
+      "energy_consumption_average": { "name": "Consum mediu de energie" },
+      "distance_trip": { "name": "Distanța călătoriei" },
+      "distance_month": { "name": "Distanța luna aceasta" },
+      "fuel_used_month": { "name": "Combustibil folosit luna aceasta" },
+      "energy_used_month": { "name": "Energie folosită luna aceasta" },
+      "cost_month": { "name": "Cost luna aceasta" },
+      "cost_per_km": { "name": "Cost pe km" },
+      "last_refuel": {
+        "name": "Ultima alimentare",
+        "state_attributes": {
+          "liters": { "name": "Litri" },
+          "cost": { "name": "Cost" },
+          "odometer": { "name": "Kilometraj" },
+          "source": {
+            "name": "Sursă",
+            "state": {
+              "auto": "Detectată",
+              "manual": "Manuală"
+            }
+          }
+        }
+      },
+      "last_charge": {
+        "name": "Ultima încărcare",
+        "state_attributes": {
+          "energy": { "name": "Energie" },
+          "cost": { "name": "Cost" },
+          "odometer": { "name": "Kilometraj" },
+          "source": {
+            "name": "Sursă",
+            "state": {
+              "auto": "Detectată",
+              "manual": "Manuală",
+              "charger": "Încărcător de acasă"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "add_refuel": {
+      "name": "Adaugă o alimentare",
+      "description": "Înregistrează manual o alimentare. Este afișată împreună cu cele detectate; consumul se calculează în continuare din senzori.",
+      "fields": {
+        "config_entry_id": { "name": "Vehicul", "description": "Vehiculul care a fost alimentat." },
+        "liters": { "name": "Litri", "description": "Combustibil adăugat." },
+        "cost": { "name": "Cost total", "description": "Suma plătită. Calculată din preț dacă este omisă." },
+        "price": { "name": "Preț pe litru", "description": "Calculat din costul total dacă este omis; prețul curent dacă lipsesc amândouă." },
+        "odometer": { "name": "Kilometraj", "description": "Citirea kilometrajului (km). Ultima citire cunoscută dacă este omisă." }
+      }
+    },
+    "add_charge": {
+      "name": "Adaugă o încărcare",
+      "description": "Înregistrează manual o încărcare. Este afișată împreună cu cele detectate; consumul se calculează în continuare din senzori.",
+      "fields": {
+        "config_entry_id": { "name": "Vehicul", "description": "Vehiculul care a fost încărcat." },
+        "energy": { "name": "Energie", "description": "Energie adăugată (kWh)." },
+        "cost": { "name": "Cost total", "description": "Suma plătită. Calculată din preț dacă este omisă." },
+        "price": { "name": "Preț pe kWh", "description": "Calculat din costul total dacă este omis; prețul curent dacă lipsesc amândouă." },
+        "odometer": { "name": "Kilometraj", "description": "Citirea kilometrajului (km). Ultima citire cunoscută dacă este omisă." }
+      }
+    },
+    "reset_statistics": {
+      "name": "Resetează statisticile",
+      "description": "Șterge călătoriile, lunile, alimentările, încărcările și totalurile vehiculului; urmărirea reîncepe de la citirile curente.",
+      "fields": {
+        "config_entry_id": { "name": "Vehicul", "description": "Vehiculul ale cărui statistici sunt șterse." }
+      }
+    },
+    "import_history": {
+      "name": "Importă istoricul",
+      "description": "Reconstruiește călătoriile, lunile, alimentările și încărcările vehiculului din ce a înregistrat Home Assistant despre senzorii săi (cât de departe în trecut le păstrează înregistratorul). Alimentările și încărcările introduse manual sunt păstrate.",
+      "fields": {
+        "config_entry_id": { "name": "Vehicul", "description": "Vehiculul al cărui istoric este importat." },
+        "days": { "name": "Zile", "description": "Cât de departe în trecut se reconstruiește (60 implicit). Stările înregistrate sunt folosite acolo unde înregistratorul le mai are (10 zile implicit), iar înainte de asta statisticile orare ale senzorilor. Lunile pe care istoricul nu le acoperă complet păstrează ce a fost urmărit." }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Nicio intrare Vehicle Consumption cu ID-ul {entry_id}."
+    },
+    "not_loaded": {
+      "message": "Vehicle Consumption pentru {name} nu este încărcat."
+    },
+    "no_recorder": {
+      "message": "Înregistratorul nu este configurat: nu există istoric de importat."
+    }
+  }
+}

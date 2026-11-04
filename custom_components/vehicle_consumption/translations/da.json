@@ -1,0 +1,255 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vehicle Consumption",
+        "description": "Vælg køretøjet: dets sensorer for kilometertæller, brændstof og batteri søges på denne enhed.",
+        "data": {
+          "device_id": "Køretøj",
+          "name": "Navn"
+        },
+        "data_description": {
+          "device_id": "Enhed fra køretøjets integration (Renault, Tesla, Kia, Volkswagen, OBD-dongle…).",
+          "name": "Vises på kortet og entiteterne. Lad feltet stå tomt for at bruge enhedens navn."
+        }
+      },
+      "sensors": {
+        "title": "Sensorer for {name}",
+        "description": "Sensorer fundet automatisk: {found}. Kontrollér dem. Kilometertælleren er påkrævet samt mindst én brændstof- eller batterisensor.",
+        "data": {
+          "odometer": "Kilometertæller",
+          "fuel_quantity": "Brændstofmængde",
+          "fuel_level": "Brændstofniveau",
+          "battery_energy": "Batterienergi",
+          "battery_level": "Batteriniveau",
+          "tank_capacity": "Tankkapacitet",
+          "battery_capacity": "Brugbar batterikapacitet",
+          "charger_energy": "Hjemmeladerens energi"
+        },
+        "data_description": {
+          "odometer": "Køretøjets samlede kørte distance (km eller mi).",
+          "fuel_quantity": "Brændstof tilbage i tanken (L eller gal).",
+          "fuel_level": "Brændstof tilbage i tanken (%). Kræver tankkapaciteten, når der ikke er nogen sensor for brændstofmængde.",
+          "battery_energy": "Energi tilbage i traktionsbatteriet (kWh eller Wh).",
+          "battery_level": "Traktionsbatteriets ladetilstand (%). Kræver batterikapaciteten, når der ikke er nogen sensor for batterienergi.",
+          "tank_capacity": "Omregner brændstofniveauet til liter.",
+          "battery_capacity": "Omregner batteriniveauet til kWh.",
+          "charger_energy": "Energimåler på din hjemmelader (evcc, Wallbox, Easee, Zaptec, Ohme…): opladninger derhjemme måles ved laderen, inklusive tab. Kræver en batterisensor."
+        }
+      },
+      "prices": {
+        "title": "Priser for {name}",
+        "description": "Bruges til at beregne omkostningen for hver tur og hver måned. En prissensor (tankstation, eltarif) går forud for den faste pris; uden nogen af dem vises omkostningerne ikke.",
+        "data": {
+          "fuel_price_entity": "Sensor for brændstofpris",
+          "fuel_price": "Fast brændstofpris",
+          "electricity_price_entity": "Sensor for elpris",
+          "electricity_price": "Fast elpris"
+        },
+        "data_description": {
+          "fuel_price_entity": "Pris pr. liter (eller pr. gallon), der følger tankstationens priser.",
+          "fuel_price": "Pris pr. liter, bruges når der ikke er nogen prissensor, eller den ikke er tilgængelig.",
+          "electricity_price_entity": "Pris pr. kWh for din eltarif.",
+          "electricity_price": "Pris pr. kWh, bruges når der ikke er nogen prissensor, eller den ikke er tilgængelig."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Vælg mindst én brændstof- eller batterisensor.",
+      "tank_capacity_required": "Tankkapaciteten skal angives for at bruge brændstofniveauet.",
+      "battery_capacity_required": "Batterikapaciteten skal angives for at bruge batteriniveauet.",
+      "duplicate_sensor": "Denne sensor bruges allerede til en anden kilde.",
+      "charger_needs_battery": "En måler på hjemmeladeren kræver en sensor for batterienergi eller batteriniveau."
+    },
+    "abort": {
+      "already_configured": "Dette køretøj er allerede konfigureret."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Køretøjets sensorer",
+        "description": "Kilometertælleren er påkrævet samt mindst én brændstof- eller batterisensor.",
+        "data": {
+          "odometer": "Kilometertæller",
+          "fuel_quantity": "Brændstofmængde",
+          "fuel_level": "Brændstofniveau",
+          "battery_energy": "Batterienergi",
+          "battery_level": "Batteriniveau",
+          "tank_capacity": "Tankkapacitet",
+          "battery_capacity": "Brugbar batterikapacitet",
+          "charger_energy": "Hjemmeladerens energi"
+        },
+        "data_description": {
+          "odometer": "Køretøjets samlede kørte distance (km eller mi).",
+          "fuel_quantity": "Brændstof tilbage i tanken (L eller gal).",
+          "fuel_level": "Brændstof tilbage i tanken (%). Kræver tankkapaciteten, når der ikke er nogen sensor for brændstofmængde.",
+          "battery_energy": "Energi tilbage i traktionsbatteriet (kWh eller Wh).",
+          "battery_level": "Traktionsbatteriets ladetilstand (%). Kræver batterikapaciteten, når der ikke er nogen sensor for batterienergi.",
+          "tank_capacity": "Omregner brændstofniveauet til liter.",
+          "battery_capacity": "Omregner batteriniveauet til kWh.",
+          "charger_energy": "Energimåler på din hjemmelader (evcc, Wallbox, Easee, Zaptec, Ohme…): opladninger derhjemme måles ved laderen, inklusive tab. Kræver en batterisensor."
+        }
+      },
+      "prices": {
+        "title": "Priser og registrering",
+        "description": "En prissensor går forud for den faste pris. Tærsklerne skelner en tankning eller en opladning fra støj i sensorerne.",
+        "data": {
+          "fuel_price_entity": "Sensor for brændstofpris",
+          "fuel_price": "Fast brændstofpris",
+          "electricity_price_entity": "Sensor for elpris",
+          "electricity_price": "Fast elpris",
+          "trip_gap": "Turen slutter efter",
+          "refuel_threshold": "Tærskel for tankning",
+          "charge_threshold": "Tærskel for opladning"
+        },
+        "data_description": {
+          "fuel_price_entity": "Pris pr. liter (eller pr. gallon), der følger tankstationens priser.",
+          "fuel_price": "Pris pr. liter, bruges når der ikke er nogen prissensor, eller den ikke er tilgængelig.",
+          "electricity_price_entity": "Pris pr. kWh for din eltarif.",
+          "electricity_price": "Pris pr. kWh, bruges når der ikke er nogen prissensor, eller den ikke er tilgængelig.",
+          "trip_gap": "En tur slutter, når kilometertælleren ikke har flyttet sig i så lang tid.",
+          "refuel_threshold": "En stigning i brændstof på mindst denne mængde er en tankning; mindre stigninger ignoreres.",
+          "charge_threshold": "En stigning i batteriet på mindst denne mængde er en opladning; mindre stigninger ignoreres."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Vælg mindst én brændstof- eller batterisensor.",
+      "tank_capacity_required": "Tankkapaciteten skal angives for at bruge brændstofniveauet.",
+      "battery_capacity_required": "Batterikapaciteten skal angives for at bruge batteriniveauet.",
+      "duplicate_sensor": "Denne sensor bruges allerede til en anden kilde.",
+      "charger_needs_battery": "En måler på hjemmeladeren kræver en sensor for batterienergi eller batteriniveau."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "consumption": {
+        "name": "Forbrug",
+        "state_attributes": {
+          "vehicle": { "name": "Køretøj" },
+          "entry_id": { "name": "Post-ID" },
+          "kind": {
+            "name": "Energi",
+            "state": {
+              "fuel": "Brændstof",
+              "electric": "Elektrisk",
+              "plugin_hybrid": "Plugin-hybrid"
+            }
+          },
+          "currency": { "name": "Valuta" },
+          "odometer": { "name": "Kilometertæller" },
+          "fuel_quantity": { "name": "Brændstofmængde" },
+          "fuel_level": { "name": "Brændstofniveau" },
+          "tank_capacity": { "name": "Tankkapacitet" },
+          "battery_energy": { "name": "Batterienergi" },
+          "battery_level": { "name": "Batteriniveau" },
+          "battery_capacity": { "name": "Batterikapacitet" },
+          "fuel_price": { "name": "Brændstofpris" },
+          "electricity_price": { "name": "Elpris" },
+          "driving": { "name": "Kører" },
+          "trip": { "name": "Tur" },
+          "month": { "name": "Måned" },
+          "total": { "name": "I alt" },
+          "months": { "name": "Måneder" },
+          "trips": { "name": "Ture" },
+          "refuels": { "name": "Tankninger" },
+          "charges": { "name": "Opladninger" }
+        }
+      },
+      "fuel_consumption_trip": { "name": "Brændstofforbrug på turen" },
+      "fuel_consumption_month": { "name": "Brændstofforbrug denne måned" },
+      "fuel_consumption_average": { "name": "Gennemsnitligt brændstofforbrug" },
+      "energy_consumption_trip": { "name": "Energiforbrug på turen" },
+      "energy_consumption_month": { "name": "Energiforbrug denne måned" },
+      "energy_consumption_average": { "name": "Gennemsnitligt energiforbrug" },
+      "distance_trip": { "name": "Turens distance" },
+      "distance_month": { "name": "Distance denne måned" },
+      "fuel_used_month": { "name": "Brændstof brugt denne måned" },
+      "energy_used_month": { "name": "Energi brugt denne måned" },
+      "cost_month": { "name": "Omkostning denne måned" },
+      "cost_per_km": { "name": "Omkostning pr. km" },
+      "last_refuel": {
+        "name": "Seneste tankning",
+        "state_attributes": {
+          "liters": { "name": "Liter" },
+          "cost": { "name": "Omkostning" },
+          "odometer": { "name": "Kilometertæller" },
+          "source": {
+            "name": "Kilde",
+            "state": {
+              "auto": "Registreret",
+              "manual": "Manuel"
+            }
+          }
+        }
+      },
+      "last_charge": {
+        "name": "Seneste opladning",
+        "state_attributes": {
+          "energy": { "name": "Energi" },
+          "cost": { "name": "Omkostning" },
+          "odometer": { "name": "Kilometertæller" },
+          "source": {
+            "name": "Kilde",
+            "state": {
+              "auto": "Registreret",
+              "manual": "Manuel",
+              "charger": "Hjemmelader"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "add_refuel": {
+      "name": "Tilføj en tankning",
+      "description": "Noterer en tankning manuelt. Den vises sammen med de registrerede; forbruget beregnes fortsat ud fra sensorerne.",
+      "fields": {
+        "config_entry_id": { "name": "Køretøj", "description": "Køretøjet, der blev tanket." },
+        "liters": { "name": "Liter", "description": "Tanket brændstof." },
+        "cost": { "name": "Samlet pris", "description": "Betalt beløb. Beregnes ud fra prisen, hvis det udelades." },
+        "price": { "name": "Pris pr. liter", "description": "Beregnes ud fra den samlede pris, hvis den udelades; den aktuelle pris, hvis begge udelades." },
+        "odometer": { "name": "Kilometertæller", "description": "Kilometertællerens aflæsning (km). Den senest kendte aflæsning, hvis den udelades." }
+      }
+    },
+    "add_charge": {
+      "name": "Tilføj en opladning",
+      "description": "Noterer en opladning manuelt. Den vises sammen med de registrerede; forbruget beregnes fortsat ud fra sensorerne.",
+      "fields": {
+        "config_entry_id": { "name": "Køretøj", "description": "Køretøjet, der blev opladet." },
+        "energy": { "name": "Energi", "description": "Tilført energi (kWh)." },
+        "cost": { "name": "Samlet pris", "description": "Betalt beløb. Beregnes ud fra prisen, hvis det udelades." },
+        "price": { "name": "Pris pr. kWh", "description": "Beregnes ud fra den samlede pris, hvis den udelades; den aktuelle pris, hvis begge udelades." },
+        "odometer": { "name": "Kilometertæller", "description": "Kilometertællerens aflæsning (km). Den senest kendte aflæsning, hvis den udelades." }
+      }
+    },
+    "reset_statistics": {
+      "name": "Nulstil statistik",
+      "description": "Sletter køretøjets ture, måneder, tankninger, opladninger og totaler; registreringen starter forfra fra de aktuelle aflæsninger.",
+      "fields": {
+        "config_entry_id": { "name": "Køretøj", "description": "Køretøjet, hvis statistik slettes." }
+      }
+    },
+    "import_history": {
+      "name": "Importér historik",
+      "description": "Genopbygger køretøjets ture, måneder, tankninger og opladninger ud fra det, Home Assistant har optaget fra dets sensorer (så langt tilbage som optageren gemmer det). Manuelle tankninger og opladninger bevares.",
+      "fields": {
+        "config_entry_id": { "name": "Køretøj", "description": "Køretøjet, hvis historik importeres." },
+        "days": { "name": "Dage", "description": "Hvor langt tilbage der genopbygges (60 som standard). De optagede tilstande bruges, hvor optageren stadig har dem (10 dage som standard), og før det sensorernes timestatistik. Måneder, som historikken ikke dækker helt, beholder det, der blev registreret." }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Ingen Vehicle Consumption-post med ID {entry_id}."
+    },
+    "not_loaded": {
+      "message": "Vehicle Consumption for {name} er ikke indlæst."
+    },
+    "no_recorder": {
+      "message": "Optageren er ikke konfigureret: der er ingen historik at importere."
+    }
+  }
+}

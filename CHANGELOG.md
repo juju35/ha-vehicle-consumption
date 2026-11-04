@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2 - 2026-11-04
+
+### What's new
+- Added Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek translations: `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv` and `el` for the setup and options, the entities, the actions and the card with its visual editor.
+
 ## 1.0.1 - 2026-11-02
 
 ### Fixes

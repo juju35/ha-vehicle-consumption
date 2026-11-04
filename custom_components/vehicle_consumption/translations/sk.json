@@ -1,0 +1,255 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vehicle Consumption",
+        "description": "Vyberte vozidlo: jeho senzory počítadla kilometrov, paliva a batérie sa vyhľadajú na tomto zariadení.",
+        "data": {
+          "device_id": "Vozidlo",
+          "name": "Názov"
+        },
+        "data_description": {
+          "device_id": "Zariadenie integrácie vozidla (Renault, Tesla, Kia, Volkswagen, OBD adaptér…).",
+          "name": "Zobrazuje sa na karte a pri entitách. Nechajte prázdne, ak chcete použiť názov zariadenia."
+        }
+      },
+      "sensors": {
+        "title": "Senzory vozidla {name}",
+        "description": "Automaticky nájdené senzory: {found}. Skontrolujte ich. Počítadlo kilometrov je povinné, a k nemu aspoň jeden senzor paliva alebo batérie.",
+        "data": {
+          "odometer": "Počítadlo kilometrov",
+          "fuel_quantity": "Množstvo paliva",
+          "fuel_level": "Hladina paliva",
+          "battery_energy": "Energia batérie",
+          "battery_level": "Úroveň batérie",
+          "tank_capacity": "Objem nádrže",
+          "battery_capacity": "Využiteľná kapacita batérie",
+          "charger_energy": "Energia domácej nabíjačky"
+        },
+        "data_description": {
+          "odometer": "Celková prejdená vzdialenosť vozidla (km alebo mi).",
+          "fuel_quantity": "Zostávajúce palivo v nádrži (L alebo gal).",
+          "fuel_level": "Zostávajúce palivo v nádrži (%). Vyžaduje objem nádrže, ak nie je k dispozícii senzor množstva paliva.",
+          "battery_energy": "Zostávajúca energia v trakčnej batérii (kWh alebo Wh).",
+          "battery_level": "Stav nabitia trakčnej batérie (%). Vyžaduje kapacitu batérie, ak nie je k dispozícii senzor energie batérie.",
+          "tank_capacity": "Prepočíta hladinu paliva na litre.",
+          "battery_capacity": "Prepočíta úroveň batérie na kWh.",
+          "charger_energy": "Merač energie vašej domácej nabíjačky (evcc, Wallbox, Easee, Zaptec, Ohme…): nabíjania doma sa merajú na nabíjačke vrátane strát. Vyžaduje senzor batérie."
+        }
+      },
+      "prices": {
+        "title": "Ceny pre {name}",
+        "description": "Používajú sa na výpočet nákladov na každú jazdu a každý mesiac. Senzor ceny (čerpacia stanica, tarifa za elektrinu) má prednosť pred pevnou cenou; bez nich sa náklady nezobrazujú.",
+        "data": {
+          "fuel_price_entity": "Senzor ceny paliva",
+          "fuel_price": "Pevná cena paliva",
+          "electricity_price_entity": "Senzor ceny elektriny",
+          "electricity_price": "Pevná cena elektriny"
+        },
+        "data_description": {
+          "fuel_price_entity": "Cena za liter (alebo za galón), ktorá sleduje ceny na čerpacej stanici.",
+          "fuel_price": "Cena za liter, použije sa, ak nie je senzor ceny alebo je nedostupný.",
+          "electricity_price_entity": "Cena za kWh podľa vašej tarify.",
+          "electricity_price": "Cena za kWh, použije sa, ak nie je senzor ceny alebo je nedostupný."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Vyberte aspoň jeden senzor paliva alebo batérie.",
+      "tank_capacity_required": "Na použitie hladiny paliva je potrebný objem nádrže.",
+      "battery_capacity_required": "Na použitie úrovne batérie je potrebná kapacita batérie.",
+      "duplicate_sensor": "Tento senzor sa už používa pre iný zdroj.",
+      "charger_needs_battery": "Merač domácej nabíjačky vyžaduje senzor energie alebo úrovne batérie."
+    },
+    "abort": {
+      "already_configured": "Toto vozidlo je už nakonfigurované."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Senzory vozidla",
+        "description": "Počítadlo kilometrov je povinné, a k nemu aspoň jeden senzor paliva alebo batérie.",
+        "data": {
+          "odometer": "Počítadlo kilometrov",
+          "fuel_quantity": "Množstvo paliva",
+          "fuel_level": "Hladina paliva",
+          "battery_energy": "Energia batérie",
+          "battery_level": "Úroveň batérie",
+          "tank_capacity": "Objem nádrže",
+          "battery_capacity": "Využiteľná kapacita batérie",
+          "charger_energy": "Energia domácej nabíjačky"
+        },
+        "data_description": {
+          "odometer": "Celková prejdená vzdialenosť vozidla (km alebo mi).",
+          "fuel_quantity": "Zostávajúce palivo v nádrži (L alebo gal).",
+          "fuel_level": "Zostávajúce palivo v nádrži (%). Vyžaduje objem nádrže, ak nie je k dispozícii senzor množstva paliva.",
+          "battery_energy": "Zostávajúca energia v trakčnej batérii (kWh alebo Wh).",
+          "battery_level": "Stav nabitia trakčnej batérie (%). Vyžaduje kapacitu batérie, ak nie je k dispozícii senzor energie batérie.",
+          "tank_capacity": "Prepočíta hladinu paliva na litre.",
+          "battery_capacity": "Prepočíta úroveň batérie na kWh.",
+          "charger_energy": "Merač energie vašej domácej nabíjačky (evcc, Wallbox, Easee, Zaptec, Ohme…): nabíjania doma sa merajú na nabíjačke vrátane strát. Vyžaduje senzor batérie."
+        }
+      },
+      "prices": {
+        "title": "Ceny a detekcia",
+        "description": "Senzor ceny má prednosť pred pevnou cenou. Prahy odlišujú tankovanie alebo nabíjanie od šumu senzorov.",
+        "data": {
+          "fuel_price_entity": "Senzor ceny paliva",
+          "fuel_price": "Pevná cena paliva",
+          "electricity_price_entity": "Senzor ceny elektriny",
+          "electricity_price": "Pevná cena elektriny",
+          "trip_gap": "Koniec jazdy po",
+          "refuel_threshold": "Prah tankovania",
+          "charge_threshold": "Prah nabíjania"
+        },
+        "data_description": {
+          "fuel_price_entity": "Cena za liter (alebo za galón), ktorá sleduje ceny na čerpacej stanici.",
+          "fuel_price": "Cena za liter, použije sa, ak nie je senzor ceny alebo je nedostupný.",
+          "electricity_price_entity": "Cena za kWh podľa vašej tarify.",
+          "electricity_price": "Cena za kWh, použije sa, ak nie je senzor ceny alebo je nedostupný.",
+          "trip_gap": "Jazda sa skončí, keď sa počítadlo kilometrov takto dlho nepohne.",
+          "refuel_threshold": "Nárast paliva aspoň o túto hodnotu je tankovanie; menšie nárasty sa ignorujú.",
+          "charge_threshold": "Nárast batérie aspoň o túto hodnotu je nabíjanie; menšie nárasty sa ignorujú."
+        }
+      }
+    },
+    "error": {
+      "no_energy_sensor": "Vyberte aspoň jeden senzor paliva alebo batérie.",
+      "tank_capacity_required": "Na použitie hladiny paliva je potrebný objem nádrže.",
+      "battery_capacity_required": "Na použitie úrovne batérie je potrebná kapacita batérie.",
+      "duplicate_sensor": "Tento senzor sa už používa pre iný zdroj.",
+      "charger_needs_battery": "Merač domácej nabíjačky vyžaduje senzor energie alebo úrovne batérie."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "consumption": {
+        "name": "Spotreba",
+        "state_attributes": {
+          "vehicle": { "name": "Vozidlo" },
+          "entry_id": { "name": "ID záznamu" },
+          "kind": {
+            "name": "Energia",
+            "state": {
+              "fuel": "Palivo",
+              "electric": "Elektrické",
+              "plugin_hybrid": "Plug-in hybrid"
+            }
+          },
+          "currency": { "name": "Mena" },
+          "odometer": { "name": "Počítadlo kilometrov" },
+          "fuel_quantity": { "name": "Množstvo paliva" },
+          "fuel_level": { "name": "Hladina paliva" },
+          "tank_capacity": { "name": "Objem nádrže" },
+          "battery_energy": { "name": "Energia batérie" },
+          "battery_level": { "name": "Úroveň batérie" },
+          "battery_capacity": { "name": "Kapacita batérie" },
+          "fuel_price": { "name": "Cena paliva" },
+          "electricity_price": { "name": "Cena elektriny" },
+          "driving": { "name": "V jazde" },
+          "trip": { "name": "Jazda" },
+          "month": { "name": "Mesiac" },
+          "total": { "name": "Celkom" },
+          "months": { "name": "Mesiace" },
+          "trips": { "name": "Jazdy" },
+          "refuels": { "name": "Tankovania" },
+          "charges": { "name": "Nabíjania" }
+        }
+      },
+      "fuel_consumption_trip": { "name": "Spotreba paliva za jazdu" },
+      "fuel_consumption_month": { "name": "Spotreba paliva tento mesiac" },
+      "fuel_consumption_average": { "name": "Priemerná spotreba paliva" },
+      "energy_consumption_trip": { "name": "Spotreba energie za jazdu" },
+      "energy_consumption_month": { "name": "Spotreba energie tento mesiac" },
+      "energy_consumption_average": { "name": "Priemerná spotreba energie" },
+      "distance_trip": { "name": "Vzdialenosť jazdy" },
+      "distance_month": { "name": "Vzdialenosť tento mesiac" },
+      "fuel_used_month": { "name": "Spotrebované palivo tento mesiac" },
+      "energy_used_month": { "name": "Spotrebovaná energia tento mesiac" },
+      "cost_month": { "name": "Náklady tento mesiac" },
+      "cost_per_km": { "name": "Náklady na km" },
+      "last_refuel": {
+        "name": "Posledné tankovanie",
+        "state_attributes": {
+          "liters": { "name": "Litre" },
+          "cost": { "name": "Náklady" },
+          "odometer": { "name": "Počítadlo kilometrov" },
+          "source": {
+            "name": "Zdroj",
+            "state": {
+              "auto": "Zistené",
+              "manual": "Ručne"
+            }
+          }
+        }
+      },
+      "last_charge": {
+        "name": "Posledné nabíjanie",
+        "state_attributes": {
+          "energy": { "name": "Energia" },
+          "cost": { "name": "Náklady" },
+          "odometer": { "name": "Počítadlo kilometrov" },
+          "source": {
+            "name": "Zdroj",
+            "state": {
+              "auto": "Zistené",
+              "manual": "Ručne",
+              "charger": "Domáca nabíjačka"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "add_refuel": {
+      "name": "Pridať tankovanie",
+      "description": "Ručne zaznamená tankovanie. Zobrazí sa spolu so zistenými; spotreba sa naďalej počíta zo senzorov.",
+      "fields": {
+        "config_entry_id": { "name": "Vozidlo", "description": "Vozidlo, ktoré bolo natankované." },
+        "liters": { "name": "Litre", "description": "Natankované palivo." },
+        "cost": { "name": "Celková cena", "description": "Zaplatená suma. Ak sa vynechá, vypočíta sa z ceny." },
+        "price": { "name": "Cena za liter", "description": "Ak sa vynechá, vypočíta sa z celkovej ceny; ak chýbajú obe, použije sa aktuálna cena." },
+        "odometer": { "name": "Počítadlo kilometrov", "description": "Stav počítadla kilometrov (km). Ak sa vynechá, posledný známy stav." }
+      }
+    },
+    "add_charge": {
+      "name": "Pridať nabíjanie",
+      "description": "Ručne zaznamená nabíjanie. Zobrazí sa spolu so zistenými; spotreba sa naďalej počíta zo senzorov.",
+      "fields": {
+        "config_entry_id": { "name": "Vozidlo", "description": "Vozidlo, ktoré bolo nabité." },
+        "energy": { "name": "Energia", "description": "Dodaná energia (kWh)." },
+        "cost": { "name": "Celková cena", "description": "Zaplatená suma. Ak sa vynechá, vypočíta sa z ceny." },
+        "price": { "name": "Cena za kWh", "description": "Ak sa vynechá, vypočíta sa z celkovej ceny; ak chýbajú obe, použije sa aktuálna cena." },
+        "odometer": { "name": "Počítadlo kilometrov", "description": "Stav počítadla kilometrov (km). Ak sa vynechá, posledný známy stav." }
+      }
+    },
+    "reset_statistics": {
+      "name": "Vynulovať štatistiky",
+      "description": "Vymaže jazdy, mesiace, tankovania, nabíjania a súčty vozidla; sledovanie začne znova od aktuálnych hodnôt.",
+      "fields": {
+        "config_entry_id": { "name": "Vozidlo", "description": "Vozidlo, ktorého štatistiky sa vymažú." }
+      }
+    },
+    "import_history": {
+      "name": "Importovať históriu",
+      "description": "Znovu vytvorí jazdy, mesiace, tankovania a nabíjania vozidla z toho, čo Home Assistant zaznamenal z jeho senzorov (tak ďaleko do minulosti, ako to zapisovač uchováva). Ručne zadané tankovania a nabíjania sa zachovajú.",
+      "fields": {
+        "config_entry_id": { "name": "Vozidlo", "description": "Vozidlo, ktorého história sa importuje." },
+        "days": { "name": "Dni", "description": "Ako ďaleko do minulosti sa má obnoviť (predvolene 60). Zaznamenané stavy sa použijú tam, kde ich zapisovač ešte má (predvolene 10 dní), predtým hodinové štatistiky senzorov. Mesiace, ktoré história nepokrýva úplne, si ponechajú sledované údaje." }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Žiadny záznam Vehicle Consumption s ID {entry_id}."
+    },
+    "not_loaded": {
+      "message": "Vehicle Consumption pre {name} nie je načítané."
+    },
+    "no_recorder": {
+      "message": "Zapisovač nie je nastavený: nie je k dispozícii žiadna história na import."
+    }
+  }
+}
