@@ -4,15 +4,14 @@ from __future__ import annotations
 
 from homeassistant.components.diagnostics import REDACTED
 from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.components.diagnostics import get_diagnostics_for_config_entry
-from pytest_homeassistant_custom_component.typing import ClientSessionGenerator
 
 from custom_components.vehicle_consumption.const import CONF_FUEL_QUANTITY, CONF_ODOMETER
+from custom_components.vehicle_consumption.diagnostics import async_get_config_entry_diagnostics
 
 from .conftest import FUEL, KM, LITERS, ODOMETER, setup_vehicle
 
 
-async def test_diagnostics_redacted(hass: HomeAssistant, hass_client: ClientSessionGenerator) -> None:
+async def test_diagnostics_redacted(hass: HomeAssistant) -> None:
     vehicle = {
         "vin": "VF1RHN00012345678",
         "license_plate": "AB-123-CD",
@@ -27,7 +26,8 @@ async def test_diagnostics_redacted(hass: HomeAssistant, hass_client: ClientSess
     hass.states.async_set(ODOMETER, "10050", {**KM, **vehicle})
     await hass.async_block_till_done()
 
-    diag = await get_diagnostics_for_config_entry(hass, hass_client, entry)
+    # Called directly: the diagnostics test helper is missing from the minimum Home Assistant's test package.
+    diag = await async_get_config_entry_diagnostics(hass, entry)
 
     assert diag["entry"]["options"] == {CONF_ODOMETER: ODOMETER, CONF_FUEL_QUANTITY: FUEL}
     assert diag["tracker"]["entry_id"] == entry.entry_id
