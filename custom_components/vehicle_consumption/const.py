@@ -6,7 +6,7 @@ from datetime import timedelta
 from typing import Final
 
 DOMAIN: Final = "vehicle_consumption"
-VERSION: Final = "1.2.1"
+VERSION: Final = "1.3.0"
 
 # Entry data
 CONF_DEVICE_ID: Final = "device_id"
@@ -106,3 +106,6 @@ STORAGE_KEY: Final = DOMAIN + ".{entry_id}"
 SAVE_DELAY: Final = 10
 
 CARD_URL: Final = f"/{DOMAIN}/vehicle-consumption-card.js"
+
+# Fired on the event bus when the tracking closes a trip (`trip_gap` minutes after the odometer last moved).
+EVENT_TRIP_ENDED: Final = f"{DOMAIN}_trip_ended"

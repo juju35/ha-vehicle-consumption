@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 - 2026-11-07
+
+### What's new
+- New event `vehicle_consumption_trip_ended`, fired when a trip closes, with its distance, fuel, energy, consumption, cost, CO₂ and duration, for automations (see the README).
+- Diagnostics can be downloaded for a vehicle, with VINs, plates, GPS positions and account data redacted.
+
 ## 1.2.1 - 2026-11-07
 
 ### Security
