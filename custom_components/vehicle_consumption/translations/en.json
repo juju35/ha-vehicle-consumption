@@ -44,13 +44,17 @@
           "fuel_price_entity": "Fuel price sensor",
           "fuel_price": "Fixed fuel price",
           "electricity_price_entity": "Electricity price sensor",
-          "electricity_price": "Fixed electricity price"
+          "electricity_price": "Fixed electricity price",
+          "fuel_type": "Fuel type",
+          "co2_electricity": "Electricity CO₂"
         },
         "data_description": {
           "fuel_price_entity": "Price per litre (or per gallon) that follows the station prices.",
           "fuel_price": "Price per litre, used when there is no price sensor or it is unavailable.",
           "electricity_price_entity": "Price per kWh of your tariff.",
-          "electricity_price": "Price per kWh, used when there is no price sensor or it is unavailable."
+          "electricity_price": "Price per kWh, used when there is no price sensor or it is unavailable.",
+          "fuel_type": "Gives the CO₂ of each litre burnt: petrol 2.31 kg, diesel 2.68 kg, LPG 1.66 kg, E85 1.61 kg.",
+          "co2_electricity": "Grams of CO₂ per kWh charged; 55 for the French grid, about 380 for the German one."
         }
       }
     },
@@ -101,7 +105,9 @@
           "electricity_price": "Fixed electricity price",
           "trip_gap": "End of trip after",
           "refuel_threshold": "Refuel threshold",
-          "charge_threshold": "Charge threshold"
+          "charge_threshold": "Charge threshold",
+          "fuel_type": "Fuel type",
+          "co2_electricity": "Electricity CO₂"
         },
         "data_description": {
           "fuel_price_entity": "Price per litre (or per gallon) that follows the station prices.",
@@ -110,7 +116,9 @@
           "electricity_price": "Price per kWh, used when there is no price sensor or it is unavailable.",
           "trip_gap": "A trip ends when the odometer has not moved for this long.",
           "refuel_threshold": "A fuel rise of at least this much is a refuel; smaller rises are ignored.",
-          "charge_threshold": "A battery rise of at least this much is a charge; smaller rises are ignored."
+          "charge_threshold": "A battery rise of at least this much is a charge; smaller rises are ignored.",
+          "fuel_type": "Gives the CO₂ of each litre burnt: petrol 2.31 kg, diesel 2.68 kg, LPG 1.66 kg, E85 1.61 kg.",
+          "co2_electricity": "Grams of CO₂ per kWh charged; 55 for the French grid, about 380 for the German one."
         }
       }
     },
@@ -127,8 +135,12 @@
       "consumption": {
         "name": "Consumption",
         "state_attributes": {
-          "vehicle": { "name": "Vehicle" },
-          "entry_id": { "name": "Entry ID" },
+          "vehicle": {
+            "name": "Vehicle"
+          },
+          "entry_id": {
+            "name": "Entry ID"
+          },
           "kind": {
             "name": "Energy",
             "state": {
@@ -137,44 +149,110 @@
               "plugin_hybrid": "Plug-in hybrid"
             }
           },
-          "currency": { "name": "Currency" },
-          "odometer": { "name": "Odometer" },
-          "fuel_quantity": { "name": "Fuel quantity" },
-          "fuel_level": { "name": "Fuel level" },
-          "tank_capacity": { "name": "Tank capacity" },
-          "battery_energy": { "name": "Battery energy" },
-          "battery_level": { "name": "Battery level" },
-          "battery_capacity": { "name": "Battery capacity" },
-          "fuel_price": { "name": "Fuel price" },
-          "electricity_price": { "name": "Electricity price" },
-          "driving": { "name": "Driving" },
-          "trip": { "name": "Trip" },
-          "month": { "name": "Month" },
-          "total": { "name": "Total" },
-          "months": { "name": "Months" },
-          "trips": { "name": "Trips" },
-          "refuels": { "name": "Refuels" },
-          "charges": { "name": "Charges" }
+          "currency": {
+            "name": "Currency"
+          },
+          "odometer": {
+            "name": "Odometer"
+          },
+          "fuel_quantity": {
+            "name": "Fuel quantity"
+          },
+          "fuel_level": {
+            "name": "Fuel level"
+          },
+          "tank_capacity": {
+            "name": "Tank capacity"
+          },
+          "battery_energy": {
+            "name": "Battery energy"
+          },
+          "battery_level": {
+            "name": "Battery level"
+          },
+          "battery_capacity": {
+            "name": "Battery capacity"
+          },
+          "fuel_price": {
+            "name": "Fuel price"
+          },
+          "electricity_price": {
+            "name": "Electricity price"
+          },
+          "driving": {
+            "name": "Driving"
+          },
+          "trip": {
+            "name": "Trip"
+          },
+          "month": {
+            "name": "Month"
+          },
+          "total": {
+            "name": "Total"
+          },
+          "months": {
+            "name": "Months"
+          },
+          "trips": {
+            "name": "Trips"
+          },
+          "refuels": {
+            "name": "Refuels"
+          },
+          "charges": {
+            "name": "Charges"
+          }
         }
       },
-      "fuel_consumption_trip": { "name": "Fuel consumption trip" },
-      "fuel_consumption_month": { "name": "Fuel consumption this month" },
-      "fuel_consumption_average": { "name": "Average fuel consumption" },
-      "energy_consumption_trip": { "name": "Energy consumption trip" },
-      "energy_consumption_month": { "name": "Energy consumption this month" },
-      "energy_consumption_average": { "name": "Average energy consumption" },
-      "distance_trip": { "name": "Trip distance" },
-      "distance_month": { "name": "Distance this month" },
-      "fuel_used_month": { "name": "Fuel used this month" },
-      "energy_used_month": { "name": "Energy used this month" },
-      "cost_month": { "name": "Cost this month" },
-      "cost_per_km": { "name": "Cost per km" },
+      "fuel_consumption_trip": {
+        "name": "Fuel consumption trip"
+      },
+      "fuel_consumption_month": {
+        "name": "Fuel consumption this month"
+      },
+      "fuel_consumption_average": {
+        "name": "Average fuel consumption"
+      },
+      "energy_consumption_trip": {
+        "name": "Energy consumption trip"
+      },
+      "energy_consumption_month": {
+        "name": "Energy consumption this month"
+      },
+      "energy_consumption_average": {
+        "name": "Average energy consumption"
+      },
+      "distance_trip": {
+        "name": "Trip distance"
+      },
+      "distance_month": {
+        "name": "Distance this month"
+      },
+      "fuel_used_month": {
+        "name": "Fuel used this month"
+      },
+      "energy_used_month": {
+        "name": "Energy used this month"
+      },
+      "cost_month": {
+        "name": "Cost this month"
+      },
+      "cost_per_km": {
+        "name": "Cost per km"
+      },
       "last_refuel": {
         "name": "Last refuel",
         "state_attributes": {
-          "liters": { "name": "Litres" },
-          "cost": { "name": "Cost" },
-          "odometer": { "name": "Odometer" },
+          "liters": {
+            "name": "Litres"
+          },
+          "cost": {
+            "name": "Cost"
+          },
+          "odometer": {
+            "name": "Odometer"
+          },
           "source": {
             "name": "Source",
             "state": {
@@ -187,9 +265,15 @@
       "last_charge": {
         "name": "Last charge",
         "state_attributes": {
-          "energy": { "name": "Energy" },
-          "cost": { "name": "Cost" },
-          "odometer": { "name": "Odometer" },
+          "energy": {
+            "name": "Energy"
+          },
+          "cost": {
+            "name": "Cost"
+          },
+          "odometer": {
+            "name": "Odometer"
+          },
           "source": {
             "name": "Source",
             "state": {
@@ -199,6 +283,15 @@
             }
           }
         }
+      },
+      "co2_trip": {
+        "name": "CO₂ of the trip"
+      },
+      "co2_month": {
+        "name": "CO₂ this month"
+      },
+      "co2_per_km": {
+        "name": "CO₂ per km"
       }
     }
   },
@@ -207,37 +300,76 @@
       "name": "Add a refuel",
       "description": "Logs a refuel by hand. It is listed with the detected ones; the consumption keeps coming from the sensors.",
       "fields": {
-        "config_entry_id": { "name": "Vehicle", "description": "The vehicle that was refuelled." },
-        "liters": { "name": "Litres", "description": "Fuel added." },
-        "cost": { "name": "Total cost", "description": "Amount paid. Worked out from the price when left out." },
-        "price": { "name": "Price per litre", "description": "Worked out from the total cost when left out; the current price when both are." },
-        "odometer": { "name": "Odometer", "description": "Odometer reading (km). The last known reading when left out." }
+        "config_entry_id": {
+          "name": "Vehicle",
+          "description": "The vehicle that was refuelled."
+        },
+        "liters": {
+          "name": "Litres",
+          "description": "Fuel added."
+        },
+        "cost": {
+          "name": "Total cost",
+          "description": "Amount paid. Worked out from the price when left out."
+        },
+        "price": {
+          "name": "Price per litre",
+          "description": "Worked out from the total cost when left out; the current price when both are."
+        },
+        "odometer": {
+          "name": "Odometer",
+          "description": "Odometer reading (km). The last known reading when left out."
+        }
       }
     },
     "add_charge": {
       "name": "Add a charge",
       "description": "Logs a charge by hand. It is listed with the detected ones; the consumption keeps coming from the sensors.",
       "fields": {
-        "config_entry_id": { "name": "Vehicle", "description": "The vehicle that was charged." },
-        "energy": { "name": "Energy", "description": "Energy added (kWh)." },
-        "cost": { "name": "Total cost", "description": "Amount paid. Worked out from the price when left out." },
-        "price": { "name": "Price per kWh", "description": "Worked out from the total cost when left out; the current price when both are." },
-        "odometer": { "name": "Odometer", "description": "Odometer reading (km). The last known reading when left out." }
+        "config_entry_id": {
+          "name": "Vehicle",
+          "description": "The vehicle that was charged."
+        },
+        "energy": {
+          "name": "Energy",
+          "description": "Energy added (kWh)."
+        },
+        "cost": {
+          "name": "Total cost",
+          "description": "Amount paid. Worked out from the price when left out."
+        },
+        "price": {
+          "name": "Price per kWh",
+          "description": "Worked out from the total cost when left out; the current price when both are."
+        },
+        "odometer": {
+          "name": "Odometer",
+          "description": "Odometer reading (km). The last known reading when left out."
+        }
       }
     },
     "reset_statistics": {
       "name": "Reset statistics",
       "description": "Clears the trips, months, refuels, charges and totals of the vehicle; tracking starts again from the current readings.",
       "fields": {
-        "config_entry_id": { "name": "Vehicle", "description": "The vehicle whose statistics are cleared." }
+        "config_entry_id": {
+          "name": "Vehicle",
+          "description": "The vehicle whose statistics are cleared."
+        }
       }
     },
     "import_history": {
       "name": "Import history",
       "description": "Rebuilds the trips, months, refuels and charges of the vehicle from what Home Assistant recorded of its sensors (as far back as the recorder keeps it). Manual refuels and charges are kept.",
       "fields": {
-        "config_entry_id": { "name": "Vehicle", "description": "The vehicle whose history is imported." },
-        "days": { "name": "Days", "description": "How far back to rebuild (365 by default). The recorded states are used where the recorder still has them (10 days by default), the hourly statistics of the sensors before. Months the history does not fully cover keep what was tracked." }
+        "config_entry_id": {
+          "name": "Vehicle",
+          "description": "The vehicle whose history is imported."
+        },
+        "days": {
+          "name": "Days",
+          "description": "How far back to rebuild (365 by default). The recorded states are used where the recorder still has them (10 days by default), the hourly statistics of the sensors before. Months the history does not fully cover keep what was tracked."
+        }
       }
     }
   },
@@ -250,6 +382,16 @@
     },
     "no_recorder": {
       "message": "The recorder is not set up: there is no history to import."
+    }
+  },
+  "selector": {
+    "fuel_type": {
+      "options": {
+        "petrol": "Petrol",
+        "diesel": "Diesel",
+        "lpg": "LPG",
+        "e85": "E85 (ethanol)"
+      }
     }
   }
 }

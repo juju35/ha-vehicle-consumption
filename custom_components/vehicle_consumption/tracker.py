@@ -38,20 +38,25 @@ from .const import (
     CONF_BATTERY_LEVEL,
     CONF_CHARGE_THRESHOLD,
     CONF_CHARGER_ENERGY,
+    CONF_CO2_ELECTRICITY,
     CONF_ELECTRICITY_PRICE,
     CONF_ELECTRICITY_PRICE_ENTITY,
     CONF_FUEL_LEVEL,
     CONF_FUEL_PRICE,
     CONF_FUEL_PRICE_ENTITY,
     CONF_FUEL_QUANTITY,
+    CONF_FUEL_TYPE,
     CONF_ODOMETER,
     CONF_REFUEL_THRESHOLD,
     CONF_TANK_CAPACITY,
     CONF_TRIP_GAP,
     DEFAULT_CHARGE_THRESHOLD,
+    DEFAULT_CO2_ELECTRICITY,
+    DEFAULT_FUEL_TYPE,
     DEFAULT_HISTORY_DAYS,
     DEFAULT_REFUEL_THRESHOLD,
     DEFAULT_TRIP_GAP,
+    FUEL_CO2,
     HISTORY_DAYS,
     KIND_ELECTRIC,
     KIND_FUEL,
@@ -157,10 +162,16 @@ class Totals:
     def copy(self) -> Totals:
         return Totals(self.distance, self.fuel, self.energy, self.cost)
 
-    def summary(self) -> dict[str, Any]:
-        """Rounded figures for the card: consumption and cost per km need a meaningful distance."""
+    def summary(self, co2: tuple[float, float] | None = None) -> dict[str, Any]:
+        """Rounded figures for the card: consumption and cost per km need a meaningful distance.
+
+        `co2` = (kg per litre of fuel, kg per kWh): the CO₂ of what was consumed, in kg, and per km in g.
+        """
         enough = self.distance >= MIN_DISTANCE
+        kg = None if co2 is None else self.fuel * co2[0] + self.energy * co2[1]
         return {
+            "co2": None if kg is None else round(kg, 1),
+            "co2_per_km": round(kg / self.distance * 1000) if enough and kg is not None else None,
             "distance": round(self.distance, 1),
             "fuel": round(self.fuel, 2),
             "energy": round(self.energy, 2),
@@ -202,8 +213,8 @@ class Trip:
     end: datetime | None  # last odometer move; None while driving (stored as the last move)
     totals: Totals
 
-    def summary(self) -> dict[str, Any]:
-        return {"start": _iso(self.start), "end": _iso(self.end), **self.totals.summary()}
+    def summary(self, co2: tuple[float, float] | None = None) -> dict[str, Any]:
+        return {"start": _iso(self.start), "end": _iso(self.end), **self.totals.summary(co2)}
 
     def dump(self) -> dict[str, Any]:
         return {"start": _iso(self.start), "end": _iso(self.end), **asdict(self.totals)}
@@ -342,6 +353,13 @@ class ConsumptionTracker:
         self.fixed_fuel_price = _positive(options.get(CONF_FUEL_PRICE))
         self.fixed_electricity_price = _positive(options.get(CONF_ELECTRICITY_PRICE))
         self.trip_gap = timedelta(minutes=float(options.get(CONF_TRIP_GAP, DEFAULT_TRIP_GAP)))
+        # CO₂ factors: kg per litre of the fuel type, kg per kWh of the grid (option in g/kWh).
+        self.fuel_type = str(options.get(CONF_FUEL_TYPE) or DEFAULT_FUEL_TYPE)
+        grid = _positive(options.get(CONF_CO2_ELECTRICITY))
+        self.co2 = (
+            FUEL_CO2.get(self.fuel_type, FUEL_CO2[DEFAULT_FUEL_TYPE]),
+            (grid if grid is not None else DEFAULT_CO2_ELECTRICITY) / 1000,
+        )
         self.refuel_threshold = float(options.get(CONF_REFUEL_THRESHOLD, DEFAULT_REFUEL_THRESHOLD))
         self.charge_threshold = float(options.get(CONF_CHARGE_THRESHOLD, DEFAULT_CHARGE_THRESHOLD))
 
@@ -1413,8 +1431,8 @@ class ConsumptionTracker:
     def current_trip(self) -> dict[str, Any] | None:
         """The trip in progress (end None), else the last finished one."""
         if self.trip is not None:
-            return Trip(self.trip.start, None, self.total.minus(self._trip_start)).summary()
-        return self.trips[0].summary() if self.trips else None
+            return Trip(self.trip.start, None, self.total.minus(self._trip_start)).summary(self.co2)
+        return self.trips[0].summary(self.co2) if self.trips else None
 
     def month_totals(self) -> tuple[str, Totals]:
         key = dt_util.as_local(dt_util.utcnow()).strftime("%Y-%m")
@@ -1429,7 +1447,7 @@ class ConsumptionTracker:
         """Every stored month, oldest first, with the current month even before anything happened in it."""
         key, current = self.month_totals()
         months = {**self.months, key: current}
-        return [{"month": k, **months[k].summary()} for k in sorted(months)[-MAX_MONTHS:]]
+        return [{"month": k, **months[k].summary(self.co2)} for k in sorted(months)[-MAX_MONTHS:]]
 
     @property
     def refuels(self) -> list[Refill]:
@@ -1462,10 +1480,11 @@ class ConsumptionTracker:
             "electricity_price": _round(self.electricity_price, 3),
             "driving": self.driving,
             "trip": self.current_trip(),
-            "month": {"month": month_key, **month.summary()},
-            "total": {"since": self.since.isoformat(), **self.total.summary()},
+            "fuel_type": self.fuel_type if self.tracks_fuel else None,
+            "month": {"month": month_key, **month.summary(self.co2)},
+            "total": {"since": self.since.isoformat(), **self.total.summary(self.co2)},
             "months": self.months_summary(),
-            "trips": [t.summary() for t in self.trips[:MAX_TRIPS]],
+            "trips": [t.summary(self.co2) for t in self.trips[:MAX_TRIPS]],
             "refuels": [e.summary("liters") for e in self.refuels[:MAX_EVENTS]],
             "charges": [e.summary("energy") for e in self.charges[:MAX_EVENTS]],
             # Everything kept (`HISTORY_DAYS`): the lists above only hold the newest.

@@ -22,6 +22,9 @@ from homeassistant.helpers.selector import (
     NumberSelector,
     NumberSelectorConfig,
     NumberSelectorMode,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
     TextSelector,
 )
 
@@ -32,6 +35,7 @@ from .const import (
     CONF_BATTERY_LEVEL,
     CONF_CHARGE_THRESHOLD,
     CONF_CHARGER_ENERGY,
+    CONF_CO2_ELECTRICITY,
     CONF_DEVICE_ID,
     CONF_ELECTRICITY_PRICE,
     CONF_ELECTRICITY_PRICE_ENTITY,
@@ -39,15 +43,19 @@ from .const import (
     CONF_FUEL_PRICE,
     CONF_FUEL_PRICE_ENTITY,
     CONF_FUEL_QUANTITY,
+    CONF_FUEL_TYPE,
     CONF_NAME,
     CONF_ODOMETER,
     CONF_REFUEL_THRESHOLD,
     CONF_TANK_CAPACITY,
     CONF_TRIP_GAP,
     DEFAULT_CHARGE_THRESHOLD,
+    DEFAULT_CO2_ELECTRICITY,
+    DEFAULT_FUEL_TYPE,
     DEFAULT_REFUEL_THRESHOLD,
     DEFAULT_TRIP_GAP,
     DOMAIN,
+    FUEL_TYPES,
     SENSOR_KEYS,
 )
 from .detect import async_detect
@@ -56,7 +64,17 @@ _SENSOR = EntitySelector(EntitySelectorConfig(domain="sensor"))
 _CHARGER = EntitySelector(EntitySelectorConfig(domain="sensor", device_class="energy"))
 _PRICE_ENTITY = EntitySelector(EntitySelectorConfig(domain=["sensor", "input_number", "number"]))
 _ENERGY_SOURCES = tuple(key for key in SENSOR_KEYS if key != CONF_ODOMETER)
-_PRICE_KEYS = (CONF_FUEL_PRICE_ENTITY, CONF_FUEL_PRICE, CONF_ELECTRICITY_PRICE_ENTITY, CONF_ELECTRICITY_PRICE)
+_PRICE_KEYS = (
+    CONF_FUEL_PRICE_ENTITY,
+    CONF_FUEL_PRICE,
+    CONF_ELECTRICITY_PRICE_ENTITY,
+    CONF_ELECTRICITY_PRICE,
+    CONF_FUEL_TYPE,
+    CONF_CO2_ELECTRICITY,
+)
+_FUEL_TYPE = SelectSelector(
+    SelectSelectorConfig(options=list(FUEL_TYPES), mode=SelectSelectorMode.DROPDOWN, translation_key=CONF_FUEL_TYPE)
+)
 _TUNING = (
     (CONF_TRIP_GAP, DEFAULT_TRIP_GAP),
     (CONF_REFUEL_THRESHOLD, DEFAULT_REFUEL_THRESHOLD),
@@ -89,6 +107,9 @@ def _prices_schema(currency: str, tuning: bool) -> vol.Schema:
         vol.Optional(CONF_FUEL_PRICE): _number(0, 100, "any", f"{currency}/L"),
         vol.Optional(CONF_ELECTRICITY_PRICE_ENTITY): _PRICE_ENTITY,
         vol.Optional(CONF_ELECTRICITY_PRICE): _number(0, 100, "any", f"{currency}/kWh"),
+        # CO₂: the fuel type gives the kg per litre burnt; the grid factor the g per kWh charged.
+        vol.Optional(CONF_FUEL_TYPE, default=DEFAULT_FUEL_TYPE): _FUEL_TYPE,
+        vol.Optional(CONF_CO2_ELECTRICITY, default=DEFAULT_CO2_ELECTRICITY): _number(0, 1500, 1, "g/kWh"),
     }
     if tuning:
         schema |= {

@@ -44,13 +44,17 @@
           "fuel_price_entity": "Sensor for brændstofpris",
           "fuel_price": "Fast brændstofpris",
           "electricity_price_entity": "Sensor for elpris",
-          "electricity_price": "Fast elpris"
+          "electricity_price": "Fast elpris",
+          "fuel_type": "Brændstof",
+          "co2_electricity": "CO₂ for elektricitet"
         },
         "data_description": {
           "fuel_price_entity": "Pris pr. liter (eller pr. gallon), der følger tankstationens priser.",
           "fuel_price": "Pris pr. liter, bruges når der ikke er nogen prissensor, eller den ikke er tilgængelig.",
           "electricity_price_entity": "Pris pr. kWh for din eltarif.",
-          "electricity_price": "Pris pr. kWh, bruges når der ikke er nogen prissensor, eller den ikke er tilgængelig."
+          "electricity_price": "Pris pr. kWh, bruges når der ikke er nogen prissensor, eller den ikke er tilgængelig.",
+          "fuel_type": "Giver CO₂ for hver brændt liter: benzin 2,31 kg, diesel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
+          "co2_electricity": "Gram CO₂ pr. opladet kWh; 55 for det franske net, omkring 380 for det tyske."
         }
       }
     },
@@ -101,7 +105,9 @@
           "electricity_price": "Fast elpris",
           "trip_gap": "Turen slutter efter",
           "refuel_threshold": "Tærskel for tankning",
-          "charge_threshold": "Tærskel for opladning"
+          "charge_threshold": "Tærskel for opladning",
+          "fuel_type": "Brændstof",
+          "co2_electricity": "CO₂ for elektricitet"
         },
         "data_description": {
           "fuel_price_entity": "Pris pr. liter (eller pr. gallon), der følger tankstationens priser.",
@@ -110,7 +116,9 @@
           "electricity_price": "Pris pr. kWh, bruges når der ikke er nogen prissensor, eller den ikke er tilgængelig.",
           "trip_gap": "En tur slutter, når kilometertælleren ikke har flyttet sig i så lang tid.",
           "refuel_threshold": "En stigning i brændstof på mindst denne mængde er en tankning; mindre stigninger ignoreres.",
-          "charge_threshold": "En stigning i batteriet på mindst denne mængde er en opladning; mindre stigninger ignoreres."
+          "charge_threshold": "En stigning i batteriet på mindst denne mængde er en opladning; mindre stigninger ignoreres.",
+          "fuel_type": "Giver CO₂ for hver brændt liter: benzin 2,31 kg, diesel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
+          "co2_electricity": "Gram CO₂ pr. opladet kWh; 55 for det franske net, omkring 380 for det tyske."
         }
       }
     },
@@ -127,8 +135,12 @@
       "consumption": {
         "name": "Forbrug",
         "state_attributes": {
-          "vehicle": { "name": "Køretøj" },
-          "entry_id": { "name": "Post-ID" },
+          "vehicle": {
+            "name": "Køretøj"
+          },
+          "entry_id": {
+            "name": "Post-ID"
+          },
           "kind": {
             "name": "Energi",
             "state": {
@@ -137,44 +149,110 @@
               "plugin_hybrid": "Plugin-hybrid"
             }
           },
-          "currency": { "name": "Valuta" },
-          "odometer": { "name": "Kilometertæller" },
-          "fuel_quantity": { "name": "Brændstofmængde" },
-          "fuel_level": { "name": "Brændstofniveau" },
-          "tank_capacity": { "name": "Tankkapacitet" },
-          "battery_energy": { "name": "Batterienergi" },
-          "battery_level": { "name": "Batteriniveau" },
-          "battery_capacity": { "name": "Batterikapacitet" },
-          "fuel_price": { "name": "Brændstofpris" },
-          "electricity_price": { "name": "Elpris" },
-          "driving": { "name": "Kører" },
-          "trip": { "name": "Tur" },
-          "month": { "name": "Måned" },
-          "total": { "name": "I alt" },
-          "months": { "name": "Måneder" },
-          "trips": { "name": "Ture" },
-          "refuels": { "name": "Tankninger" },
-          "charges": { "name": "Opladninger" }
+          "currency": {
+            "name": "Valuta"
+          },
+          "odometer": {
+            "name": "Kilometertæller"
+          },
+          "fuel_quantity": {
+            "name": "Brændstofmængde"
+          },
+          "fuel_level": {
+            "name": "Brændstofniveau"
+          },
+          "tank_capacity": {
+            "name": "Tankkapacitet"
+          },
+          "battery_energy": {
+            "name": "Batterienergi"
+          },
+          "battery_level": {
+            "name": "Batteriniveau"
+          },
+          "battery_capacity": {
+            "name": "Batterikapacitet"
+          },
+          "fuel_price": {
+            "name": "Brændstofpris"
+          },
+          "electricity_price": {
+            "name": "Elpris"
+          },
+          "driving": {
+            "name": "Kører"
+          },
+          "trip": {
+            "name": "Tur"
+          },
+          "month": {
+            "name": "Måned"
+          },
+          "total": {
+            "name": "I alt"
+          },
+          "months": {
+            "name": "Måneder"
+          },
+          "trips": {
+            "name": "Ture"
+          },
+          "refuels": {
+            "name": "Tankninger"
+          },
+          "charges": {
+            "name": "Opladninger"
+          }
         }
       },
-      "fuel_consumption_trip": { "name": "Brændstofforbrug på turen" },
-      "fuel_consumption_month": { "name": "Brændstofforbrug denne måned" },
-      "fuel_consumption_average": { "name": "Gennemsnitligt brændstofforbrug" },
-      "energy_consumption_trip": { "name": "Energiforbrug på turen" },
-      "energy_consumption_month": { "name": "Energiforbrug denne måned" },
-      "energy_consumption_average": { "name": "Gennemsnitligt energiforbrug" },
-      "distance_trip": { "name": "Turens distance" },
-      "distance_month": { "name": "Distance denne måned" },
-      "fuel_used_month": { "name": "Brændstof brugt denne måned" },
-      "energy_used_month": { "name": "Energi brugt denne måned" },
-      "cost_month": { "name": "Omkostning denne måned" },
-      "cost_per_km": { "name": "Omkostning pr. km" },
+      "fuel_consumption_trip": {
+        "name": "Brændstofforbrug på turen"
+      },
+      "fuel_consumption_month": {
+        "name": "Brændstofforbrug denne måned"
+      },
+      "fuel_consumption_average": {
+        "name": "Gennemsnitligt brændstofforbrug"
+      },
+      "energy_consumption_trip": {
+        "name": "Energiforbrug på turen"
+      },
+      "energy_consumption_month": {
+        "name": "Energiforbrug denne måned"
+      },
+      "energy_consumption_average": {
+        "name": "Gennemsnitligt energiforbrug"
+      },
+      "distance_trip": {
+        "name": "Turens distance"
+      },
+      "distance_month": {
+        "name": "Distance denne måned"
+      },
+      "fuel_used_month": {
+        "name": "Brændstof brugt denne måned"
+      },
+      "energy_used_month": {
+        "name": "Energi brugt denne måned"
+      },
+      "cost_month": {
+        "name": "Omkostning denne måned"
+      },
+      "cost_per_km": {
+        "name": "Omkostning pr. km"
+      },
       "last_refuel": {
         "name": "Seneste tankning",
         "state_attributes": {
-          "liters": { "name": "Liter" },
-          "cost": { "name": "Omkostning" },
-          "odometer": { "name": "Kilometertæller" },
+          "liters": {
+            "name": "Liter"
+          },
+          "cost": {
+            "name": "Omkostning"
+          },
+          "odometer": {
+            "name": "Kilometertæller"
+          },
           "source": {
             "name": "Kilde",
             "state": {
@@ -187,9 +265,15 @@
       "last_charge": {
         "name": "Seneste opladning",
         "state_attributes": {
-          "energy": { "name": "Energi" },
-          "cost": { "name": "Omkostning" },
-          "odometer": { "name": "Kilometertæller" },
+          "energy": {
+            "name": "Energi"
+          },
+          "cost": {
+            "name": "Omkostning"
+          },
+          "odometer": {
+            "name": "Kilometertæller"
+          },
           "source": {
             "name": "Kilde",
             "state": {
@@ -199,6 +283,15 @@
             }
           }
         }
+      },
+      "co2_trip": {
+        "name": "CO₂ for turen"
+      },
+      "co2_month": {
+        "name": "CO₂ denne måned"
+      },
+      "co2_per_km": {
+        "name": "CO₂ pr. km"
       }
     }
   },
@@ -207,37 +300,76 @@
       "name": "Tilføj en tankning",
       "description": "Noterer en tankning manuelt. Den vises sammen med de registrerede; forbruget beregnes fortsat ud fra sensorerne.",
       "fields": {
-        "config_entry_id": { "name": "Køretøj", "description": "Køretøjet, der blev tanket." },
-        "liters": { "name": "Liter", "description": "Tanket brændstof." },
-        "cost": { "name": "Samlet pris", "description": "Betalt beløb. Beregnes ud fra prisen, hvis det udelades." },
-        "price": { "name": "Pris pr. liter", "description": "Beregnes ud fra den samlede pris, hvis den udelades; den aktuelle pris, hvis begge udelades." },
-        "odometer": { "name": "Kilometertæller", "description": "Kilometertællerens aflæsning (km). Den senest kendte aflæsning, hvis den udelades." }
+        "config_entry_id": {
+          "name": "Køretøj",
+          "description": "Køretøjet, der blev tanket."
+        },
+        "liters": {
+          "name": "Liter",
+          "description": "Tanket brændstof."
+        },
+        "cost": {
+          "name": "Samlet pris",
+          "description": "Betalt beløb. Beregnes ud fra prisen, hvis det udelades."
+        },
+        "price": {
+          "name": "Pris pr. liter",
+          "description": "Beregnes ud fra den samlede pris, hvis den udelades; den aktuelle pris, hvis begge udelades."
+        },
+        "odometer": {
+          "name": "Kilometertæller",
+          "description": "Kilometertællerens aflæsning (km). Den senest kendte aflæsning, hvis den udelades."
+        }
       }
     },
     "add_charge": {
       "name": "Tilføj en opladning",
       "description": "Noterer en opladning manuelt. Den vises sammen med de registrerede; forbruget beregnes fortsat ud fra sensorerne.",
       "fields": {
-        "config_entry_id": { "name": "Køretøj", "description": "Køretøjet, der blev opladet." },
-        "energy": { "name": "Energi", "description": "Tilført energi (kWh)." },
-        "cost": { "name": "Samlet pris", "description": "Betalt beløb. Beregnes ud fra prisen, hvis det udelades." },
-        "price": { "name": "Pris pr. kWh", "description": "Beregnes ud fra den samlede pris, hvis den udelades; den aktuelle pris, hvis begge udelades." },
-        "odometer": { "name": "Kilometertæller", "description": "Kilometertællerens aflæsning (km). Den senest kendte aflæsning, hvis den udelades." }
+        "config_entry_id": {
+          "name": "Køretøj",
+          "description": "Køretøjet, der blev opladet."
+        },
+        "energy": {
+          "name": "Energi",
+          "description": "Tilført energi (kWh)."
+        },
+        "cost": {
+          "name": "Samlet pris",
+          "description": "Betalt beløb. Beregnes ud fra prisen, hvis det udelades."
+        },
+        "price": {
+          "name": "Pris pr. kWh",
+          "description": "Beregnes ud fra den samlede pris, hvis den udelades; den aktuelle pris, hvis begge udelades."
+        },
+        "odometer": {
+          "name": "Kilometertæller",
+          "description": "Kilometertællerens aflæsning (km). Den senest kendte aflæsning, hvis den udelades."
+        }
       }
     },
     "reset_statistics": {
       "name": "Nulstil statistik",
       "description": "Sletter køretøjets ture, måneder, tankninger, opladninger og totaler; registreringen starter forfra fra de aktuelle aflæsninger.",
       "fields": {
-        "config_entry_id": { "name": "Køretøj", "description": "Køretøjet, hvis statistik slettes." }
+        "config_entry_id": {
+          "name": "Køretøj",
+          "description": "Køretøjet, hvis statistik slettes."
+        }
       }
     },
     "import_history": {
       "name": "Importér historik",
       "description": "Genopbygger køretøjets ture, måneder, tankninger og opladninger ud fra det, Home Assistant har optaget fra dets sensorer (så langt tilbage som optageren gemmer det). Manuelle tankninger og opladninger bevares.",
       "fields": {
-        "config_entry_id": { "name": "Køretøj", "description": "Køretøjet, hvis historik importeres." },
-        "days": { "name": "Dage", "description": "Hvor langt tilbage der genopbygges (365 som standard). De optagede tilstande bruges, hvor optageren stadig har dem (10 dage som standard), og før det sensorernes timestatistik. Måneder, som historikken ikke dækker helt, beholder det, der blev registreret." }
+        "config_entry_id": {
+          "name": "Køretøj",
+          "description": "Køretøjet, hvis historik importeres."
+        },
+        "days": {
+          "name": "Dage",
+          "description": "Hvor langt tilbage der genopbygges (365 som standard). De optagede tilstande bruges, hvor optageren stadig har dem (10 dage som standard), og før det sensorernes timestatistik. Måneder, som historikken ikke dækker helt, beholder det, der blev registreret."
+        }
       }
     }
   },
@@ -250,6 +382,16 @@
     },
     "no_recorder": {
       "message": "Optageren er ikke konfigureret: der er ingen historik at importere."
+    }
+  },
+  "selector": {
+    "fuel_type": {
+      "options": {
+        "petrol": "Benzin",
+        "diesel": "Diesel",
+        "lpg": "LPG",
+        "e85": "E85 (ethanol)"
+      }
     }
   }
 }

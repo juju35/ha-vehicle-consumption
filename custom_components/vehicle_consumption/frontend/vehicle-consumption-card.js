@@ -5,7 +5,7 @@
  * Served and added to the dashboard resources by the integration.
  * https://github.com/juju35/ha-vehicle-consumption
  */
-var VEHICLE_CONSUMPTION_CARD_VERSION = '1.1.3';
+var VEHICLE_CONSUMPTION_CARD_VERSION = '1.2.0';
 
 const VC_I18N = {
   en: {
@@ -36,6 +36,8 @@ const VC_I18N = {
     chart_consumption: 'Consumption',
     chart_distance: 'Distance',
     chart_cost: 'Cost',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Last {n} months',
     add: 'Log a refuel or a charge',
     add_refuel: 'Log a refuel',
@@ -91,6 +93,8 @@ const VC_I18N = {
     chart_consumption: 'Consommation',
     chart_distance: 'Distance',
     chart_cost: 'Coût',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: '{n} derniers mois',
     add: 'Noter un plein ou une recharge',
     add_refuel: 'Noter un plein',
@@ -146,6 +150,8 @@ const VC_I18N = {
     chart_consumption: 'Verbrauch',
     chart_distance: 'Strecke',
     chart_cost: 'Kosten',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Letzte {n} Monate',
     add: 'Tank- oder Ladevorgang erfassen',
     add_refuel: 'Tankvorgang erfassen',
@@ -201,6 +207,8 @@ const VC_I18N = {
     chart_consumption: 'Consumo',
     chart_distance: 'Distancia',
     chart_cost: 'Coste',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Últimos {n} meses',
     add: 'Registrar un repostaje o una carga',
     add_refuel: 'Registrar un repostaje',
@@ -256,6 +264,8 @@ const VC_I18N = {
     chart_consumption: 'Consumo',
     chart_distance: 'Distanza',
     chart_cost: 'Costo',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Ultimi {n} mesi',
     add: 'Registra un rifornimento o una ricarica',
     add_refuel: 'Registra un rifornimento',
@@ -311,6 +321,8 @@ const VC_I18N = {
     chart_consumption: 'Verbruik',
     chart_distance: 'Afstand',
     chart_cost: 'Kosten',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Laatste {n} maanden',
     add: 'Tankbeurt of laadbeurt invoeren',
     add_refuel: 'Tankbeurt invoeren',
@@ -366,6 +378,8 @@ const VC_I18N = {
     chart_consumption: 'Consumo',
     chart_distance: 'Distância',
     chart_cost: 'Custo',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Últimos {n} meses',
     add: 'Registar um abastecimento ou carregamento',
     add_refuel: 'Registar um abastecimento',
@@ -421,6 +435,8 @@ const VC_I18N = {
     chart_consumption: 'Zużycie',
     chart_distance: 'Dystans',
     chart_cost: 'Koszt',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Ostatnie miesiące: {n}',
     add: 'Zapisz tankowanie lub ładowanie',
     add_refuel: 'Zapisz tankowanie',
@@ -476,6 +492,8 @@ const VC_I18N = {
     chart_consumption: 'Consum',
     chart_distance: 'Distanță',
     chart_cost: 'Cost',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Ultimele {n} luni',
     add: 'Adaugă o alimentare sau o încărcare',
     add_refuel: 'Adaugă o alimentare',
@@ -531,6 +549,8 @@ const VC_I18N = {
     chart_consumption: 'Forbrug',
     chart_distance: 'Distance',
     chart_cost: 'Omkostning',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Seneste {n} måneder',
     add: 'Notér en tankning eller opladning',
     add_refuel: 'Notér en tankning',
@@ -586,6 +606,8 @@ const VC_I18N = {
     chart_consumption: 'Förbrukning',
     chart_distance: 'Sträcka',
     chart_cost: 'Kostnad',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Senaste {n} månader',
     add: 'Registrera en tankning eller laddning',
     add_refuel: 'Registrera en tankning',
@@ -641,6 +663,8 @@ const VC_I18N = {
     chart_consumption: 'Разход',
     chart_distance: 'Разстояние',
     chart_cost: 'Разходи',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Последните {n} месеца',
     add: 'Запиши танкуване или зареждане',
     add_refuel: 'Запиши танкуване',
@@ -696,6 +720,8 @@ const VC_I18N = {
     chart_consumption: 'Расход',
     chart_distance: 'Расстояние',
     chart_cost: 'Затраты',
+    chart_co2: 'CO₂',
+    co2_km: '{v} г CO₂/км',
     last_months: 'Последние месяцы: {n}',
     add: 'Записать заправку или зарядку',
     add_refuel: 'Записать заправку',
@@ -751,6 +777,8 @@ const VC_I18N = {
     chart_consumption: 'Витрата',
     chart_distance: 'Відстань',
     chart_cost: 'Витрати',
+    chart_co2: 'CO₂',
+    co2_km: '{v} г CO₂/км',
     last_months: 'Останні місяці: {n}',
     add: 'Записати заправку або заряджання',
     add_refuel: 'Записати заправку',
@@ -806,6 +834,8 @@ const VC_I18N = {
     chart_consumption: 'Fogyasztás',
     chart_distance: 'Távolság',
     chart_cost: 'Költség',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Utolsó {n} hónap',
     add: 'Tankolás vagy töltés rögzítése',
     add_refuel: 'Tankolás rögzítése',
@@ -861,6 +891,8 @@ const VC_I18N = {
     chart_consumption: 'Spotreba',
     chart_distance: 'Vzdialenosť',
     chart_cost: 'Náklady',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Posledné mesiace: {n}',
     add: 'Zaznamenať tankovanie alebo nabíjanie',
     add_refuel: 'Zaznamenať tankovanie',
@@ -916,6 +948,8 @@ const VC_I18N = {
     chart_consumption: 'Spotřeba',
     chart_distance: 'Vzdálenost',
     chart_cost: 'Náklady',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Poslední měsíce: {n}',
     add: 'Zaznamenat tankování nebo nabíjení',
     add_refuel: 'Zaznamenat tankování',
@@ -971,6 +1005,8 @@ const VC_I18N = {
     chart_consumption: 'Poraba',
     chart_distance: 'Razdalja',
     chart_cost: 'Stroški',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Zadnji meseci: {n}',
     add: 'Zabeleži točenje goriva ali polnjenje',
     add_refuel: 'Zabeleži točenje goriva',
@@ -1026,6 +1062,8 @@ const VC_I18N = {
     chart_consumption: 'Patēriņš',
     chart_distance: 'Attālums',
     chart_cost: 'Izmaksas',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Pēdējie {n} mēneši',
     add: 'Reģistrēt uzpildi vai uzlādi',
     add_refuel: 'Reģistrēt uzpildi',
@@ -1081,6 +1119,8 @@ const VC_I18N = {
     chart_consumption: 'Κατανάλωση',
     chart_distance: 'Απόσταση',
     chart_cost: 'Κόστος',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Τελευταίοι {n} μήνες',
     add: 'Καταγραφή ανεφοδιασμού ή φόρτισης',
     add_refuel: 'Καταγραφή ανεφοδιασμού',
@@ -1136,6 +1176,8 @@ const VC_I18N = {
     chart_consumption: 'Потрошња',
     chart_distance: 'Пређени пут',
     chart_cost: 'Трошак',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Последњи месеци: {n}',
     add: 'Унеси точење горива или пуњење',
     add_refuel: 'Унеси точење горива',
@@ -1191,6 +1233,8 @@ const VC_I18N = {
     chart_consumption: 'Potrošnja',
     chart_distance: 'Pređeni put',
     chart_cost: 'Trošak',
+    chart_co2: 'CO₂',
+    co2_km: '{v} g CO₂/km',
     last_months: 'Poslednji meseci: {n}',
     add: 'Unesi točenje goriva ili punjenje',
     add_refuel: 'Unesi točenje goriva',
@@ -1242,7 +1286,7 @@ const VC_DEFAULTS = {
   refuels: true,
   add_button: true,
 };
-const VC_METRICS = ['consumption', 'distance', 'cost'];
+const VC_METRICS = ['consumption', 'distance', 'cost', 'co2'];
 // Rows listed in a folded section, newest first.
 const VC_ROWS = 5;
 // A gauge under this level turns to the warning colour.
@@ -1659,7 +1703,13 @@ class VehicleConsumptionCard extends HTMLElement {
         this._t('cost_km'),
         'mdi:cash',
         [{ v: f.money(cpk, 3), unit: vcFinite(cpk) ? '/km' : '' }],
-        vcFinite(month.cost) ? this._t('month_cost', { v: f.money(month.cost) }) : '',
+        // The month's cost, and the CO₂ per km of the whole period when the integration gives it.
+        [
+          vcFinite(month.cost) ? this._t('month_cost', { v: f.money(month.cost) }) : '',
+          vcFinite(total.co2_per_km) ? this._t('co2_km', { v: f.num(total.co2_per_km, 0) }) : '',
+        ]
+          .filter(Boolean)
+          .join(' · '),
       ),
     ].join('');
   }
@@ -1675,12 +1725,22 @@ class VehicleConsumptionCard extends HTMLElement {
     const last = a.month?.month || months[months.length - 1]?.month;
     const keys = vcMonthKeys(last, n);
     const byKey = new Map(months.map((m) => [m?.month, m]));
-    const metricOf = (m) => (metric === 'distance' ? m?.distance : metric === 'cost' ? m?.cost : m?.[`${primary}_consumption`]);
+    const metricOf = (m) =>
+      metric === 'distance' ? m?.distance : metric === 'cost' ? m?.cost : metric === 'co2' ? m?.co2 : m?.[`${primary}_consumption`];
     const values = keys.map((k) => (vcFinite(metricOf(byKey.get(k))) ? Number(metricOf(byKey.get(k))) : null));
     const max = Math.max(0, ...values.filter((v) => v != null));
-    const unit = metric === 'distance' ? 'km' : metric === 'cost' ? a.currency || '' : primary === 'fuel' ? 'L/100 km' : 'kWh/100 km';
+    const unit =
+      metric === 'distance'
+        ? 'km'
+        : metric === 'cost'
+          ? a.currency || ''
+          : metric === 'co2'
+            ? 'kg CO₂'
+            : primary === 'fuel'
+              ? 'L/100 km'
+              : 'kWh/100 km';
     const label = (v) =>
-      metric === 'cost' ? f.money(v, 0) : metric === 'distance' ? f.num(v, 0) : f.num(v, 1);
+      metric === 'cost' ? f.money(v, 0) : metric === 'distance' || metric === 'co2' ? f.num(v, 0) : f.num(v, 1);
     // The card's width less its padding (12 px) and the chart's (10 px), so 1 unit is 1 px; 400 until measured.
     const W = this._width ? Math.max(160, Math.min(1200, this._width - 44)) : 400;
     const top = 16;

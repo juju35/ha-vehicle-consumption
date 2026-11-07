@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 - 2026-11-07
+
+### What's new
+- **CO₂**: new options *Fuel type* (petrol, diesel, LPG, E85: tailpipe CO₂ per litre burnt) and *Electricity CO₂* (g per kWh charged, 55 for the French grid by default). Every trip, month and the total carry `co2` (kg) and `co2_per_km` (g/km, from 5 km); new sensors **CO₂ of the trip**, **CO₂ this month** (kg, `TOTAL` reset each month) and **CO₂ per km** (g/km). The main sensor gets a `fuel_type` attribute.
+- Card: the chart can show the CO₂ of each month (`chart_metric: co2`, kg), and the cost per km tile shows the CO₂ per km under it.
+
 ## 1.1.3 - 2026-11-04
 
 ### Documentation

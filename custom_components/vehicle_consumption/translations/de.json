@@ -44,13 +44,17 @@
           "fuel_price_entity": "Kraftstoffpreis-Sensor",
           "fuel_price": "Fester Kraftstoffpreis",
           "electricity_price_entity": "Strompreis-Sensor",
-          "electricity_price": "Fester Strompreis"
+          "electricity_price": "Fester Strompreis",
+          "fuel_type": "Kraftstoff",
+          "co2_electricity": "CO₂ des Stroms"
         },
         "data_description": {
           "fuel_price_entity": "Preis pro Liter (oder Gallone), der den Tankstellenpreisen folgt.",
           "fuel_price": "Preis pro Liter, verwendet ohne Preissensor oder wenn dieser nicht verfügbar ist.",
           "electricity_price_entity": "Preis pro kWh deines Tarifs.",
-          "electricity_price": "Preis pro kWh, verwendet ohne Preissensor oder wenn dieser nicht verfügbar ist."
+          "electricity_price": "Preis pro kWh, verwendet ohne Preissensor oder wenn dieser nicht verfügbar ist.",
+          "fuel_type": "Gibt das CO₂ je verbranntem Liter an: Benzin 2,31 kg, Diesel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
+          "co2_electricity": "Gramm CO₂ je geladener kWh; 55 für das französische Netz, etwa 380 für das deutsche."
         }
       }
     },
@@ -101,7 +105,9 @@
           "electricity_price": "Fester Strompreis",
           "trip_gap": "Fahrtende nach",
           "refuel_threshold": "Schwelle für Tanken",
-          "charge_threshold": "Schwelle für Laden"
+          "charge_threshold": "Schwelle für Laden",
+          "fuel_type": "Kraftstoff",
+          "co2_electricity": "CO₂ des Stroms"
         },
         "data_description": {
           "fuel_price_entity": "Preis pro Liter (oder Gallone), der den Tankstellenpreisen folgt.",
@@ -110,7 +116,9 @@
           "electricity_price": "Preis pro kWh, verwendet ohne Preissensor oder wenn dieser nicht verfügbar ist.",
           "trip_gap": "Eine Fahrt endet, wenn sich der Kilometerzähler so lange nicht bewegt hat.",
           "refuel_threshold": "Ein Anstieg des Kraftstoffs um mindestens diese Menge gilt als Tanken; kleinere Anstiege werden ignoriert.",
-          "charge_threshold": "Ein Anstieg der Batterie um mindestens diese Menge gilt als Laden; kleinere Anstiege werden ignoriert."
+          "charge_threshold": "Ein Anstieg der Batterie um mindestens diese Menge gilt als Laden; kleinere Anstiege werden ignoriert.",
+          "fuel_type": "Gibt das CO₂ je verbranntem Liter an: Benzin 2,31 kg, Diesel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
+          "co2_electricity": "Gramm CO₂ je geladener kWh; 55 für das französische Netz, etwa 380 für das deutsche."
         }
       }
     },
@@ -127,8 +135,12 @@
       "consumption": {
         "name": "Verbrauch",
         "state_attributes": {
-          "vehicle": { "name": "Fahrzeug" },
-          "entry_id": { "name": "Eintrags-ID" },
+          "vehicle": {
+            "name": "Fahrzeug"
+          },
+          "entry_id": {
+            "name": "Eintrags-ID"
+          },
           "kind": {
             "name": "Antrieb",
             "state": {
@@ -137,44 +149,110 @@
               "plugin_hybrid": "Plug-in-Hybrid"
             }
           },
-          "currency": { "name": "Währung" },
-          "odometer": { "name": "Kilometerzähler" },
-          "fuel_quantity": { "name": "Kraftstoffmenge" },
-          "fuel_level": { "name": "Kraftstoffstand" },
-          "tank_capacity": { "name": "Tankinhalt" },
-          "battery_energy": { "name": "Batterieenergie" },
-          "battery_level": { "name": "Batteriestand" },
-          "battery_capacity": { "name": "Batteriekapazität" },
-          "fuel_price": { "name": "Kraftstoffpreis" },
-          "electricity_price": { "name": "Strompreis" },
-          "driving": { "name": "Unterwegs" },
-          "trip": { "name": "Fahrt" },
-          "month": { "name": "Monat" },
-          "total": { "name": "Gesamt" },
-          "months": { "name": "Monate" },
-          "trips": { "name": "Fahrten" },
-          "refuels": { "name": "Tankvorgänge" },
-          "charges": { "name": "Ladevorgänge" }
+          "currency": {
+            "name": "Währung"
+          },
+          "odometer": {
+            "name": "Kilometerzähler"
+          },
+          "fuel_quantity": {
+            "name": "Kraftstoffmenge"
+          },
+          "fuel_level": {
+            "name": "Kraftstoffstand"
+          },
+          "tank_capacity": {
+            "name": "Tankinhalt"
+          },
+          "battery_energy": {
+            "name": "Batterieenergie"
+          },
+          "battery_level": {
+            "name": "Batteriestand"
+          },
+          "battery_capacity": {
+            "name": "Batteriekapazität"
+          },
+          "fuel_price": {
+            "name": "Kraftstoffpreis"
+          },
+          "electricity_price": {
+            "name": "Strompreis"
+          },
+          "driving": {
+            "name": "Unterwegs"
+          },
+          "trip": {
+            "name": "Fahrt"
+          },
+          "month": {
+            "name": "Monat"
+          },
+          "total": {
+            "name": "Gesamt"
+          },
+          "months": {
+            "name": "Monate"
+          },
+          "trips": {
+            "name": "Fahrten"
+          },
+          "refuels": {
+            "name": "Tankvorgänge"
+          },
+          "charges": {
+            "name": "Ladevorgänge"
+          }
         }
       },
-      "fuel_consumption_trip": { "name": "Kraftstoffverbrauch der Fahrt" },
-      "fuel_consumption_month": { "name": "Kraftstoffverbrauch des Monats" },
-      "fuel_consumption_average": { "name": "Durchschnittlicher Kraftstoffverbrauch" },
-      "energy_consumption_trip": { "name": "Energieverbrauch der Fahrt" },
-      "energy_consumption_month": { "name": "Energieverbrauch des Monats" },
-      "energy_consumption_average": { "name": "Durchschnittlicher Energieverbrauch" },
-      "distance_trip": { "name": "Fahrtstrecke" },
-      "distance_month": { "name": "Strecke diesen Monat" },
-      "fuel_used_month": { "name": "Kraftstoff diesen Monat" },
-      "energy_used_month": { "name": "Energie diesen Monat" },
-      "cost_month": { "name": "Kosten diesen Monat" },
-      "cost_per_km": { "name": "Kosten pro km" },
+      "fuel_consumption_trip": {
+        "name": "Kraftstoffverbrauch der Fahrt"
+      },
+      "fuel_consumption_month": {
+        "name": "Kraftstoffverbrauch des Monats"
+      },
+      "fuel_consumption_average": {
+        "name": "Durchschnittlicher Kraftstoffverbrauch"
+      },
+      "energy_consumption_trip": {
+        "name": "Energieverbrauch der Fahrt"
+      },
+      "energy_consumption_month": {
+        "name": "Energieverbrauch des Monats"
+      },
+      "energy_consumption_average": {
+        "name": "Durchschnittlicher Energieverbrauch"
+      },
+      "distance_trip": {
+        "name": "Fahrtstrecke"
+      },
+      "distance_month": {
+        "name": "Strecke diesen Monat"
+      },
+      "fuel_used_month": {
+        "name": "Kraftstoff diesen Monat"
+      },
+      "energy_used_month": {
+        "name": "Energie diesen Monat"
+      },
+      "cost_month": {
+        "name": "Kosten diesen Monat"
+      },
+      "cost_per_km": {
+        "name": "Kosten pro km"
+      },
       "last_refuel": {
         "name": "Letztes Tanken",
         "state_attributes": {
-          "liters": { "name": "Liter" },
-          "cost": { "name": "Kosten" },
-          "odometer": { "name": "Kilometerzähler" },
+          "liters": {
+            "name": "Liter"
+          },
+          "cost": {
+            "name": "Kosten"
+          },
+          "odometer": {
+            "name": "Kilometerzähler"
+          },
           "source": {
             "name": "Quelle",
             "state": {
@@ -187,9 +265,15 @@
       "last_charge": {
         "name": "Letzter Ladevorgang",
         "state_attributes": {
-          "energy": { "name": "Energie" },
-          "cost": { "name": "Kosten" },
-          "odometer": { "name": "Kilometerzähler" },
+          "energy": {
+            "name": "Energie"
+          },
+          "cost": {
+            "name": "Kosten"
+          },
+          "odometer": {
+            "name": "Kilometerzähler"
+          },
           "source": {
             "name": "Quelle",
             "state": {
@@ -199,6 +283,15 @@
             }
           }
         }
+      },
+      "co2_trip": {
+        "name": "CO₂ der Fahrt"
+      },
+      "co2_month": {
+        "name": "CO₂ diesen Monat"
+      },
+      "co2_per_km": {
+        "name": "CO₂ pro km"
       }
     }
   },
@@ -207,37 +300,76 @@
       "name": "Tanken hinzufügen",
       "description": "Erfasst einen Tankvorgang manuell. Er wird mit den erkannten aufgeführt; der Verbrauch wird weiterhin aus den Sensoren berechnet.",
       "fields": {
-        "config_entry_id": { "name": "Fahrzeug", "description": "Das getankte Fahrzeug." },
-        "liters": { "name": "Liter", "description": "Getankter Kraftstoff." },
-        "cost": { "name": "Gesamtkosten", "description": "Bezahlter Betrag. Wird aus dem Preis berechnet, wenn er fehlt." },
-        "price": { "name": "Preis pro Liter", "description": "Wird aus den Gesamtkosten berechnet, wenn er fehlt; der aktuelle Preis, wenn beide fehlen." },
-        "odometer": { "name": "Kilometerzähler", "description": "Kilometerstand (km). Der letzte bekannte Stand, wenn er fehlt." }
+        "config_entry_id": {
+          "name": "Fahrzeug",
+          "description": "Das getankte Fahrzeug."
+        },
+        "liters": {
+          "name": "Liter",
+          "description": "Getankter Kraftstoff."
+        },
+        "cost": {
+          "name": "Gesamtkosten",
+          "description": "Bezahlter Betrag. Wird aus dem Preis berechnet, wenn er fehlt."
+        },
+        "price": {
+          "name": "Preis pro Liter",
+          "description": "Wird aus den Gesamtkosten berechnet, wenn er fehlt; der aktuelle Preis, wenn beide fehlen."
+        },
+        "odometer": {
+          "name": "Kilometerzähler",
+          "description": "Kilometerstand (km). Der letzte bekannte Stand, wenn er fehlt."
+        }
       }
     },
     "add_charge": {
       "name": "Ladevorgang hinzufügen",
       "description": "Erfasst einen Ladevorgang manuell. Er wird mit den erkannten aufgeführt; der Verbrauch wird weiterhin aus den Sensoren berechnet.",
       "fields": {
-        "config_entry_id": { "name": "Fahrzeug", "description": "Das geladene Fahrzeug." },
-        "energy": { "name": "Energie", "description": "Geladene Energie (kWh)." },
-        "cost": { "name": "Gesamtkosten", "description": "Bezahlter Betrag. Wird aus dem Preis berechnet, wenn er fehlt." },
-        "price": { "name": "Preis pro kWh", "description": "Wird aus den Gesamtkosten berechnet, wenn er fehlt; der aktuelle Preis, wenn beide fehlen." },
-        "odometer": { "name": "Kilometerzähler", "description": "Kilometerstand (km). Der letzte bekannte Stand, wenn er fehlt." }
+        "config_entry_id": {
+          "name": "Fahrzeug",
+          "description": "Das geladene Fahrzeug."
+        },
+        "energy": {
+          "name": "Energie",
+          "description": "Geladene Energie (kWh)."
+        },
+        "cost": {
+          "name": "Gesamtkosten",
+          "description": "Bezahlter Betrag. Wird aus dem Preis berechnet, wenn er fehlt."
+        },
+        "price": {
+          "name": "Preis pro kWh",
+          "description": "Wird aus den Gesamtkosten berechnet, wenn er fehlt; der aktuelle Preis, wenn beide fehlen."
+        },
+        "odometer": {
+          "name": "Kilometerzähler",
+          "description": "Kilometerstand (km). Der letzte bekannte Stand, wenn er fehlt."
+        }
       }
     },
     "reset_statistics": {
       "name": "Statistiken zurücksetzen",
       "description": "Löscht Fahrten, Monate, Tank- und Ladevorgänge sowie die Summen des Fahrzeugs; die Erfassung beginnt neu bei den aktuellen Werten.",
       "fields": {
-        "config_entry_id": { "name": "Fahrzeug", "description": "Das Fahrzeug, dessen Statistiken gelöscht werden." }
+        "config_entry_id": {
+          "name": "Fahrzeug",
+          "description": "Das Fahrzeug, dessen Statistiken gelöscht werden."
+        }
       }
     },
     "import_history": {
       "name": "Verlauf importieren",
       "description": "Erstellt die Fahrten, Monate, Tankvorgänge und Ladevorgänge des Fahrzeugs neu aus dem, was Home Assistant von seinen Sensoren aufgezeichnet hat (so weit zurück, wie der Recorder es aufbewahrt). Manuell erfasste Tank- und Ladevorgänge bleiben erhalten.",
       "fields": {
-        "config_entry_id": { "name": "Fahrzeug", "description": "Das Fahrzeug, dessen Verlauf importiert wird." },
-        "days": { "name": "Tage", "description": "Wie weit zurück neu aufgebaut wird (standardmäßig 365). Wo der Recorder die Zustände noch hat (standardmäßig 10 Tage), werden sie verwendet, davor die stündlichen Statistiken der Sensoren. Monate, die der Verlauf nicht vollständig abdeckt, behalten die erfassten Werte." }
+        "config_entry_id": {
+          "name": "Fahrzeug",
+          "description": "Das Fahrzeug, dessen Verlauf importiert wird."
+        },
+        "days": {
+          "name": "Tage",
+          "description": "Wie weit zurück neu aufgebaut wird (standardmäßig 365). Wo der Recorder die Zustände noch hat (standardmäßig 10 Tage), werden sie verwendet, davor die stündlichen Statistiken der Sensoren. Monate, die der Verlauf nicht vollständig abdeckt, behalten die erfassten Werte."
+        }
       }
     }
   },
@@ -250,6 +382,16 @@
     },
     "no_recorder": {
       "message": "Der Recorder ist nicht eingerichtet: Es gibt keinen Verlauf zum Importieren."
+    }
+  },
+  "selector": {
+    "fuel_type": {
+      "options": {
+        "petrol": "Benzin",
+        "diesel": "Diesel",
+        "lpg": "LPG",
+        "e85": "E85 (Ethanol)"
+      }
     }
   }
 }

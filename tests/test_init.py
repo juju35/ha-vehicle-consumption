@@ -43,6 +43,9 @@ async def test_setup_and_entities(hass: HomeAssistant) -> None:
             "fuel_used_month",
             "cost_month",
             "cost_per_km",
+            "co2_trip",
+            "co2_month",
+            "co2_per_km",
             "last_refuel",
         ]
     )
@@ -142,3 +145,38 @@ async def test_card_served(hass: HomeAssistant, hass_client) -> None:
     client = await hass_client()
     response = await client.get(CARD_URL)
     assert response.status == 200
+
+
+async def test_co2_figures(hass: HomeAssistant) -> None:
+    """CO₂ from the fuel burnt (per fuel type) and the energy used (grid factor), per trip, month and km."""
+    from custom_components.vehicle_consumption.const import CONF_CO2_ELECTRICITY, CONF_FUEL_TYPE
+
+    entry = await setup_vehicle(
+        hass,
+        options={
+            CONF_ODOMETER: ODOMETER,
+            CONF_FUEL_QUANTITY: FUEL,
+            CONF_FUEL_TYPE: "diesel",
+            CONF_CO2_ELECTRICITY: 100,
+        },
+    )
+    tracker = entry.runtime_data
+    assert tracker.co2 == (2.68, 0.1)
+    hass.states.async_set(ODOMETER, "10100", KM)
+    hass.states.async_set(FUEL, "35", LITERS)
+    await hass.async_block_till_done()
+    attributes = state_of(hass, "consumption").attributes
+    assert attributes["fuel_type"] == "diesel"
+    # 100 km on 5 L of diesel: 13.4 kg, 134 g/km.
+    assert attributes["trip"]["co2"] == 13.4
+    assert attributes["trip"]["co2_per_km"] == 134
+    assert attributes["month"]["co2"] == 13.4
+    assert attributes["total"]["co2_per_km"] == 134
+    assert float(state_of(hass, "co2_trip").state) == 13.4
+    assert float(state_of(hass, "co2_month").state) == 13.4
+    assert float(state_of(hass, "co2_per_km").state) == 134
+    assert state_of(hass, "co2_per_km").attributes["unit_of_measurement"] == "g/km"
+
+    # Petrol by default, French grid: the factors of the README.
+    entry = await setup_vehicle(hass, name="Other car")
+    assert entry.runtime_data.co2 == (2.31, 0.055)

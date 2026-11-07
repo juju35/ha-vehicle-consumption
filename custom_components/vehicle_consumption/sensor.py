@@ -13,7 +13,7 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import UnitOfEnergy, UnitOfLength, UnitOfVolume
+from homeassistant.const import UnitOfEnergy, UnitOfLength, UnitOfMass, UnitOfVolume
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -36,7 +36,7 @@ def _trip(key: str) -> Callable[[ConsumptionTracker], Any]:
 
 
 def _month(key: str) -> Callable[[ConsumptionTracker], Any]:
-    return lambda t: t.month_totals()[1].summary()[key]
+    return lambda t: t.month_totals()[1].summary(t.co2)[key]
 
 
 SENSORS: tuple[VehicleSensorDescription, ...] = (
@@ -130,6 +130,26 @@ SENSORS: tuple[VehicleSensorDescription, ...] = (
         key="cost_per_km",
         suggested_display_precision=3,
         value_fn=lambda t: t.total.summary()["cost_per_km"],
+    ),
+    VehicleSensorDescription(
+        key="co2_trip",
+        native_unit_of_measurement=UnitOfMass.KILOGRAMS,
+        suggested_display_precision=1,
+        value_fn=_trip("co2"),
+    ),
+    VehicleSensorDescription(
+        key="co2_month",
+        native_unit_of_measurement=UnitOfMass.KILOGRAMS,
+        state_class=SensorStateClass.TOTAL,
+        suggested_display_precision=1,
+        value_fn=_month("co2"),
+    ),
+    VehicleSensorDescription(
+        key="co2_per_km",
+        native_unit_of_measurement="g/km",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
+        value_fn=lambda t: t.total.summary(t.co2)["co2_per_km"],
     ),
 )
 
