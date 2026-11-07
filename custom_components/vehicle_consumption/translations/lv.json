@@ -44,13 +44,17 @@
           "fuel_price_entity": "Degvielas cenas sensors",
           "fuel_price": "Fiksētā degvielas cena",
           "electricity_price_entity": "Elektroenerģijas cenas sensors",
-          "electricity_price": "Fiksētā elektroenerģijas cena"
+          "electricity_price": "Fiksētā elektroenerģijas cena",
+          "fuel_type": "Degviela",
+          "co2_electricity": "Elektrības CO₂"
         },
         "data_description": {
           "fuel_price_entity": "Cena par litru (vai par galonu), kas seko uzpildes stacijas cenām.",
           "fuel_price": "Cena par litru, tiek izmantota, ja nav cenas sensora vai tas nav pieejams.",
           "electricity_price_entity": "Jūsu tarifa cena par kWh.",
-          "electricity_price": "Cena par kWh, tiek izmantota, ja nav cenas sensora vai tas nav pieejams."
+          "electricity_price": "Cena par kWh, tiek izmantota, ja nav cenas sensora vai tas nav pieejams.",
+          "fuel_type": "Nosaka katra sadedzinātā litra CO₂: benzīns 2,31 kg, dīzelis 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
+          "co2_electricity": "Grami CO₂ uz uzlādēto kWh; 55 Francijas tīklam, aptuveni 380 Vācijas tīklam."
         }
       }
     },
@@ -101,7 +105,9 @@
           "electricity_price": "Fiksētā elektroenerģijas cena",
           "trip_gap": "Brauciena beigas pēc",
           "refuel_threshold": "Uzpildes slieksnis",
-          "charge_threshold": "Uzlādes slieksnis"
+          "charge_threshold": "Uzlādes slieksnis",
+          "fuel_type": "Degviela",
+          "co2_electricity": "Elektrības CO₂"
         },
         "data_description": {
           "fuel_price_entity": "Cena par litru (vai par galonu), kas seko uzpildes stacijas cenām.",
@@ -110,7 +116,9 @@
           "electricity_price": "Cena par kWh, tiek izmantota, ja nav cenas sensora vai tas nav pieejams.",
           "trip_gap": "Brauciens beidzas, kad odometrs tik ilgi nav mainījies.",
           "refuel_threshold": "Degvielas pieaugums vismaz par šo daudzumu ir uzpilde; mazāki pieaugumi tiek ignorēti.",
-          "charge_threshold": "Akumulatora pieaugums vismaz par šo daudzumu ir uzlāde; mazāki pieaugumi tiek ignorēti."
+          "charge_threshold": "Akumulatora pieaugums vismaz par šo daudzumu ir uzlāde; mazāki pieaugumi tiek ignorēti.",
+          "fuel_type": "Nosaka katra sadedzinātā litra CO₂: benzīns 2,31 kg, dīzelis 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
+          "co2_electricity": "Grami CO₂ uz uzlādēto kWh; 55 Francijas tīklam, aptuveni 380 Vācijas tīklam."
         }
       }
     },
@@ -127,8 +135,12 @@
       "consumption": {
         "name": "Patēriņš",
         "state_attributes": {
-          "vehicle": { "name": "Transportlīdzeklis" },
-          "entry_id": { "name": "Ieraksta ID" },
+          "vehicle": {
+            "name": "Transportlīdzeklis"
+          },
+          "entry_id": {
+            "name": "Ieraksta ID"
+          },
           "kind": {
             "name": "Enerģija",
             "state": {
@@ -137,44 +149,110 @@
               "plugin_hybrid": "Uzlādējams hibrīds"
             }
           },
-          "currency": { "name": "Valūta" },
-          "odometer": { "name": "Odometrs" },
-          "fuel_quantity": { "name": "Degvielas daudzums" },
-          "fuel_level": { "name": "Degvielas līmenis" },
-          "tank_capacity": { "name": "Bākas tilpums" },
-          "battery_energy": { "name": "Akumulatora enerģija" },
-          "battery_level": { "name": "Akumulatora līmenis" },
-          "battery_capacity": { "name": "Akumulatora ietilpība" },
-          "fuel_price": { "name": "Degvielas cena" },
-          "electricity_price": { "name": "Elektroenerģijas cena" },
-          "driving": { "name": "Brauc" },
-          "trip": { "name": "Brauciens" },
-          "month": { "name": "Mēnesis" },
-          "total": { "name": "Kopā" },
-          "months": { "name": "Mēneši" },
-          "trips": { "name": "Braucieni" },
-          "refuels": { "name": "Uzpildes" },
-          "charges": { "name": "Uzlādes" }
+          "currency": {
+            "name": "Valūta"
+          },
+          "odometer": {
+            "name": "Odometrs"
+          },
+          "fuel_quantity": {
+            "name": "Degvielas daudzums"
+          },
+          "fuel_level": {
+            "name": "Degvielas līmenis"
+          },
+          "tank_capacity": {
+            "name": "Bākas tilpums"
+          },
+          "battery_energy": {
+            "name": "Akumulatora enerģija"
+          },
+          "battery_level": {
+            "name": "Akumulatora līmenis"
+          },
+          "battery_capacity": {
+            "name": "Akumulatora ietilpība"
+          },
+          "fuel_price": {
+            "name": "Degvielas cena"
+          },
+          "electricity_price": {
+            "name": "Elektroenerģijas cena"
+          },
+          "driving": {
+            "name": "Brauc"
+          },
+          "trip": {
+            "name": "Brauciens"
+          },
+          "month": {
+            "name": "Mēnesis"
+          },
+          "total": {
+            "name": "Kopā"
+          },
+          "months": {
+            "name": "Mēneši"
+          },
+          "trips": {
+            "name": "Braucieni"
+          },
+          "refuels": {
+            "name": "Uzpildes"
+          },
+          "charges": {
+            "name": "Uzlādes"
+          }
         }
       },
-      "fuel_consumption_trip": { "name": "Brauciena degvielas patēriņš" },
-      "fuel_consumption_month": { "name": "Degvielas patēriņš šomēnes" },
-      "fuel_consumption_average": { "name": "Vidējais degvielas patēriņš" },
-      "energy_consumption_trip": { "name": "Brauciena enerģijas patēriņš" },
-      "energy_consumption_month": { "name": "Enerģijas patēriņš šomēnes" },
-      "energy_consumption_average": { "name": "Vidējais enerģijas patēriņš" },
-      "distance_trip": { "name": "Brauciena attālums" },
-      "distance_month": { "name": "Attālums šomēnes" },
-      "fuel_used_month": { "name": "Šomēnes izmantotā degviela" },
-      "energy_used_month": { "name": "Šomēnes izmantotā enerģija" },
-      "cost_month": { "name": "Izmaksas šomēnes" },
-      "cost_per_km": { "name": "Izmaksas par km" },
+      "fuel_consumption_trip": {
+        "name": "Brauciena degvielas patēriņš"
+      },
+      "fuel_consumption_month": {
+        "name": "Degvielas patēriņš šomēnes"
+      },
+      "fuel_consumption_average": {
+        "name": "Vidējais degvielas patēriņš"
+      },
+      "energy_consumption_trip": {
+        "name": "Brauciena enerģijas patēriņš"
+      },
+      "energy_consumption_month": {
+        "name": "Enerģijas patēriņš šomēnes"
+      },
+      "energy_consumption_average": {
+        "name": "Vidējais enerģijas patēriņš"
+      },
+      "distance_trip": {
+        "name": "Brauciena attālums"
+      },
+      "distance_month": {
+        "name": "Attālums šomēnes"
+      },
+      "fuel_used_month": {
+        "name": "Šomēnes izmantotā degviela"
+      },
+      "energy_used_month": {
+        "name": "Šomēnes izmantotā enerģija"
+      },
+      "cost_month": {
+        "name": "Izmaksas šomēnes"
+      },
+      "cost_per_km": {
+        "name": "Izmaksas par km"
+      },
       "last_refuel": {
         "name": "Pēdējā uzpilde",
         "state_attributes": {
-          "liters": { "name": "Litri" },
-          "cost": { "name": "Izmaksas" },
-          "odometer": { "name": "Odometrs" },
+          "liters": {
+            "name": "Litri"
+          },
+          "cost": {
+            "name": "Izmaksas"
+          },
+          "odometer": {
+            "name": "Odometrs"
+          },
           "source": {
             "name": "Avots",
             "state": {
@@ -187,9 +265,15 @@
       "last_charge": {
         "name": "Pēdējā uzlāde",
         "state_attributes": {
-          "energy": { "name": "Enerģija" },
-          "cost": { "name": "Izmaksas" },
-          "odometer": { "name": "Odometrs" },
+          "energy": {
+            "name": "Enerģija"
+          },
+          "cost": {
+            "name": "Izmaksas"
+          },
+          "odometer": {
+            "name": "Odometrs"
+          },
           "source": {
             "name": "Avots",
             "state": {
@@ -199,6 +283,15 @@
             }
           }
         }
+      },
+      "co2_trip": {
+        "name": "Brauciena CO₂"
+      },
+      "co2_month": {
+        "name": "CO₂ šomēnes"
+      },
+      "co2_per_km": {
+        "name": "CO₂ uz km"
       }
     }
   },
@@ -207,37 +300,76 @@
       "name": "Pievienot uzpildi",
       "description": "Manuāli reģistrē degvielas uzpildi. Tā tiek rādīta kopā ar noteiktajām; patēriņš joprojām tiek aprēķināts no sensoriem.",
       "fields": {
-        "config_entry_id": { "name": "Transportlīdzeklis", "description": "Transportlīdzeklis, kuram tika uzpildīta degviela." },
-        "liters": { "name": "Litri", "description": "Uzpildītā degviela." },
-        "cost": { "name": "Kopējās izmaksas", "description": "Samaksātā summa. Ja nav norādīta, tiek aprēķināta no cenas." },
-        "price": { "name": "Cena par litru", "description": "Ja nav norādīta, tiek aprēķināta no kopējām izmaksām; ja nav norādīts neviens, tiek izmantota pašreizējā cena." },
-        "odometer": { "name": "Odometrs", "description": "Odometra rādījums (km). Ja nav norādīts, pēdējais zināmais rādījums." }
+        "config_entry_id": {
+          "name": "Transportlīdzeklis",
+          "description": "Transportlīdzeklis, kuram tika uzpildīta degviela."
+        },
+        "liters": {
+          "name": "Litri",
+          "description": "Uzpildītā degviela."
+        },
+        "cost": {
+          "name": "Kopējās izmaksas",
+          "description": "Samaksātā summa. Ja nav norādīta, tiek aprēķināta no cenas."
+        },
+        "price": {
+          "name": "Cena par litru",
+          "description": "Ja nav norādīta, tiek aprēķināta no kopējām izmaksām; ja nav norādīts neviens, tiek izmantota pašreizējā cena."
+        },
+        "odometer": {
+          "name": "Odometrs",
+          "description": "Odometra rādījums (km). Ja nav norādīts, pēdējais zināmais rādījums."
+        }
       }
     },
     "add_charge": {
       "name": "Pievienot uzlādi",
       "description": "Manuāli reģistrē uzlādi. Tā tiek rādīta kopā ar noteiktajām; patēriņš joprojām tiek aprēķināts no sensoriem.",
       "fields": {
-        "config_entry_id": { "name": "Transportlīdzeklis", "description": "Transportlīdzeklis, kas tika uzlādēts." },
-        "energy": { "name": "Enerģija", "description": "Uzlādētā enerģija (kWh)." },
-        "cost": { "name": "Kopējās izmaksas", "description": "Samaksātā summa. Ja nav norādīta, tiek aprēķināta no cenas." },
-        "price": { "name": "Cena par kWh", "description": "Ja nav norādīta, tiek aprēķināta no kopējām izmaksām; ja nav norādīts neviens, tiek izmantota pašreizējā cena." },
-        "odometer": { "name": "Odometrs", "description": "Odometra rādījums (km). Ja nav norādīts, pēdējais zināmais rādījums." }
+        "config_entry_id": {
+          "name": "Transportlīdzeklis",
+          "description": "Transportlīdzeklis, kas tika uzlādēts."
+        },
+        "energy": {
+          "name": "Enerģija",
+          "description": "Uzlādētā enerģija (kWh)."
+        },
+        "cost": {
+          "name": "Kopējās izmaksas",
+          "description": "Samaksātā summa. Ja nav norādīta, tiek aprēķināta no cenas."
+        },
+        "price": {
+          "name": "Cena par kWh",
+          "description": "Ja nav norādīta, tiek aprēķināta no kopējām izmaksām; ja nav norādīts neviens, tiek izmantota pašreizējā cena."
+        },
+        "odometer": {
+          "name": "Odometrs",
+          "description": "Odometra rādījums (km). Ja nav norādīts, pēdējais zināmais rādījums."
+        }
       }
     },
     "reset_statistics": {
       "name": "Atiestatīt statistiku",
       "description": "Notīra transportlīdzekļa braucienus, mēnešus, uzpildes, uzlādes un kopsummas; uzskaite sākas no jauna no pašreizējiem rādījumiem.",
       "fields": {
-        "config_entry_id": { "name": "Transportlīdzeklis", "description": "Transportlīdzeklis, kura statistika tiek notīrīta." }
+        "config_entry_id": {
+          "name": "Transportlīdzeklis",
+          "description": "Transportlīdzeklis, kura statistika tiek notīrīta."
+        }
       }
     },
     "import_history": {
       "name": "Importēt vēsturi",
       "description": "Atjauno transportlīdzekļa braucienus, mēnešus, uzpildes un uzlādes no tā, ko Home Assistant ir ierakstījis par tā sensoriem (tik tālu pagātnē, cik ilgi to glabā ierakstītājs). Manuāli ievadītās uzpildes un uzlādes tiek saglabātas.",
       "fields": {
-        "config_entry_id": { "name": "Transportlīdzeklis", "description": "Transportlīdzeklis, kura vēsture tiek importēta." },
-        "days": { "name": "Dienas", "description": "Cik tālu pagātnē atjaunot (pēc noklusējuma 365). Ierakstītie stāvokļi tiek izmantoti tur, kur ierakstītājs tos vēl glabā (pēc noklusējuma 10 dienas), pirms tam sensoru stundas statistika. Mēneši, kurus vēsture pilnībā nesedz, saglabā uzskaitīto." }
+        "config_entry_id": {
+          "name": "Transportlīdzeklis",
+          "description": "Transportlīdzeklis, kura vēsture tiek importēta."
+        },
+        "days": {
+          "name": "Dienas",
+          "description": "Cik tālu pagātnē atjaunot (pēc noklusējuma 365). Ierakstītie stāvokļi tiek izmantoti tur, kur ierakstītājs tos vēl glabā (pēc noklusējuma 10 dienas), pirms tam sensoru stundas statistika. Mēneši, kurus vēsture pilnībā nesedz, saglabā uzskaitīto."
+        }
       }
     }
   },
@@ -250,6 +382,16 @@
     },
     "no_recorder": {
       "message": "Ierakstītājs nav iestatīts: nav vēstures, ko importēt."
+    }
+  },
+  "selector": {
+    "fuel_type": {
+      "options": {
+        "petrol": "Benzīns",
+        "diesel": "Dīzelis",
+        "lpg": "LPG",
+        "e85": "E85 (etanols)"
+      }
     }
   }
 }

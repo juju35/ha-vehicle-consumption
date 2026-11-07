@@ -68,7 +68,8 @@ _TO_LATIN |= {c.upper(): lat.capitalize() for c, lat in _TO_LATIN.items()}
 # Latin words allowed in the Cyrillic file: names, brands, acronyms and units.
 _LATIN_NAMES = re.compile(
     r"Vehicle Consumption|Home Assistant|Renault|Tesla|Kia|Volkswagen|OBD|evcc|Wallbox|Easee|Zaptec|Ohme"
-    r"|\b(?:km|mi|L|gal|kWh|Wh)\b|\{\w+\}"
+    # Units, formulas and fuel names stay in Latin letters in Cyrillic text (CO₂, E85, LPG as written on pumps).
+    r"|\b(?:km|mi|L|gal|kWh|Wh|kg|CO₂|E85|LPG)\b|\{\w+\}"
 )
 
 

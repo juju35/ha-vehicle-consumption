@@ -6,7 +6,7 @@ from datetime import timedelta
 from typing import Final
 
 DOMAIN: Final = "vehicle_consumption"
-VERSION: Final = "1.1.3"
+VERSION: Final = "1.2.0"
 
 # Entry data
 CONF_DEVICE_ID: Final = "device_id"
@@ -34,6 +34,14 @@ CONF_ELECTRICITY_PRICE_ENTITY: Final = "electricity_price_entity"
 CONF_ELECTRICITY_PRICE: Final = "electricity_price"
 
 # Tuning
+CONF_FUEL_TYPE: Final = "fuel_type"
+CONF_CO2_ELECTRICITY: Final = "co2_electricity"
+# Tailpipe CO₂ (kg per litre burnt) of each fuel, and the grid CO₂ (g per kWh) by default (France, 2024 average).
+FUEL_TYPES: Final = ("petrol", "diesel", "lpg", "e85")
+FUEL_CO2: Final = {"petrol": 2.31, "diesel": 2.68, "lpg": 1.66, "e85": 1.61}
+DEFAULT_FUEL_TYPE: Final = "petrol"
+DEFAULT_CO2_ELECTRICITY: Final = 55.0
+
 CONF_TRIP_GAP: Final = "trip_gap"
 CONF_REFUEL_THRESHOLD: Final = "refuel_threshold"
 CONF_CHARGE_THRESHOLD: Final = "charge_threshold"

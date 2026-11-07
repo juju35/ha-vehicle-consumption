@@ -44,13 +44,17 @@
           "fuel_price_entity": "Senzor de preț al combustibilului",
           "fuel_price": "Preț fix al combustibilului",
           "electricity_price_entity": "Senzor de preț al electricității",
-          "electricity_price": "Preț fix al electricității"
+          "electricity_price": "Preț fix al electricității",
+          "fuel_type": "Combustibil",
+          "co2_electricity": "CO₂ al electricității"
         },
         "data_description": {
           "fuel_price_entity": "Prețul pe litru (sau pe galon) care urmează prețurile de la stație.",
           "fuel_price": "Prețul pe litru, folosit când nu există un senzor de preț sau acesta nu este disponibil.",
           "electricity_price_entity": "Prețul pe kWh al tarifului tău.",
-          "electricity_price": "Prețul pe kWh, folosit când nu există un senzor de preț sau acesta nu este disponibil."
+          "electricity_price": "Prețul pe kWh, folosit când nu există un senzor de preț sau acesta nu este disponibil.",
+          "fuel_type": "Dă CO₂-ul fiecărui litru ars: benzină 2,31 kg, motorină 2,68 kg, GPL 1,66 kg, E85 1,61 kg.",
+          "co2_electricity": "Grame de CO₂ pe kWh încărcat; 55 pentru rețeaua franceză, circa 380 pentru cea germană."
         }
       }
     },
@@ -101,7 +105,9 @@
           "electricity_price": "Preț fix al electricității",
           "trip_gap": "Sfârșitul călătoriei după",
           "refuel_threshold": "Prag de alimentare",
-          "charge_threshold": "Prag de încărcare"
+          "charge_threshold": "Prag de încărcare",
+          "fuel_type": "Combustibil",
+          "co2_electricity": "CO₂ al electricității"
         },
         "data_description": {
           "fuel_price_entity": "Prețul pe litru (sau pe galon) care urmează prețurile de la stație.",
@@ -110,7 +116,9 @@
           "electricity_price": "Prețul pe kWh, folosit când nu există un senzor de preț sau acesta nu este disponibil.",
           "trip_gap": "O călătorie se încheie când kilometrajul nu s-a modificat timp de această durată.",
           "refuel_threshold": "O creștere a combustibilului de cel puțin această valoare este o alimentare; creșterile mai mici sunt ignorate.",
-          "charge_threshold": "O creștere a bateriei de cel puțin această valoare este o încărcare; creșterile mai mici sunt ignorate."
+          "charge_threshold": "O creștere a bateriei de cel puțin această valoare este o încărcare; creșterile mai mici sunt ignorate.",
+          "fuel_type": "Dă CO₂-ul fiecărui litru ars: benzină 2,31 kg, motorină 2,68 kg, GPL 1,66 kg, E85 1,61 kg.",
+          "co2_electricity": "Grame de CO₂ pe kWh încărcat; 55 pentru rețeaua franceză, circa 380 pentru cea germană."
         }
       }
     },
@@ -127,8 +135,12 @@
       "consumption": {
         "name": "Consum",
         "state_attributes": {
-          "vehicle": { "name": "Vehicul" },
-          "entry_id": { "name": "ID-ul intrării" },
+          "vehicle": {
+            "name": "Vehicul"
+          },
+          "entry_id": {
+            "name": "ID-ul intrării"
+          },
           "kind": {
             "name": "Energie",
             "state": {
@@ -137,44 +149,110 @@
               "plugin_hybrid": "Hibrid plug-in"
             }
           },
-          "currency": { "name": "Monedă" },
-          "odometer": { "name": "Kilometraj" },
-          "fuel_quantity": { "name": "Cantitate de combustibil" },
-          "fuel_level": { "name": "Nivel de combustibil" },
-          "tank_capacity": { "name": "Capacitatea rezervorului" },
-          "battery_energy": { "name": "Energia bateriei" },
-          "battery_level": { "name": "Nivelul bateriei" },
-          "battery_capacity": { "name": "Capacitatea bateriei" },
-          "fuel_price": { "name": "Prețul combustibilului" },
-          "electricity_price": { "name": "Prețul electricității" },
-          "driving": { "name": "În mers" },
-          "trip": { "name": "Călătorie" },
-          "month": { "name": "Lună" },
-          "total": { "name": "Total" },
-          "months": { "name": "Luni" },
-          "trips": { "name": "Călătorii" },
-          "refuels": { "name": "Alimentări" },
-          "charges": { "name": "Încărcări" }
+          "currency": {
+            "name": "Monedă"
+          },
+          "odometer": {
+            "name": "Kilometraj"
+          },
+          "fuel_quantity": {
+            "name": "Cantitate de combustibil"
+          },
+          "fuel_level": {
+            "name": "Nivel de combustibil"
+          },
+          "tank_capacity": {
+            "name": "Capacitatea rezervorului"
+          },
+          "battery_energy": {
+            "name": "Energia bateriei"
+          },
+          "battery_level": {
+            "name": "Nivelul bateriei"
+          },
+          "battery_capacity": {
+            "name": "Capacitatea bateriei"
+          },
+          "fuel_price": {
+            "name": "Prețul combustibilului"
+          },
+          "electricity_price": {
+            "name": "Prețul electricității"
+          },
+          "driving": {
+            "name": "În mers"
+          },
+          "trip": {
+            "name": "Călătorie"
+          },
+          "month": {
+            "name": "Lună"
+          },
+          "total": {
+            "name": "Total"
+          },
+          "months": {
+            "name": "Luni"
+          },
+          "trips": {
+            "name": "Călătorii"
+          },
+          "refuels": {
+            "name": "Alimentări"
+          },
+          "charges": {
+            "name": "Încărcări"
+          }
         }
       },
-      "fuel_consumption_trip": { "name": "Consum de combustibil în călătorie" },
-      "fuel_consumption_month": { "name": "Consum de combustibil luna aceasta" },
-      "fuel_consumption_average": { "name": "Consum mediu de combustibil" },
-      "energy_consumption_trip": { "name": "Consum de energie în călătorie" },
-      "energy_consumption_month": { "name": "Consum de energie luna aceasta" },
-      "energy_consumption_average": { "name": "Consum mediu de energie" },
-      "distance_trip": { "name": "Distanța călătoriei" },
-      "distance_month": { "name": "Distanța luna aceasta" },
-      "fuel_used_month": { "name": "Combustibil folosit luna aceasta" },
-      "energy_used_month": { "name": "Energie folosită luna aceasta" },
-      "cost_month": { "name": "Cost luna aceasta" },
-      "cost_per_km": { "name": "Cost pe km" },
+      "fuel_consumption_trip": {
+        "name": "Consum de combustibil în călătorie"
+      },
+      "fuel_consumption_month": {
+        "name": "Consum de combustibil luna aceasta"
+      },
+      "fuel_consumption_average": {
+        "name": "Consum mediu de combustibil"
+      },
+      "energy_consumption_trip": {
+        "name": "Consum de energie în călătorie"
+      },
+      "energy_consumption_month": {
+        "name": "Consum de energie luna aceasta"
+      },
+      "energy_consumption_average": {
+        "name": "Consum mediu de energie"
+      },
+      "distance_trip": {
+        "name": "Distanța călătoriei"
+      },
+      "distance_month": {
+        "name": "Distanța luna aceasta"
+      },
+      "fuel_used_month": {
+        "name": "Combustibil folosit luna aceasta"
+      },
+      "energy_used_month": {
+        "name": "Energie folosită luna aceasta"
+      },
+      "cost_month": {
+        "name": "Cost luna aceasta"
+      },
+      "cost_per_km": {
+        "name": "Cost pe km"
+      },
       "last_refuel": {
         "name": "Ultima alimentare",
         "state_attributes": {
-          "liters": { "name": "Litri" },
-          "cost": { "name": "Cost" },
-          "odometer": { "name": "Kilometraj" },
+          "liters": {
+            "name": "Litri"
+          },
+          "cost": {
+            "name": "Cost"
+          },
+          "odometer": {
+            "name": "Kilometraj"
+          },
           "source": {
             "name": "Sursă",
             "state": {
@@ -187,9 +265,15 @@
       "last_charge": {
         "name": "Ultima încărcare",
         "state_attributes": {
-          "energy": { "name": "Energie" },
-          "cost": { "name": "Cost" },
-          "odometer": { "name": "Kilometraj" },
+          "energy": {
+            "name": "Energie"
+          },
+          "cost": {
+            "name": "Cost"
+          },
+          "odometer": {
+            "name": "Kilometraj"
+          },
           "source": {
             "name": "Sursă",
             "state": {
@@ -199,6 +283,15 @@
             }
           }
         }
+      },
+      "co2_trip": {
+        "name": "CO₂ al călătoriei"
+      },
+      "co2_month": {
+        "name": "CO₂ luna aceasta"
+      },
+      "co2_per_km": {
+        "name": "CO₂ pe km"
       }
     }
   },
@@ -207,37 +300,76 @@
       "name": "Adaugă o alimentare",
       "description": "Înregistrează manual o alimentare. Este afișată împreună cu cele detectate; consumul se calculează în continuare din senzori.",
       "fields": {
-        "config_entry_id": { "name": "Vehicul", "description": "Vehiculul care a fost alimentat." },
-        "liters": { "name": "Litri", "description": "Combustibil adăugat." },
-        "cost": { "name": "Cost total", "description": "Suma plătită. Calculată din preț dacă este omisă." },
-        "price": { "name": "Preț pe litru", "description": "Calculat din costul total dacă este omis; prețul curent dacă lipsesc amândouă." },
-        "odometer": { "name": "Kilometraj", "description": "Citirea kilometrajului (km). Ultima citire cunoscută dacă este omisă." }
+        "config_entry_id": {
+          "name": "Vehicul",
+          "description": "Vehiculul care a fost alimentat."
+        },
+        "liters": {
+          "name": "Litri",
+          "description": "Combustibil adăugat."
+        },
+        "cost": {
+          "name": "Cost total",
+          "description": "Suma plătită. Calculată din preț dacă este omisă."
+        },
+        "price": {
+          "name": "Preț pe litru",
+          "description": "Calculat din costul total dacă este omis; prețul curent dacă lipsesc amândouă."
+        },
+        "odometer": {
+          "name": "Kilometraj",
+          "description": "Citirea kilometrajului (km). Ultima citire cunoscută dacă este omisă."
+        }
       }
     },
     "add_charge": {
       "name": "Adaugă o încărcare",
       "description": "Înregistrează manual o încărcare. Este afișată împreună cu cele detectate; consumul se calculează în continuare din senzori.",
       "fields": {
-        "config_entry_id": { "name": "Vehicul", "description": "Vehiculul care a fost încărcat." },
-        "energy": { "name": "Energie", "description": "Energie adăugată (kWh)." },
-        "cost": { "name": "Cost total", "description": "Suma plătită. Calculată din preț dacă este omisă." },
-        "price": { "name": "Preț pe kWh", "description": "Calculat din costul total dacă este omis; prețul curent dacă lipsesc amândouă." },
-        "odometer": { "name": "Kilometraj", "description": "Citirea kilometrajului (km). Ultima citire cunoscută dacă este omisă." }
+        "config_entry_id": {
+          "name": "Vehicul",
+          "description": "Vehiculul care a fost încărcat."
+        },
+        "energy": {
+          "name": "Energie",
+          "description": "Energie adăugată (kWh)."
+        },
+        "cost": {
+          "name": "Cost total",
+          "description": "Suma plătită. Calculată din preț dacă este omisă."
+        },
+        "price": {
+          "name": "Preț pe kWh",
+          "description": "Calculat din costul total dacă este omis; prețul curent dacă lipsesc amândouă."
+        },
+        "odometer": {
+          "name": "Kilometraj",
+          "description": "Citirea kilometrajului (km). Ultima citire cunoscută dacă este omisă."
+        }
       }
     },
     "reset_statistics": {
       "name": "Resetează statisticile",
       "description": "Șterge călătoriile, lunile, alimentările, încărcările și totalurile vehiculului; urmărirea reîncepe de la citirile curente.",
       "fields": {
-        "config_entry_id": { "name": "Vehicul", "description": "Vehiculul ale cărui statistici sunt șterse." }
+        "config_entry_id": {
+          "name": "Vehicul",
+          "description": "Vehiculul ale cărui statistici sunt șterse."
+        }
       }
     },
     "import_history": {
       "name": "Importă istoricul",
       "description": "Reconstruiește călătoriile, lunile, alimentările și încărcările vehiculului din ce a înregistrat Home Assistant despre senzorii săi (cât de departe în trecut le păstrează înregistratorul). Alimentările și încărcările introduse manual sunt păstrate.",
       "fields": {
-        "config_entry_id": { "name": "Vehicul", "description": "Vehiculul al cărui istoric este importat." },
-        "days": { "name": "Zile", "description": "Cât de departe în trecut se reconstruiește (365 implicit). Stările înregistrate sunt folosite acolo unde înregistratorul le mai are (10 zile implicit), iar înainte de asta statisticile orare ale senzorilor. Lunile pe care istoricul nu le acoperă complet păstrează ce a fost urmărit." }
+        "config_entry_id": {
+          "name": "Vehicul",
+          "description": "Vehiculul al cărui istoric este importat."
+        },
+        "days": {
+          "name": "Zile",
+          "description": "Cât de departe în trecut se reconstruiește (365 implicit). Stările înregistrate sunt folosite acolo unde înregistratorul le mai are (10 zile implicit), iar înainte de asta statisticile orare ale senzorilor. Lunile pe care istoricul nu le acoperă complet păstrează ce a fost urmărit."
+        }
       }
     }
   },
@@ -250,6 +382,16 @@
     },
     "no_recorder": {
       "message": "Înregistratorul nu este configurat: nu există istoric de importat."
+    }
+  },
+  "selector": {
+    "fuel_type": {
+      "options": {
+        "petrol": "Benzină",
+        "diesel": "Motorină",
+        "lpg": "GPL",
+        "e85": "E85 (etanol)"
+      }
     }
   }
 }

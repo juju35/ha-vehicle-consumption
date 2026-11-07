@@ -44,13 +44,17 @@
           "fuel_price_entity": "Senzor ceny paliva",
           "fuel_price": "Pevná cena paliva",
           "electricity_price_entity": "Senzor ceny elektriny",
-          "electricity_price": "Pevná cena elektriny"
+          "electricity_price": "Pevná cena elektriny",
+          "fuel_type": "Palivo",
+          "co2_electricity": "CO₂ elektriny"
         },
         "data_description": {
           "fuel_price_entity": "Cena za liter (alebo za galón), ktorá sleduje ceny na čerpacej stanici.",
           "fuel_price": "Cena za liter, použije sa, ak nie je senzor ceny alebo je nedostupný.",
           "electricity_price_entity": "Cena za kWh podľa vašej tarify.",
-          "electricity_price": "Cena za kWh, použije sa, ak nie je senzor ceny alebo je nedostupný."
+          "electricity_price": "Cena za kWh, použije sa, ak nie je senzor ceny alebo je nedostupný.",
+          "fuel_type": "Udáva CO₂ každého spáleného litra: benzín 2,31 kg, nafta 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
+          "co2_electricity": "Gramy CO₂ na nabitú kWh; 55 pre francúzsku sieť, približne 380 pre nemeckú."
         }
       }
     },
@@ -101,7 +105,9 @@
           "electricity_price": "Pevná cena elektriny",
           "trip_gap": "Koniec jazdy po",
           "refuel_threshold": "Prah tankovania",
-          "charge_threshold": "Prah nabíjania"
+          "charge_threshold": "Prah nabíjania",
+          "fuel_type": "Palivo",
+          "co2_electricity": "CO₂ elektriny"
         },
         "data_description": {
           "fuel_price_entity": "Cena za liter (alebo za galón), ktorá sleduje ceny na čerpacej stanici.",
@@ -110,7 +116,9 @@
           "electricity_price": "Cena za kWh, použije sa, ak nie je senzor ceny alebo je nedostupný.",
           "trip_gap": "Jazda sa skončí, keď sa počítadlo kilometrov takto dlho nepohne.",
           "refuel_threshold": "Nárast paliva aspoň o túto hodnotu je tankovanie; menšie nárasty sa ignorujú.",
-          "charge_threshold": "Nárast batérie aspoň o túto hodnotu je nabíjanie; menšie nárasty sa ignorujú."
+          "charge_threshold": "Nárast batérie aspoň o túto hodnotu je nabíjanie; menšie nárasty sa ignorujú.",
+          "fuel_type": "Udáva CO₂ každého spáleného litra: benzín 2,31 kg, nafta 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
+          "co2_electricity": "Gramy CO₂ na nabitú kWh; 55 pre francúzsku sieť, približne 380 pre nemeckú."
         }
       }
     },
@@ -127,8 +135,12 @@
       "consumption": {
         "name": "Spotreba",
         "state_attributes": {
-          "vehicle": { "name": "Vozidlo" },
-          "entry_id": { "name": "ID záznamu" },
+          "vehicle": {
+            "name": "Vozidlo"
+          },
+          "entry_id": {
+            "name": "ID záznamu"
+          },
           "kind": {
             "name": "Energia",
             "state": {
@@ -137,44 +149,110 @@
               "plugin_hybrid": "Plug-in hybrid"
             }
           },
-          "currency": { "name": "Mena" },
-          "odometer": { "name": "Počítadlo kilometrov" },
-          "fuel_quantity": { "name": "Množstvo paliva" },
-          "fuel_level": { "name": "Hladina paliva" },
-          "tank_capacity": { "name": "Objem nádrže" },
-          "battery_energy": { "name": "Energia batérie" },
-          "battery_level": { "name": "Úroveň batérie" },
-          "battery_capacity": { "name": "Kapacita batérie" },
-          "fuel_price": { "name": "Cena paliva" },
-          "electricity_price": { "name": "Cena elektriny" },
-          "driving": { "name": "V jazde" },
-          "trip": { "name": "Jazda" },
-          "month": { "name": "Mesiac" },
-          "total": { "name": "Celkom" },
-          "months": { "name": "Mesiace" },
-          "trips": { "name": "Jazdy" },
-          "refuels": { "name": "Tankovania" },
-          "charges": { "name": "Nabíjania" }
+          "currency": {
+            "name": "Mena"
+          },
+          "odometer": {
+            "name": "Počítadlo kilometrov"
+          },
+          "fuel_quantity": {
+            "name": "Množstvo paliva"
+          },
+          "fuel_level": {
+            "name": "Hladina paliva"
+          },
+          "tank_capacity": {
+            "name": "Objem nádrže"
+          },
+          "battery_energy": {
+            "name": "Energia batérie"
+          },
+          "battery_level": {
+            "name": "Úroveň batérie"
+          },
+          "battery_capacity": {
+            "name": "Kapacita batérie"
+          },
+          "fuel_price": {
+            "name": "Cena paliva"
+          },
+          "electricity_price": {
+            "name": "Cena elektriny"
+          },
+          "driving": {
+            "name": "V jazde"
+          },
+          "trip": {
+            "name": "Jazda"
+          },
+          "month": {
+            "name": "Mesiac"
+          },
+          "total": {
+            "name": "Celkom"
+          },
+          "months": {
+            "name": "Mesiace"
+          },
+          "trips": {
+            "name": "Jazdy"
+          },
+          "refuels": {
+            "name": "Tankovania"
+          },
+          "charges": {
+            "name": "Nabíjania"
+          }
         }
       },
-      "fuel_consumption_trip": { "name": "Spotreba paliva za jazdu" },
-      "fuel_consumption_month": { "name": "Spotreba paliva tento mesiac" },
-      "fuel_consumption_average": { "name": "Priemerná spotreba paliva" },
-      "energy_consumption_trip": { "name": "Spotreba energie za jazdu" },
-      "energy_consumption_month": { "name": "Spotreba energie tento mesiac" },
-      "energy_consumption_average": { "name": "Priemerná spotreba energie" },
-      "distance_trip": { "name": "Vzdialenosť jazdy" },
-      "distance_month": { "name": "Vzdialenosť tento mesiac" },
-      "fuel_used_month": { "name": "Spotrebované palivo tento mesiac" },
-      "energy_used_month": { "name": "Spotrebovaná energia tento mesiac" },
-      "cost_month": { "name": "Náklady tento mesiac" },
-      "cost_per_km": { "name": "Náklady na km" },
+      "fuel_consumption_trip": {
+        "name": "Spotreba paliva za jazdu"
+      },
+      "fuel_consumption_month": {
+        "name": "Spotreba paliva tento mesiac"
+      },
+      "fuel_consumption_average": {
+        "name": "Priemerná spotreba paliva"
+      },
+      "energy_consumption_trip": {
+        "name": "Spotreba energie za jazdu"
+      },
+      "energy_consumption_month": {
+        "name": "Spotreba energie tento mesiac"
+      },
+      "energy_consumption_average": {
+        "name": "Priemerná spotreba energie"
+      },
+      "distance_trip": {
+        "name": "Vzdialenosť jazdy"
+      },
+      "distance_month": {
+        "name": "Vzdialenosť tento mesiac"
+      },
+      "fuel_used_month": {
+        "name": "Spotrebované palivo tento mesiac"
+      },
+      "energy_used_month": {
+        "name": "Spotrebovaná energia tento mesiac"
+      },
+      "cost_month": {
+        "name": "Náklady tento mesiac"
+      },
+      "cost_per_km": {
+        "name": "Náklady na km"
+      },
       "last_refuel": {
         "name": "Posledné tankovanie",
         "state_attributes": {
-          "liters": { "name": "Litre" },
-          "cost": { "name": "Náklady" },
-          "odometer": { "name": "Počítadlo kilometrov" },
+          "liters": {
+            "name": "Litre"
+          },
+          "cost": {
+            "name": "Náklady"
+          },
+          "odometer": {
+            "name": "Počítadlo kilometrov"
+          },
           "source": {
             "name": "Zdroj",
             "state": {
@@ -187,9 +265,15 @@
       "last_charge": {
         "name": "Posledné nabíjanie",
         "state_attributes": {
-          "energy": { "name": "Energia" },
-          "cost": { "name": "Náklady" },
-          "odometer": { "name": "Počítadlo kilometrov" },
+          "energy": {
+            "name": "Energia"
+          },
+          "cost": {
+            "name": "Náklady"
+          },
+          "odometer": {
+            "name": "Počítadlo kilometrov"
+          },
           "source": {
             "name": "Zdroj",
             "state": {
@@ -199,6 +283,15 @@
             }
           }
         }
+      },
+      "co2_trip": {
+        "name": "CO₂ jazdy"
+      },
+      "co2_month": {
+        "name": "CO₂ tento mesiac"
+      },
+      "co2_per_km": {
+        "name": "CO₂ na km"
       }
     }
   },
@@ -207,37 +300,76 @@
       "name": "Pridať tankovanie",
       "description": "Ručne zaznamená tankovanie. Zobrazí sa spolu so zistenými; spotreba sa naďalej počíta zo senzorov.",
       "fields": {
-        "config_entry_id": { "name": "Vozidlo", "description": "Vozidlo, ktoré bolo natankované." },
-        "liters": { "name": "Litre", "description": "Natankované palivo." },
-        "cost": { "name": "Celková cena", "description": "Zaplatená suma. Ak sa vynechá, vypočíta sa z ceny." },
-        "price": { "name": "Cena za liter", "description": "Ak sa vynechá, vypočíta sa z celkovej ceny; ak chýbajú obe, použije sa aktuálna cena." },
-        "odometer": { "name": "Počítadlo kilometrov", "description": "Stav počítadla kilometrov (km). Ak sa vynechá, posledný známy stav." }
+        "config_entry_id": {
+          "name": "Vozidlo",
+          "description": "Vozidlo, ktoré bolo natankované."
+        },
+        "liters": {
+          "name": "Litre",
+          "description": "Natankované palivo."
+        },
+        "cost": {
+          "name": "Celková cena",
+          "description": "Zaplatená suma. Ak sa vynechá, vypočíta sa z ceny."
+        },
+        "price": {
+          "name": "Cena za liter",
+          "description": "Ak sa vynechá, vypočíta sa z celkovej ceny; ak chýbajú obe, použije sa aktuálna cena."
+        },
+        "odometer": {
+          "name": "Počítadlo kilometrov",
+          "description": "Stav počítadla kilometrov (km). Ak sa vynechá, posledný známy stav."
+        }
       }
     },
     "add_charge": {
       "name": "Pridať nabíjanie",
       "description": "Ručne zaznamená nabíjanie. Zobrazí sa spolu so zistenými; spotreba sa naďalej počíta zo senzorov.",
       "fields": {
-        "config_entry_id": { "name": "Vozidlo", "description": "Vozidlo, ktoré bolo nabité." },
-        "energy": { "name": "Energia", "description": "Dodaná energia (kWh)." },
-        "cost": { "name": "Celková cena", "description": "Zaplatená suma. Ak sa vynechá, vypočíta sa z ceny." },
-        "price": { "name": "Cena za kWh", "description": "Ak sa vynechá, vypočíta sa z celkovej ceny; ak chýbajú obe, použije sa aktuálna cena." },
-        "odometer": { "name": "Počítadlo kilometrov", "description": "Stav počítadla kilometrov (km). Ak sa vynechá, posledný známy stav." }
+        "config_entry_id": {
+          "name": "Vozidlo",
+          "description": "Vozidlo, ktoré bolo nabité."
+        },
+        "energy": {
+          "name": "Energia",
+          "description": "Dodaná energia (kWh)."
+        },
+        "cost": {
+          "name": "Celková cena",
+          "description": "Zaplatená suma. Ak sa vynechá, vypočíta sa z ceny."
+        },
+        "price": {
+          "name": "Cena za kWh",
+          "description": "Ak sa vynechá, vypočíta sa z celkovej ceny; ak chýbajú obe, použije sa aktuálna cena."
+        },
+        "odometer": {
+          "name": "Počítadlo kilometrov",
+          "description": "Stav počítadla kilometrov (km). Ak sa vynechá, posledný známy stav."
+        }
       }
     },
     "reset_statistics": {
       "name": "Vynulovať štatistiky",
       "description": "Vymaže jazdy, mesiace, tankovania, nabíjania a súčty vozidla; sledovanie začne znova od aktuálnych hodnôt.",
       "fields": {
-        "config_entry_id": { "name": "Vozidlo", "description": "Vozidlo, ktorého štatistiky sa vymažú." }
+        "config_entry_id": {
+          "name": "Vozidlo",
+          "description": "Vozidlo, ktorého štatistiky sa vymažú."
+        }
       }
     },
     "import_history": {
       "name": "Importovať históriu",
       "description": "Znovu vytvorí jazdy, mesiace, tankovania a nabíjania vozidla z toho, čo Home Assistant zaznamenal z jeho senzorov (tak ďaleko do minulosti, ako to zapisovač uchováva). Ručne zadané tankovania a nabíjania sa zachovajú.",
       "fields": {
-        "config_entry_id": { "name": "Vozidlo", "description": "Vozidlo, ktorého história sa importuje." },
-        "days": { "name": "Dni", "description": "Ako ďaleko do minulosti sa má obnoviť (predvolene 365). Zaznamenané stavy sa použijú tam, kde ich zapisovač ešte má (predvolene 10 dní), predtým hodinové štatistiky senzorov. Mesiace, ktoré história nepokrýva úplne, si ponechajú sledované údaje." }
+        "config_entry_id": {
+          "name": "Vozidlo",
+          "description": "Vozidlo, ktorého história sa importuje."
+        },
+        "days": {
+          "name": "Dni",
+          "description": "Ako ďaleko do minulosti sa má obnoviť (predvolene 365). Zaznamenané stavy sa použijú tam, kde ich zapisovač ešte má (predvolene 10 dní), predtým hodinové štatistiky senzorov. Mesiace, ktoré história nepokrýva úplne, si ponechajú sledované údaje."
+        }
       }
     }
   },
@@ -250,6 +382,16 @@
     },
     "no_recorder": {
       "message": "Zapisovač nie je nastavený: nie je k dispozícii žiadna história na import."
+    }
+  },
+  "selector": {
+    "fuel_type": {
+      "options": {
+        "petrol": "Benzín",
+        "diesel": "Nafta",
+        "lpg": "LPG",
+        "e85": "E85 (etanol)"
+      }
     }
   }
 }

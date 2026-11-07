@@ -33,9 +33,10 @@ It comes with a **Lovelace card** showing the tank and battery gauges, the key f
 - **Trips**: a trip starts when the odometer moves and ends after a gap without driving (30 minutes by default), with its distance, consumption and cost
 - **Consumption** in L/100 km and kWh/100 km for the last trip, the current month and on average
 - **Cost**: fuel and electricity prices from a sensor (such as [ha-carburants-france](https://github.com/juju35/ha-carburants-france)) or fixed; cost of the month and **cost per km**
+- **CO₂**: the CO₂ of the fuel burnt (by fuel type: petrol, diesel, LPG, E85) and of the energy charged (grid factor in g/kWh, French grid by default), per trip, per month and per km
 - **History** kept across restarts: the last 24 months, and every trip, refuel and charge of the last 365 days, rebuilt from the recorder for the days the tracking does not cover yet
 - **Actions** to log a refuel or a charge by hand (`add_refuel`, `add_charge`) to start over (`reset_statistics`) or to rebuild everything from the recorded history (`import_history`)
-- **Lovelace card bundled with the integration**, added automatically to the dashboard resources (nothing to add by hand): fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart (consumption, distance or cost), recent trips and refuels or charges, a pulsing dot while driving, a popup to log a refuel or a charge; visual editor
+- **Lovelace card bundled with the integration**, added automatically to the dashboard resources (nothing to add by hand): fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart (consumption, distance, cost or CO₂), CO₂ per km under the cost per km, recent trips and refuels or charges, a pulsing dot while driving, a popup to log a refuel or a charge; visual editor
 - UI setup, no YAML; English, French, German, Spanish, Italian, Dutch, Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian, Greek and Serbian (Cyrillic and Latin)
 
 ## Supported integrations
@@ -131,6 +132,8 @@ Everything can be changed later with **Configure**, which also holds the trip an
 | Fixed fuel price | — | Price per litre, when there is no price sensor |
 | Electricity price sensor | — | Sensor giving the price per kWh (wins over the fixed price) |
 | Fixed electricity price | — | Price per kWh, when there is no price sensor |
+| Fuel type | `petrol` | `petrol`, `diesel`, `lpg` or `e85`: kg of CO₂ per litre burnt (2.31, 2.68, 1.66, 1.61) |
+| Electricity CO₂ | `55` g/kWh | Grams of CO₂ per kWh charged: about 55 for the French grid, 380 for the German one; set your supplier's figure |
 | End of trip after | `30` min | Minutes without the odometer moving that end a trip |
 | Refuel threshold | `3` L | A rise of at least this much fuel is a refuel |
 | Charge threshold | `1` kWh | A rise of at least this much energy is a charge |
@@ -151,6 +154,8 @@ One device per vehicle; the entities only exist when they make sense for it (`fu
 | `sensor.my_car_energy_used_this_month` | Energy used this month (kWh) |
 | `sensor.my_car_cost_this_month` | Cost of the fuel and energy used this month |
 | `sensor.my_car_cost_per_km` | Cost per kilometre, on average |
+| `sensor.my_car_co2_of_the_trip`, `sensor.my_car_co2_this_month` | CO₂ of the last trip and of this month (kg) |
+| `sensor.my_car_co2_per_km` | CO₂ per kilometre, on average (g/km) |
 | `sensor.my_car_last_refuel` | Time of the last refuel; attributes `liters`, `cost`, `odometer`, `source` (`auto` or `manual`) |
 | `sensor.my_car_last_charge` | Time of the last charge; attributes `energy`, `cost`, `odometer`, `source` (`auto`, `charger` or `manual`) |
 
@@ -241,7 +246,7 @@ entity: sensor.my_car_consumption
 | `entity` | Auto | The vehicle: its **Consumption** sensor. Leave empty for the first vehicle |
 | `title` | Vehicle name | Card title |
 | `chart` | `true` | Monthly bar chart |
-| `chart_metric` | `consumption` | What the chart shows: `consumption`, `distance` or `cost` |
+| `chart_metric` | `consumption` | What the chart shows: `consumption`, `distance`, `cost` or `co2` (kg) |
 | `months` | `6` | Number of months in the chart (3–12) |
 | `trips` | `true` | **Recent trips** section |
 | `refuels` | `true` | **Refuels** / **Charges** section |
@@ -303,6 +308,7 @@ When a vehicle is added, the last 365 days of its sensors are replayed once, in 
 - **Distance**: every rise of the odometer is added up (a jump over 2000 km is ignored as a glitch).
 - **Trips**: a trip starts when the odometer moves and ends after the **trip gap** (30 minutes by default) without moving. Its distance, fuel, energy and cost are what was counted between its start and its end.
 - **Prices**: the fuel price per litre and the electricity price per kWh come from a **sensor** (such as the station prices of [ha-carburants-france](https://github.com/juju35/ha-carburants-france), or your electricity tariff) or a **fixed** value; a sensor wins over the fixed price. While the sensor is `unknown` or `unavailable` (a best-price sensor with no station for a while, a restart), its last price is used, and kept across restarts. Without any price, cost stays empty.
+- **CO₂** is the fuel used × the factor of its type (tailpipe CO₂ per litre: petrol 2.31 kg, diesel 2.68 kg, LPG 1.66 kg, E85 1.61 kg) plus the energy used × the grid factor (g/kWh, set in the options). It is worked out from the counted totals, so changing a factor applies to the whole history. Per km it is shown from 5 km, like the consumption.
 - **Consumption** is the amount used divided by the distance, × 100. Under **5 km** it is not shown: too short to mean anything.
 - **History**: months are kept for 24 months (local time), trips, refuels and charges for 365 days (the card lists the newest, with the count of the year). The days of the last 365 that are not counted yet are added from the recorder's history at every start and reload. Everything is stored in `.storage/vehicle_consumption.<entry_id>` and survives restarts.
 

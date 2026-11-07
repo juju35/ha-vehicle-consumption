@@ -193,7 +193,7 @@ test('i18n Serbian: the Cyrillic and Latin cards say the same thing, letter for 
     map.set(c.toUpperCase(), lat[i][0].toUpperCase() + lat[i].slice(1));
   });
   // Latin letters allowed in Cyrillic: names (Vehicle Consumption, Home Assistant), units (km) and placeholders.
-  const names = /Vehicle Consumption|Home Assistant|\bkm\b|\{\w+\}/g;
+  const names = /Vehicle Consumption|Home Assistant|\bkm\b|\bg CO₂|CO₂|\{\w+\}/g;
   for (const [key, text] of Object.entries(VC_I18N.sr)) {
     assert.equal([...text].map((c) => map.get(c) ?? c).join(''), VC_I18N['sr-Latn'][key], key);
     assert.doesNotMatch(text.replace(names, ''), /[A-Za-z]/, `sr.${key}`);
@@ -1074,3 +1074,23 @@ test('trips: the trip being driven is listed first, marked as driving, and count
   const parked = html(card).split('data-section="trips"')[1].split('</section>')[0];
   assert.equal(parked.split('class="row').length - 1, 1);
 });
+
+test('CO₂: chart metric in kg, and the CO₂ per km under the cost per km', () => {
+  const a = fuelAttrs();
+  a.total = { ...a.total, co2_per_km: 134 };
+  a.months = a.months.map((m) => ({ ...m, co2: vcFiniteish(m.distance) }));
+  a.month = { ...a.month, co2: 25 };
+  const card = makeCard({ chart_metric: 'co2' });
+  card.hass = hassWith(a);
+  const out = html(card);
+  assert.match(out, /CO₂<small>kg CO₂/);
+  assert.match(out, /134 g CO₂\/km/);
+  // Without the figure (an older integration), nothing is added.
+  const plain = makeCard();
+  plain.hass = hassWith(fuelAttrs());
+  assert.doesNotMatch(html(plain), /CO₂\/km/);
+});
+
+function vcFiniteish(distance) {
+  return Number.isFinite(Number(distance)) ? Math.round(Number(distance) * 0.13) : null;
+}
