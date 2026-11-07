@@ -39,6 +39,7 @@ from .const import (
     CONF_CHARGE_THRESHOLD,
     CONF_CHARGER_ENERGY,
     CONF_CO2_ELECTRICITY,
+    CONF_DEVICE_ID,
     CONF_ELECTRICITY_PRICE,
     CONF_ELECTRICITY_PRICE_ENTITY,
     CONF_FUEL_LEVEL,
@@ -56,6 +57,7 @@ from .const import (
     DEFAULT_HISTORY_DAYS,
     DEFAULT_REFUEL_THRESHOLD,
     DEFAULT_TRIP_GAP,
+    EVENT_TRIP_ENDED,
     FUEL_CO2,
     HISTORY_DAYS,
     KIND_ELECTRIC,
@@ -716,6 +718,21 @@ class ConsumptionTracker:
             self._prune()
         return True
 
+    def _fire_trip_ended(self, trip: Trip) -> None:
+        """Tell automations a trip just closed (live tracking only: never at load, in a replay or a backfill)."""
+        end = trip.end or trip.start
+        entry = self.hass.config_entries.async_get_entry(self.entry_id)
+        self.hass.bus.async_fire(
+            EVENT_TRIP_ENDED,
+            {
+                "entry_id": self.entry_id,
+                "device_id": entry.data.get(CONF_DEVICE_ID) if entry else None,
+                "vehicle": self.name,
+                **trip.summary(self.co2),
+                "duration": round((end - trip.start).total_seconds() / 60),
+            },
+        )
+
     def _prune(self) -> None:
         """Drop the trips, refuels and charges older than `HISTORY_DAYS` (lists newest first)."""
         cut = _retention_cut()
@@ -754,7 +771,10 @@ class ConsumptionTracker:
         def tick(now: datetime) -> None:
             month = self._shown_month
             self._shown_month = self.month_totals()[0]
+            driving = self.trip
             ended = self._end_trip_if_stopped(now)
+            if ended and driving is not None and self.trips and self.trips[0] is driving:
+                self._fire_trip_ended(driving)
             if self._close_charger_session(now) or ended:
                 self._changed()
             elif month != self._shown_month:

@@ -232,6 +232,45 @@ data:
   days: 60
 ```
 
+### Events
+
+#### `vehicle_consumption_trip_ended`
+
+Fired when the integration closes a trip: the **trip gap** after the odometer last moved, as the trip shows up in the trips list. Only for trips closed while Home Assistant runs (not for a trip closed at startup, which ended while it was stopped, nor for trips found in the history), and only when the odometer moved. With an odometer polled hourly, a reading that shows the car never stopped long enough reopens the last trip: it is announced again when it closes.
+
+| Field | Content |
+|---|---|
+| `entry_id`, `device_id`, `vehicle` | Config entry, vehicle device and vehicle name |
+| `start`, `end` | First and last odometer move (ISO 8601) |
+| `duration` | Minutes from `start` to `end` |
+| `distance` | km |
+| `fuel`, `energy` | L and kWh used |
+| `fuel_consumption`, `energy_consumption` | L/100 km and kWh/100 km (`null` under 5 km) |
+| `cost`, `cost_per_km` | In the Home Assistant currency (`null` without a price) |
+| `co2`, `co2_per_km` | kg and g/km |
+
+```yaml
+triggers:
+  - trigger: event
+    event_type: vehicle_consumption_trip_ended
+    event_data:
+      vehicle: My car
+conditions:
+  - condition: template
+    value_template: "{{ trigger.event.data.distance >= 5 }}"
+actions:
+  - action: notify.mobile_app_phone
+    data:
+      title: Trip ended
+      message: >-
+        {{ trigger.event.data.distance }} km in {{ trigger.event.data.duration }} min,
+        {{ trigger.event.data.fuel_consumption }} L/100 km, {{ trigger.event.data.cost }} €
+```
+
+### Diagnostics
+
+**Settings → Devices & services → Vehicle Consumption → ⋮ → Download diagnostics** gives the entry, the tracked figures and the current state of each source sensor. VINs, plates, GPS positions, addresses and account data (user names, e-mails, tokens) are replaced by `**REDACTED**`.
+
 ### Card
 
 The card is added to the dashboard resources by the integration. Add it from the dashboard (**Add card → Vehicle Consumption Card**) or in YAML:
