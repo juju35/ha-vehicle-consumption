@@ -134,6 +134,7 @@ Everything can be changed later with **Configure**, which also holds the trip an
 | Fixed electricity price | — | Price per kWh, when there is no price sensor |
 | Fuel type | `petrol` | `petrol`, `diesel`, `lpg` or `e85`: kg of CO₂ per litre burnt (2.31, 2.68, 1.66, 1.61) |
 | Electricity CO₂ | `55` g/kWh | Grams of CO₂ per kWh charged: about 55 for the French grid, 380 for the German one; set your supplier's figure |
+| Units | `metric` | `metric` (km, L, L/100 km, kWh/100 km) or `imperial` (miles, US gallons, mpg, mi/kWh, cost and CO₂ per mile): the units of the card, of the main sensor's attributes, of the `vehicle_consumption_trip_ended` event and of the consumption, cost per distance and CO₂ per distance sensors. The distance and volume sensors stay in km and L: Home Assistant converts them to its unit system (or to the unit set in the entity's settings). Everything is tracked and stored in km, L and kWh, so the option can be changed at any time |
 | End of trip after | `30` min | Minutes without the odometer moving that end a trip |
 | Refuel threshold | `3` L | A rise of at least this much fuel is a refuel |
 | Charge threshold | `1` kWh | A rise of at least this much energy is a charge |
@@ -146,16 +147,16 @@ One device per vehicle; the entities only exist when they make sense for it (`fu
 
 | Entity | Description |
 |---|---|
-| `sensor.my_car_consumption` | Average consumption (L/100 km, or kWh/100 km for an electric car). Its attributes carry everything the card shows: `vehicle`, `entry_id`, `kind`, `currency`, current levels and prices, `driving`, `trip`, `month`, `total`, `months`, `trips`, `refuels`, `charges` |
-| `sensor.my_car_fuel_consumption_trip`, `sensor.my_car_fuel_consumption_this_month`, `sensor.my_car_average_fuel_consumption` | Fuel consumption of the last trip, this month and on average (L/100 km) |
-| `sensor.my_car_energy_consumption_trip`, `sensor.my_car_energy_consumption_this_month`, `sensor.my_car_average_energy_consumption` | Energy consumption of the last trip, this month and on average (kWh/100 km) |
+| `sensor.my_car_consumption` | Average consumption (L/100 km, or kWh/100 km for an electric car). Its attributes carry everything the card shows: `vehicle`, `entry_id`, `kind`, `currency`, `units`, `odometer_unit` (the odometer sensor's unit), current levels and prices, `driving`, `trip`, `month`, `total`, `months`, `trips`, `refuels`, `charges`. The card data that changes with every reading (levels, prices, odometer, trip, month, total, lists and counts) is not recorded in the history: the figures have sensors of their own |
+| `sensor.my_car_fuel_consumption_trip`, `sensor.my_car_fuel_consumption_this_month`, `sensor.my_car_average_fuel_consumption` | Fuel consumption of the last trip, this month and on average (L/100 km, or mpg in imperial units) |
+| `sensor.my_car_energy_consumption_trip`, `sensor.my_car_energy_consumption_this_month`, `sensor.my_car_average_energy_consumption` | Energy consumption of the last trip, this month and on average (kWh/100 km, or mi/kWh in imperial units) |
 | `sensor.my_car_trip_distance`, `sensor.my_car_distance_this_month` | Distance of the last trip and this month (km) |
 | `sensor.my_car_fuel_used_this_month` | Fuel used this month (L) |
 | `sensor.my_car_energy_used_this_month` | Energy used this month (kWh) |
 | `sensor.my_car_cost_this_month` | Cost of the fuel and energy used this month |
-| `sensor.my_car_cost_per_km` | Cost per kilometre, on average |
+| `sensor.my_car_cost_per_km` | Cost per kilometre (per mile in imperial units), on average |
 | `sensor.my_car_co2_of_the_trip`, `sensor.my_car_co2_this_month` | CO₂ of the last trip and of this month (kg) |
-| `sensor.my_car_co2_per_km` | CO₂ per kilometre, on average (g/km) |
+| `sensor.my_car_co2_per_km` | CO₂ per kilometre, on average (g/km, or g/mi in imperial units) |
 | `sensor.my_car_last_refuel` | Time of the last refuel; attributes `liters`, `cost`, `odometer`, `source` (`auto` or `manual`) |
 | `sensor.my_car_last_charge` | Time of the last charge; attributes `energy`, `cost`, `odometer`, `source` (`auto`, `charger` or `manual`) |
 
@@ -163,7 +164,7 @@ One device per vehicle; the entities only exist when they make sense for it (`fu
 
 #### `vehicle_consumption.add_refuel`
 
-Logs a refuel by hand: it shows up in the card's refuels with source `manual`. Consumption still comes from the sensors, so a manual refuel does not change it. Fields: `config_entry_id` (the vehicle, required), `liters` (required), `cost` (total), `price` (per litre), `odometer`.
+Logs a refuel by hand: it shows up in the card's refuels with source `manual`. Consumption still comes from the sensors, so a manual refuel does not change it. Fields: `config_entry_id` (the vehicle, required), `liters` (required), `cost` (total), `price` (per litre), `odometer` (in the unit of the odometer sensor: miles for a car that reports miles; the last reading when left out).
 
 ```yaml
 action: vehicle_consumption.add_refuel
@@ -236,18 +237,19 @@ data:
 
 #### `vehicle_consumption_trip_ended`
 
-Fired when the integration closes a trip: the **trip gap** after the odometer last moved, as the trip shows up in the trips list. Only for trips closed while Home Assistant runs (not for a trip closed at startup, which ended while it was stopped, nor for trips found in the history), and only when the odometer moved. With an odometer polled hourly, a reading that shows the car never stopped long enough reopens the last trip: it is announced again when it closes.
+Fired once per trip, when it is final: the **trip gap** after the odometer last moved, or 65 minutes if the trip gap is shorter. A trip shows up in the trips list after the trip gap, but an odometer polled hourly (Renault, MyPeugeot…) can still report the rest of the same drive within the hour and reopen it; the event waits until that can no longer happen, so it carries the figures of the whole drive, and a trip announced is never reopened (a later reading starts a new trip). A new trip starting makes the previous one final at once. Only for trips closed while Home Assistant runs (not for a trip closed at startup, which ended while it was stopped, nor for trips found in the history), and only when the odometer moved. The figures are in the units of the **Units** option.
 
 | Field | Content |
 |---|---|
 | `entry_id`, `device_id`, `vehicle` | Config entry, vehicle device and vehicle name |
 | `start`, `end` | First and last odometer move (ISO 8601) |
 | `duration` | Minutes from `start` to `end` |
-| `distance` | km |
-| `fuel`, `energy` | L and kWh used |
-| `fuel_consumption`, `energy_consumption` | L/100 km and kWh/100 km (`null` under 5 km) |
-| `cost`, `cost_per_km` | In the Home Assistant currency (`null` without a price) |
-| `co2`, `co2_per_km` | kg and g/km |
+| `distance` | km (miles in imperial units) |
+| `fuel`, `energy` | L (US gallons in imperial units) and kWh used |
+| `fuel_consumption`, `energy_consumption` | L/100 km and kWh/100 km, or mpg and mi/kWh (`null` under 5 km) |
+| `cost`, `cost_per_km` | In the Home Assistant currency, per km or per mile (`null` without a price) |
+| `co2`, `co2_per_km` | kg and g/km (g/mi in imperial units) |
+| `units` | `metric` or `imperial` |
 
 ```yaml
 triggers:

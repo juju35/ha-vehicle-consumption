@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.4.0 - 2026-11-08
+
+### What's new
+- New option *Units*: imperial shows miles, US gallons, mpg, mi/kWh and the cost and CO₂ per mile on the card, in the main sensor's attributes, in the trip ended event and in the consumption sensors (metric stays the default).
+- The odometer given to `add_refuel` / `add_charge` is read in the unit of the vehicle's odometer sensor (miles for a car reporting miles), and the card's refuel popup takes gallons in imperial units.
+
+### Fixes
+- `vehicle_consumption_trip_ended` is fired once per trip with its final figures: it waits until an hourly odometer can no longer reopen the trip (65 minutes, or the trip gap if longer), instead of firing for each part of a drive.
+- The main sensor no longer records its card data (trip, month, total, levels, prices, odometer, counts) in the history at every change.
+
 ## 1.3.0 - 2026-11-07
 
 ### What's new

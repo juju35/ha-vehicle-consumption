@@ -51,6 +51,7 @@ from .const import (
     CONF_REFUEL_THRESHOLD,
     CONF_TANK_CAPACITY,
     CONF_TRIP_GAP,
+    CONF_UNITS,
     DEFAULT_CHARGE_THRESHOLD,
     DEFAULT_CO2_ELECTRICITY,
     DEFAULT_FUEL_TYPE,
@@ -75,6 +76,9 @@ from .const import (
     SENSOR_KEYS,
     STORAGE_KEY,
     STORAGE_VERSION,
+    TRIP_REOPEN_WINDOW,
+    UNITS_IMPERIAL,
+    UNITS_METRIC,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -164,13 +168,27 @@ class Totals:
     def copy(self) -> Totals:
         return Totals(self.distance, self.fuel, self.energy, self.cost)
 
-    def summary(self, co2: tuple[float, float] | None = None) -> dict[str, Any]:
+    def summary(self, co2: tuple[float, float] | None = None, imperial: bool = False) -> dict[str, Any]:
         """Rounded figures for the card: consumption and cost per km need a meaningful distance.
 
         `co2` = (kg per litre of fuel, kg per kWh): the CO₂ of what was consumed, in kg, and per km in g.
+        `imperial`: miles, US gallons, mpg and mi/kWh; the cost and the CO₂ per mile (same keys).
         """
         enough = self.distance >= MIN_DISTANCE
         kg = None if co2 is None else self.fuel * co2[0] + self.energy * co2[1]
+        if imperial:
+            miles, gallons = self.distance / KM_PER_MILE, self.fuel / LITERS_PER_GALLON
+            return {
+                "co2": None if kg is None else round(kg, 1),
+                "co2_per_km": round(kg / miles * 1000) if enough and kg is not None else None,
+                "distance": round(miles, 1),
+                "fuel": round(gallons, 2),
+                "energy": round(self.energy, 2),
+                "fuel_consumption": round(miles / gallons, 1) if enough and gallons > 0 else None,
+                "energy_consumption": round(miles / self.energy, 1) if enough and self.energy > 0 else None,
+                "cost": _round(self.cost, 2),
+                "cost_per_km": round(self.cost / miles, 3) if enough and self.cost is not None else None,
+            }
         return {
             "co2": None if kg is None else round(kg, 1),
             "co2_per_km": round(kg / self.distance * 1000) if enough and kg is not None else None,
@@ -215,8 +233,8 @@ class Trip:
     end: datetime | None  # last odometer move; None while driving (stored as the last move)
     totals: Totals
 
-    def summary(self, co2: tuple[float, float] | None = None) -> dict[str, Any]:
-        return {"start": _iso(self.start), "end": _iso(self.end), **self.totals.summary(co2)}
+    def summary(self, co2: tuple[float, float] | None = None, imperial: bool = False) -> dict[str, Any]:
+        return {"start": _iso(self.start), "end": _iso(self.end), **self.totals.summary(co2, imperial)}
 
     def dump(self) -> dict[str, Any]:
         return {"start": _iso(self.start), "end": _iso(self.end), **asdict(self.totals)}
@@ -242,13 +260,16 @@ class Refill:
     source: str
     start: datetime | None = None  # start of a home charger session
 
-    def summary(self, unit_key: str) -> dict[str, Any]:
+    def summary(self, unit_key: str, imperial: bool = False) -> dict[str, Any]:
+        """Rounded for the card; `imperial`: odometer in miles, fuel in US gallons and its price per gallon."""
+        volume = LITERS_PER_GALLON if imperial and unit_key == "liters" else 1.0
+        distance = KM_PER_MILE if imperial else 1.0
         return {
             "time": self.time.isoformat(),
-            "odometer": _round(self.odometer, 1),
-            unit_key: round(self.amount, 2),
+            "odometer": _round(None if self.odometer is None else self.odometer / distance, 1),
+            unit_key: round(self.amount / volume, 2),
             "cost": _round(self.cost, 2),
-            "price": _round(self.price, 3),
+            "price": _round(None if self.price is None else self.price * volume, 3),
             "source": self.source,
         }
 
@@ -362,6 +383,7 @@ class ConsumptionTracker:
             FUEL_CO2.get(self.fuel_type, FUEL_CO2[DEFAULT_FUEL_TYPE]),
             (grid if grid is not None else DEFAULT_CO2_ELECTRICITY) / 1000,
         )
+        self.imperial = options.get(CONF_UNITS) == UNITS_IMPERIAL
         self.refuel_threshold = float(options.get(CONF_REFUEL_THRESHOLD, DEFAULT_REFUEL_THRESHOLD))
         self.charge_threshold = float(options.get(CONF_CHARGE_THRESHOLD, DEFAULT_CHARGE_THRESHOLD))
 
@@ -392,6 +414,9 @@ class ConsumptionTracker:
         self.history_imported = False
         # Oldest time the recorder's history was read from: nothing older is ever asked for again.
         self.history_from: datetime | None = None
+        # Start of the newest trip announced with `EVENT_TRIP_ENDED` (or never to be: closed at load, replayed). Trips
+        # closed live after it are announced once final; none of them is reopened after that.
+        self._announced: datetime | None = None
         self._reset_data(dt_util.utcnow())
         self._shown_month = self.month_totals()[0]
 
@@ -492,6 +517,14 @@ class ConsumptionTracker:
         return level * self.battery_capacity / 100 if level is not None and self.battery_capacity else None
 
     @property
+    def odometer_unit(self) -> str | None:
+        """Unit of the odometer sensor (km, mi, m): the unit of an odometer reading entered by hand."""
+        entity_id = self.sensors.get(CONF_ODOMETER)
+        state = self.hass.states.get(entity_id) if entity_id else None
+        unit = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) if state is not None else None
+        return str(unit) if unit else None
+
+    @property
     def fuel_quantity(self) -> float | None:
         return self._fuel_now()
 
@@ -556,7 +589,9 @@ class ConsumptionTracker:
             return False
         if self.trip is None:
             last = self.trips[0] if self.trips else None
-            if last is not None and self._drove_through(last, delta, now):
+            # An announced trip is final (live tracking only: a replay rebuilds the trips without announcing them).
+            final = self._replay_prices is None and self._is_announced(last)
+            if last is not None and not final and self._drove_through(last, delta, now):
                 # Same drive, reported late: the stop between the two readings was shorter than `trip_gap`.
                 self.trips.pop(0)
                 self._trip_start = self.total.minus(last.totals)
@@ -718,6 +753,31 @@ class ConsumptionTracker:
             self._prune()
         return True
 
+    def _is_announced(self, trip: Trip | None) -> bool:
+        return trip is not None and self._announced is not None and trip.start <= self._announced
+
+    def _mark_announced(self, until: datetime) -> None:
+        """Never announce the trips starting before `until` (closed at load, replayed by an import or a backfill)."""
+        starts = [t.start for t in self.trips if t.start < until]
+        if starts:
+            self._announced = max(self._announced or starts[0], *starts)
+
+    def _announce_trips(self, now: datetime) -> bool:
+        """Fire `EVENT_TRIP_ENDED` for every closed trip that is final now, oldest first; True when one was.
+
+        The newest closed trip can still be reopened by a late odometer reading (`_drove_through`) while no other trip
+        has started: it is final once `max(trip_gap, TRIP_REOPEN_WINDOW)` has passed since its last move.
+        """
+        pending = [t for t in self.trips if not self._is_announced(t)]
+        if pending and pending[0] is self.trips[0] and self.trip is None:
+            last = pending[0]
+            if now - (last.end or last.start) < max(self.trip_gap, TRIP_REOPEN_WINDOW):
+                pending.pop(0)
+        for trip in reversed(pending):
+            self._fire_trip_ended(trip)
+            self._announced = trip.start
+        return bool(pending)
+
     def _fire_trip_ended(self, trip: Trip) -> None:
         """Tell automations a trip just closed (live tracking only: never at load, in a replay or a backfill)."""
         end = trip.end or trip.start
@@ -728,7 +788,8 @@ class ConsumptionTracker:
                 "entry_id": self.entry_id,
                 "device_id": entry.data.get(CONF_DEVICE_ID) if entry else None,
                 "vehicle": self.name,
-                **trip.summary(self.co2),
+                **trip.summary(self.co2, self.imperial),
+                "units": self.units,
                 "duration": round((end - trip.start).total_seconds() / 60),
             },
         )
@@ -771,10 +832,8 @@ class ConsumptionTracker:
         def tick(now: datetime) -> None:
             month = self._shown_month
             self._shown_month = self.month_totals()[0]
-            driving = self.trip
             ended = self._end_trip_if_stopped(now)
-            if ended and driving is not None and self.trips and self.trips[0] is driving:
-                self._fire_trip_ended(driving)
+            ended |= self._announce_trips(now)
             if self._close_charger_session(now) or ended:
                 self._changed()
             elif month != self._shown_month:
@@ -815,6 +874,9 @@ class ConsumptionTracker:
             cost = amount * price
         elif price is None and cost is not None and amount > 0:
             price = cost / amount
+        if odometer is not None:
+            # Read like the odometer sensor: in its unit (miles for a car reporting miles), tracked in km.
+            odometer *= _UNIT_FACTORS[CONF_ODOMETER].get(self.odometer_unit, 1.0)
         events = self._levels[kind].events
         events.append(
             Refill(
@@ -869,6 +931,7 @@ class ConsumptionTracker:
             hourly_until=history.hourly_until,
             initial_prices=history.initial_prices,
         )
+        self._mark_announced(dt_util.utcnow())
         self.history_from = min(start, self.history_from or start)
         self._changed()
         return True
@@ -889,6 +952,7 @@ class ConsumptionTracker:
             return False
         history = await self._async_history(start, end)
         added = self._backfill(history.rows, history.prices, end, history.hourly_until, history.initial_prices)
+        self._mark_announced(end)
         self.history_from = min(start, self.history_from or start)
         self._changed()
         _LOGGER.debug("%s: history before %s %s", self.name, end, "added" if added else "not available")
@@ -1376,8 +1440,12 @@ class ConsumptionTracker:
                 _LOGGER.exception("Stored data of %s could not be read; starting again", self.name)
                 self._reset_data(now)
         self._prune()  # what got older than the days kept while stopped
-        # A trip still open in the store ended while Home Assistant was stopped (once the gap has passed).
+        # A trip still open in the store ended while Home Assistant was stopped (once the gap has passed): not
+        # announced, as for a trip closed in a replay.
+        closing = self.trip
         updated = self._end_trip_if_stopped(now)
+        if updated and closing is not None and self.trips and self.trips[0] is closing:
+            self._announced = closing.start
         updated |= self._close_charger_session(now)
         if self._read_current(now) or updated or not stored:
             self._store.async_delay_save(self._dump, SAVE_DELAY)
@@ -1408,6 +1476,12 @@ class ConsumptionTracker:
             isinstance(imported, int) and not isinstance(imported, bool) and imported >= HISTORY_IMPORT_VERSION
         )
         self.history_from = _time(data.get("history_from"))
+        # Stores before 1.4.0: the trips already listed were announced when they closed.
+        self._announced = (
+            _time(data.get("trip_announced"))
+            if "trip_announced" in data
+            else (self.trips[0].start if self.trips else None)
+        )
         self._known_prices = {
             str(k): price for k, v in (data.get("prices") or {}).items() if (price := _float(v)) is not None
         }
@@ -1432,6 +1506,7 @@ class ConsumptionTracker:
             "charger": self._charger.dump(),
             "history_imported": HISTORY_IMPORT_VERSION if self.history_imported else 0,
             "history_from": _iso(self.history_from),
+            "trip_announced": _iso(self._announced),
             "prices": dict(self._known_prices),
         }
 
@@ -1448,11 +1523,16 @@ class ConsumptionTracker:
     def driving(self) -> bool:
         return self.trip is not None
 
-    def current_trip(self) -> dict[str, Any] | None:
-        """The trip in progress (end None), else the last finished one."""
+    @property
+    def units(self) -> str:
+        return UNITS_IMPERIAL if self.imperial else UNITS_METRIC
+
+    def current_trip(self, imperial: bool | None = None) -> dict[str, Any] | None:
+        """The trip in progress (end None), else the last finished one (in the units chosen unless `imperial`)."""
+        imperial = self.imperial if imperial is None else imperial
         if self.trip is not None:
-            return Trip(self.trip.start, None, self.total.minus(self._trip_start)).summary(self.co2)
-        return self.trips[0].summary(self.co2) if self.trips else None
+            return Trip(self.trip.start, None, self.total.minus(self._trip_start)).summary(self.co2, imperial)
+        return self.trips[0].summary(self.co2, imperial) if self.trips else None
 
     def month_totals(self) -> tuple[str, Totals]:
         key = dt_util.as_local(dt_util.utcnow()).strftime("%Y-%m")
@@ -1467,7 +1547,7 @@ class ConsumptionTracker:
         """Every stored month, oldest first, with the current month even before anything happened in it."""
         key, current = self.month_totals()
         months = {**self.months, key: current}
-        return [{"month": k, **months[k].summary(self.co2)} for k in sorted(months)[-MAX_MONTHS:]]
+        return [{"month": k, **months[k].summary(self.co2, self.imperial)} for k in sorted(months)[-MAX_MONTHS:]]
 
     @property
     def refuels(self) -> list[Refill]:
@@ -1478,35 +1558,40 @@ class ConsumptionTracker:
         return self._levels[ENERGY].events
 
     def average(self, kind: str) -> float | None:
-        """All-time L/100 km (`fuel`) or kWh/100 km (`energy`)."""
-        return self.total.summary()[f"{kind}_consumption"]
+        """All-time L/100 km (`fuel`) or kWh/100 km (`energy`); mpg or mi/kWh in imperial units."""
+        return self.total.summary(None, self.imperial)[f"{kind}_consumption"]
 
     def attributes(self) -> dict[str, Any]:
         """Everything the card shows (exact keys: the card relies on them)."""
         month_key, month = self.month_totals()
+        # Imperial units: miles, US gallons, prices per gallon (the figures below too, same keys).
+        miles = KM_PER_MILE if self.imperial else 1.0
+        gallons = LITERS_PER_GALLON if self.imperial else 1.0
         return {
             "vehicle": self.name,
             "entry_id": self.entry_id,
             "kind": self.kind,
             "currency": self.currency,
-            "odometer": _round(self.odometer, 1),
-            "fuel_quantity": _round(self.fuel_quantity, 2),
+            "units": self.units,
+            "odometer": _round(None if self.odometer is None else self.odometer / miles, 1),
+            "odometer_unit": self.odometer_unit,
+            "fuel_quantity": _round(None if (q := self.fuel_quantity) is None else q / gallons, 2),
             "fuel_level": _round(self.fuel_level, 1),
-            "tank_capacity": self.tank_capacity,
+            "tank_capacity": _round(cap / gallons, 1) if (cap := self.tank_capacity) and self.imperial else cap,
             "battery_energy": _round(self.battery_energy, 2),
             "battery_level": _round(self.battery_level, 1),
             "battery_capacity": self.battery_capacity,
-            "fuel_price": _round(self.fuel_price, 3),
+            "fuel_price": _round(None if (p := self.fuel_price) is None else p * gallons, 3),
             "electricity_price": _round(self.electricity_price, 3),
             "driving": self.driving,
             "trip": self.current_trip(),
             "fuel_type": self.fuel_type if self.tracks_fuel else None,
-            "month": {"month": month_key, **month.summary(self.co2)},
-            "total": {"since": self.since.isoformat(), **self.total.summary(self.co2)},
+            "month": {"month": month_key, **month.summary(self.co2, self.imperial)},
+            "total": {"since": self.since.isoformat(), **self.total.summary(self.co2, self.imperial)},
             "months": self.months_summary(),
-            "trips": [t.summary(self.co2) for t in self.trips[:MAX_TRIPS]],
-            "refuels": [e.summary("liters") for e in self.refuels[:MAX_EVENTS]],
-            "charges": [e.summary("energy") for e in self.charges[:MAX_EVENTS]],
+            "trips": [t.summary(self.co2, self.imperial) for t in self.trips[:MAX_TRIPS]],
+            "refuels": [e.summary("liters", self.imperial) for e in self.refuels[:MAX_EVENTS]],
+            "charges": [e.summary("energy", self.imperial) for e in self.charges[:MAX_EVENTS]],
             # Everything kept (`HISTORY_DAYS`): the lists above only hold the newest.
             "trip_count": len(self.trips),
             "refuel_count": len(self.refuels),

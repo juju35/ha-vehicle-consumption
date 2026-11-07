@@ -41,10 +41,10 @@ async def test_trip_ended_event(hass: HomeAssistant, freezer: FrozenDateTimeFact
     await _set(hass, 10020, 39)
     await _wait(hass, freezer, 20)
     await _set(hass, 10050, 37)
-    await _wait(hass, freezer, 29)
-    assert events == []  # still within the gap
+    await _wait(hass, freezer, 31)
+    assert events == []  # closed, but a late odometer reading could still reopen it
 
-    await _wait(hass, freezer, 2)
+    await _wait(hass, freezer, 35)
     [event] = events
     assert event.data == {
         "entry_id": entry.entry_id,
@@ -62,6 +62,7 @@ async def test_trip_ended_event(hass: HomeAssistant, freezer: FrozenDateTimeFact
         "cost_per_km": 0.12,
         "co2": event.data["co2"],
         "co2_per_km": event.data["co2_per_km"],
+        "units": "metric",
     }
     assert event.data["co2"] > 0 and event.data["start"] < event.data["end"]
 
@@ -83,3 +84,50 @@ async def test_no_event_without_distance_or_at_load(hass: HomeAssistant, freezer
     await hass.async_block_till_done()
     await _wait(hass, freezer, 5)
     assert events == []
+
+
+async def test_one_event_for_a_trip_reopened_by_a_polled_odometer(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    """An hourly odometer closes the trip between two readings of the same drive: one event, with the final figures."""
+    events = async_capture_events(hass, EVENT_TRIP_ENDED)
+    await setup_vehicle(hass, OPTIONS)
+    await _set(hass, 10030, 38)
+    await _wait(hass, freezer, 60)  # closed after 30 min, still not final
+    assert events == []
+    await _set(hass, 10130, 32)  # 100 km in the hour: the car never stopped, the trip is reopened
+    await _wait(hass, freezer, 64)
+    assert events == []
+    await _wait(hass, freezer, 2)
+    [event] = events
+    assert event.data["distance"] == 130.0
+    assert event.data["fuel"] == 8.0
+    assert event.data["duration"] == 60
+
+    await _wait(hass, freezer, 120)
+    assert len(events) == 1
+
+
+async def test_announced_trip_is_never_reopened(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    """Once announced, a trip is final: a later reading starts a new trip, announced on its own."""
+    events = async_capture_events(hass, EVENT_TRIP_ENDED)
+    await setup_vehicle(hass, OPTIONS)
+    await _set(hass, 10010, 39)
+    await _wait(hass, freezer, 66)
+    assert [e.data["distance"] for e in events] == [10.0]
+    # 200 km since: `_drove_through` alone would have reopened it.
+    await _set(hass, 10210, 27)
+    await _wait(hass, freezer, 66)
+    assert [e.data["distance"] for e in events] == [10.0, 200.0]
+
+
+async def test_pending_trip_announced_when_another_starts(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    """A new trip (not a reopening) makes the previous one final: it is announced right away."""
+    events = async_capture_events(hass, EVENT_TRIP_ENDED)
+    await setup_vehicle(hass, OPTIONS)
+    await _set(hass, 10010, 39)
+    await _wait(hass, freezer, 50)
+    assert events == []
+    await _set(hass, 10012, 39)  # 2 km after a 50-min stop: a new trip
+    await _wait(hass, freezer, 1)
+    assert [e.data["distance"] for e in events] == [10.0]

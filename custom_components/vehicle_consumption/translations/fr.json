@@ -46,7 +46,8 @@
           "electricity_price_entity": "Capteur du prix de l'électricité",
           "electricity_price": "Prix fixe de l'électricité",
           "fuel_type": "Carburant",
-          "co2_electricity": "CO₂ de l'électricité"
+          "co2_electricity": "CO₂ de l'électricité",
+          "units": "Unités"
         },
         "data_description": {
           "fuel_price_entity": "Prix au litre (ou au gallon) qui suit les prix des stations.",
@@ -54,7 +55,8 @@
           "electricity_price_entity": "Prix du kWh de votre tarif.",
           "electricity_price": "Prix du kWh, utilisé sans capteur de prix ou quand celui-ci est indisponible.",
           "fuel_type": "Donne le CO₂ de chaque litre brûlé : essence 2,31 kg, gazole 2,68 kg, GPL 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Grammes de CO₂ par kWh chargé ; 55 pour le réseau français, environ 380 pour l'allemand."
+          "co2_electricity": "Grammes de CO₂ par kWh chargé ; 55 pour le réseau français, environ 380 pour l'allemand.",
+          "units": "Unités des valeurs affichées sur la carte et dans les capteurs de consommation. Les distances et volumes des trajets et du mois suivent le système d'unités de Home Assistant."
         }
       }
     },
@@ -107,7 +109,8 @@
           "refuel_threshold": "Seuil de plein",
           "charge_threshold": "Seuil de recharge",
           "fuel_type": "Carburant",
-          "co2_electricity": "CO₂ de l'électricité"
+          "co2_electricity": "CO₂ de l'électricité",
+          "units": "Unités"
         },
         "data_description": {
           "fuel_price_entity": "Prix au litre (ou au gallon) qui suit les prix des stations.",
@@ -118,7 +121,8 @@
           "refuel_threshold": "Une hausse du carburant d'au moins cette quantité est un plein ; les hausses plus faibles sont ignorées.",
           "charge_threshold": "Une hausse de la batterie d'au moins cette quantité est une recharge ; les hausses plus faibles sont ignorées.",
           "fuel_type": "Donne le CO₂ de chaque litre brûlé : essence 2,31 kg, gazole 2,68 kg, GPL 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Grammes de CO₂ par kWh chargé ; 55 pour le réseau français, environ 380 pour l'allemand."
+          "co2_electricity": "Grammes de CO₂ par kWh chargé ; 55 pour le réseau français, environ 380 pour l'allemand.",
+          "units": "Unités des valeurs affichées sur la carte et dans les capteurs de consommation. Les distances et volumes des trajets et du mois suivent le système d'unités de Home Assistant."
         }
       }
     },
@@ -318,7 +322,7 @@
         },
         "odometer": {
           "name": "Compteur kilométrique",
-          "description": "Kilométrage (km). Dernier relevé connu s'il est omis."
+          "description": "Kilométrage, dans l'unité du capteur de kilométrage. Dernier relevé connu s'il est omis."
         }
       }
     },
@@ -344,7 +348,7 @@
         },
         "odometer": {
           "name": "Compteur kilométrique",
-          "description": "Kilométrage (km). Dernier relevé connu s'il est omis."
+          "description": "Kilométrage, dans l'unité du capteur de kilométrage. Dernier relevé connu s'il est omis."
         }
       }
     },
@@ -391,6 +395,12 @@
         "diesel": "Gazole",
         "lpg": "GPL",
         "e85": "E85 (éthanol)"
+      }
+    },
+    "units": {
+      "options": {
+        "metric": "Métrique (km, L/100 km, kWh/100 km)",
+        "imperial": "Impérial (miles, mpg, mi/kWh)"
       }
     }
   }

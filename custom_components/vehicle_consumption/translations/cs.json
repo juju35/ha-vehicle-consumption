@@ -46,7 +46,8 @@
           "electricity_price_entity": "Senzor ceny elektřiny",
           "electricity_price": "Pevná cena elektřiny",
           "fuel_type": "Palivo",
-          "co2_electricity": "CO₂ elektřiny"
+          "co2_electricity": "CO₂ elektřiny",
+          "units": "Jednotky"
         },
         "data_description": {
           "fuel_price_entity": "Cena za litr (nebo za galon), která sleduje ceny na čerpací stanici.",
@@ -54,7 +55,8 @@
           "electricity_price_entity": "Cena za kWh podle vašeho tarifu.",
           "electricity_price": "Cena za kWh, použije se, pokud není senzor ceny nebo je nedostupný.",
           "fuel_type": "Udává CO₂ každého spáleného litru: benzín 2,31 kg, nafta 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gramy CO₂ na nabitou kWh; 55 pro francouzskou síť, přibližně 380 pro německou."
+          "co2_electricity": "Gramy CO₂ na nabitou kWh; 55 pro francouzskou síť, přibližně 380 pro německou.",
+          "units": "Jednotky hodnot na kartě a ve snímačích spotřeby. Vzdálenosti a objemy jízdy a měsíce se řídí systémem jednotek Home Assistant."
         }
       }
     },
@@ -107,7 +109,8 @@
           "refuel_threshold": "Práh tankování",
           "charge_threshold": "Práh nabíjení",
           "fuel_type": "Palivo",
-          "co2_electricity": "CO₂ elektřiny"
+          "co2_electricity": "CO₂ elektřiny",
+          "units": "Jednotky"
         },
         "data_description": {
           "fuel_price_entity": "Cena za litr (nebo za galon), která sleduje ceny na čerpací stanici.",
@@ -118,7 +121,8 @@
           "refuel_threshold": "Nárůst paliva alespoň o tuto hodnotu je tankování; menší nárůsty se ignorují.",
           "charge_threshold": "Nárůst baterie alespoň o tuto hodnotu je nabíjení; menší nárůsty se ignorují.",
           "fuel_type": "Udává CO₂ každého spáleného litru: benzín 2,31 kg, nafta 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gramy CO₂ na nabitou kWh; 55 pro francouzskou síť, přibližně 380 pro německou."
+          "co2_electricity": "Gramy CO₂ na nabitou kWh; 55 pro francouzskou síť, přibližně 380 pro německou.",
+          "units": "Jednotky hodnot na kartě a ve snímačích spotřeby. Vzdálenosti a objemy jízdy a měsíce se řídí systémem jednotek Home Assistant."
         }
       }
     },
@@ -318,7 +322,7 @@
         },
         "odometer": {
           "name": "Počítadlo kilometrů",
-          "description": "Stav počítadla kilometrů (km). Pokud se vynechá, poslední známý stav."
+          "description": "Stav počítadla kilometrů, v jednotce jeho snímače. Pokud se vynechá, poslední známý stav."
         }
       }
     },
@@ -344,7 +348,7 @@
         },
         "odometer": {
           "name": "Počítadlo kilometrů",
-          "description": "Stav počítadla kilometrů (km). Pokud se vynechá, poslední známý stav."
+          "description": "Stav počítadla kilometrů, v jednotce jeho snímače. Pokud se vynechá, poslední známý stav."
         }
       }
     },
@@ -391,6 +395,12 @@
         "diesel": "Nafta",
         "lpg": "LPG",
         "e85": "E85 (etanol)"
+      }
+    },
+    "units": {
+      "options": {
+        "metric": "Metrické (km, L/100 km, kWh/100 km)",
+        "imperial": "Imperiální (míle, mpg, mi/kWh)"
       }
     }
   }

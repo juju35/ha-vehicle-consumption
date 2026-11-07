@@ -5,7 +5,7 @@
  * Served and added to the dashboard resources by the integration.
  * https://github.com/juju35/ha-vehicle-consumption
  */
-var VEHICLE_CONSUMPTION_CARD_VERSION = '1.3.0';
+var VEHICLE_CONSUMPTION_CARD_VERSION = '1.4.0';
 
 const VC_I18N = {
   en: {
@@ -23,7 +23,7 @@ const VC_I18N = {
     trip_now: 'Current trip',
     month: 'This month',
     average: 'Average',
-    cost_km: 'Cost per km',
+    cost_km: 'Cost per {u}',
     month_cost: '{v} this month',
     recent_trips: 'Recent trips',
     refuels: 'Refuels',
@@ -37,7 +37,7 @@ const VC_I18N = {
     chart_distance: 'Distance',
     chart_cost: 'Cost',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Last {n} months',
     add: 'Log a refuel or a charge',
     add_refuel: 'Log a refuel',
@@ -80,7 +80,7 @@ const VC_I18N = {
     trip_now: 'Trajet en cours',
     month: 'Ce mois-ci',
     average: 'Moyenne',
-    cost_km: 'Coût au km',
+    cost_km: 'Coût au {u}',
     month_cost: '{v} ce mois-ci',
     recent_trips: 'Trajets récents',
     refuels: 'Pleins',
@@ -94,7 +94,7 @@ const VC_I18N = {
     chart_distance: 'Distance',
     chart_cost: 'Coût',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: '{n} derniers mois',
     add: 'Noter un plein ou une recharge',
     add_refuel: 'Noter un plein',
@@ -137,7 +137,7 @@ const VC_I18N = {
     trip_now: 'Aktuelle Fahrt',
     month: 'Diesen Monat',
     average: 'Durchschnitt',
-    cost_km: 'Kosten pro km',
+    cost_km: 'Kosten pro {u}',
     month_cost: '{v} diesen Monat',
     recent_trips: 'Letzte Fahrten',
     refuels: 'Tankvorgänge',
@@ -151,7 +151,7 @@ const VC_I18N = {
     chart_distance: 'Strecke',
     chart_cost: 'Kosten',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Letzte {n} Monate',
     add: 'Tank- oder Ladevorgang erfassen',
     add_refuel: 'Tankvorgang erfassen',
@@ -194,7 +194,7 @@ const VC_I18N = {
     trip_now: 'Trayecto en curso',
     month: 'Este mes',
     average: 'Media',
-    cost_km: 'Coste por km',
+    cost_km: 'Coste por {u}',
     month_cost: '{v} este mes',
     recent_trips: 'Trayectos recientes',
     refuels: 'Repostajes',
@@ -208,7 +208,7 @@ const VC_I18N = {
     chart_distance: 'Distancia',
     chart_cost: 'Coste',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Últimos {n} meses',
     add: 'Registrar un repostaje o una carga',
     add_refuel: 'Registrar un repostaje',
@@ -251,7 +251,7 @@ const VC_I18N = {
     trip_now: 'Viaggio in corso',
     month: 'Questo mese',
     average: 'Media',
-    cost_km: 'Costo al km',
+    cost_km: 'Costo al {u}',
     month_cost: '{v} questo mese',
     recent_trips: 'Viaggi recenti',
     refuels: 'Rifornimenti',
@@ -265,7 +265,7 @@ const VC_I18N = {
     chart_distance: 'Distanza',
     chart_cost: 'Costo',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Ultimi {n} mesi',
     add: 'Registra un rifornimento o una ricarica',
     add_refuel: 'Registra un rifornimento',
@@ -308,7 +308,7 @@ const VC_I18N = {
     trip_now: 'Huidige rit',
     month: 'Deze maand',
     average: 'Gemiddeld',
-    cost_km: 'Kosten per km',
+    cost_km: 'Kosten per {u}',
     month_cost: '{v} deze maand',
     recent_trips: 'Recente ritten',
     refuels: 'Tankbeurten',
@@ -322,7 +322,7 @@ const VC_I18N = {
     chart_distance: 'Afstand',
     chart_cost: 'Kosten',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Laatste {n} maanden',
     add: 'Tankbeurt of laadbeurt invoeren',
     add_refuel: 'Tankbeurt invoeren',
@@ -365,7 +365,7 @@ const VC_I18N = {
     trip_now: 'Viagem em curso',
     month: 'Este mês',
     average: 'Média',
-    cost_km: 'Custo por km',
+    cost_km: 'Custo por {u}',
     month_cost: '{v} este mês',
     recent_trips: 'Viagens recentes',
     refuels: 'Abastecimentos',
@@ -379,7 +379,7 @@ const VC_I18N = {
     chart_distance: 'Distância',
     chart_cost: 'Custo',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Últimos {n} meses',
     add: 'Registar um abastecimento ou carregamento',
     add_refuel: 'Registar um abastecimento',
@@ -422,7 +422,7 @@ const VC_I18N = {
     trip_now: 'Bieżąca trasa',
     month: 'Ten miesiąc',
     average: 'Średnio',
-    cost_km: 'Koszt za km',
+    cost_km: 'Koszt za {u}',
     month_cost: '{v} w tym mies.',
     recent_trips: 'Ostatnie trasy',
     refuels: 'Tankowania',
@@ -436,7 +436,7 @@ const VC_I18N = {
     chart_distance: 'Dystans',
     chart_cost: 'Koszt',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Ostatnie miesiące: {n}',
     add: 'Zapisz tankowanie lub ładowanie',
     add_refuel: 'Zapisz tankowanie',
@@ -479,7 +479,7 @@ const VC_I18N = {
     trip_now: 'Călătorie în curs',
     month: 'Luna aceasta',
     average: 'Medie',
-    cost_km: 'Cost pe km',
+    cost_km: 'Cost pe {u}',
     month_cost: '{v} luna asta',
     recent_trips: 'Călătorii recente',
     refuels: 'Alimentări',
@@ -493,7 +493,7 @@ const VC_I18N = {
     chart_distance: 'Distanță',
     chart_cost: 'Cost',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Ultimele {n} luni',
     add: 'Adaugă o alimentare sau o încărcare',
     add_refuel: 'Adaugă o alimentare',
@@ -536,7 +536,7 @@ const VC_I18N = {
     trip_now: 'Igangværende tur',
     month: 'Denne måned',
     average: 'Gennemsnit',
-    cost_km: 'Pris pr. km',
+    cost_km: 'Pris pr. {u}',
     month_cost: '{v} denne md.',
     recent_trips: 'Seneste ture',
     refuels: 'Tankninger',
@@ -550,7 +550,7 @@ const VC_I18N = {
     chart_distance: 'Distance',
     chart_cost: 'Omkostning',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Seneste {n} måneder',
     add: 'Notér en tankning eller opladning',
     add_refuel: 'Notér en tankning',
@@ -593,7 +593,7 @@ const VC_I18N = {
     trip_now: 'Pågående resa',
     month: 'Denna månad',
     average: 'Genomsnitt',
-    cost_km: 'Kostnad per km',
+    cost_km: 'Kostnad per {u}',
     month_cost: '{v} denna månad',
     recent_trips: 'Senaste resor',
     refuels: 'Tankningar',
@@ -607,7 +607,7 @@ const VC_I18N = {
     chart_distance: 'Sträcka',
     chart_cost: 'Kostnad',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Senaste {n} månader',
     add: 'Registrera en tankning eller laddning',
     add_refuel: 'Registrera en tankning',
@@ -650,7 +650,7 @@ const VC_I18N = {
     trip_now: 'Текущо пътуване',
     month: 'Този месец',
     average: 'Средно',
-    cost_km: 'Цена за km',
+    cost_km: 'Цена за {u}',
     month_cost: '{v} този месец',
     recent_trips: 'Пътувания',
     refuels: 'Танкувания',
@@ -664,7 +664,7 @@ const VC_I18N = {
     chart_distance: 'Разстояние',
     chart_cost: 'Разходи',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Последните {n} месеца',
     add: 'Запиши танкуване или зареждане',
     add_refuel: 'Запиши танкуване',
@@ -707,7 +707,7 @@ const VC_I18N = {
     trip_now: 'Текущая поездка',
     month: 'Этот месяц',
     average: 'Среднее',
-    cost_km: 'Стоимость на km',
+    cost_km: 'Стоимость на {u}',
     month_cost: '{v} в этом мес.',
     recent_trips: 'Поездки',
     refuels: 'Заправки',
@@ -721,7 +721,7 @@ const VC_I18N = {
     chart_distance: 'Расстояние',
     chart_cost: 'Затраты',
     chart_co2: 'CO₂',
-    co2_km: '{v} г CO₂/км',
+    co2_km: '{v} г CO₂/{u}',
     last_months: 'Последние месяцы: {n}',
     add: 'Записать заправку или зарядку',
     add_refuel: 'Записать заправку',
@@ -764,7 +764,7 @@ const VC_I18N = {
     trip_now: 'Поточна поїздка',
     month: 'Цей місяць',
     average: 'Середнє',
-    cost_km: 'Вартість за km',
+    cost_km: 'Вартість за {u}',
     month_cost: '{v} цього міс.',
     recent_trips: 'Поїздки',
     refuels: 'Заправки',
@@ -778,7 +778,7 @@ const VC_I18N = {
     chart_distance: 'Відстань',
     chart_cost: 'Витрати',
     chart_co2: 'CO₂',
-    co2_km: '{v} г CO₂/км',
+    co2_km: '{v} г CO₂/{u}',
     last_months: 'Останні місяці: {n}',
     add: 'Записати заправку або заряджання',
     add_refuel: 'Записати заправку',
@@ -821,7 +821,7 @@ const VC_I18N = {
     trip_now: 'Jelenlegi út',
     month: 'Ez a hónap',
     average: 'Átlag',
-    cost_km: 'Költség/km',
+    cost_km: 'Költség/{u}',
     month_cost: '{v} e hóban',
     recent_trips: 'Legutóbbi utak',
     refuels: 'Tankolások',
@@ -835,7 +835,7 @@ const VC_I18N = {
     chart_distance: 'Távolság',
     chart_cost: 'Költség',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Utolsó {n} hónap',
     add: 'Tankolás vagy töltés rögzítése',
     add_refuel: 'Tankolás rögzítése',
@@ -878,7 +878,7 @@ const VC_I18N = {
     trip_now: 'Aktuálna jazda',
     month: 'Tento mesiac',
     average: 'Priemer',
-    cost_km: 'Náklady na km',
+    cost_km: 'Náklady na {u}',
     month_cost: '{v} tento mesiac',
     recent_trips: 'Nedávne jazdy',
     refuels: 'Tankovania',
@@ -892,7 +892,7 @@ const VC_I18N = {
     chart_distance: 'Vzdialenosť',
     chart_cost: 'Náklady',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Posledné mesiace: {n}',
     add: 'Zaznamenať tankovanie alebo nabíjanie',
     add_refuel: 'Zaznamenať tankovanie',
@@ -935,7 +935,7 @@ const VC_I18N = {
     trip_now: 'Aktuální jízda',
     month: 'Tento měsíc',
     average: 'Průměr',
-    cost_km: 'Náklady na km',
+    cost_km: 'Náklady na {u}',
     month_cost: '{v} tento měsíc',
     recent_trips: 'Nedávné jízdy',
     refuels: 'Tankování',
@@ -949,7 +949,7 @@ const VC_I18N = {
     chart_distance: 'Vzdálenost',
     chart_cost: 'Náklady',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Poslední měsíce: {n}',
     add: 'Zaznamenat tankování nebo nabíjení',
     add_refuel: 'Zaznamenat tankování',
@@ -992,7 +992,7 @@ const VC_I18N = {
     trip_now: 'Trenutna vožnja',
     month: 'Ta mesec',
     average: 'Povprečje',
-    cost_km: 'Strošek na km',
+    cost_km: 'Strošek na {u}',
     month_cost: '{v} ta mesec',
     recent_trips: 'Nedavne vožnje',
     refuels: 'Točenja goriva',
@@ -1006,7 +1006,7 @@ const VC_I18N = {
     chart_distance: 'Razdalja',
     chart_cost: 'Stroški',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Zadnji meseci: {n}',
     add: 'Zabeleži točenje goriva ali polnjenje',
     add_refuel: 'Zabeleži točenje goriva',
@@ -1049,7 +1049,7 @@ const VC_I18N = {
     trip_now: 'Šis brauciens',
     month: 'Šis mēnesis',
     average: 'Vidēji',
-    cost_km: 'Izmaksas par km',
+    cost_km: 'Izmaksas par {u}',
     month_cost: '{v} šomēnes',
     recent_trips: 'Nesenie braucieni',
     refuels: 'Uzpildes',
@@ -1063,7 +1063,7 @@ const VC_I18N = {
     chart_distance: 'Attālums',
     chart_cost: 'Izmaksas',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Pēdējie {n} mēneši',
     add: 'Reģistrēt uzpildi vai uzlādi',
     add_refuel: 'Reģistrēt uzpildi',
@@ -1106,7 +1106,7 @@ const VC_I18N = {
     trip_now: 'Τρέχ. διαδρομή',
     month: 'Αυτός ο μήνας',
     average: 'Μέσος όρος',
-    cost_km: 'Κόστος ανά km',
+    cost_km: 'Κόστος ανά {u}',
     month_cost: '{v} τον μήνα',
     recent_trips: 'Διαδρομές',
     refuels: 'Ανεφοδιασμοί',
@@ -1120,7 +1120,7 @@ const VC_I18N = {
     chart_distance: 'Απόσταση',
     chart_cost: 'Κόστος',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Τελευταίοι {n} μήνες',
     add: 'Καταγραφή ανεφοδιασμού ή φόρτισης',
     add_refuel: 'Καταγραφή ανεφοδιασμού',
@@ -1163,7 +1163,7 @@ const VC_I18N = {
     trip_now: 'Тренутна вожња',
     month: 'Овај месец',
     average: 'Просек',
-    cost_km: 'Трошак по km',
+    cost_km: 'Трошак по {u}',
     month_cost: '{v} овог месеца',
     recent_trips: 'Недавне вожње',
     refuels: 'Точења горива',
@@ -1177,7 +1177,7 @@ const VC_I18N = {
     chart_distance: 'Пређени пут',
     chart_cost: 'Трошак',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Последњи месеци: {n}',
     add: 'Унеси точење горива или пуњење',
     add_refuel: 'Унеси точење горива',
@@ -1220,7 +1220,7 @@ const VC_I18N = {
     trip_now: 'Trenutna vožnja',
     month: 'Ovaj mesec',
     average: 'Prosek',
-    cost_km: 'Trošak po km',
+    cost_km: 'Trošak po {u}',
     month_cost: '{v} ovog meseca',
     recent_trips: 'Nedavne vožnje',
     refuels: 'Točenja goriva',
@@ -1234,7 +1234,7 @@ const VC_I18N = {
     chart_distance: 'Pređeni put',
     chart_cost: 'Trošak',
     chart_co2: 'CO₂',
-    co2_km: '{v} g CO₂/km',
+    co2_km: '{v} g CO₂/{u}',
     last_months: 'Poslednji meseci: {n}',
     add: 'Unesi točenje goriva ili punjenje',
     add_refuel: 'Unesi točenje goriva',
@@ -1296,6 +1296,27 @@ const VC_ANIM_MS = 1600;
 const VC_DASH = '—';
 
 const vcFinite = (v) => v != null && v !== '' && Number.isFinite(Number(v));
+
+// The units of the figures the integration gives (its `units` option): metric, or imperial (miles, US gallons, mpg,
+// mi/kWh, cost and CO₂ per mile). The source odometer's unit (`odometer_unit`): what an odometer entered by hand is in.
+const VC_KM = { km: 1, mi: 1.609344, m: 0.001 };
+const VC_GALLON = 3.785411784;
+function vcUnits(a) {
+  const imperial = a?.units === 'imperial';
+  const dist = imperial ? 'mi' : 'km';
+  const source = a?.odometer_unit in VC_KM ? a.odometer_unit : dist;
+  return {
+    imperial,
+    dist,
+    vol: imperial ? 'gal' : 'L',
+    fuel: imperial ? 'mpg' : 'L/100 km',
+    energy: imperial ? 'mi/kWh' : 'kWh/100 km',
+    odometer: source,
+    // An odometer shown (in `dist`) to the odometer sensor's unit, and litres from what is typed (gal or L).
+    toSource: (v) => (v * VC_KM[dist]) / VC_KM[source],
+    toLiters: (v) => (imperial ? v * VC_GALLON : v),
+  };
+}
 
 // Home Assistant's `pt` is European Portuguese, while Intl reads a bare `pt` as Brazilian (« € 1.234 », « 30 de out. »).
 const vcIntlLocale = (l) => (String(l || '').toLowerCase() === 'pt' ? 'pt-PT' : l);
@@ -1570,12 +1591,12 @@ class VehicleConsumptionCard extends HTMLElement {
     const kind = VC_KINDS.includes(a.kind) ? a.kind : 'fuel';
     const tracks = vcTracks(kind);
     const gauges = [
-      tracks.fuel ? this._gauge('fuel', a.fuel_level, a.fuel_quantity, 'L', 'mdi:gas-station', f) : null,
+      tracks.fuel ? this._gauge('fuel', a.fuel_level, a.fuel_quantity, vcUnits(a).vol, 'mdi:gas-station', f) : null,
       tracks.energy ? this._gauge('battery', a.battery_level, a.battery_energy, 'kWh', 'mdi:battery-charging-medium', f) : null,
     ].filter(Boolean);
     const low = gauges.some((g) => g.low);
     const level = a.driving ? 'drive' : low ? 'warn' : 'ok';
-    const unit = st.attributes.unit_of_measurement || (tracks.fuel ? 'L/100 km' : 'kWh/100 km');
+    const unit = st.attributes.unit_of_measurement || (tracks.fuel ? vcUnits(a).fuel : vcUnits(a).energy);
     const avg = vcFinite(st.state) ? `${f.num(st.state, 1)} ${unit}` : VC_DASH;
 
     // First-render animations: started at the first render, resumed (negative delay) by a re-render inside the window.
@@ -1669,9 +1690,10 @@ class VehicleConsumptionCard extends HTMLElement {
   // One consumption per tracked energy: [{ v, unit }].
   _cons(obj, kind, f) {
     const t = vcTracks(kind);
+    const u = vcUnits(this._attrs);
     return [
-      t.fuel ? { v: f.num(obj?.fuel_consumption, 1), unit: 'L/100 km' } : null,
-      t.energy ? { v: f.num(obj?.energy_consumption, 1), unit: 'kWh/100 km' } : null,
+      t.fuel ? { v: f.num(obj?.fuel_consumption, 1), unit: u.fuel } : null,
+      t.energy ? { v: f.num(obj?.energy_consumption, 1), unit: u.energy } : null,
     ].filter(Boolean);
   }
 
@@ -1688,7 +1710,8 @@ class VehicleConsumptionCard extends HTMLElement {
   }
 
   _kpis(a, kind, f) {
-    const km = (v) => (vcFinite(v) ? `${f.num(v, Number(v) < 100 ? 1 : 0)} km` : '');
+    const u = vcUnits(a);
+    const km = (v) => (vcFinite(v) ? `${f.num(v, Number(v) < 100 ? 1 : 0)} ${u.dist}` : '');
     const trip = a.trip || {};
     const tripSub = [km(trip.distance), vcFinite(trip.cost) ? f.money(trip.cost) : ''].filter(Boolean).join(' · ');
     const month = a.month || {};
@@ -1700,13 +1723,13 @@ class VehicleConsumptionCard extends HTMLElement {
       this._kpi('k-avg', this._t('average'), 'mdi:chart-line', this._cons(total, kind, f), km(total.distance)),
       this._kpi(
         'k-cost',
-        this._t('cost_km'),
+        this._t('cost_km', { u: u.dist }),
         'mdi:cash',
-        [{ v: f.money(cpk, 3), unit: vcFinite(cpk) ? '/km' : '' }],
+        [{ v: f.money(cpk, 3), unit: vcFinite(cpk) ? `/${u.dist}` : '' }],
         // The month's cost, and the CO₂ per km of the whole period when the integration gives it.
         [
           vcFinite(month.cost) ? this._t('month_cost', { v: f.money(month.cost) }) : '',
-          vcFinite(total.co2_per_km) ? this._t('co2_km', { v: f.num(total.co2_per_km, 0) }) : '',
+          vcFinite(total.co2_per_km) ? this._t('co2_km', { v: f.num(total.co2_per_km, 0), u: u.dist }) : '',
         ]
           .filter(Boolean)
           .join(' · '),
@@ -1729,16 +1752,9 @@ class VehicleConsumptionCard extends HTMLElement {
       metric === 'distance' ? m?.distance : metric === 'cost' ? m?.cost : metric === 'co2' ? m?.co2 : m?.[`${primary}_consumption`];
     const values = keys.map((k) => (vcFinite(metricOf(byKey.get(k))) ? Number(metricOf(byKey.get(k))) : null));
     const max = Math.max(0, ...values.filter((v) => v != null));
+    const u = vcUnits(a);
     const unit =
-      metric === 'distance'
-        ? 'km'
-        : metric === 'cost'
-          ? a.currency || ''
-          : metric === 'co2'
-            ? 'kg CO₂'
-            : primary === 'fuel'
-              ? 'L/100 km'
-              : 'kWh/100 km';
+      metric === 'distance' ? u.dist : metric === 'cost' ? a.currency || '' : metric === 'co2' ? 'kg CO₂' : u[primary];
     const label = (v) =>
       metric === 'cost' ? f.money(v, 0) : metric === 'distance' || metric === 'co2' ? f.num(v, 0) : f.num(v, 1);
     // The card's width less its padding (12 px) and the chart's (10 px), so 1 unit is 1 px; 400 until measured.
@@ -1786,6 +1802,7 @@ class VehicleConsumptionCard extends HTMLElement {
 
   _sections(a, kind, f) {
     const c = this._config;
+    const u = vcUnits(a);
     const out = [];
     if (c.trips !== false) {
       // The trip being driven first: it only joins the list once `trip_gap` has passed without a move.
@@ -1796,7 +1813,7 @@ class VehicleConsumptionCard extends HTMLElement {
         const cons = this._cons(t, kind, f)
           .filter((l) => l.v !== VC_DASH)
           .map((l) => `${l.v} ${l.unit}`);
-        const sub = [vcFinite(t.distance) ? `${f.num(t.distance, 1)} km` : '', t.open ? this._t('driving') : ''].filter(Boolean).join(' · ');
+        const sub = [vcFinite(t.distance) ? `${f.num(t.distance, 1)} ${u.dist}` : '', t.open ? this._t('driving') : ''].filter(Boolean).join(' · ');
         return this._row(f.date(t.start), sub || VC_DASH, cons.length ? cons : VC_DASH, f.money(t.cost));
       });
       // The count of everything kept (a year): the list only holds the newest.
@@ -1808,12 +1825,12 @@ class VehicleConsumptionCard extends HTMLElement {
       const events = (list, key, unit) =>
         (Array.isArray(list) ? list : []).slice(0, VC_ROWS).map((e) => {
           const from = e.source === 'manual' || e.source === 'charger' ? this._t(e.source) : '';
-          const sub = [vcFinite(e.odometer) ? `${f.num(e.odometer, 0)} km` : '', from]
+          const sub = [vcFinite(e.odometer) ? `${f.num(e.odometer, 0)} ${u.dist}` : '', from]
             .filter(Boolean)
             .join(' · ');
           return this._row(f.date(e.time), sub || VC_DASH, vcFinite(e[key]) ? `${f.num(e[key], 1)} ${unit}` : VC_DASH, f.money(e.cost), e.source === 'manual');
         });
-      if (t.fuel) out.push(this._section('refuels', 'mdi:gas-station', this._t('refuels'), vcFinite(a.refuel_count) ? a.refuel_count : a.refuels?.length || 0, events(a.refuels, 'liters', 'L'), 'no_refuels'));
+      if (t.fuel) out.push(this._section('refuels', 'mdi:gas-station', this._t('refuels'), vcFinite(a.refuel_count) ? a.refuel_count : a.refuels?.length || 0, events(a.refuels, 'liters', u.vol), 'no_refuels'));
       if (t.energy) out.push(this._section('charges', 'mdi:ev-station', this._t('charges'), vcFinite(a.charge_count) ? a.charge_count : a.charges?.length || 0, events(a.charges, 'energy', 'kWh'), 'no_charges'));
     }
     return out.length ? `<div class="sections">${out.join('')}</div>` : '';
@@ -1917,7 +1934,9 @@ class VehicleConsumptionCard extends HTMLElement {
     const amount = vcParse(p?.values.amount);
     if (!p || amount == null || amount <= 0) return null;
     const charge = p.mode === 'charge';
-    const data = { config_entry_id: this._attrs.entry_id, [charge ? 'energy' : 'liters']: amount };
+    const u = vcUnits(this._attrs);
+    // The service takes litres, and an odometer in the unit of the odometer sensor (typed here in that unit).
+    const data = { config_entry_id: this._attrs.entry_id, [charge ? 'energy' : 'liters']: charge ? amount : u.toLiters(amount) };
     const cost = vcParse(p.values.cost);
     const odometer = vcParse(p.values.odometer);
     if (cost != null && cost >= 0) data.cost = cost;
@@ -1944,6 +1963,7 @@ class VehicleConsumptionCard extends HTMLElement {
     const p = this._popup;
     const charge = p.mode === 'charge';
     const title = this._t(charge ? 'add_charge' : 'add_refuel');
+    const u = vcUnits(a);
     const field = (name, label, unit, placeholder = '', optional = false) => `
             <label class="field">
               <span class="flabel">${vcEsc(label)}${optional ? ` <i>${vcEsc(this._t('optional'))}</i>` : ''}</span>
@@ -1961,9 +1981,9 @@ class VehicleConsumptionCard extends HTMLElement {
           </div>
           ${kind === 'plugin_hybrid' ? `<div class="tabs" role="group">${tab('refuel', 'mdi:gas-station')}${tab('charge', 'mdi:ev-station')}</div>` : ''}
           <div class="fields">
-            ${field('amount', this._t(charge ? 'energy' : 'liters'), charge ? 'kWh' : 'L')}
+            ${field('amount', this._t(charge ? 'energy' : 'liters'), charge ? 'kWh' : u.vol)}
             ${field('cost', this._t('total_cost'), f.symbol() || a.currency || '', '', true)}
-            ${field('odometer', this._t('odometer'), 'km', vcFinite(a.odometer) ? f.num(a.odometer, 0) : '', true)}
+            ${field('odometer', this._t('odometer'), u.odometer, vcFinite(a.odometer) ? f.num(u.toSource(Number(a.odometer)), 0) : '', true)}
           </div>
           ${p.error ? `<div class="err">${vcEsc(p.error)}</div>` : ''}
           <div class="actions">

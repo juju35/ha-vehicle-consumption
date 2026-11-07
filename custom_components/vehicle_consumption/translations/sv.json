@@ -46,7 +46,8 @@
           "electricity_price_entity": "Sensor för elpris",
           "electricity_price": "Fast elpris",
           "fuel_type": "Bränsle",
-          "co2_electricity": "CO₂ för elektricitet"
+          "co2_electricity": "CO₂ för elektricitet",
+          "units": "Enheter"
         },
         "data_description": {
           "fuel_price_entity": "Pris per liter (eller per gallon) som följer stationens priser.",
@@ -54,7 +55,8 @@
           "electricity_price_entity": "Pris per kWh enligt ditt elavtal.",
           "electricity_price": "Pris per kWh, används när det inte finns någon prissensor eller den inte är tillgänglig.",
           "fuel_type": "Ger CO₂ för varje förbränd liter: bensin 2,31 kg, diesel 2,68 kg, gasol 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gram CO₂ per laddad kWh; 55 för det franska nätet, cirka 380 för det tyska."
+          "co2_electricity": "Gram CO₂ per laddad kWh; 55 för det franska nätet, cirka 380 för det tyska.",
+          "units": "Enheter för värdena på kortet och i förbrukningssensorerna. Resans och månadens sträckor och volymer följer Home Assistants enhetssystem."
         }
       }
     },
@@ -107,7 +109,8 @@
           "refuel_threshold": "Tröskel för tankning",
           "charge_threshold": "Tröskel för laddning",
           "fuel_type": "Bränsle",
-          "co2_electricity": "CO₂ för elektricitet"
+          "co2_electricity": "CO₂ för elektricitet",
+          "units": "Enheter"
         },
         "data_description": {
           "fuel_price_entity": "Pris per liter (eller per gallon) som följer stationens priser.",
@@ -118,7 +121,8 @@
           "refuel_threshold": "En ökning av bränslet med minst så här mycket är en tankning; mindre ökningar ignoreras.",
           "charge_threshold": "En ökning av batteriet med minst så här mycket är en laddning; mindre ökningar ignoreras.",
           "fuel_type": "Ger CO₂ för varje förbränd liter: bensin 2,31 kg, diesel 2,68 kg, gasol 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gram CO₂ per laddad kWh; 55 för det franska nätet, cirka 380 för det tyska."
+          "co2_electricity": "Gram CO₂ per laddad kWh; 55 för det franska nätet, cirka 380 för det tyska.",
+          "units": "Enheter för värdena på kortet och i förbrukningssensorerna. Resans och månadens sträckor och volymer följer Home Assistants enhetssystem."
         }
       }
     },
@@ -318,7 +322,7 @@
         },
         "odometer": {
           "name": "Vägmätare",
-          "description": "Vägmätarställning (km). Den senast kända ställningen om den utelämnas."
+          "description": "Vägmätarställning, i vägmätarsensorns enhet. Den senast kända ställningen om den utelämnas."
         }
       }
     },
@@ -344,7 +348,7 @@
         },
         "odometer": {
           "name": "Vägmätare",
-          "description": "Vägmätarställning (km). Den senast kända ställningen om den utelämnas."
+          "description": "Vägmätarställning, i vägmätarsensorns enhet. Den senast kända ställningen om den utelämnas."
         }
       }
     },
@@ -391,6 +395,12 @@
         "diesel": "Diesel",
         "lpg": "Gasol",
         "e85": "E85 (etanol)"
+      }
+    },
+    "units": {
+      "options": {
+        "metric": "Metriska (km, L/100 km, kWh/100 km)",
+        "imperial": "Brittiska (miles, mpg, mi/kWh)"
       }
     }
   }

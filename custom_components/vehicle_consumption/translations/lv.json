@@ -46,7 +46,8 @@
           "electricity_price_entity": "Elektroenerģijas cenas sensors",
           "electricity_price": "Fiksētā elektroenerģijas cena",
           "fuel_type": "Degviela",
-          "co2_electricity": "Elektrības CO₂"
+          "co2_electricity": "Elektrības CO₂",
+          "units": "Mērvienības"
         },
         "data_description": {
           "fuel_price_entity": "Cena par litru (vai par galonu), kas seko uzpildes stacijas cenām.",
@@ -54,7 +55,8 @@
           "electricity_price_entity": "Jūsu tarifa cena par kWh.",
           "electricity_price": "Cena par kWh, tiek izmantota, ja nav cenas sensora vai tas nav pieejams.",
           "fuel_type": "Nosaka katra sadedzinātā litra CO₂: benzīns 2,31 kg, dīzelis 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Grami CO₂ uz uzlādēto kWh; 55 Francijas tīklam, aptuveni 380 Vācijas tīklam."
+          "co2_electricity": "Grami CO₂ uz uzlādēto kWh; 55 Francijas tīklam, aptuveni 380 Vācijas tīklam.",
+          "units": "Kartē un patēriņa sensoros rādīto vērtību mērvienības. Brauciena un mēneša attālumi un apjomi atbilst Home Assistant mērvienību sistēmai."
         }
       }
     },
@@ -107,7 +109,8 @@
           "refuel_threshold": "Uzpildes slieksnis",
           "charge_threshold": "Uzlādes slieksnis",
           "fuel_type": "Degviela",
-          "co2_electricity": "Elektrības CO₂"
+          "co2_electricity": "Elektrības CO₂",
+          "units": "Mērvienības"
         },
         "data_description": {
           "fuel_price_entity": "Cena par litru (vai par galonu), kas seko uzpildes stacijas cenām.",
@@ -118,7 +121,8 @@
           "refuel_threshold": "Degvielas pieaugums vismaz par šo daudzumu ir uzpilde; mazāki pieaugumi tiek ignorēti.",
           "charge_threshold": "Akumulatora pieaugums vismaz par šo daudzumu ir uzlāde; mazāki pieaugumi tiek ignorēti.",
           "fuel_type": "Nosaka katra sadedzinātā litra CO₂: benzīns 2,31 kg, dīzelis 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Grami CO₂ uz uzlādēto kWh; 55 Francijas tīklam, aptuveni 380 Vācijas tīklam."
+          "co2_electricity": "Grami CO₂ uz uzlādēto kWh; 55 Francijas tīklam, aptuveni 380 Vācijas tīklam.",
+          "units": "Kartē un patēriņa sensoros rādīto vērtību mērvienības. Brauciena un mēneša attālumi un apjomi atbilst Home Assistant mērvienību sistēmai."
         }
       }
     },
@@ -318,7 +322,7 @@
         },
         "odometer": {
           "name": "Odometrs",
-          "description": "Odometra rādījums (km). Ja nav norādīts, pēdējais zināmais rādījums."
+          "description": "Odometra rādījums, tā sensora mērvienībā. Ja nav norādīts, pēdējais zināmais rādījums."
         }
       }
     },
@@ -344,7 +348,7 @@
         },
         "odometer": {
           "name": "Odometrs",
-          "description": "Odometra rādījums (km). Ja nav norādīts, pēdējais zināmais rādījums."
+          "description": "Odometra rādījums, tā sensora mērvienībā. Ja nav norādīts, pēdējais zināmais rādījums."
         }
       }
     },
@@ -391,6 +395,12 @@
         "diesel": "Dīzelis",
         "lpg": "LPG",
         "e85": "E85 (etanols)"
+      }
+    },
+    "units": {
+      "options": {
+        "metric": "Metriskās (km, L/100 km, kWh/100 km)",
+        "imperial": "Imperiālās (jūdzes, mpg, mi/kWh)"
       }
     }
   }

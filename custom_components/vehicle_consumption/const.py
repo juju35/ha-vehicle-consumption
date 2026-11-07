@@ -6,7 +6,7 @@ from datetime import timedelta
 from typing import Final
 
 DOMAIN: Final = "vehicle_consumption"
-VERSION: Final = "1.3.0"
+VERSION: Final = "1.4.0"
 
 # Entry data
 CONF_DEVICE_ID: Final = "device_id"
@@ -41,6 +41,14 @@ FUEL_TYPES: Final = ("petrol", "diesel", "lpg", "e85")
 FUEL_CO2: Final = {"petrol": 2.31, "diesel": 2.68, "lpg": 1.66, "e85": 1.61}
 DEFAULT_FUEL_TYPE: Final = "petrol"
 DEFAULT_CO2_ELECTRICITY: Final = 55.0
+
+# Units of the figures shown (attributes, card, consumption sensors): metric (km, L, L/100 km, kWh/100 km) or imperial
+# (miles, US gallons, mpg, mi/kWh). Tracked and stored in km / L / kWh either way.
+CONF_UNITS: Final = "units"
+UNITS_METRIC: Final = "metric"
+UNITS_IMPERIAL: Final = "imperial"
+UNIT_SYSTEMS: Final = (UNITS_METRIC, UNITS_IMPERIAL)
+DEFAULT_UNITS: Final = UNITS_METRIC
 
 CONF_TRIP_GAP: Final = "trip_gap"
 CONF_REFUEL_THRESHOLD: Final = "refuel_threshold"
@@ -83,6 +91,8 @@ KIND_PLUGIN_HYBRID: Final = "plugin_hybrid"
 
 UNIT_FUEL_CONSUMPTION: Final = "L/100 km"
 UNIT_ENERGY_CONSUMPTION: Final = "kWh/100 km"
+UNIT_MPG: Final = "mpg"
+UNIT_MI_PER_KWH: Final = "mi/kWh"
 
 SERVICE_ADD_REFUEL: Final = "add_refuel"
 SERVICE_ADD_CHARGE: Final = "add_charge"
@@ -107,5 +117,8 @@ SAVE_DELAY: Final = 10
 
 CARD_URL: Final = f"/{DOMAIN}/vehicle-consumption-card.js"
 
-# Fired on the event bus when the tracking closes a trip (`trip_gap` minutes after the odometer last moved).
+# Fired on the event bus once a closed trip is final: it can no longer be reopened by a late odometer reading.
 EVENT_TRIP_ENDED: Final = f"{DOMAIN}_trip_ended"
+# An odometer polled every hour (Renault, MyPeugeot…) reports the rest of a drive up to an hour after its last move:
+# a closed trip is only final (announced, never reopened) once this long, or `trip_gap` if longer, has passed.
+TRIP_REOPEN_WINDOW: Final = timedelta(minutes=65)

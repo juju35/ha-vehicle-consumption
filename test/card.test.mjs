@@ -1094,3 +1094,46 @@ test('CO₂: chart metric in kg, and the CO₂ per km under the cost per km', ()
 function vcFiniteish(distance) {
   return Number.isFinite(Number(distance)) ? Math.round(Number(distance) * 0.13) : null;
 }
+
+test('imperial units: miles, gallons, mpg, cost and CO₂ per mile; the popup sends litres and the source odometer', async () => {
+  const card = makeCard();
+  const attrs = fuelAttrs({
+    units: 'imperial',
+    odometer: 30000,
+    odometer_unit: 'km',
+    fuel_quantity: 8.3,
+    trip: { start: '2026-10-30T08:00:00+01:00', distance: 26.3, fuel: 0.63, fuel_consumption: 41.7, cost: 4.32 },
+    total: { distance: 6089, fuel_consumption: 38.6, cost_per_km: 0.172, co2_per_km: 216 },
+  });
+  const hass = hassWith(attrs, {});
+  hass.states[SENSOR].attributes.unit_of_measurement = 'mpg';
+  card.hass = hass;
+  const out = html(card);
+  assert.match(out, /63 % · 8.3 gal/);
+  assert.match(out, /41.7<small>mpg/);
+  assert.match(out, /26.3 mi/);
+  assert.match(out, /Cost per mi/);
+  assert.match(out, /€0.172<small>\/mi/);
+  assert.match(out, /216 g CO₂\/mi/);
+  assert.match(out, /48,100 mi/);
+  assert.match(out, /41.2 gal/);
+  assert.doesNotMatch(out, /L\/100 km|\bkm\b/);
+
+  card._openPopup();
+  assert.match(html(card), /<em>gal<\/em>/);
+  // The odometer field is in the odometer sensor's unit (km here), prefilled from the miles shown.
+  assert.match(html(card), /placeholder="48,280"><em>km<\/em>/);
+  card._input('amount', '10');
+  card._input('odometer', '48300');
+  await card._save();
+  const [call] = JSON.parse(JSON.stringify(hass.calls));
+  assert.equal(call.data.liters, 37.85411784);
+  assert.equal(call.data.odometer, 48300);
+});
+
+test('metric stays the default: no units attribute, km and L/100 km', () => {
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs());
+  assert.match(html(card), /Cost per km/);
+  assert.match(html(card), /42.3 km/);
+});

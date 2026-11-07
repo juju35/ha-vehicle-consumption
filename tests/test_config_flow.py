@@ -25,6 +25,7 @@ from custom_components.vehicle_consumption.const import (
     CONF_REFUEL_THRESHOLD,
     CONF_TANK_CAPACITY,
     CONF_TRIP_GAP,
+    CONF_UNITS,
     DOMAIN,
 )
 from custom_components.vehicle_consumption.detect import _KNOWN, _TRANSLATION_KEY_ONLY, _known_key, async_detect
@@ -169,6 +170,7 @@ async def test_full_flow_renault(hass: HomeAssistant) -> None:
         CONF_ELECTRICITY_PRICE: 0.2,
         CONF_FUEL_TYPE: "petrol",
         CONF_CO2_ELECTRICITY: 55.0,
+        CONF_UNITS: "metric",
         CONF_TRIP_GAP: 30.0,
         CONF_REFUEL_THRESHOLD: 3.0,
         CONF_CHARGE_THRESHOLD: 1.0,
@@ -275,6 +277,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
             CONF_FUEL_PRICE_ENTITY: "sensor.station",
             CONF_FUEL_TYPE: "diesel",
             CONF_CO2_ELECTRICITY: 400,
+            CONF_UNITS: "metric",
             CONF_TRIP_GAP: 15,
             CONF_REFUEL_THRESHOLD: 5,
             CONF_CHARGE_THRESHOLD: 2,
@@ -288,6 +291,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
         CONF_FUEL_PRICE_ENTITY: "sensor.station",
         CONF_FUEL_TYPE: "diesel",
         CONF_CO2_ELECTRICITY: 400.0,
+        CONF_UNITS: "metric",
         CONF_TRIP_GAP: 15.0,
         CONF_REFUEL_THRESHOLD: 5.0,
         CONF_CHARGE_THRESHOLD: 2.0,

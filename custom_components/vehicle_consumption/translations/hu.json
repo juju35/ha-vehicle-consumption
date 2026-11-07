@@ -46,7 +46,8 @@
           "electricity_price_entity": "Villamosenergiaár-érzékelő",
           "electricity_price": "Fix villamosenergia-ár",
           "fuel_type": "Üzemanyag",
-          "co2_electricity": "Az áram CO₂-ja"
+          "co2_electricity": "Az áram CO₂-ja",
+          "units": "Mértékegységek"
         },
         "data_description": {
           "fuel_price_entity": "Literenkénti (vagy gallononkénti) ár, amely a benzinkút árait követi.",
@@ -54,7 +55,8 @@
           "electricity_price_entity": "A tarifád kWh-nkénti ára.",
           "electricity_price": "kWh-nkénti ár, amelyet akkor használunk, ha nincs árérzékelő, vagy az nem érhető el.",
           "fuel_type": "Megadja minden elégetett liter CO₂-ját: benzin 2,31 kg, dízel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gramm CO₂ töltött kWh-ként; 55 a francia hálózatnál, körülbelül 380 a németnél."
+          "co2_electricity": "Gramm CO₂ töltött kWh-ként; 55 a francia hálózatnál, körülbelül 380 a németnél.",
+          "units": "A kártyán és a fogyasztásérzékelőkben mutatott értékek mértékegységei. Az út és a hónap távolságai és mennyiségei a Home Assistant mértékegységrendszerét követik."
         }
       }
     },
@@ -107,7 +109,8 @@
           "refuel_threshold": "Tankolási küszöb",
           "charge_threshold": "Töltési küszöb",
           "fuel_type": "Üzemanyag",
-          "co2_electricity": "Az áram CO₂-ja"
+          "co2_electricity": "Az áram CO₂-ja",
+          "units": "Mértékegységek"
         },
         "data_description": {
           "fuel_price_entity": "Literenkénti (vagy gallononkénti) ár, amely a benzinkút árait követi.",
@@ -118,7 +121,8 @@
           "refuel_threshold": "Az üzemanyag legalább ekkora növekedése tankolásnak számít; a kisebb növekedéseket figyelmen kívül hagyjuk.",
           "charge_threshold": "Az akkumulátor legalább ekkora növekedése töltésnek számít; a kisebb növekedéseket figyelmen kívül hagyjuk.",
           "fuel_type": "Megadja minden elégetett liter CO₂-ját: benzin 2,31 kg, dízel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gramm CO₂ töltött kWh-ként; 55 a francia hálózatnál, körülbelül 380 a németnél."
+          "co2_electricity": "Gramm CO₂ töltött kWh-ként; 55 a francia hálózatnál, körülbelül 380 a németnél.",
+          "units": "A kártyán és a fogyasztásérzékelőkben mutatott értékek mértékegységei. Az út és a hónap távolságai és mennyiségei a Home Assistant mértékegységrendszerét követik."
         }
       }
     },
@@ -318,7 +322,7 @@
         },
         "odometer": {
           "name": "Kilométer-számláló",
-          "description": "A kilométer-számláló állása (km). Ha nincs megadva, az utolsó ismert állás."
+          "description": "A kilométer-számláló állása, az érzékelője mértékegységében. Ha nincs megadva, az utolsó ismert állás."
         }
       }
     },
@@ -344,7 +348,7 @@
         },
         "odometer": {
           "name": "Kilométer-számláló",
-          "description": "A kilométer-számláló állása (km). Ha nincs megadva, az utolsó ismert állás."
+          "description": "A kilométer-számláló állása, az érzékelője mértékegységében. Ha nincs megadva, az utolsó ismert állás."
         }
       }
     },
@@ -391,6 +395,12 @@
         "diesel": "Dízel",
         "lpg": "LPG",
         "e85": "E85 (etanol)"
+      }
+    },
+    "units": {
+      "options": {
+        "metric": "Metrikus (km, L/100 km, kWh/100 km)",
+        "imperial": "Angolszász (mérföld, mpg, mi/kWh)"
       }
     }
   }

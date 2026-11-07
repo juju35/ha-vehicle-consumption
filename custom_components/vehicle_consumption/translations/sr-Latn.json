@@ -46,7 +46,8 @@
           "electricity_price_entity": "Senzor cene struje",
           "electricity_price": "Fiksna cena struje",
           "fuel_type": "Gorivo",
-          "co2_electricity": "CO₂ struje"
+          "co2_electricity": "CO₂ struje",
+          "units": "Merne jedinice"
         },
         "data_description": {
           "fuel_price_entity": "Cena po litru (ili po galonu) koja prati cene na stanicama.",
@@ -54,7 +55,8 @@
           "electricity_price_entity": "Cena po kWh vaše tarife.",
           "electricity_price": "Cena po kWh, koristi se kada nema senzora cene ili kada je nedostupan.",
           "fuel_type": "Daje CO₂ svakog sagorelog litra: benzin 2,31 kg, dizel 2,68 kg, TNG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Grama CO₂ po napunjenom kWh; 55 za francusku mrežu, oko 380 za nemačku."
+          "co2_electricity": "Grama CO₂ po napunjenom kWh; 55 za francusku mrežu, oko 380 za nemačku.",
+          "units": "Merne jedinice vrednosti na kartici i u senzorima potrošnje. Razdaljine i zapremine vožnje i meseca prate sistem mernih jedinica Home Assistant-a."
         }
       }
     },
@@ -107,7 +109,8 @@
           "refuel_threshold": "Prag točenja goriva",
           "charge_threshold": "Prag punjenja",
           "fuel_type": "Gorivo",
-          "co2_electricity": "CO₂ struje"
+          "co2_electricity": "CO₂ struje",
+          "units": "Merne jedinice"
         },
         "data_description": {
           "fuel_price_entity": "Cena po litru (ili po galonu) koja prati cene na stanicama.",
@@ -118,7 +121,8 @@
           "refuel_threshold": "Porast goriva od najmanje ove vrednosti je točenje goriva; manji porast se zanemaruje.",
           "charge_threshold": "Porast baterije od najmanje ove vrednosti je punjenje; manji porast se zanemaruje.",
           "fuel_type": "Daje CO₂ svakog sagorelog litra: benzin 2,31 kg, dizel 2,68 kg, TNG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Grama CO₂ po napunjenom kWh; 55 za francusku mrežu, oko 380 za nemačku."
+          "co2_electricity": "Grama CO₂ po napunjenom kWh; 55 za francusku mrežu, oko 380 za nemačku.",
+          "units": "Merne jedinice vrednosti na kartici i u senzorima potrošnje. Razdaljine i zapremine vožnje i meseca prate sistem mernih jedinica Home Assistant-a."
         }
       }
     },
@@ -318,7 +322,7 @@
         },
         "odometer": {
           "name": "Kilometraža",
-          "description": "Stanje kilometraže (km). Ako se izostavi, koristi se poslednje poznato stanje."
+          "description": "Stanje kilometraže, u jedinici njegovog senzora. Ako se izostavi, koristi se poslednje poznato stanje."
         }
       }
     },
@@ -344,7 +348,7 @@
         },
         "odometer": {
           "name": "Kilometraža",
-          "description": "Stanje kilometraže (km). Ako se izostavi, koristi se poslednje poznato stanje."
+          "description": "Stanje kilometraže, u jedinici njegovog senzora. Ako se izostavi, koristi se poslednje poznato stanje."
         }
       }
     },
@@ -391,6 +395,12 @@
         "diesel": "Dizel",
         "lpg": "TNG (gas)",
         "e85": "E85 (etanol)"
+      }
+    },
+    "units": {
+      "options": {
+        "metric": "Metrički (kilometri, litri)",
+        "imperial": "Imperijalni (milje, galoni)"
       }
     }
   }
