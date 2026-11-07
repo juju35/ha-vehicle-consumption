@@ -1,6 +1,6 @@
 # ha-vehicle-consumption
 
-[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![Marketplace](https://img.shields.io/badge/Marketplace-Custom-41BDF5.svg)](https://www.home-assistant.io/integrations/marketplace/)
 [![HACS Validation](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/hacs.yml/badge.svg)](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/hacs.yml)
 [![Validate](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/validate.yml/badge.svg)](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/validate.yml)
 [![Lint](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/lint.yml/badge.svg)](https://github.com/juju35/ha-vehicle-consumption/actions/workflows/lint.yml)
@@ -19,7 +19,7 @@ Home Assistant integration that turns your car's own sensors into a **fuel and e
 
 It comes with a **Lovelace card** showing the tank and battery gauges, the key figures, a monthly chart and your recent trips and refuels.
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-vehicle-consumption&category=integration)
+[![Open your Home Assistant instance and open a repository inside the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-vehicle-consumption&category=integration)
 
 | Fuel car | Electric car |
 |---|---|
@@ -46,22 +46,22 @@ The odometer and the fuel and battery sensors of these integrations are **detect
 |---|---|---|---|---|
 | Renault, Dacia, Alpine | [Renault](https://www.home-assistant.io/integrations/renault/) (official) | ✓ | litres | kWh, % |
 | Tesla | [Tesla Fleet](https://www.home-assistant.io/integrations/tesla_fleet/), [Teslemetry](https://www.home-assistant.io/integrations/teslemetry/), [Tessie](https://www.home-assistant.io/integrations/tessie/) (official) | ✓ ¹ | — | kWh ², % |
-| Kia, Hyundai, Genesis | [Kia Connect / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) (HACS) | ✓ | % | kWh, % |
-| BMW, Mini | [BMW Connected Drive](https://www.home-assistant.io/integrations/bmw_connected_drive/) (official until 2026.3), [BMW CarData](https://github.com/kvanbiesen/bmw-cardata-ha), [BavarianData](https://github.com/JustChr/BavarianData) (HACS) | ✓ | litres, % | % |
-| Mercedes-Benz, smart | [MercedesME 2020](https://github.com/ReneNulschDE/mbapi2020) (HACS) | ✓ | % | % |
-| Toyota, Lexus | [Toyota](https://github.com/pytoyoda/ha_toyota) (HACS) | ✓ | % | % |
-| Volvo | [Volvo](https://www.home-assistant.io/integrations/volvo/) (official), [Volvo Cars](https://github.com/thomasddn/ha-volvo-cars) (HACS, former) | ✓ | litres | % |
-| Polestar | [Polestar API](https://github.com/pypolestar/polestar_api) (HACS) | ✓ | — | % |
-| Volkswagen | [Volkswagen Car-Net](https://github.com/robinostlund/homeassistant-volkswagencarnet), [Volkswagen We Connect ID](https://github.com/mitch-dc/volkswagen_we_connect_id) (HACS) | ✓ | % | % |
-| Audi | [Audi connect](https://github.com/audiconnect/audi_connect_ha) (HACS) | ✓ | % | % |
-| Škoda | [MySkoda](https://github.com/skodaconnect/homeassistant-myskoda) (HACS) | ✓ | % | % |
-| SEAT, CUPRA | [SEAT Connect](https://github.com/Farfar/homeassistant-seatconnect), [CUPRA We Connect](https://github.com/daernsinstantfortress/cupra_we_connect) (HACS) | ✓ | % | % |
-| Peugeot, Citroën, DS, Opel, Fiat, Jeep, Alfa Romeo | [Stellantis Vehicles](https://github.com/andreadegiovine/homeassistant-stellantis-vehicles) (HACS) | ✓ | % | kWh, % |
-| Ford | [FordPass](https://github.com/itchannel/fordpass-ha) (HACS) | ✓ | % ³ | — |
+| Kia, Hyundai, Genesis | [Kia Connect / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) (Marketplace) | ✓ | % | kWh, % |
+| BMW, Mini | [BMW Connected Drive](https://www.home-assistant.io/integrations/bmw_connected_drive/) (official until 2026.3), [BMW CarData](https://github.com/kvanbiesen/bmw-cardata-ha), [BavarianData](https://github.com/JustChr/BavarianData) (Marketplace) | ✓ | litres, % | % |
+| Mercedes-Benz, smart | [MercedesME 2020](https://github.com/ReneNulschDE/mbapi2020) (Marketplace) | ✓ | % | % |
+| Toyota, Lexus | [Toyota](https://github.com/pytoyoda/ha_toyota) (Marketplace) | ✓ | % | % |
+| Volvo | [Volvo](https://www.home-assistant.io/integrations/volvo/) (official), [Volvo Cars](https://github.com/thomasddn/ha-volvo-cars) (Marketplace, former) | ✓ | litres | % |
+| Polestar | [Polestar API](https://github.com/pypolestar/polestar_api) (Marketplace) | ✓ | — | % |
+| Volkswagen | [Volkswagen Car-Net](https://github.com/robinostlund/homeassistant-volkswagencarnet), [Volkswagen We Connect ID](https://github.com/mitch-dc/volkswagen_we_connect_id) (Marketplace) | ✓ | % | % |
+| Audi | [Audi connect](https://github.com/audiconnect/audi_connect_ha) (Marketplace) | ✓ | % | % |
+| Škoda | [MySkoda](https://github.com/skodaconnect/homeassistant-myskoda) (Marketplace) | ✓ | % | % |
+| SEAT, CUPRA | [SEAT Connect](https://github.com/Farfar/homeassistant-seatconnect), [CUPRA We Connect](https://github.com/daernsinstantfortress/cupra_we_connect) (Marketplace) | ✓ | % | % |
+| Peugeot, Citroën, DS, Opel, Fiat, Jeep, Alfa Romeo | [Stellantis Vehicles](https://github.com/andreadegiovine/homeassistant-stellantis-vehicles) (Marketplace) | ✓ | % | kWh, % |
+| Ford | [FordPass](https://github.com/itchannel/fordpass-ha) (Marketplace) | ✓ | % ³ | — |
 | Nissan | [Nissan Leaf](https://www.home-assistant.io/integrations/nissan_leaf/) (official) | — ⁴ | — | % |
-| MG | [MG SAIC](https://github.com/ad-ha/mg-saic-ha) (HACS) | ✓ | % | kWh, % |
-| BYD | [BYD Vehicle](https://github.com/jkaberg/hass-byd-vehicle) (HACS) | ✓ | % | % |
-| Any (OBD-II) | [WiCAN](https://github.com/jay-oswald/ha-wican), [OVMS](https://github.com/ovms-hass/ovms-home-assistant) (HACS) | ✓ | litres, % ⁵ | % |
+| MG | [MG SAIC](https://github.com/ad-ha/mg-saic-ha) (Marketplace) | ✓ | % | kWh, % |
+| BYD | [BYD Vehicle](https://github.com/jkaberg/hass-byd-vehicle) (Marketplace) | ✓ | % | % |
+| Any (OBD-II) | [WiCAN](https://github.com/jay-oswald/ha-wican), [OVMS](https://github.com/ovms-hass/ovms-home-assistant) (Marketplace) | ✓ | litres, % ⁵ | % |
 
 ¹ Disabled by default in Tesla Fleet and Teslemetry: enable the *Odometer* entity first. ² Teslemetry and Tessie. ³ On an electric Ford, FordPass reports the battery level there. ⁴ The Leaf integration has no odometer: pick one from another source. ⁵ WiCAN, depending on the vehicle profile.
 
@@ -71,9 +71,9 @@ The odometer and the fuel and battery sensors of these integrations are **detect
 
 For an electric or plug-in hybrid car, the energy counter of your home charger is found automatically (it is another device) and measures home charges at the charger, losses included:
 
-- **evcc** ([HACS `evcc_intg`](https://github.com/marq24/ha-evcc)): *Charged (Total)* of the loadpoint, else *Session energy* / *Charge energy*
-- **Easee** ([HACS](https://github.com/fondberg/easee_hass)): *Lifetime energy*, else *Session energy*
-- **Zaptec** ([HACS](https://github.com/custom-components/zaptec)): *Energy meter*, else *Session total charge*
+- **evcc** ([Marketplace, `evcc_intg`](https://github.com/marq24/ha-evcc)): *Charged (Total)* of the loadpoint, else *Session energy* / *Charge energy*
+- **Easee** ([Marketplace](https://github.com/fondberg/easee_hass)): *Lifetime energy*, else *Session energy*
+- **Zaptec** ([Marketplace](https://github.com/custom-components/zaptec)): *Energy meter*, else *Session total charge*
 - **Wallbox** ([official integration](https://www.home-assistant.io/integrations/wallbox/)): *Added energy*
 - **Ohme** ([official integration](https://www.home-assistant.io/integrations/ohme/)): *Energy* (Home Assistant before 2026.7)
 
@@ -86,15 +86,15 @@ Any other energy sensor (kWh or Wh) that counts what the charger delivers works 
 
 ## Installation
 
-### Via HACS (recommended)
+### Via the Marketplace (recommended)
 
-[![Add to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-vehicle-consumption&category=integration)
+[![Add to the Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-vehicle-consumption&category=integration)
 
 Or manually:
 
-1. Open HACS → **⋮** → **Custom repositories**
+1. Open **Settings → Marketplace → Add from link** (top right; this needs a GitHub account connected)
 2. Add `https://github.com/juju35/ha-vehicle-consumption` — Type: **Integration**
-3. Search for **Vehicle Consumption** and download it
+3. Open **Vehicle Consumption** and click **Install**
 4. Restart Home Assistant
 
 ### Manual
@@ -105,7 +105,7 @@ Or manually:
 
 ### Removal
 
-Remove each vehicle from **Settings → Devices & services**: its stored history is deleted with it, and the card resource is removed with the last one. Then remove the repository from HACS.
+Remove each vehicle from **Settings → Devices & services**: its stored history is deleted with it, and the card resource is removed with the last one. Then uninstall the repository in **Settings → Marketplace**.
 
 ## Configuration
 
