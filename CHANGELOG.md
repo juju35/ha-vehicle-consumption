@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 - 2026-11-07
+
+### Security
+- The `reset_statistics` and `import_history` actions, which wipe or rebuild a vehicle's tracked data, are now reserved to administrators: other users get an *Unauthorized* error. `add_refuel` and `add_charge` stay open to every user, so refuels and charges can still be logged from a dashboard.
+
 ## 1.2.0 - 2026-11-07
 
 ### What's new

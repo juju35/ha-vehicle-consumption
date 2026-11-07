@@ -14,6 +14,7 @@ from homeassistant.const import EVENT_HOMEASSISTANT_STARTED, Platform
 from homeassistant.core import CoreState, Event, HomeAssistant, ServiceCall
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.service import async_register_admin_service
 from homeassistant.helpers.typing import ConfigType
 
 from .const import (
@@ -120,8 +121,9 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         if not await tracker(call).async_import_history(call.data[ATTR_DAYS]):
             raise ServiceValidationError(translation_domain=DOMAIN, translation_key="no_recorder")
 
-    hass.services.async_register(DOMAIN, SERVICE_RESET_STATISTICS, reset, _ENTRY_SCHEMA)
-    hass.services.async_register(DOMAIN, SERVICE_IMPORT_HISTORY, import_history, _IMPORT_SCHEMA)
+    # Destructive or heavy: admins only. Refuels and charges stay open, logged from dashboards by any user.
+    async_register_admin_service(hass, DOMAIN, SERVICE_RESET_STATISTICS, reset, _ENTRY_SCHEMA)
+    async_register_admin_service(hass, DOMAIN, SERVICE_IMPORT_HISTORY, import_history, _IMPORT_SCHEMA)
     return True
 
 
