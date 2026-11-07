@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from homeassistant.auth.models import User
+from homeassistant.core import Context, HomeAssistant
+from homeassistant.exceptions import ServiceValidationError, Unauthorized
 
 from custom_components.vehicle_consumption.const import (
     CONF_BATTERY_ENERGY,
@@ -118,3 +121,33 @@ async def test_errors(hass: HomeAssistant) -> None:
         await hass.services.async_call(
             DOMAIN, "add_refuel", {"config_entry_id": entry.entry_id, "liters": 0}, blocking=True
         )
+
+
+@pytest.mark.parametrize("service", ["reset_statistics", "import_history"])
+async def test_admin_actions(
+    hass: HomeAssistant, hass_admin_user: User, hass_read_only_user: User, service: str
+) -> None:
+    """Resetting and re-importing are for admins; any user can still log a refuel."""
+    entry = await setup_vehicle(hass)
+    data = {"config_entry_id": entry.entry_id}
+    with patch(
+        "custom_components.vehicle_consumption.tracker.ConsumptionTracker.async_import_history",
+        AsyncMock(return_value=True),
+    ) as imported:
+        with pytest.raises(Unauthorized):
+            await hass.services.async_call(
+                DOMAIN, service, data, blocking=True, context=Context(user_id=hass_read_only_user.id)
+            )
+        await hass.services.async_call(
+            DOMAIN, service, data, blocking=True, context=Context(user_id=hass_admin_user.id)
+        )
+    assert imported.call_count == (service == "import_history")
+
+    await hass.services.async_call(
+        DOMAIN,
+        "add_refuel",
+        {**data, "liters": 5},
+        blocking=True,
+        context=Context(user_id=hass_read_only_user.id),
+    )
+    assert len(state_of(hass, "consumption").attributes["refuels"]) == 1
