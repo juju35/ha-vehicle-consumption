@@ -101,6 +101,8 @@ _GALLON_FACTORS = {
     CONF_REFUEL_THRESHOLD: LITERS_PER_GALLON,
     CONF_FUEL_PRICE: 1 / LITERS_PER_GALLON,
 }
+# Decimals of each value shown in gallons: what one would type (a price to the tenth of a cent).
+_GALLON_DIGITS = {CONF_TANK_CAPACITY: 2, CONF_REFUEL_THRESHOLD: 2, CONF_FUEL_PRICE: 3}
 
 
 def _to_stored(values: dict[str, Any], imperial: bool) -> dict[str, Any]:
@@ -115,7 +117,7 @@ def _to_shown(values: dict[str, Any], imperial: bool) -> dict[str, Any]:
     if not imperial:
         return values
     return {
-        k: round(v / _GALLON_FACTORS[k], 4) if k in _GALLON_FACTORS and isinstance(v, int | float) else v
+        k: round(v / _GALLON_FACTORS[k], _GALLON_DIGITS[k]) if k in _GALLON_DIGITS and isinstance(v, int | float) else v
         for k, v in values.items()
     }
 
@@ -128,7 +130,8 @@ def _number(minimum: float, maximum: float, step: float | str, unit: str | None 
 
 def _sensors_schema(imperial: bool) -> vol.Schema:
     """Source sensors and capacities; values come in as suggestions, so an optional field can be emptied."""
-    tank = _number(0.3, 132, 0.1, "gal") if imperial else _number(1, 500, 0.1, "L")
+    # Gallons from litres are rarely a multiple of 0.1: any step, so a converted value is never refused.
+    tank = _number(0.3, 132, "any", "gal") if imperial else _number(1, 500, 0.1, "L")
     return vol.Schema(
         {
             vol.Required(CONF_ODOMETER): _SENSOR,
@@ -158,7 +161,7 @@ def _prices_schema(currency: str, tuning: bool, imperial: bool, units: str) -> v
     if tuning:
         schema |= {
             vol.Required(CONF_TRIP_GAP): _number(5, 720, 1, "min"),
-            vol.Required(CONF_REFUEL_THRESHOLD): _number(0.1, 13, 0.1, "gal")
+            vol.Required(CONF_REFUEL_THRESHOLD): _number(0.1, 13, "any", "gal")
             if imperial
             else _number(0.5, 50, 0.1, "L"),
             vol.Required(CONF_CHARGE_THRESHOLD): _number(0.1, 50, 0.1, "kWh"),

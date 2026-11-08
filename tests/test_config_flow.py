@@ -323,6 +323,7 @@ async def test_options_flow_imperial(hass: HomeAssistant) -> None:
     suggested = {str(k): k.description["suggested_value"] for k in schema if k.description}
     assert suggested[CONF_TANK_CAPACITY] == 15.0
     assert schema[CONF_TANK_CAPACITY].config["unit_of_measurement"] == "gal"
+    assert schema[CONF_TANK_CAPACITY].config["step"] == "any"
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"], {CONF_ODOMETER: ODOMETER, CONF_FUEL_LEVEL: "sensor.car_fuel_level", CONF_TANK_CAPACITY: 20}
@@ -330,10 +331,11 @@ async def test_options_flow_imperial(hass: HomeAssistant) -> None:
     assert result["step_id"] == "prices"
     schema = result["data_schema"].schema
     suggested = {str(k): k.description["suggested_value"] for k in schema if k.description}
-    assert suggested[CONF_FUEL_PRICE] == 1.8927  # per gallon
+    assert suggested[CONF_FUEL_PRICE] == 1.893  # per gallon
     assert suggested[CONF_REFUEL_THRESHOLD] == 1.0
     assert schema[CONF_FUEL_PRICE].config["unit_of_measurement"] == "EUR/gal"
     assert schema[CONF_REFUEL_THRESHOLD].config["unit_of_measurement"] == "gal"
+    assert schema[CONF_REFUEL_THRESHOLD].config["step"] == "any"
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
