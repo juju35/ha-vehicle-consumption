@@ -72,6 +72,7 @@ const VC_I18N = {
     zoom_in: 'Show details',
     zoom_out: 'Back to the compact view',
     ed_zoom: 'Details button (full view)',
+    estimated: 'Estimated',
   },
   fr: {
     title: 'Véhicule',
@@ -136,6 +137,7 @@ const VC_I18N = {
     zoom_in: 'Afficher les détails',
     zoom_out: 'Revenir à la vue compacte',
     ed_zoom: 'Bouton détails (vue complète)',
+    estimated: 'Estimé',
   },
   de: {
     title: 'Fahrzeug',
@@ -200,6 +202,7 @@ const VC_I18N = {
     zoom_in: 'Details anzeigen',
     zoom_out: 'Zurück zur kompakten Ansicht',
     ed_zoom: 'Detail-Schaltfläche (vollständige Ansicht)',
+    estimated: 'Geschätzt',
   },
   es: {
     title: 'Vehículo',
@@ -264,6 +267,7 @@ const VC_I18N = {
     zoom_in: 'Mostrar detalles',
     zoom_out: 'Volver a la vista compacta',
     ed_zoom: 'Botón de detalles (vista completa)',
+    estimated: 'Estimado',
   },
   it: {
     title: 'Veicolo',
@@ -328,6 +332,7 @@ const VC_I18N = {
     zoom_in: 'Mostra dettagli',
     zoom_out: 'Torna alla vista compatta',
     ed_zoom: 'Pulsante dettagli (vista completa)',
+    estimated: 'Stimato',
   },
   nl: {
     title: 'Voertuig',
@@ -392,6 +397,7 @@ const VC_I18N = {
     zoom_in: 'Details tonen',
     zoom_out: 'Terug naar de compacte weergave',
     ed_zoom: 'Detailknop (volledige weergave)',
+    estimated: 'Geschat',
   },
   pt: {
     title: 'Veículo',
@@ -456,6 +462,7 @@ const VC_I18N = {
     zoom_in: 'Mostrar detalhes',
     zoom_out: 'Voltar à vista compacta',
     ed_zoom: 'Botão de detalhes (vista completa)',
+    estimated: 'Estimado',
   },
   pl: {
     title: 'Pojazd',
@@ -520,6 +527,7 @@ const VC_I18N = {
     zoom_in: 'Pokaż szczegóły',
     zoom_out: 'Wróć do widoku kompaktowego',
     ed_zoom: 'Przycisk szczegółów (pełny widok)',
+    estimated: 'Szacowany',
   },
   ro: {
     title: 'Vehicul',
@@ -584,6 +592,7 @@ const VC_I18N = {
     zoom_in: 'Afișează detaliile',
     zoom_out: 'Înapoi la vederea compactă',
     ed_zoom: 'Buton detalii (vedere completă)',
+    estimated: 'Estimat',
   },
   da: {
     title: 'Køretøj',
@@ -648,6 +657,7 @@ const VC_I18N = {
     zoom_in: 'Vis detaljer',
     zoom_out: 'Tilbage til kompakt visning',
     ed_zoom: 'Detaljeknap (fuld visning)',
+    estimated: 'Anslået',
   },
   sv: {
     title: 'Fordon',
@@ -712,6 +722,7 @@ const VC_I18N = {
     zoom_in: 'Visa detaljer',
     zoom_out: 'Tillbaka till kompakt vy',
     ed_zoom: 'Detaljknapp (fullständig vy)',
+    estimated: 'Uppskattad',
   },
   bg: {
     title: 'Автомобил',
@@ -776,6 +787,7 @@ const VC_I18N = {
     zoom_in: 'Покажи подробности',
     zoom_out: 'Обратно към компактния изглед',
     ed_zoom: 'Бутон за подробности (пълен изглед)',
+    estimated: 'Приблизително',
   },
   ru: {
     title: 'Автомобиль',
@@ -840,6 +852,7 @@ const VC_I18N = {
     zoom_in: 'Показать подробности',
     zoom_out: 'Вернуться к компактному виду',
     ed_zoom: 'Кнопка подробностей (полный вид)',
+    estimated: 'Оценка',
   },
   uk: {
     title: 'Автомобіль',
@@ -904,6 +917,7 @@ const VC_I18N = {
     zoom_in: 'Показати подробиці',
     zoom_out: 'Повернутися до компактного вигляду',
     ed_zoom: 'Кнопка подробиць (повний вигляд)',
+    estimated: 'Оцінка',
   },
   hu: {
     title: 'Jármű',
@@ -968,6 +982,7 @@ const VC_I18N = {
     zoom_in: 'Részletek megjelenítése',
     zoom_out: 'Vissza a kompakt nézethez',
     ed_zoom: 'Részletek gomb (teljes nézet)',
+    estimated: 'Becsült',
   },
   sk: {
     title: 'Vozidlo',
@@ -1032,6 +1047,7 @@ const VC_I18N = {
     zoom_in: 'Zobraziť podrobnosti',
     zoom_out: 'Späť na kompaktné zobrazenie',
     ed_zoom: 'Tlačidlo podrobností (úplné zobrazenie)',
+    estimated: 'Odhad',
   },
   cs: {
     title: 'Vozidlo',
@@ -1096,6 +1112,7 @@ const VC_I18N = {
     zoom_in: 'Zobrazit podrobnosti',
     zoom_out: 'Zpět na kompaktní zobrazení',
     ed_zoom: 'Tlačítko podrobností (úplné zobrazení)',
+    estimated: 'Odhad',
   },
   sl: {
     title: 'Vozilo',
@@ -1160,6 +1177,7 @@ const VC_I18N = {
     zoom_in: 'Pokaži podrobnosti',
     zoom_out: 'Nazaj na strnjen prikaz',
     ed_zoom: 'Gumb za podrobnosti (celoten prikaz)',
+    estimated: 'Ocena',
   },
   lv: {
     title: 'Automašīna',
@@ -1224,6 +1242,7 @@ const VC_I18N = {
     zoom_in: 'Rādīt detaļas',
     zoom_out: 'Atpakaļ uz kompakto skatu',
     ed_zoom: 'Detaļu poga (pilns skats)',
+    estimated: 'Aplēsts',
   },
   el: {
     title: 'Όχημα',
@@ -1288,6 +1307,7 @@ const VC_I18N = {
     zoom_in: 'Εμφάνιση λεπτομερειών',
     zoom_out: 'Επιστροφή στη συμπαγή προβολή',
     ed_zoom: 'Κουμπί λεπτομερειών (πλήρης προβολή)',
+    estimated: 'Εκτίμηση',
   },
   sr: {
     title: 'Возило',
@@ -1352,6 +1372,7 @@ const VC_I18N = {
     zoom_in: 'Прикажи детаље',
     zoom_out: 'Назад на компактан приказ',
     ed_zoom: 'Дугме за детаље (пун приказ)',
+    estimated: 'Процена',
   },
   'sr-Latn': {
     title: 'Vozilo',
@@ -1416,6 +1437,7 @@ const VC_I18N = {
     zoom_in: 'Prikaži detalje',
     zoom_out: 'Nazad na kompaktan prikaz',
     ed_zoom: 'Dugme za detalje (pun prikaz)',
+    estimated: 'Procena',
   },
 };
 
@@ -1996,7 +2018,14 @@ class VehicleConsumptionCard extends HTMLElement {
         const cons = this._cons(t, kind, f)
           .filter((l) => l.v !== VC_DASH)
           .map((l) => `${l.v} ${l.unit}`);
-        const sub = [vcFinite(t.distance) ? `${f.num(t.distance, 1)} ${u.dist}` : '', t.open ? this._t('driving') : ''].filter(Boolean).join(' · ');
+        // A trip whose use a coarse sensor (whole litres) could not measure: estimated by the integration, marked so.
+        const sub = [
+          vcFinite(t.distance) ? `${f.num(t.distance, 1)} ${u.dist}` : '',
+          t.open ? this._t('driving') : '',
+          t.estimated ? `≈ ${this._t('estimated')}` : '',
+        ]
+          .filter(Boolean)
+          .join(' · ');
         return this._row(f.date(t.start), sub || VC_DASH, cons.length ? cons : VC_DASH, f.money(t.cost));
       });
       // The count of everything kept (a year): the list only holds the newest.

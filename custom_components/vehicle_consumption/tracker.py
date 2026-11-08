@@ -58,6 +58,8 @@ from .const import (
     DEFAULT_HISTORY_DAYS,
     DEFAULT_REFUEL_THRESHOLD,
     DEFAULT_TRIP_GAP,
+    ESTIMATE_STEPS,
+    ESTIMATE_WINDOW_KM,
     EVENT_TRIP_ENDED,
     FUEL_CO2,
     HISTORY_DAYS,
@@ -233,8 +235,17 @@ class Trip:
     end: datetime | None  # last odometer move; None while driving (stored as the last move)
     totals: Totals
 
-    def summary(self, co2: tuple[float, float] | None = None, imperial: bool = False) -> dict[str, Any]:
-        return {"start": _iso(self.start), "end": _iso(self.end), **self.totals.summary(co2, imperial)}
+    def summary(
+        self, co2: tuple[float, float] | None = None, imperial: bool = False, totals: Totals | None = None
+    ) -> dict[str, Any]:
+        """`totals`: the figures shown instead of the measured ones (estimated); `estimated` says which."""
+        shown = self.totals if totals is None else totals
+        return {
+            "start": _iso(self.start),
+            "end": _iso(self.end),
+            **shown.summary(co2, imperial),
+            "estimated": totals is not None,
+        }
 
     def dump(self) -> dict[str, Any]:
         return {"start": _iso(self.start), "end": _iso(self.end), **asdict(self.totals)}
@@ -302,6 +313,8 @@ class _Level:
     # Something was consumed since the last automatic event: a new rise is then a new event, not more of the last.
     consumed_since_event: bool = True
     seen: datetime | None = None  # last reading: a rise happened between it and the next one
+    # Smallest step the source can show (L / kWh), from the decimals of its readings: 1 for whole litres. None: unknown.
+    resolution: float | None = None
 
 
 @dataclass(slots=True)
@@ -735,11 +748,26 @@ class ConsumptionTracker:
             return value is not None and self._process_odometer(value, now)
         if key in self._shown_only:
             return False
-        if key in (CONF_FUEL_QUANTITY, CONF_FUEL_LEVEL):
-            value = self._fuel_now(state, key)
-            return value is not None and self._process_level(FUEL, value, now)
-        value = self._energy_now(state, key)
-        return value is not None and self._process_level(ENERGY, value, now)
+        kind = FUEL if key in (CONF_FUEL_QUANTITY, CONF_FUEL_LEVEL) else ENERGY
+        value = self._fuel_now(state, key) if kind == FUEL else self._energy_now(state, key)
+        if value is None:
+            return False
+        self._learn_resolution(kind, key, state, value)
+        return self._process_level(kind, value, now)
+
+    def _learn_resolution(self, kind: str, key: str, state: State | None, value: float) -> None:
+        """The smallest step seen of a level source: one unit of its last decimal, in L / kWh (whole litres: 1)."""
+        if state is None and (entity_id := self.sensors.get(key)):
+            state = self.hass.states.get(entity_id)
+        raw = _float(state.state) if state is not None else None
+        if not raw:
+            return
+        text = str(state.state).strip().lower()
+        decimals = 6 if "e" in text else min(6, len(text.partition(".")[2].rstrip("0")))
+        step = abs(10**-decimals * value / raw)
+        level = self._levels[kind]
+        if level.resolution is None or step < level.resolution:
+            level.resolution = step
 
     def _end_trip_if_stopped(self, now: datetime) -> bool:
         """Close the open trip once the odometer has not moved for `trip_gap`."""
@@ -788,7 +816,7 @@ class ConsumptionTracker:
                 "entry_id": self.entry_id,
                 "device_id": entry.data.get(CONF_DEVICE_ID) if entry else None,
                 "vehicle": self.name,
-                **trip.summary(self.co2, self.imperial),
+                **self._trip_summary(trip, self.imperial),
                 "units": self.units,
                 "duration": round((end - trip.start).total_seconds() / 60),
             },
@@ -1467,6 +1495,7 @@ class ConsumptionTracker:
                 events=[e for d in raw.get("events") or [] if (e := Refill.load(d))],
                 consumed_since_event=bool(raw.get("consumed_since_event", True)),
                 seen=_time(raw.get("seen")),
+                resolution=_positive(raw.get("resolution")),
             )
         self._charger = _Charger.load(data.get("charger"))
         # Imports before 0.2.2 (stored as `true`) could be wrong (a level next to its quantity, 0 L hourly trips,
@@ -1500,6 +1529,7 @@ class ConsumptionTracker:
                     "events": [e.dump() for e in level.events],
                     "consumed_since_event": level.consumed_since_event,
                     "seen": _iso(level.seen),
+                    "resolution": level.resolution,
                 }
                 for kind, level in self._levels.items()
             },
@@ -1531,8 +1561,54 @@ class ConsumptionTracker:
         """The trip in progress (end None), else the last finished one (in the units chosen unless `imperial`)."""
         imperial = self.imperial if imperial is None else imperial
         if self.trip is not None:
-            return Trip(self.trip.start, None, self.total.minus(self._trip_start)).summary(self.co2, imperial)
-        return self.trips[0].summary(self.co2, imperial) if self.trips else None
+            return self._trip_summary(Trip(self.trip.start, None, self.total.minus(self._trip_start)), imperial)
+        return self._trip_summary(self.trips[0], imperial) if self.trips else None
+
+    def _trip_summary(self, trip: Trip, imperial: bool) -> dict[str, Any]:
+        """A trip for the card, the sensors and the event: estimated when its measured use is mostly rounding."""
+        return trip.summary(self.co2, imperial, self._estimate(trip))
+
+    def _estimate(self, trip: Trip) -> Totals | None:
+        """The trip's figures with the fuel / energy of a coarse sensor estimated from its distance; None: as measured.
+
+        A sensor in whole litres sees a short trip use 0 or 1 L: the drop is mostly rounding (0 L/100 km, then 9.5).
+        Under `ESTIMATE_STEPS` steps of the sensor, the use is the distance times the average consumption around the
+        trip, and the cost follows at the current price. Only what is shown: the measured trips, months and total are
+        kept.
+        """
+        measured = trip.totals
+        if measured.distance <= 0:
+            return None
+        out = measured.copy()
+        changed = False
+        for kind, tracked, price in (
+            (FUEL, self.tracks_fuel, self.fuel_price),
+            (ENERGY, self.tracks_energy, self.electricity_price),
+        ):
+            resolution = self._levels[kind].resolution
+            rate = self._rate(kind, trip.start) if tracked and resolution else None
+            if rate is None or measured.distance * rate >= ESTIMATE_STEPS * resolution:
+                continue
+            expected = measured.distance * rate
+            setattr(out, kind, expected)
+            if price is not None:
+                out.cost = (out.cost or 0.0) + (expected - getattr(measured, kind)) * price
+            changed = True
+        return out if changed else None
+
+    def _rate(self, kind: str, when: datetime) -> float | None:
+        """L or kWh per km measured over the months up to `when` covering `ESTIMATE_WINDOW_KM`, else the whole
+        period."""
+        key = dt_util.as_local(when).strftime("%Y-%m")
+        distance = used = 0.0
+        for month in sorted((k for k in self.months if k <= key), reverse=True):
+            distance += self.months[month].distance
+            used += getattr(self.months[month], kind)
+            if distance >= ESTIMATE_WINDOW_KM:
+                break
+        if distance < ESTIMATE_WINDOW_KM:
+            distance, used = self.total.distance, getattr(self.total, kind)
+        return used / distance if distance >= MIN_DISTANCE and used > 0 else None
 
     def month_totals(self) -> tuple[str, Totals]:
         key = dt_util.as_local(dt_util.utcnow()).strftime("%Y-%m")
@@ -1591,7 +1667,7 @@ class ConsumptionTracker:
             "month": {"month": month_key, **month.summary(self.co2, self.imperial)},
             "total": {"since": self.since.isoformat(), **self.total.summary(self.co2, self.imperial)},
             "months": self.months_summary(),
-            "trips": [t.summary(self.co2, self.imperial) for t in self.trips[:MAX_TRIPS]],
+            "trips": [self._trip_summary(t, self.imperial) for t in self.trips[:MAX_TRIPS]],
             "refuels": [e.summary("liters", self.imperial) for e in self.refuels[:MAX_EVENTS]],
             "charges": [e.summary("energy", self.imperial) for e in self.charges[:MAX_EVENTS]],
             # Everything kept (`HISTORY_DAYS`): the lists above only hold the newest.

@@ -69,6 +69,12 @@ CHARGER_OVERLAP: Final = timedelta(minutes=10)
 # A charger counter step above this (kWh) is a glitch or a replaced meter, not a charge: not counted.
 MAX_CHARGER_STEP: Final = 250.0
 
+# Trip figures from a coarse level sensor (Renault: whole litres): a trip whose expected use is under this many steps of
+# the sensor gets its fuel / energy estimated from its distance (the drop measured is mostly rounding), at the average
+# consumption of the months up to the trip covering at least `ESTIMATE_WINDOW_KM` (else the whole period's).
+ESTIMATE_STEPS: Final = 5
+ESTIMATE_WINDOW_KM: Final = 300.0
+
 # Below this distance (km) a consumption figure means nothing (a few hundred metres, one litre): None.
 MIN_DISTANCE: Final = 5.0
 # An odometer jump above this (km) is a sensor reset or a replaced car, not a drive: not counted.

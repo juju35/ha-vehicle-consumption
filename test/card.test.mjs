@@ -1287,3 +1287,20 @@ test('popup: modal (aria-modal), Tab and Shift+Tab stay inside, the focus goes b
   assert.equal(card._popup, null);
   assert.deepEqual(JSON.parse(JSON.stringify(focused)), [['add', { preventScroll: true }]]);
 });
+
+test('trips: an estimated trip (coarse fuel sensor) is marked in the list', () => {
+  const card = makeCard({});
+  card._open = new Set(['trips']);
+  card.hass = hassWith(
+    fuelAttrs({
+      trips: [
+        { start: '2026-10-30T08:00:00+01:00', distance: 11, fuel_consumption: 7.2, cost: 1.58, estimated: true },
+        { start: '2026-10-29T08:00:00+01:00', distance: 300, fuel_consumption: 7, cost: 42, estimated: false },
+      ],
+    }),
+  );
+  const out = html(card);
+  assert.match(out, /11.0 km · ≈ Estimated/);
+  assert.doesNotMatch(out, /300.0 km · ≈/);
+  assert.equal(vcT('fr', 'estimated'), 'Estimé');
+});

@@ -63,6 +63,8 @@ async def test_trip_ended_event(hass: HomeAssistant, freezer: FrozenDateTimeFact
         "co2": event.data["co2"],
         "co2_per_km": event.data["co2_per_km"],
         "units": "metric",
+        # Whole litres: a 3 L trip is under 5 steps of the sensor, its use is the average consumption's (6 L/100 km).
+        "estimated": True,
     }
     assert event.data["co2"] > 0 and event.data["start"] < event.data["end"]
 

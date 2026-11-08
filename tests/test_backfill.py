@@ -10,6 +10,7 @@ from homeassistant.core import HomeAssistant
 
 from custom_components.vehicle_consumption.const import DOMAIN, MAX_TRIPS
 
+from .conftest import measured_trips
 from .test_history import JOURNEY, START, _attrs, _record, _setup
 
 # What a tracking started after the refuel of JOURNEY (minute 210) has: trip 3 only.
@@ -50,7 +51,7 @@ async def test_reload_counts_the_days_not_tracked(
     attrs = _attrs(hass)
     assert attrs["total"]["distance"] == 100 and attrs["total"]["fuel"] == 7
     assert attrs["total"]["since"] == START.isoformat()
-    assert [(t["distance"], t["fuel"]) for t in attrs["trips"]] == [(50, 3), (30, 2), (20, 2)]
+    assert measured_trips(hass) == [(50, 3), (30, 2), (20, 2)]
     assert [(r["liters"], r["source"]) for r in attrs["refuels"]] == [(13, "auto")]
     assert attrs["month"]["distance"] == 100
 
