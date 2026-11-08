@@ -46,7 +46,8 @@
           "electricity_price_entity": "Elektriciteitsprijssensor",
           "electricity_price": "Vaste elektriciteitsprijs",
           "fuel_type": "Brandstof",
-          "co2_electricity": "CO₂ van de elektriciteit"
+          "co2_electricity": "CO₂ van de elektriciteit",
+          "units": "Eenheden"
         },
         "data_description": {
           "fuel_price_entity": "Prijs per liter (of per gallon) die de prijzen van het tankstation volgt.",
@@ -54,7 +55,8 @@
           "electricity_price_entity": "Prijs per kWh van je tarief.",
           "electricity_price": "Prijs per kWh, gebruikt als er geen prijssensor is of als die niet beschikbaar is.",
           "fuel_type": "Geeft de CO₂ van elke verbrande liter: benzine 2,31 kg, diesel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gram CO₂ per geladen kWh; 55 voor het Franse net, ongeveer 380 voor het Duitse."
+          "co2_electricity": "Gram CO₂ per geladen kWh; 55 voor het Franse net, ongeveer 380 voor het Duitse.",
+          "units": "Eenheden van de waarden op de kaart en in de verbruikssensoren. Afstanden en volumes van rit en maand volgen het eenhedenstelsel van Home Assistant."
         }
       }
     },
@@ -107,7 +109,8 @@
           "refuel_threshold": "Drempel voor tankbeurt",
           "charge_threshold": "Drempel voor laadbeurt",
           "fuel_type": "Brandstof",
-          "co2_electricity": "CO₂ van de elektriciteit"
+          "co2_electricity": "CO₂ van de elektriciteit",
+          "units": "Eenheden"
         },
         "data_description": {
           "fuel_price_entity": "Prijs per liter (of per gallon) die de prijzen van het tankstation volgt.",
@@ -118,7 +121,8 @@
           "refuel_threshold": "Een stijging van de brandstof van minstens deze hoeveelheid is een tankbeurt; kleinere stijgingen worden genegeerd.",
           "charge_threshold": "Een stijging van de accu van minstens deze hoeveelheid is een laadbeurt; kleinere stijgingen worden genegeerd.",
           "fuel_type": "Geeft de CO₂ van elke verbrande liter: benzine 2,31 kg, diesel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gram CO₂ per geladen kWh; 55 voor het Franse net, ongeveer 380 voor het Duitse."
+          "co2_electricity": "Gram CO₂ per geladen kWh; 55 voor het Franse net, ongeveer 380 voor het Duitse.",
+          "units": "Eenheden van de waarden op de kaart en in de verbruikssensoren. Afstanden en volumes van rit en maand volgen het eenhedenstelsel van Home Assistant."
         }
       }
     },
@@ -318,7 +322,7 @@
         },
         "odometer": {
           "name": "Kilometerstand",
-          "description": "Afgelezen kilometerstand (km). De laatst bekende stand als het wordt weggelaten."
+          "description": "Afgelezen kilometerstand, in de eenheid van de kilometertellersensor. De laatst bekende stand als het wordt weggelaten."
         }
       }
     },
@@ -344,7 +348,7 @@
         },
         "odometer": {
           "name": "Kilometerstand",
-          "description": "Afgelezen kilometerstand (km). De laatst bekende stand als het wordt weggelaten."
+          "description": "Afgelezen kilometerstand, in de eenheid van de kilometertellersensor. De laatst bekende stand als het wordt weggelaten."
         }
       }
     },
@@ -391,6 +395,12 @@
         "diesel": "Diesel",
         "lpg": "LPG",
         "e85": "E85 (ethanol)"
+      }
+    },
+    "units": {
+      "options": {
+        "metric": "Metrisch (km, L/100 km, kWh/100 km)",
+        "imperial": "Imperiaal (mijl, mpg, mi/kWh)"
       }
     }
   }

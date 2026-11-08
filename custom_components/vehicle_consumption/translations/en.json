@@ -46,7 +46,8 @@
           "electricity_price_entity": "Electricity price sensor",
           "electricity_price": "Fixed electricity price",
           "fuel_type": "Fuel type",
-          "co2_electricity": "Electricity CO₂"
+          "co2_electricity": "Electricity CO₂",
+          "units": "Units"
         },
         "data_description": {
           "fuel_price_entity": "Price per litre (or per gallon) that follows the station prices.",
@@ -54,7 +55,8 @@
           "electricity_price_entity": "Price per kWh of your tariff.",
           "electricity_price": "Price per kWh, used when there is no price sensor or it is unavailable.",
           "fuel_type": "Gives the CO₂ of each litre burnt: petrol 2.31 kg, diesel 2.68 kg, LPG 1.66 kg, E85 1.61 kg.",
-          "co2_electricity": "Grams of CO₂ per kWh charged; 55 for the French grid, about 380 for the German one."
+          "co2_electricity": "Grams of CO₂ per kWh charged; 55 for the French grid, about 380 for the German one.",
+          "units": "Units of the figures shown on the card and in the consumption sensors. Trip and month distances and volumes follow Home Assistant's unit system."
         }
       }
     },
@@ -107,7 +109,8 @@
           "refuel_threshold": "Refuel threshold",
           "charge_threshold": "Charge threshold",
           "fuel_type": "Fuel type",
-          "co2_electricity": "Electricity CO₂"
+          "co2_electricity": "Electricity CO₂",
+          "units": "Units"
         },
         "data_description": {
           "fuel_price_entity": "Price per litre (or per gallon) that follows the station prices.",
@@ -118,7 +121,8 @@
           "refuel_threshold": "A fuel rise of at least this much is a refuel; smaller rises are ignored.",
           "charge_threshold": "A battery rise of at least this much is a charge; smaller rises are ignored.",
           "fuel_type": "Gives the CO₂ of each litre burnt: petrol 2.31 kg, diesel 2.68 kg, LPG 1.66 kg, E85 1.61 kg.",
-          "co2_electricity": "Grams of CO₂ per kWh charged; 55 for the French grid, about 380 for the German one."
+          "co2_electricity": "Grams of CO₂ per kWh charged; 55 for the French grid, about 380 for the German one.",
+          "units": "Units of the figures shown on the card and in the consumption sensors. Trip and month distances and volumes follow Home Assistant's unit system."
         }
       }
     },
@@ -318,7 +322,7 @@
         },
         "odometer": {
           "name": "Odometer",
-          "description": "Odometer reading (km). The last known reading when left out."
+          "description": "Odometer reading, in the unit of the odometer sensor. The last known reading when left out."
         }
       }
     },
@@ -344,7 +348,7 @@
         },
         "odometer": {
           "name": "Odometer",
-          "description": "Odometer reading (km). The last known reading when left out."
+          "description": "Odometer reading, in the unit of the odometer sensor. The last known reading when left out."
         }
       }
     },
@@ -391,6 +395,12 @@
         "diesel": "Diesel",
         "lpg": "LPG",
         "e85": "E85 (ethanol)"
+      }
+    },
+    "units": {
+      "options": {
+        "metric": "Metric (km, L/100 km, kWh/100 km)",
+        "imperial": "Imperial (miles, mpg, mi/kWh)"
       }
     }
   }

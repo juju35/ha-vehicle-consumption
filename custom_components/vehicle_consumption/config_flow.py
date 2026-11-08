@@ -49,14 +49,17 @@ from .const import (
     CONF_REFUEL_THRESHOLD,
     CONF_TANK_CAPACITY,
     CONF_TRIP_GAP,
+    CONF_UNITS,
     DEFAULT_CHARGE_THRESHOLD,
     DEFAULT_CO2_ELECTRICITY,
     DEFAULT_FUEL_TYPE,
     DEFAULT_REFUEL_THRESHOLD,
     DEFAULT_TRIP_GAP,
+    DEFAULT_UNITS,
     DOMAIN,
     FUEL_TYPES,
     SENSOR_KEYS,
+    UNIT_SYSTEMS,
 )
 from .detect import async_detect
 
@@ -71,9 +74,13 @@ _PRICE_KEYS = (
     CONF_ELECTRICITY_PRICE,
     CONF_FUEL_TYPE,
     CONF_CO2_ELECTRICITY,
+    CONF_UNITS,
 )
 _FUEL_TYPE = SelectSelector(
     SelectSelectorConfig(options=list(FUEL_TYPES), mode=SelectSelectorMode.DROPDOWN, translation_key=CONF_FUEL_TYPE)
+)
+_UNITS = SelectSelector(
+    SelectSelectorConfig(options=list(UNIT_SYSTEMS), mode=SelectSelectorMode.DROPDOWN, translation_key=CONF_UNITS)
 )
 _TUNING = (
     (CONF_TRIP_GAP, DEFAULT_TRIP_GAP),
@@ -110,6 +117,8 @@ def _prices_schema(currency: str, tuning: bool) -> vol.Schema:
         # CO₂: the fuel type gives the kg per litre burnt; the grid factor the g per kWh charged.
         vol.Optional(CONF_FUEL_TYPE, default=DEFAULT_FUEL_TYPE): _FUEL_TYPE,
         vol.Optional(CONF_CO2_ELECTRICITY, default=DEFAULT_CO2_ELECTRICITY): _number(0, 1500, 1, "g/kWh"),
+        # Units of the figures shown: km, L, L/100 km or miles, US gallons, mpg, mi/kWh.
+        vol.Optional(CONF_UNITS, default=DEFAULT_UNITS): _UNITS,
     }
     if tuning:
         schema |= {

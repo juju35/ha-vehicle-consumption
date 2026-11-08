@@ -46,7 +46,8 @@
           "electricity_price_entity": "Senzor cene elektrike",
           "electricity_price": "Fiksna cena elektrike",
           "fuel_type": "Gorivo",
-          "co2_electricity": "CO₂ elektrike"
+          "co2_electricity": "CO₂ elektrike",
+          "units": "Enote"
         },
         "data_description": {
           "fuel_price_entity": "Cena na liter (ali na galono), ki sledi cenam na črpalki.",
@@ -54,7 +55,8 @@
           "electricity_price_entity": "Cena na kWh po vaši tarifi.",
           "electricity_price": "Cena na kWh, uporabljena, kadar ni senzorja cene ali ta ni na voljo.",
           "fuel_type": "Določa CO₂ vsakega porabljenega litra: bencin 2,31 kg, dizel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gramov CO₂ na napolnjeno kWh; 55 za francosko omrežje, približno 380 za nemško."
+          "co2_electricity": "Gramov CO₂ na napolnjeno kWh; 55 za francosko omrežje, približno 380 za nemško.",
+          "units": "Enote vrednosti na kartici in v senzorjih porabe. Razdalje in prostornine vožnje in meseca sledijo sistemu enot Home Assistant."
         }
       }
     },
@@ -107,7 +109,8 @@
           "refuel_threshold": "Prag točenja goriva",
           "charge_threshold": "Prag polnjenja",
           "fuel_type": "Gorivo",
-          "co2_electricity": "CO₂ elektrike"
+          "co2_electricity": "CO₂ elektrike",
+          "units": "Enote"
         },
         "data_description": {
           "fuel_price_entity": "Cena na liter (ali na galono), ki sledi cenam na črpalki.",
@@ -118,7 +121,8 @@
           "refuel_threshold": "Povečanje goriva za vsaj toliko je točenje goriva; manjša povečanja se prezrejo.",
           "charge_threshold": "Povečanje baterije za vsaj toliko je polnjenje; manjša povečanja se prezrejo.",
           "fuel_type": "Določa CO₂ vsakega porabljenega litra: bencin 2,31 kg, dizel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gramov CO₂ na napolnjeno kWh; 55 za francosko omrežje, približno 380 za nemško."
+          "co2_electricity": "Gramov CO₂ na napolnjeno kWh; 55 za francosko omrežje, približno 380 za nemško.",
+          "units": "Enote vrednosti na kartici in v senzorjih porabe. Razdalje in prostornine vožnje in meseca sledijo sistemu enot Home Assistant."
         }
       }
     },
@@ -318,7 +322,7 @@
         },
         "odometer": {
           "name": "Števec kilometrov",
-          "description": "Stanje števca kilometrov (km). Če je izpuščeno, zadnje znano stanje."
+          "description": "Stanje števca kilometrov, v enoti njegovega senzorja. Če je izpuščeno, zadnje znano stanje."
         }
       }
     },
@@ -344,7 +348,7 @@
         },
         "odometer": {
           "name": "Števec kilometrov",
-          "description": "Stanje števca kilometrov (km). Če je izpuščeno, zadnje znano stanje."
+          "description": "Stanje števca kilometrov, v enoti njegovega senzorja. Če je izpuščeno, zadnje znano stanje."
         }
       }
     },
@@ -391,6 +395,12 @@
         "diesel": "Dizel",
         "lpg": "LPG",
         "e85": "E85 (etanol)"
+      }
+    },
+    "units": {
+      "options": {
+        "metric": "Metrične (km, L/100 km, kWh/100 km)",
+        "imperial": "Imperialne (milje, mpg, mi/kWh)"
       }
     }
   }

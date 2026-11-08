@@ -39,7 +39,6 @@ add_refuel:
           max: 2000000
           step: 0.1
           mode: box
-          unit_of_measurement: km
 
 add_charge:
   fields:
@@ -82,7 +81,6 @@ add_charge:
           max: 2000000
           step: 0.1
           mode: box
-          unit_of_measurement: km
 
 reset_statistics:
   fields:

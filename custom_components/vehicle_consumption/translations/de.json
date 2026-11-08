@@ -46,7 +46,8 @@
           "electricity_price_entity": "Strompreis-Sensor",
           "electricity_price": "Fester Strompreis",
           "fuel_type": "Kraftstoff",
-          "co2_electricity": "CO₂ des Stroms"
+          "co2_electricity": "CO₂ des Stroms",
+          "units": "Einheiten"
         },
         "data_description": {
           "fuel_price_entity": "Preis pro Liter (oder Gallone), der den Tankstellenpreisen folgt.",
@@ -54,7 +55,8 @@
           "electricity_price_entity": "Preis pro kWh deines Tarifs.",
           "electricity_price": "Preis pro kWh, verwendet ohne Preissensor oder wenn dieser nicht verfügbar ist.",
           "fuel_type": "Gibt das CO₂ je verbranntem Liter an: Benzin 2,31 kg, Diesel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gramm CO₂ je geladener kWh; 55 für das französische Netz, etwa 380 für das deutsche."
+          "co2_electricity": "Gramm CO₂ je geladener kWh; 55 für das französische Netz, etwa 380 für das deutsche.",
+          "units": "Einheiten der Werte auf der Karte und in den Verbrauchssensoren. Strecken und Mengen von Fahrt und Monat folgen dem Einheitensystem von Home Assistant."
         }
       }
     },
@@ -107,7 +109,8 @@
           "refuel_threshold": "Schwelle für Tanken",
           "charge_threshold": "Schwelle für Laden",
           "fuel_type": "Kraftstoff",
-          "co2_electricity": "CO₂ des Stroms"
+          "co2_electricity": "CO₂ des Stroms",
+          "units": "Einheiten"
         },
         "data_description": {
           "fuel_price_entity": "Preis pro Liter (oder Gallone), der den Tankstellenpreisen folgt.",
@@ -118,7 +121,8 @@
           "refuel_threshold": "Ein Anstieg des Kraftstoffs um mindestens diese Menge gilt als Tanken; kleinere Anstiege werden ignoriert.",
           "charge_threshold": "Ein Anstieg der Batterie um mindestens diese Menge gilt als Laden; kleinere Anstiege werden ignoriert.",
           "fuel_type": "Gibt das CO₂ je verbranntem Liter an: Benzin 2,31 kg, Diesel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gramm CO₂ je geladener kWh; 55 für das französische Netz, etwa 380 für das deutsche."
+          "co2_electricity": "Gramm CO₂ je geladener kWh; 55 für das französische Netz, etwa 380 für das deutsche.",
+          "units": "Einheiten der Werte auf der Karte und in den Verbrauchssensoren. Strecken und Mengen von Fahrt und Monat folgen dem Einheitensystem von Home Assistant."
         }
       }
     },
@@ -318,7 +322,7 @@
         },
         "odometer": {
           "name": "Kilometerzähler",
-          "description": "Kilometerstand (km). Der letzte bekannte Stand, wenn er fehlt."
+          "description": "Kilometerstand, in der Einheit des Kilometerzählers. Der letzte bekannte Stand, wenn er fehlt."
         }
       }
     },
@@ -344,7 +348,7 @@
         },
         "odometer": {
           "name": "Kilometerzähler",
-          "description": "Kilometerstand (km). Der letzte bekannte Stand, wenn er fehlt."
+          "description": "Kilometerstand, in der Einheit des Kilometerzählers. Der letzte bekannte Stand, wenn er fehlt."
         }
       }
     },
@@ -391,6 +395,12 @@
         "diesel": "Diesel",
         "lpg": "LPG",
         "e85": "E85 (Ethanol)"
+      }
+    },
+    "units": {
+      "options": {
+        "metric": "Metrisch (km, L/100 km, kWh/100 km)",
+        "imperial": "Imperial (Meilen, mpg, mi/kWh)"
       }
     }
   }

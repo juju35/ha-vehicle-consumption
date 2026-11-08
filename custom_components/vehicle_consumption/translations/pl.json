@@ -46,7 +46,8 @@
           "electricity_price_entity": "Sensor ceny energii elektrycznej",
           "electricity_price": "Stała cena energii elektrycznej",
           "fuel_type": "Paliwo",
-          "co2_electricity": "CO₂ energii elektrycznej"
+          "co2_electricity": "CO₂ energii elektrycznej",
+          "units": "Jednostki"
         },
         "data_description": {
           "fuel_price_entity": "Cena za litr (lub za galon) zgodna z cenami na stacji.",
@@ -54,7 +55,8 @@
           "electricity_price_entity": "Cena za kWh w Twojej taryfie.",
           "electricity_price": "Cena za kWh, używana, gdy nie ma sensora ceny lub jest on niedostępny.",
           "fuel_type": "Określa CO₂ każdego spalonego litra: benzyna 2,31 kg, diesel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gramy CO₂ na naładowaną kWh; 55 dla sieci francuskiej, około 380 dla niemieckiej."
+          "co2_electricity": "Gramy CO₂ na naładowaną kWh; 55 dla sieci francuskiej, około 380 dla niemieckiej.",
+          "units": "Jednostki wartości na karcie i w czujnikach zużycia. Odległości i objętości podróży i miesiąca są zgodne z systemem jednostek Home Assistant."
         }
       }
     },
@@ -107,7 +109,8 @@
           "refuel_threshold": "Próg tankowania",
           "charge_threshold": "Próg ładowania",
           "fuel_type": "Paliwo",
-          "co2_electricity": "CO₂ energii elektrycznej"
+          "co2_electricity": "CO₂ energii elektrycznej",
+          "units": "Jednostki"
         },
         "data_description": {
           "fuel_price_entity": "Cena za litr (lub za galon) zgodna z cenami na stacji.",
@@ -118,7 +121,8 @@
           "refuel_threshold": "Wzrost ilości paliwa o co najmniej tę wartość to tankowanie; mniejsze wzrosty są ignorowane.",
           "charge_threshold": "Wzrost naładowania akumulatora o co najmniej tę wartość to ładowanie; mniejsze wzrosty są ignorowane.",
           "fuel_type": "Określa CO₂ każdego spalonego litra: benzyna 2,31 kg, diesel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Gramy CO₂ na naładowaną kWh; 55 dla sieci francuskiej, około 380 dla niemieckiej."
+          "co2_electricity": "Gramy CO₂ na naładowaną kWh; 55 dla sieci francuskiej, około 380 dla niemieckiej.",
+          "units": "Jednostki wartości na karcie i w czujnikach zużycia. Odległości i objętości podróży i miesiąca są zgodne z systemem jednostek Home Assistant."
         }
       }
     },
@@ -318,7 +322,7 @@
         },
         "odometer": {
           "name": "Licznik przebiegu",
-          "description": "Odczyt licznika przebiegu (km). Ostatni znany odczyt, jeśli pominięty."
+          "description": "Odczyt licznika przebiegu, w jednostce jego czujnika. Ostatni znany odczyt, jeśli pominięty."
         }
       }
     },
@@ -344,7 +348,7 @@
         },
         "odometer": {
           "name": "Licznik przebiegu",
-          "description": "Odczyt licznika przebiegu (km). Ostatni znany odczyt, jeśli pominięty."
+          "description": "Odczyt licznika przebiegu, w jednostce jego czujnika. Ostatni znany odczyt, jeśli pominięty."
         }
       }
     },
@@ -391,6 +395,12 @@
         "diesel": "Diesel",
         "lpg": "LPG",
         "e85": "E85 (etanol)"
+      }
+    },
+    "units": {
+      "options": {
+        "metric": "Metryczne (km, L/100 km, kWh/100 km)",
+        "imperial": "Imperialne (mile, mpg, mi/kWh)"
       }
     }
   }

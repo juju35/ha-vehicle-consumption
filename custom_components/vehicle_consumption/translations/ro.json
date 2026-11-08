@@ -46,7 +46,8 @@
           "electricity_price_entity": "Senzor de preț al electricității",
           "electricity_price": "Preț fix al electricității",
           "fuel_type": "Combustibil",
-          "co2_electricity": "CO₂ al electricității"
+          "co2_electricity": "CO₂ al electricității",
+          "units": "Unități"
         },
         "data_description": {
           "fuel_price_entity": "Prețul pe litru (sau pe galon) care urmează prețurile de la stație.",
@@ -54,7 +55,8 @@
           "electricity_price_entity": "Prețul pe kWh al tarifului tău.",
           "electricity_price": "Prețul pe kWh, folosit când nu există un senzor de preț sau acesta nu este disponibil.",
           "fuel_type": "Dă CO₂-ul fiecărui litru ars: benzină 2,31 kg, motorină 2,68 kg, GPL 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Grame de CO₂ pe kWh încărcat; 55 pentru rețeaua franceză, circa 380 pentru cea germană."
+          "co2_electricity": "Grame de CO₂ pe kWh încărcat; 55 pentru rețeaua franceză, circa 380 pentru cea germană.",
+          "units": "Unitățile valorilor afișate pe card și în senzorii de consum. Distanțele și volumele călătoriei și ale lunii urmează sistemul de unități al Home Assistant."
         }
       }
     },
@@ -107,7 +109,8 @@
           "refuel_threshold": "Prag de alimentare",
           "charge_threshold": "Prag de încărcare",
           "fuel_type": "Combustibil",
-          "co2_electricity": "CO₂ al electricității"
+          "co2_electricity": "CO₂ al electricității",
+          "units": "Unități"
         },
         "data_description": {
           "fuel_price_entity": "Prețul pe litru (sau pe galon) care urmează prețurile de la stație.",
@@ -118,7 +121,8 @@
           "refuel_threshold": "O creștere a combustibilului de cel puțin această valoare este o alimentare; creșterile mai mici sunt ignorate.",
           "charge_threshold": "O creștere a bateriei de cel puțin această valoare este o încărcare; creșterile mai mici sunt ignorate.",
           "fuel_type": "Dă CO₂-ul fiecărui litru ars: benzină 2,31 kg, motorină 2,68 kg, GPL 1,66 kg, E85 1,61 kg.",
-          "co2_electricity": "Grame de CO₂ pe kWh încărcat; 55 pentru rețeaua franceză, circa 380 pentru cea germană."
+          "co2_electricity": "Grame de CO₂ pe kWh încărcat; 55 pentru rețeaua franceză, circa 380 pentru cea germană.",
+          "units": "Unitățile valorilor afișate pe card și în senzorii de consum. Distanțele și volumele călătoriei și ale lunii urmează sistemul de unități al Home Assistant."
         }
       }
     },
@@ -318,7 +322,7 @@
         },
         "odometer": {
           "name": "Kilometraj",
-          "description": "Citirea kilometrajului (km). Ultima citire cunoscută dacă este omisă."
+          "description": "Citirea kilometrajului, în unitatea senzorului său. Ultima citire cunoscută dacă este omisă."
         }
       }
     },
@@ -344,7 +348,7 @@
         },
         "odometer": {
           "name": "Kilometraj",
-          "description": "Citirea kilometrajului (km). Ultima citire cunoscută dacă este omisă."
+          "description": "Citirea kilometrajului, în unitatea senzorului său. Ultima citire cunoscută dacă este omisă."
         }
       }
     },
@@ -391,6 +395,12 @@
         "diesel": "Motorină",
         "lpg": "GPL",
         "e85": "E85 (etanol)"
+      }
+    },
+    "units": {
+      "options": {
+        "metric": "Metric (km, L/100 km, kWh/100 km)",
+        "imperial": "Imperial (mile, mpg, mi/kWh)"
       }
     }
   }
