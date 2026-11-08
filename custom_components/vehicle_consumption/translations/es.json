@@ -56,7 +56,7 @@
           "electricity_price": "Precio por kWh, usado sin sensor de precio o cuando no está disponible.",
           "fuel_type": "Da el CO₂ de cada litro quemado: gasolina 2,31 kg, diésel 2,68 kg, GLP 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Gramos de CO₂ por kWh cargado; 55 para la red francesa, unos 380 para la alemana.",
-          "units": "Unidades de las cifras de la tarjeta y de los sensores de consumo. Las distancias y volúmenes del trayecto y del mes siguen el sistema de unidades de Home Assistant."
+          "units": "Unidades de las cifras de la tarjeta y de las distancias y volúmenes del trayecto y del mes. Los sensores de consumo, coste y CO₂ por distancia conservan su unidad métrica (sus estadísticas siguen siendo válidas) y dan la cifra imperial en sus atributos. La capacidad del depósito, el precio fijo del combustible y el umbral de repostaje se introducen en las unidades mostradas."
         }
       }
     },
@@ -122,7 +122,7 @@
           "charge_threshold": "Una subida de la batería de al menos esta cantidad es una carga; las subidas menores se ignoran.",
           "fuel_type": "Da el CO₂ de cada litro quemado: gasolina 2,31 kg, diésel 2,68 kg, GLP 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Gramos de CO₂ por kWh cargado; 55 para la red francesa, unos 380 para la alemana.",
-          "units": "Unidades de las cifras de la tarjeta y de los sensores de consumo. Las distancias y volúmenes del trayecto y del mes siguen el sistema de unidades de Home Assistant."
+          "units": "Unidades de las cifras de la tarjeta y de las distancias y volúmenes del trayecto y del mes. Los sensores de consumo, coste y CO₂ por distancia conservan su unidad métrica (sus estadísticas siguen siendo válidas) y dan la cifra imperial en sus atributos. La capacidad del depósito, el precio fijo del combustible y el umbral de repostaje se introducen en las unidades mostradas."
         }
       }
     },

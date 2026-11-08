@@ -22,3 +22,4 @@ _.last_reset  # unused property (custom_components/vehicle_consumption/sensor.py
 _.native_value  # unused property (custom_components/vehicle_consumption/sensor.py:214)
 _.extra_state_attributes  # unused property (custom_components/vehicle_consumption/sensor.py:218)
 async_get_config_entry_diagnostics  # unused function (custom_components/vehicle_consumption/diagnostics.py:45)
+_._attr_suggested_unit_of_measurement  # unused attribute (custom_components/vehicle_consumption/sensor.py:260)

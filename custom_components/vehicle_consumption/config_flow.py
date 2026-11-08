@@ -3,6 +3,7 @@
 Steps: `user` (the vehicle device and a name), `sensors` (prefilled by the auto-detection, home charger included),
 `prices`.
 The device and the name go in the entry data, everything else in the options (changed by the options flow).
+Volumes are typed in the units shown (US gallons and prices per gallon with imperial units) and stored in litres.
 """
 
 from __future__ import annotations
@@ -27,6 +28,7 @@ from homeassistant.helpers.selector import (
     SelectSelectorMode,
     TextSelector,
 )
+from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from .charger import async_detect_charger
 from .const import (
@@ -60,8 +62,11 @@ from .const import (
     FUEL_TYPES,
     SENSOR_KEYS,
     UNIT_SYSTEMS,
+    UNITS_IMPERIAL,
+    UNITS_METRIC,
 )
 from .detect import async_detect
+from .tracker import LITERS_PER_GALLON
 
 _SENSOR = EntitySelector(EntitySelectorConfig(domain="sensor"))
 _CHARGER = EntitySelector(EntitySelectorConfig(domain="sensor", device_class="energy"))
@@ -89,41 +94,73 @@ _TUNING = (
 )
 
 
+# Options stored in litres (or per litre) and typed in US gallons (or per gallon) with imperial units: the factor
+# from the value typed to the value stored.
+_GALLON_FACTORS = {
+    CONF_TANK_CAPACITY: LITERS_PER_GALLON,
+    CONF_REFUEL_THRESHOLD: LITERS_PER_GALLON,
+    CONF_FUEL_PRICE: 1 / LITERS_PER_GALLON,
+}
+
+
+def _to_stored(values: dict[str, Any], imperial: bool) -> dict[str, Any]:
+    """The values typed (gal, per gal with imperial units) as stored (L, per L)."""
+    if not imperial:
+        return values
+    return {k: v * _GALLON_FACTORS[k] if k in _GALLON_FACTORS and v is not None else v for k, v in values.items()}
+
+
+def _to_shown(values: dict[str, Any], imperial: bool) -> dict[str, Any]:
+    """The values stored (L, per L) as shown in the form (gal, per gal with imperial units), rounded for typing."""
+    if not imperial:
+        return values
+    return {
+        k: round(v / _GALLON_FACTORS[k], 4) if k in _GALLON_FACTORS and isinstance(v, int | float) else v
+        for k, v in values.items()
+    }
+
+
 def _number(minimum: float, maximum: float, step: float | str, unit: str | None = None) -> NumberSelector:
     return NumberSelector(
         NumberSelectorConfig(min=minimum, max=maximum, step=step, mode=NumberSelectorMode.BOX, unit_of_measurement=unit)
     )
 
 
-def _sensors_schema() -> vol.Schema:
+def _sensors_schema(imperial: bool) -> vol.Schema:
     """Source sensors and capacities; values come in as suggestions, so an optional field can be emptied."""
+    tank = _number(0.3, 132, 0.1, "gal") if imperial else _number(1, 500, 0.1, "L")
     return vol.Schema(
         {
             vol.Required(CONF_ODOMETER): _SENSOR,
             **{vol.Optional(key): _SENSOR for key in _ENERGY_SOURCES},
-            vol.Optional(CONF_TANK_CAPACITY): _number(1, 500, 0.1, "L"),
+            vol.Optional(CONF_TANK_CAPACITY): tank,
             vol.Optional(CONF_BATTERY_CAPACITY): _number(1, 300, 0.1, "kWh"),
             vol.Optional(CONF_CHARGER_ENERGY): _CHARGER,
         }
     )
 
 
-def _prices_schema(currency: str, tuning: bool) -> vol.Schema:
+def _prices_schema(currency: str, tuning: bool, imperial: bool, units: str) -> vol.Schema:
+    """The prices and CO₂ factors, the units and (options flow) the tuning; volumes in the units shown (`imperial`)."""
+    volume = "gal" if imperial else "L"
     schema: dict[Any, Any] = {
         vol.Optional(CONF_FUEL_PRICE_ENTITY): _PRICE_ENTITY,
-        vol.Optional(CONF_FUEL_PRICE): _number(0, 100, "any", f"{currency}/L"),
+        vol.Optional(CONF_FUEL_PRICE): _number(0, 400 if imperial else 100, "any", f"{currency}/{volume}"),
         vol.Optional(CONF_ELECTRICITY_PRICE_ENTITY): _PRICE_ENTITY,
         vol.Optional(CONF_ELECTRICITY_PRICE): _number(0, 100, "any", f"{currency}/kWh"),
         # CO₂: the fuel type gives the kg per litre burnt; the grid factor the g per kWh charged.
         vol.Optional(CONF_FUEL_TYPE, default=DEFAULT_FUEL_TYPE): _FUEL_TYPE,
         vol.Optional(CONF_CO2_ELECTRICITY, default=DEFAULT_CO2_ELECTRICITY): _number(0, 1500, 1, "g/kWh"),
         # Units of the figures shown: km, L, L/100 km or miles, US gallons, mpg, mi/kWh.
-        vol.Optional(CONF_UNITS, default=DEFAULT_UNITS): _UNITS,
+        # The figures typed in this form stay in the units it shows, whatever is picked here.
+        vol.Optional(CONF_UNITS, default=units): _UNITS,
     }
     if tuning:
         schema |= {
             vol.Required(CONF_TRIP_GAP): _number(5, 720, 1, "min"),
-            vol.Required(CONF_REFUEL_THRESHOLD): _number(0.5, 50, 0.1, "L"),
+            vol.Required(CONF_REFUEL_THRESHOLD): _number(0.1, 13, 0.1, "gal")
+            if imperial
+            else _number(0.5, 50, 0.1, "L"),
             vol.Required(CONF_CHARGE_THRESHOLD): _number(0.1, 50, 0.1, "kWh"),
         }
     return vol.Schema(schema)
@@ -177,6 +214,11 @@ def _tuning(user_input: dict[str, Any]) -> dict[str, Any]:
     return {key: float(user_input.get(key, default)) for key, default in _TUNING}
 
 
+def _prices(user_input: dict[str, Any], imperial: bool) -> dict[str, Any]:
+    """The prices step's options, volumes as stored (the tuning stays out: its defaults are in litres)."""
+    return _to_stored(_clean(user_input, _PRICE_KEYS), imperial)
+
+
 async def _sensors_step(
     flow: VehicleConsumptionConfigFlow | VehicleConsumptionOptionsFlow,
     step_id: str,
@@ -187,13 +229,16 @@ async def _sensors_step(
     """The sensors and capacities step, shared by the config and options flows: on to the prices once valid."""
     errors = _validate_sensors(user_input) if user_input is not None else {}
     if user_input is not None and not errors:
-        flow._options = _clean(
-            user_input, (*SENSOR_KEYS, CONF_TANK_CAPACITY, CONF_BATTERY_CAPACITY, CONF_CHARGER_ENERGY)
+        flow._options = _to_stored(
+            _clean(user_input, (*SENSOR_KEYS, CONF_TANK_CAPACITY, CONF_BATTERY_CAPACITY, CONF_CHARGER_ENERGY)),
+            flow.imperial,
         )
         return await flow.async_step_prices()
     return flow.async_show_form(
         step_id=step_id,
-        data_schema=flow.add_suggested_values_to_schema(_sensors_schema(), user_input or defaults),
+        data_schema=flow.add_suggested_values_to_schema(
+            _sensors_schema(flow.imperial), user_input or _to_shown(defaults, flow.imperial)
+        ),
         errors=errors,
         description_placeholders=placeholders,
     )
@@ -207,6 +252,11 @@ class VehicleConsumptionConfigFlow(ConfigFlow, domain=DOMAIN):
     def __init__(self) -> None:
         self._data: dict[str, Any] = {}
         self._options: dict[str, Any] = {}
+
+    @property
+    def imperial(self) -> bool:
+        """A new vehicle: in gallons with Home Assistant set to US customary units (the units option's default)."""
+        return self.hass.config.units is US_CUSTOMARY_SYSTEM
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
@@ -244,11 +294,12 @@ class VehicleConsumptionConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def async_step_prices(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
-            options = {**self._options, **_clean(user_input, _PRICE_KEYS), **_tuning({})}
+            options = {**self._options, **_prices(user_input, self.imperial), **_tuning({})}
             return self.async_create_entry(title=self._data[CONF_NAME], data=self._data, options=options)
+        units = UNITS_IMPERIAL if self.imperial else UNITS_METRIC
         return self.async_show_form(
             step_id="prices",
-            data_schema=_prices_schema(self.hass.config.currency, tuning=False),
+            data_schema=_prices_schema(self.hass.config.currency, False, self.imperial, units),
             description_placeholders={"name": self._data[CONF_NAME]},
         )
 
@@ -264,18 +315,23 @@ class VehicleConsumptionOptionsFlow(OptionsFlow):
     def __init__(self) -> None:
         self._options: dict[str, Any] = {}
 
+    @property
+    def imperial(self) -> bool:
+        """The units the vehicle is shown in: the volumes are typed in them."""
+        return self.config_entry.options.get(CONF_UNITS) == UNITS_IMPERIAL
+
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         return await _sensors_step(self, "init", user_input, dict(self.config_entry.options))
 
     async def async_step_prices(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
-            return self.async_create_entry(
-                data={**self._options, **_clean(user_input, _PRICE_KEYS), **_tuning(user_input)}
-            )
+            tuning = _to_stored(_tuning(user_input), self.imperial)
+            return self.async_create_entry(data={**self._options, **_prices(user_input, self.imperial), **tuning})
         current = {**_tuning(dict(self.config_entry.options)), **self.config_entry.options}
+        units = str(self.config_entry.options.get(CONF_UNITS, DEFAULT_UNITS))
         return self.async_show_form(
             step_id="prices",
             data_schema=self.add_suggested_values_to_schema(
-                _prices_schema(self.hass.config.currency, tuning=True), current
+                _prices_schema(self.hass.config.currency, True, self.imperial, units), _to_shown(current, self.imperial)
             ),
         )

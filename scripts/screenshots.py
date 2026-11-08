@@ -62,6 +62,8 @@ ICONS = {
     "map-marker-path": "M18,15A3,3 0 0,1 21,18A3,3 0 0,1 18,21C16.69,21 15.58,20.17 15.17,19H14V17H15.17C15.58,15.83 16.69,15 18,15M18,17A1,1 0 0,0 17,18A1,1 0 0,0 18,19A1,1 0 0,0 19,18A1,1 0 0,0 18,17M18,8A1.43,1.43 0 0,0 19.43,6.57C19.43,5.78 18.79,5.14 18,5.14C17.21,5.14 16.57,5.78 16.57,6.57A1.43,1.43 0 0,0 18,8M18,2.57A4,4 0 0,1 22,6.57C22,9.56 18,14 18,14C18,14 14,9.56 14,6.57A4,4 0 0,1 18,2.57M8.83,17H10V19H8.83C8.42,20.17 7.31,21 6,21A3,3 0 0,1 3,18C3,16.69 3.83,15.58 5,15.17V14H7V15.17C7.85,15.47 8.53,16.15 8.83,17M6,17A1,1 0 0,0 5,18A1,1 0 0,0 6,19A1,1 0 0,0 7,18A1,1 0 0,0 6,17M6,3A3,3 0 0,1 9,6C9,7.31 8.17,8.42 7,8.83V10H5V8.83C3.83,8.42 3,7.31 3,6A3,3 0 0,1 6,3M6,5A1,1 0 0,0 5,6A1,1 0 0,0 6,7A1,1 0 0,0 7,6A1,1 0 0,0 6,5M11,19V17H13V19H11M7,13H5V11H7V13Z",
     "ev-station": "M19.77,7.23L19.78,7.22L16.06,3.5L15,4.56L17.11,6.67C16.17,7.03 15.5,7.93 15.5,9A2.5,2.5 0 0,0 18,11.5C18.36,11.5 18.69,11.42 19,11.29V18.5A1,1 0 0,1 18,19.5A1,1 0 0,1 17,18.5V14A2,2 0 0,0 15,12H14V5A2,2 0 0,0 12,3H6A2,2 0 0,0 4,5V21H14V13.5H15.5V18.5A2.5,2.5 0 0,0 18,21A2.5,2.5 0 0,0 20.5,18.5V9C20.5,8.31 20.22,7.68 19.77,7.23M18,10A1,1 0 0,1 17,9A1,1 0 0,1 18,8A1,1 0 0,1 19,9A1,1 0 0,1 18,10M8,18V13.5H6L10,6V11H12L8,18Z",
     "close": "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z",
+    "arrow-expand": "M10,21V19H6.41L10.91,14.5L9.5,13.09L5,17.59V14H3V21H10M14.5,10.91L19,6.41V10H21V3H14V5H17.59L13.09,9.5L14.5,10.91Z",
+    "arrow-collapse": "M19.5,3.09L15,7.59V4H13V11H20V9H16.41L20.91,4.5L19.5,3.09M4,13V15H7.59L3.09,19.5L4.5,20.91L9,16.41V20H11V13H4Z",
 }
 
 # Minimal stand-ins for Home Assistant's <ha-card> and <ha-icon>.
@@ -312,6 +314,23 @@ SHOTS = [
     },
     {"file": "popup", "theme": "light", "kind": "fuel", "config": {}, "popup": {"amount": "41.2", "cost": "74.98"}},
     {"file": "popup-dark", "theme": "dark", "kind": "fuel", "config": {}, "popup": {"amount": "41.2", "cost": "74.98"}},
+    # The mini card, at about 6 of 12 columns.
+    {
+        "file": "mini-card",
+        "theme": "light",
+        "kind": "fuel",
+        "config": {},
+        "tag": "vehicle-consumption-mini-card",
+        "width": 260,
+    },
+    {
+        "file": "mini-card-dark",
+        "theme": "dark",
+        "kind": "plugin_hybrid",
+        "config": {},
+        "tag": "vehicle-consumption-mini-card",
+        "width": 260,
+    },
 ]
 
 # One GIF per animation, on a compact card. `names`: the animations stepped; the others are shown finished.
@@ -386,19 +405,19 @@ def save(new, out):
     return True
 
 
-def page_html(theme):
+def page_html(theme, width=WIDTH):
     variables = "".join(f"{k}:{v};" for k, v in {**THEMES[theme], **COMMON}.items())
     return f"""<!doctype html><html><head><meta charset="utf-8"><style>
 :root {{ {variables} }}
 body {{ margin: 0; padding: 16px; background: var(--primary-background-color);
-       font-family: Roboto, "Segoe UI", Helvetica, Arial, sans-serif; width: {WIDTH}px; }}
+       font-family: Roboto, "Segoe UI", Helvetica, Arial, sans-serif; width: {width}px; }}
 </style></head><body><div id="root"></div></body></html>"""
 
 
 # Mounts the card on a new page; `open` unfolds sections, `popup` opens the add popup and types in its fields.
-MOUNT = """([hass, config, open, popup]) => {
-    const el = document.createElement("vehicle-consumption-card");
-    el.setConfig({ type: "custom:vehicle-consumption-card", ...config });
+MOUNT = """([hass, config, open, popup, tag]) => {
+    const el = document.createElement(tag);
+    el.setConfig({ type: `custom:${tag}`, ...config });
     el.hass = { ...hass, callService: async () => {} };
     document.getElementById("root").appendChild(el);
     // Several sections at once (a click on one folds the others back, like on a dashboard).
@@ -422,14 +441,16 @@ def open_card(browser, shot):
     page = browser.new_page(device_scale_factor=2, viewport={"width": 1000, "height": 1600})
     page.on("pageerror", lambda err, name=shot["file"]: print(f"{name}: page error: {err}"))
     page.clock.set_fixed_time(NOW)
-    page.set_content(page_html(shot.get("theme", "light")))
+    width = shot.get("width", WIDTH)
+    page.set_content(page_html(shot.get("theme", "light"), width))
     page.add_script_tag(content=HA_ELEMENTS)
     page.add_script_tag(content=CARD_JS)
     hass = mock_hass(shot["kind"], **shot.get("extra", {}))
-    page.evaluate(MOUNT, [hass, shot["config"], shot.get("open"), shot.get("popup")])
+    tag = shot.get("tag", "vehicle-consumption-card")
+    page.evaluate(MOUNT, [hass, shot["config"], shot.get("open"), shot.get("popup"), tag])
     page.wait_for_timeout(400)
     box = page.locator("#root").bounding_box()
-    clip = {"x": 0, "y": 0, "width": WIDTH + 32, "height": int(box["height"] + 0.999) + 32}
+    clip = {"x": 0, "y": 0, "width": width + 32, "height": int(box["height"] + 0.999) + 32}
     return page, clip
 
 

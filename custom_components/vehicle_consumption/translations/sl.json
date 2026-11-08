@@ -56,7 +56,7 @@
           "electricity_price": "Cena na kWh, uporabljena, kadar ni senzorja cene ali ta ni na voljo.",
           "fuel_type": "Določa CO₂ vsakega porabljenega litra: bencin 2,31 kg, dizel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Gramov CO₂ na napolnjeno kWh; 55 za francosko omrežje, približno 380 za nemško.",
-          "units": "Enote vrednosti na kartici in v senzorjih porabe. Razdalje in prostornine vožnje in meseca sledijo sistemu enot Home Assistant."
+          "units": "Enote vrednosti na kartici ter razdalj in prostornin vožnje in meseca. Senzorji porabe, stroškov in CO₂ na razdaljo ohranijo metrično enoto (njihova statistika ostane veljavna) in imperialno vrednost podajo v atributih. Prostornino rezervoarja, stalno ceno goriva in prag točenja vnesete v prikazanih enotah."
         }
       }
     },
@@ -122,7 +122,7 @@
           "charge_threshold": "Povečanje baterije za vsaj toliko je polnjenje; manjša povečanja se prezrejo.",
           "fuel_type": "Določa CO₂ vsakega porabljenega litra: bencin 2,31 kg, dizel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Gramov CO₂ na napolnjeno kWh; 55 za francosko omrežje, približno 380 za nemško.",
-          "units": "Enote vrednosti na kartici in v senzorjih porabe. Razdalje in prostornine vožnje in meseca sledijo sistemu enot Home Assistant."
+          "units": "Enote vrednosti na kartici ter razdalj in prostornin vožnje in meseca. Senzorji porabe, stroškov in CO₂ na razdaljo ohranijo metrično enoto (njihova statistika ostane veljavna) in imperialno vrednost podajo v atributih. Prostornino rezervoarja, stalno ceno goriva in prag točenja vnesete v prikazanih enotah."
         }
       }
     },

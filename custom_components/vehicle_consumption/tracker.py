@@ -1557,9 +1557,11 @@ class ConsumptionTracker:
     def charges(self) -> list[Refill]:
         return self._levels[ENERGY].events
 
-    def average(self, kind: str) -> float | None:
-        """All-time L/100 km (`fuel`) or kWh/100 km (`energy`); mpg or mi/kWh in imperial units."""
-        return self.total.summary(None, self.imperial)[f"{kind}_consumption"]
+    def average(self, kind: str, imperial: bool | None = None) -> float | None:
+        """All-time L/100 km (`fuel`) or kWh/100 km (`energy`); mpg or mi/kWh in imperial units (the option's unless
+        `imperial`)."""
+        imperial = self.imperial if imperial is None else imperial
+        return self.total.summary(None, imperial)[f"{kind}_consumption"]
 
     def attributes(self) -> dict[str, Any]:
         """Everything the card shows (exact keys: the card relies on them)."""

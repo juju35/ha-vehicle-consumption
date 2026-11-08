@@ -56,7 +56,7 @@
           "electricity_price": "Cena po kWh, koristi se kada nema senzora cene ili kada je nedostupan.",
           "fuel_type": "Daje CO₂ svakog sagorelog litra: benzin 2,31 kg, dizel 2,68 kg, TNG 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Grama CO₂ po napunjenom kWh; 55 za francusku mrežu, oko 380 za nemačku.",
-          "units": "Merne jedinice vrednosti na kartici i u senzorima potrošnje. Razdaljine i zapremine vožnje i meseca prate sistem mernih jedinica Home Assistant-a."
+          "units": "Merne jedinice vrednosti na kartici i razdaljina i zapremina vožnje i meseca. Senzori potrošnje, troška i CO₂ po razdaljini zadržavaju metričku jedinicu (njihova statistika ostaje ispravna) i imperijalnu vrednost daju u atributima. Zapremina rezervoara, fiksna cena goriva i prag točenja unose se u prikazanim jedinicama."
         }
       }
     },
@@ -122,7 +122,7 @@
           "charge_threshold": "Porast baterije od najmanje ove vrednosti je punjenje; manji porast se zanemaruje.",
           "fuel_type": "Daje CO₂ svakog sagorelog litra: benzin 2,31 kg, dizel 2,68 kg, TNG 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Grama CO₂ po napunjenom kWh; 55 za francusku mrežu, oko 380 za nemačku.",
-          "units": "Merne jedinice vrednosti na kartici i u senzorima potrošnje. Razdaljine i zapremine vožnje i meseca prate sistem mernih jedinica Home Assistant-a."
+          "units": "Merne jedinice vrednosti na kartici i razdaljina i zapremina vožnje i meseca. Senzori potrošnje, troška i CO₂ po razdaljini zadržavaju metričku jedinicu (njihova statistika ostaje ispravna) i imperijalnu vrednost daju u atributima. Zapremina rezervoara, fiksna cena goriva i prag točenja unose se u prikazanim jedinicama."
         }
       }
     },

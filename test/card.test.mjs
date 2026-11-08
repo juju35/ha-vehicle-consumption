@@ -73,11 +73,24 @@ const context = {
 };
 vm.createContext(context);
 vm.runInContext(
-  `${source}\nthis.vc = { VehicleConsumptionCard, VehicleConsumptionCardEditor, VC_I18N, VC_DEFAULTS, vcEsc, vcLang, vcT, vcFormat, vcMonthKeys, vcParse, vcVehicles };`,
+  `${source}\nthis.vc = { VehicleConsumptionCard, VehicleConsumptionCardEditor, VehicleConsumptionMiniCard, VehicleConsumptionMiniCardEditor, VC_I18N, VC_DEFAULTS, vcEsc, vcLang, vcT, vcFormat, vcMonthKeys, vcParse, vcVehicles, vcPickerLang };`,
   context,
 );
-const { VehicleConsumptionCard, VehicleConsumptionCardEditor, VC_I18N, vcEsc, vcLang, vcT, vcFormat, vcMonthKeys, vcParse, vcVehicles } =
-  context.vc;
+const {
+  VehicleConsumptionCard,
+  VehicleConsumptionCardEditor,
+  VehicleConsumptionMiniCard,
+  VehicleConsumptionMiniCardEditor,
+  VC_I18N,
+  vcEsc,
+  vcLang,
+  vcT,
+  vcFormat,
+  vcMonthKeys,
+  vcParse,
+  vcVehicles,
+  vcPickerLang,
+} = context.vc;
 
 const SENSOR = 'sensor.family_car_consumption';
 const months = (fn) =>
@@ -1105,10 +1118,11 @@ test('imperial units: miles, gallons, mpg, cost and CO₂ per mile; the popup se
     trip: { start: '2026-10-30T08:00:00+01:00', distance: 26.3, fuel: 0.63, fuel_consumption: 41.7, cost: 4.32 },
     total: { distance: 6089, fuel_consumption: 38.6, cost_per_km: 0.172, co2_per_km: 216 },
   });
-  const hass = hassWith(attrs, {});
-  hass.states[SENSOR].attributes.unit_of_measurement = 'mpg';
+  const hass = hassWith({ ...attrs, imperial_value: 38.6, imperial_unit: 'mpg' }, {});
   card.hass = hass;
   const out = html(card);
+  // The sensor stays in L/100 km (its statistics): the pill shows its imperial figure.
+  assert.match(out, /class="pill" title="38.6 mpg"/);
   assert.match(out, /63 % · 8.3 gal/);
   assert.match(out, /41.7<small>mpg/);
   assert.match(out, /26.3 mi/);
@@ -1136,4 +1150,140 @@ test('metric stays the default: no units attribute, km and L/100 km', () => {
   card.hass = hassWith(fuelAttrs());
   assert.match(html(card), /Cost per km/);
   assert.match(html(card), /42.3 km/);
+});
+
+// ── Mini card ──
+function makeMini(config = {}) {
+  const card = new VehicleConsumptionMiniCard();
+  const attrs = new Set();
+  card.setAttribute = (name) => attrs.add(name);
+  card.hasAttribute = (name) => attrs.has(name);
+  card.attachShadow = () => {
+    card.shadowRoot = { innerHTML: '', querySelector: () => null, querySelectorAll: () => [] };
+    return card.shadowRoot;
+  };
+  card.setConfig(config);
+  return card;
+}
+
+test('mini card: compact view (gauges, last trip, average), its detail button opens the full card and back', () => {
+  const card = makeMini();
+  card.hass = hassWith(fuelAttrs());
+  let out = html(card);
+  assert.ok(card.hasAttribute('mini'));
+  assert.match(out, /<ha-card class="lvl-ok mini/);
+  assert.match(out, /class="gauge g-fuel/);
+  assert.match(out, /k-trip/);
+  assert.match(out, /k-avg/);
+  assert.doesNotMatch(out, /k-month|k-cost|class="chart"|class="sections"|class="icon-btn add"/);
+  assert.match(out, /class="zoom" title="Show details" aria-label="Show details" aria-expanded="false"/);
+  // The badge keeps its 40 px.
+  assert.match(styles(), /\.badge \{ flex: none; width: 40px; height: 40px;/);
+  assert.deepEqual(JSON.parse(JSON.stringify(card.getGridOptions())), { columns: 6, min_columns: 6, rows: 'auto' });
+  assert.equal(card.getCardSize(), 3);
+
+  card._zoomClick({ stopPropagation() {}, detail: 1 });
+  out = html(card);
+  assert.match(out, /k-month/);
+  assert.match(out, /class="chart"/);
+  assert.match(out, /class="sections"/);
+  assert.match(out, /class="icon-btn add"/);
+  assert.match(out, /class="zoom" title="Back to the compact view"[^>]*aria-expanded="true"/);
+  assert.equal(card.getGridOptions().rows, 'auto');
+  assert.equal(card.getGridOptions().min_columns, 8);
+
+  card._zoomClick({ stopPropagation() {}, detail: 1 });
+  assert.doesNotMatch(html(card), /class="chart"/);
+});
+
+test('mini card: a click outside folds the full view back (capture phase), not inside it nor in a dialog', () => {
+  const card = makeMini();
+  card.hass = hassWith(fuelAttrs());
+  const added = [];
+  const doc = context.document;
+  const add = doc.addEventListener;
+  doc.addEventListener = (type, fn, capture) => added.push({ type, fn, capture });
+  card.connectedCallback();
+  doc.addEventListener = add;
+  const outside = added.find((l) => l.type === 'click' && l.capture === true);
+  assert.ok(outside, 'no capture-phase click listener');
+  card._setZoom(true);
+  outside.fn({ composedPath: () => [card] });
+  assert.equal(card._zoomed, true);
+  outside.fn({ composedPath: () => [{ localName: 'ha-more-info-dialog' }] });
+  assert.equal(card._zoomed, true);
+  card._openPopup();
+  assert.ok(card._popup);
+  outside.fn({ composedPath: () => [{ localName: 'div' }] });
+  assert.equal(card._zoomed, false);
+  assert.equal(card._popup, null);
+  assert.equal(listeners.keydown, undefined);
+  card.disconnectedCallback();
+});
+
+test('mini card: zoom: false removes the detail button; the editor offers it, the full card editor does not', () => {
+  const card = makeMini({ zoom: false });
+  card.hass = hassWith(fuelAttrs());
+  assert.doesNotMatch(html(card), /class="zoom"/);
+  const editor = new VehicleConsumptionMiniCardEditor();
+  editor.appendChild = () => {};
+  editor.setConfig({ type: 'custom:vehicle-consumption-mini-card' });
+  editor.hass = hassWith(fuelAttrs());
+  assert.ok(editor._form.schema.some((s) => s.name === 'zoom'));
+  assert.equal(editor._form.computeLabel({ name: 'zoom' }), 'Details button (full view)');
+  const full = new VehicleConsumptionCardEditor();
+  full.appendChild = () => {};
+  full.setConfig({ type: 'custom:vehicle-consumption-card' });
+  full.hass = hassWith(fuelAttrs());
+  assert.ok(!full._form.schema.some((s) => s.name === 'zoom'));
+  assert.equal(VehicleConsumptionMiniCard.getConfigElement !== VehicleConsumptionCard.getConfigElement, true);
+});
+
+test('card picker: both cards listed, named in the language of Home Assistant', () => {
+  const types = JSON.parse(JSON.stringify(context.window.customCards.map((c) => c.type)));
+  assert.deepEqual(types, ['vehicle-consumption-card', 'vehicle-consumption-mini-card']);
+  assert.equal(context.window.customCards[1].name, 'Vehicle Consumption Mini Card');
+  context.window.localStorage = { getItem: () => '"fr"' };
+  assert.equal(vcPickerLang(), 'fr');
+  assert.equal(vcT(vcPickerLang(), 'mini_name'), 'Mini-carte consommation véhicule');
+  context.window.localStorage = { getItem: () => '"sr-Latn"' };
+  assert.equal(vcPickerLang(), 'sr-Latn');
+  delete context.window.localStorage;
+  assert.equal(vcPickerLang(), 'en');
+});
+
+test('popup: modal (aria-modal), Tab and Shift+Tab stay inside, the focus goes back to the add button', () => {
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs());
+  const focused = [];
+  const el = (name) => ({ name, addEventListener() {}, focus: (opts) => { card.shadowRoot.activeElement = el.byName[name]; focused.push([name, opts]); } });
+  el.byName = {};
+  for (const n of ['close', 'amount', 'cost', 'odometer', 'cancel', 'save', 'add']) el.byName[n] = el(n);
+  const items = ['close', 'amount', 'cost', 'odometer', 'cancel', 'save'].map((n) => el.byName[n]);
+  const sheet = { querySelectorAll: () => items, scrollIntoView() {} };
+  card.shadowRoot.querySelector = (sel) =>
+    sel === '.sheet' ? sheet : sel === '.add' ? el.byName.add : sel === 'input[name="amount"]' ? el.byName.amount : null;
+  card._openPopup();
+  assert.match(html(card), /class="sheet" role="dialog" aria-modal="true"/);
+
+  let prevented = 0;
+  const tab = (shiftKey) => listeners.keydown({ key: 'Tab', shiftKey, preventDefault: () => prevented++ });
+  card.shadowRoot.activeElement = el.byName.save;
+  tab(false);
+  assert.equal(card.shadowRoot.activeElement, el.byName.close);
+  tab(true);
+  assert.equal(card.shadowRoot.activeElement, el.byName.save);
+  // In the middle: the browser moves the focus itself.
+  card.shadowRoot.activeElement = el.byName.cost;
+  tab(false);
+  assert.equal(prevented, 2);
+  // Focus outside the popup: brought back in.
+  card.shadowRoot.activeElement = null;
+  tab(false);
+  assert.equal(card.shadowRoot.activeElement, el.byName.close);
+
+  focused.length = 0;
+  listeners.keydown({ key: 'Escape' });
+  assert.equal(card._popup, null);
+  assert.deepEqual(JSON.parse(JSON.stringify(focused)), [['add', { preventScroll: true }]]);
 });

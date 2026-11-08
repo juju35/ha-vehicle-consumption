@@ -56,7 +56,7 @@
           "electricity_price": "Cena za kWh, použije sa, ak nie je senzor ceny alebo je nedostupný.",
           "fuel_type": "Udáva CO₂ každého spáleného litra: benzín 2,31 kg, nafta 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Gramy CO₂ na nabitú kWh; 55 pre francúzsku sieť, približne 380 pre nemeckú.",
-          "units": "Jednotky hodnôt na karte a v snímačoch spotreby. Vzdialenosti a objemy jazdy a mesiaca sa riadia systémom jednotiek Home Assistant."
+          "units": "Jednotky hodnôt na karte a vzdialeností a objemov jazdy a mesiaca. Snímače spotreby, nákladov a CO₂ na vzdialenosť si ponechávajú metrickú jednotku (ich štatistiky zostávajú platné) a imperiálnu hodnotu uvádzajú v atribútoch. Objem nádrže, pevná cena paliva a prah tankovania sa zadávajú v zobrazených jednotkách."
         }
       }
     },
@@ -122,7 +122,7 @@
           "charge_threshold": "Nárast batérie aspoň o túto hodnotu je nabíjanie; menšie nárasty sa ignorujú.",
           "fuel_type": "Udáva CO₂ každého spáleného litra: benzín 2,31 kg, nafta 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Gramy CO₂ na nabitú kWh; 55 pre francúzsku sieť, približne 380 pre nemeckú.",
-          "units": "Jednotky hodnôt na karte a v snímačoch spotreby. Vzdialenosti a objemy jazdy a mesiaca sa riadia systémom jednotiek Home Assistant."
+          "units": "Jednotky hodnôt na karte a vzdialeností a objemov jazdy a mesiaca. Snímače spotreby, nákladov a CO₂ na vzdialenosť si ponechávajú metrickú jednotku (ich štatistiky zostávajú platné) a imperiálnu hodnotu uvádzajú v atribútoch. Objem nádrže, pevná cena paliva a prah tankovania sa zadávajú v zobrazených jednotkách."
         }
       }
     },

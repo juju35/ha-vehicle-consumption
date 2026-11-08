@@ -15,6 +15,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import UnitOfEnergy, UnitOfLength, UnitOfMass, UnitOfVolume
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import VehicleConsumptionConfigEntry
@@ -25,23 +26,29 @@ from .tracker import ENERGY, FUEL, ConsumptionTracker, Refill
 
 @dataclass(frozen=True, kw_only=True)
 class VehicleSensorDescription(SensorEntityDescription):
-    """A figure read from the tracker; `kind` limits it to vehicles tracking fuel or energy."""
+    """A figure read from the tracker (metric, or imperial with `True`); `kind` limits it to vehicles tracking fuel or
+    energy."""
 
-    value_fn: Callable[[ConsumptionTracker], Any]
+    value_fn: Callable[[ConsumptionTracker, bool], Any]
     kind: str | None = None
 
 
-# Distances and volumes stay in km and L: Home Assistant converts them (unit system, entity settings). Consumptions,
-# cost and CO₂ per distance, which it cannot convert, follow the units option (mpg, mi/kWh, per mile).
-_METRIC_ONLY = {"distance", "fuel"}
+# Units and statistics: a sensor's native unit never changes with the units option (a new unit for the same entity
+# would break its long-term statistics). Distances and volumes stay in km and L, shown in mi and gal through Home
+# Assistant's suggested unit (it converts them, statistics included). Consumptions, cost and CO₂ per distance, which it
+# cannot convert (L/100 km is not mpg), stay metric and give the figure in the units chosen in `imperial_value` /
+# `imperial_unit` attributes (what the card shows).
+_IMPERIAL_DISPLAY = {SensorDeviceClass.DISTANCE: UnitOfLength.MILES, SensorDeviceClass.VOLUME: UnitOfVolume.GALLONS}
+ATTR_IMPERIAL_VALUE = "imperial_value"
+ATTR_IMPERIAL_UNIT = "imperial_unit"
 
 
-def _trip(key: str) -> Callable[[ConsumptionTracker], Any]:
-    return lambda t: (t.current_trip(False if key in _METRIC_ONLY else None) or {}).get(key)
+def _trip(key: str) -> Callable[[ConsumptionTracker, bool], Any]:
+    return lambda t, imperial: (t.current_trip(imperial) or {}).get(key)
 
 
-def _month(key: str) -> Callable[[ConsumptionTracker], Any]:
-    return lambda t: t.month_totals()[1].summary(t.co2, t.imperial and key not in _METRIC_ONLY)[key]
+def _month(key: str) -> Callable[[ConsumptionTracker, bool], Any]:
+    return lambda t, imperial: t.month_totals()[1].summary(t.co2, imperial)[key]
 
 
 def _consumption_unit(kind: str, imperial: bool) -> str:
@@ -72,7 +79,7 @@ SENSORS: tuple[VehicleSensorDescription, ...] = (
         native_unit_of_measurement=UNIT_FUEL_CONSUMPTION,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=1,
-        value_fn=lambda t: t.average(FUEL),
+        value_fn=lambda t, imperial: t.average(FUEL, imperial),
     ),
     VehicleSensorDescription(
         key="energy_consumption_trip",
@@ -95,7 +102,7 @@ SENSORS: tuple[VehicleSensorDescription, ...] = (
         native_unit_of_measurement=UNIT_ENERGY_CONSUMPTION,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=1,
-        value_fn=lambda t: t.average(ENERGY),
+        value_fn=lambda t, imperial: t.average(ENERGY, imperial),
     ),
     VehicleSensorDescription(
         key="distance_trip",
@@ -140,7 +147,7 @@ SENSORS: tuple[VehicleSensorDescription, ...] = (
     VehicleSensorDescription(
         key="cost_per_km",
         suggested_display_precision=3,
-        value_fn=lambda t: t.total.summary(None, t.imperial)["cost_per_km"],
+        value_fn=lambda t, imperial: t.total.summary(None, imperial)["cost_per_km"],
     ),
     VehicleSensorDescription(
         key="co2_trip",
@@ -160,7 +167,7 @@ SENSORS: tuple[VehicleSensorDescription, ...] = (
         native_unit_of_measurement="g/km",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=0,
-        value_fn=lambda t: t.total.summary(t.co2, t.imperial)["co2_per_km"],
+        value_fn=lambda t, imperial: t.total.summary(t.co2, imperial)["co2_per_km"],
     ),
 )
 
@@ -213,15 +220,19 @@ class ConsumptionSensor(VehicleConsumptionEntity, SensorEntity):
     def __init__(self, tracker: ConsumptionTracker) -> None:
         super().__init__(tracker, "consumption")
         self._kind = FUEL if tracker.tracks_fuel else ENERGY
-        self._attr_native_unit_of_measurement = _consumption_unit(self._kind, tracker.imperial)
+        self._attr_native_unit_of_measurement = _consumption_unit(self._kind, False)
 
     @property
     def native_value(self) -> float | None:
-        return self.tracker.average(self._kind)
+        return self.tracker.average(self._kind, False)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        return self.tracker.attributes()
+        attributes = self.tracker.attributes()
+        if self.tracker.imperial:
+            attributes[ATTR_IMPERIAL_VALUE] = self.tracker.average(self._kind, True)
+            attributes[ATTR_IMPERIAL_UNIT] = _consumption_unit(self._kind, True)
+        return attributes
 
 
 class VehicleSensor(VehicleConsumptionEntity, SensorEntity):
@@ -232,19 +243,62 @@ class VehicleSensor(VehicleConsumptionEntity, SensorEntity):
     def __init__(self, tracker: ConsumptionTracker, description: VehicleSensorDescription) -> None:
         super().__init__(tracker, description.key)
         self.entity_description = description
-        per = "mi" if tracker.imperial else "km"
+        # The unit of the figure in the units chosen when Home Assistant cannot convert to it (None: it can, or metric).
+        self._imperial_unit: str | None = None
         if description.key == "cost_month":
             self._attr_native_unit_of_measurement = tracker.currency
         elif description.key == "cost_per_km":
-            self._attr_native_unit_of_measurement = f"{tracker.currency}/{per}"
+            self._attr_native_unit_of_measurement = f"{tracker.currency}/km"
+            self._imperial_unit = f"{tracker.currency}/mi"
         elif description.key == "co2_per_km":
-            self._attr_native_unit_of_measurement = f"g/{per}"
+            self._imperial_unit = "g/mi"
         elif description.kind is not None and description.key.startswith(f"{description.kind}_consumption"):
-            self._attr_native_unit_of_measurement = _consumption_unit(description.kind, tracker.imperial)
+            self._imperial_unit = _consumption_unit(description.kind, True)
+        if not tracker.imperial:
+            self._imperial_unit = None
+        elif description.device_class in _IMPERIAL_DISPLAY:
+            self._attr_suggested_unit_of_measurement = _IMPERIAL_DISPLAY[description.device_class]
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        self._follow_units()
+
+    def _follow_units(self) -> None:
+        """A distance / volume registered before a change of the units option: shown in the new units.
+
+        Home Assistant only reads the suggested unit when it registers the entity: the one it keeps (`sensor.private`)
+        is updated here. A unit picked by the user in the entity settings still wins.
+        """
+        device_class = self.entity_description.device_class
+        if device_class not in _IMPERIAL_DISPLAY or self.registry_entry is None:
+            return
+        native = self.entity_description.native_unit_of_measurement
+        wanted = (
+            _IMPERIAL_DISPLAY[device_class]
+            if self.tracker.imperial
+            else self.hass.config.units.get_converted_unit(device_class, native)
+        )
+        private = dict(self.registry_entry.options.get("sensor.private") or {})
+        if private.get("suggested_unit_of_measurement") == wanted:
+            return
+        if wanted is None:
+            private.pop("suggested_unit_of_measurement", None)
+        else:
+            private["suggested_unit_of_measurement"] = wanted
+        er.async_get(self.hass).async_update_entity_options(self.entity_id, "sensor.private", private)
 
     @property
     def native_value(self) -> float | None:
-        return self.entity_description.value_fn(self.tracker)
+        return self.entity_description.value_fn(self.tracker, False)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any] | None:
+        if self._imperial_unit is None:
+            return None
+        return {
+            ATTR_IMPERIAL_VALUE: self.entity_description.value_fn(self.tracker, True),
+            ATTR_IMPERIAL_UNIT: self._imperial_unit,
+        }
 
     @property
     def last_reset(self) -> datetime | None:
