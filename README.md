@@ -125,18 +125,18 @@ Everything can be changed later with **Configure**, which also holds the trip an
 | Fuel level | Detected | Fuel left in % (needs the tank capacity) |
 | Battery energy | Detected | Energy left in the battery (kWh or Wh) |
 | Battery level | Detected | Battery level in % (needs the battery capacity) |
-| Tank capacity | — | Litres, to turn a fuel level in % into litres |
+| Tank capacity | — | Litres (US gallons in imperial units), to turn a fuel level in % into litres |
 | Usable battery capacity | — | Usable kWh, to turn a battery level in % into kWh |
 | Charger energy | Detected | Energy counter of your home charger (total or per session, kWh); needs a battery sensor. Home charges are measured at the charger, losses included |
 | Fuel price sensor | — | Sensor giving the price per litre (wins over the fixed price) |
-| Fixed fuel price | — | Price per litre, when there is no price sensor |
+| Fixed fuel price | — | Price per litre (per US gallon in imperial units), when there is no price sensor |
 | Electricity price sensor | — | Sensor giving the price per kWh (wins over the fixed price) |
 | Fixed electricity price | — | Price per kWh, when there is no price sensor |
 | Fuel type | `petrol` | `petrol`, `diesel`, `lpg` or `e85`: kg of CO₂ per litre burnt (2.31, 2.68, 1.66, 1.61) |
 | Electricity CO₂ | `55` g/kWh | Grams of CO₂ per kWh charged: about 55 for the French grid, 380 for the German one; set your supplier's figure |
-| Units | `metric` | `metric` (km, L, L/100 km, kWh/100 km) or `imperial` (miles, US gallons, mpg, mi/kWh, cost and CO₂ per mile): the units of the card, of the main sensor's attributes, of the `vehicle_consumption_trip_ended` event and of the consumption, cost per distance and CO₂ per distance sensors. The distance and volume sensors stay in km and L: Home Assistant converts them to its unit system (or to the unit set in the entity's settings). Everything is tracked and stored in km, L and kWh, so the option can be changed at any time |
+| Units | `metric` (`imperial` when Home Assistant uses US customary units) | `metric` (km, L, L/100 km, kWh/100 km) or `imperial` (miles, US gallons, mpg, mi/kWh, cost and CO₂ per mile): the units of the card, of the main sensor's attributes and of the `vehicle_consumption_trip_ended` event. The sensors never change their native unit, so their long-term statistics stay valid when the option changes: the distance and volume sensors are in km and L and shown in mi and gal in imperial units (Home Assistant converts them; a unit set in the entity's settings still wins); the consumption, cost per distance and CO₂ per distance sensors stay in L/100 km, kWh/100 km, per km and g/km, with the imperial figure in their `imperial_value` and `imperial_unit` attributes. The tank capacity, fixed fuel price and refuel threshold are typed in the units shown in the form (gal and per gal in imperial units). Everything is tracked and stored in km, L and kWh, so the option can be changed at any time |
 | End of trip after | `30` min | Minutes without the odometer moving that end a trip |
-| Refuel threshold | `3` L | A rise of at least this much fuel is a refuel |
+| Refuel threshold | `3` L | A rise of at least this much fuel is a refuel (in US gallons in imperial units) |
 | Charge threshold | `1` kWh | A rise of at least this much energy is a charge |
 
 At least one fuel or battery sensor is needed. A vehicle with only fuel sensors is tracked as **fuel**, with only battery sensors as **electric**, with both as **plug-in hybrid**.
@@ -148,15 +148,15 @@ One device per vehicle; the entities only exist when they make sense for it (`fu
 | Entity | Description |
 |---|---|
 | `sensor.my_car_consumption` | Average consumption (L/100 km, or kWh/100 km for an electric car). Its attributes carry everything the card shows: `vehicle`, `entry_id`, `kind`, `currency`, `units`, `odometer_unit` (the odometer sensor's unit), current levels and prices, `driving`, `trip`, `month`, `total`, `months`, `trips`, `refuels`, `charges`. The card data that changes with every reading (levels, prices, odometer, trip, month, total, lists and counts) is not recorded in the history: the figures have sensors of their own |
-| `sensor.my_car_fuel_consumption_trip`, `sensor.my_car_fuel_consumption_this_month`, `sensor.my_car_average_fuel_consumption` | Fuel consumption of the last trip, this month and on average (L/100 km, or mpg in imperial units) |
-| `sensor.my_car_energy_consumption_trip`, `sensor.my_car_energy_consumption_this_month`, `sensor.my_car_average_energy_consumption` | Energy consumption of the last trip, this month and on average (kWh/100 km, or mi/kWh in imperial units) |
+| `sensor.my_car_fuel_consumption_trip`, `sensor.my_car_fuel_consumption_this_month`, `sensor.my_car_average_fuel_consumption` | Fuel consumption of the last trip, this month and on average (L/100 km; in imperial units, mpg in the `imperial_value` attribute) |
+| `sensor.my_car_energy_consumption_trip`, `sensor.my_car_energy_consumption_this_month`, `sensor.my_car_average_energy_consumption` | Energy consumption of the last trip, this month and on average (kWh/100 km; in imperial units, mi/kWh in the `imperial_value` attribute) |
 | `sensor.my_car_trip_distance`, `sensor.my_car_distance_this_month` | Distance of the last trip and this month (km) |
 | `sensor.my_car_fuel_used_this_month` | Fuel used this month (L) |
 | `sensor.my_car_energy_used_this_month` | Energy used this month (kWh) |
 | `sensor.my_car_cost_this_month` | Cost of the fuel and energy used this month |
-| `sensor.my_car_cost_per_km` | Cost per kilometre (per mile in imperial units), on average |
+| `sensor.my_car_cost_per_km` | Cost per kilometre, on average (per mile in the `imperial_value` attribute in imperial units) |
 | `sensor.my_car_co2_of_the_trip`, `sensor.my_car_co2_this_month` | CO₂ of the last trip and of this month (kg) |
-| `sensor.my_car_co2_per_km` | CO₂ per kilometre, on average (g/km, or g/mi in imperial units) |
+| `sensor.my_car_co2_per_km` | CO₂ per kilometre, on average (g/km; g/mi in the `imperial_value` attribute in imperial units) |
 | `sensor.my_car_last_refuel` | Time of the last refuel; attributes `liters`, `cost`, `odometer`, `source` (`auto` or `manual`) |
 | `sensor.my_car_last_charge` | Time of the last charge; attributes `energy`, `cost`, `odometer`, `source` (`auto`, `charger` or `manual`) |
 
@@ -250,6 +250,7 @@ Fired once per trip, when it is final: the **trip gap** after the odometer last 
 | `cost`, `cost_per_km` | In the Home Assistant currency, per km or per mile (`null` without a price) |
 | `co2`, `co2_per_km` | kg and g/km (g/mi in imperial units) |
 | `units` | `metric` or `imperial` |
+| `estimated` | `true` when the trip's fuel / energy is estimated from its distance (coarse sensor, see *How it works*) |
 
 ```yaml
 triggers:
@@ -298,7 +299,22 @@ In the visual editor, **Vehicle** lists every vehicle set up in Vehicle Consumpt
 
 The badge in the header is a gauge whose colour gives the state of the vehicle: the primary colour when all is well, green while driving, orange when the fuel or battery is low, grey when the vehicle is not available.
 
-The **+** button opens a popup at the top of the card to log a refuel (litres) or a charge (kWh), its total cost and, optionally, the odometer. The sections fold and unfold with a tap, and fold back on their own when you tap elsewhere.
+The **+** button opens a popup at the top of the card to log a refuel (litres) or a charge (kWh), its total cost and, optionally, the odometer. The popup is modal: Tab stays inside it, Escape closes it and the focus goes back to the **+** button. The sections fold and unfold with a tap, and fold back on their own when you tap elsewhere.
+
+#### Mini card
+
+A compact view of the vehicle (**Add card → Vehicle Consumption Mini Card**): the header with the average consumption, the fuel and battery gauges, the last trip and the average. Its detail button at the top right opens the full card in place; a tap outside the card brings the compact view back. It takes the options of the full card (used by the full view), plus:
+
+```yaml
+type: custom:vehicle-consumption-mini-card
+entity: sensor.my_car_consumption
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `zoom` | `true` | Detail button that opens the full card |
+
+The card picker shows both cards with their name and description in Home Assistant's language.
 
 ## Screenshots
 
@@ -332,6 +348,12 @@ The card animates in three places, and stays still with `prefers-reduced-motion`
 | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-hybrid.png" alt="plug-in hybrid" width="374"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/popup.png" alt="add a refuel" width="400"> |
 | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-hybrid-dark.png" alt="plug-in hybrid dark" width="374"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/popup-dark.png" alt="add a refuel dark" width="400"> |
 
+Mini card:
+
+| Fuel car | Plug-in hybrid, dark |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/mini-card.png" alt="mini card" width="292"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/mini-card-dark.png" alt="mini card dark" width="292"> |
+
 Recent trips and refuels unfolded:
 
 | Light | Dark |
@@ -348,6 +370,7 @@ When a vehicle is added, the last 365 days of its sensors are replayed once, in 
 - **Home charger**: with a charger energy counter, a **home charge** is the counter going up, until it has not moved for 30 minutes. Its amount is what the counter delivered (losses included; a session counter going back to 0 starts a new session) and its cost that amount × the electricity price; it is listed as *Home charger*. A battery rise while the counter moves is that session, never counted twice; a battery rise while the charger is idle is a charge away from home, recorded as before. The energy used still comes from the battery going down.
 - **Distance**: every rise of the odometer is added up (a jump over 2000 km is ignored as a glitch).
 - **Trips**: a trip starts when the odometer moves and ends after the **trip gap** (30 minutes by default) without moving. Its distance, fuel, energy and cost are what was counted between its start and its end.
+- **Estimated trips**: a coarse sensor (Renault reports whole litres) cannot measure a short trip: 11 km shows no drop (0 L, 0 €) and the next 2 km trip gets the whole litre. The step of the sensor is learnt from its readings (1 L for whole litres, 1 % of the capacity for a level); when a trip's expected use is under **5 steps**, its fuel or energy is the distance × the average consumption of the months up to the trip covering at least 300 km (else of the whole period), its cost follows at the current price, and it is marked `estimated: true` (*≈ Estimated* in the card's trip list, also in the trip sensors and the `vehicle_consumption_trip_ended` event). Only what is shown is estimated: the stored trips, the months and the total stay measured, so their sums stay true; the estimate applies to stored trips too, once the sensor's step has been seen after an update. A fine-grained sensor (hundredths of a litre) keeps its trips measured.
 - **Prices**: the fuel price per litre and the electricity price per kWh come from a **sensor** (such as the station prices of [ha-carburants-france](https://github.com/juju35/ha-carburants-france), or your electricity tariff) or a **fixed** value; a sensor wins over the fixed price. While the sensor is `unknown` or `unavailable` (a best-price sensor with no station for a while, a restart), its last price is used, and kept across restarts. Without any price, cost stays empty.
 - **CO₂** is the fuel used × the factor of its type (tailpipe CO₂ per litre: petrol 2.31 kg, diesel 2.68 kg, LPG 1.66 kg, E85 1.61 kg) plus the energy used × the grid factor (g/kWh, set in the options). It is worked out from the counted totals, so changing a factor applies to the whole history. Per km it is shown from 5 km, like the consumption.
 - **Consumption** is the amount used divided by the distance, × 100. Under **5 km** it is not shown: too short to mean anything.

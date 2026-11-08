@@ -1,11 +1,12 @@
 /**
  * vehicle-consumption-card — the fuel and energy consumption tracked by the Vehicle Consumption integration:
  * tank and battery gauges, last trip, this month, average, cost per km, a monthly chart, the recent trips and the
- * refuels / charges, with a popup to log a refuel or a charge by hand.
+ * refuels / charges, with a popup to log a refuel or a charge by hand. vehicle-consumption-mini-card: the compact view
+ * (gauges, last trip, average), whose detail button opens the full card.
  * Served and added to the dashboard resources by the integration.
  * https://github.com/juju35/ha-vehicle-consumption
  */
-var VEHICLE_CONSUMPTION_CARD_VERSION = '1.4.0';
+var VEHICLE_CONSUMPTION_CARD_VERSION = '1.5.0';
 
 const VC_I18N = {
   en: {
@@ -64,6 +65,14 @@ const VC_I18N = {
     ed_add_button: '“Log a refuel or a charge” button',
     ed_language: 'Language',
     ed_language_helper: 'Leave empty to follow Home Assistant',
+    card_name: 'Vehicle Consumption Card',
+    card_desc: 'Fuel and energy consumption of a vehicle: gauges, trips, monthly chart, refuels and charges',
+    mini_name: 'Vehicle Consumption Mini Card',
+    mini_desc: 'Compact view of a vehicle: tank and battery, last trip and average consumption',
+    zoom_in: 'Show details',
+    zoom_out: 'Back to the compact view',
+    ed_zoom: 'Details button (full view)',
+    estimated: 'Estimated',
   },
   fr: {
     title: 'Véhicule',
@@ -121,6 +130,14 @@ const VC_I18N = {
     ed_add_button: 'Bouton « Noter un plein ou une recharge »',
     ed_language: 'Langue',
     ed_language_helper: 'Laisser vide pour suivre Home Assistant',
+    card_name: 'Carte consommation véhicule',
+    card_desc: 'Consommation de carburant et d’énergie d’un véhicule : jauges, trajets, graphique mensuel, pleins et recharges',
+    mini_name: 'Mini-carte consommation véhicule',
+    mini_desc: 'Vue compacte d’un véhicule : réservoir et batterie, dernier trajet et consommation moyenne',
+    zoom_in: 'Afficher les détails',
+    zoom_out: 'Revenir à la vue compacte',
+    ed_zoom: 'Bouton détails (vue complète)',
+    estimated: 'Estimé',
   },
   de: {
     title: 'Fahrzeug',
@@ -178,6 +195,14 @@ const VC_I18N = {
     ed_add_button: 'Schaltfläche „Tank- oder Ladevorgang erfassen“',
     ed_language: 'Sprache',
     ed_language_helper: 'Leer lassen, um Home Assistant zu folgen',
+    card_name: 'Fahrzeugverbrauch-Karte',
+    card_desc: 'Kraftstoff- und Energieverbrauch eines Fahrzeugs: Anzeigen, Fahrten, Monatsdiagramm, Tank- und Ladevorgänge',
+    mini_name: 'Fahrzeugverbrauch-Minikarte',
+    mini_desc: 'Kompakte Ansicht eines Fahrzeugs: Tank und Akku, letzte Fahrt und Durchschnittsverbrauch',
+    zoom_in: 'Details anzeigen',
+    zoom_out: 'Zurück zur kompakten Ansicht',
+    ed_zoom: 'Detail-Schaltfläche (vollständige Ansicht)',
+    estimated: 'Geschätzt',
   },
   es: {
     title: 'Vehículo',
@@ -235,6 +260,14 @@ const VC_I18N = {
     ed_add_button: 'Botón «Registrar un repostaje o una carga»',
     ed_language: 'Idioma',
     ed_language_helper: 'Déjalo vacío para seguir a Home Assistant',
+    card_name: 'Tarjeta de consumo del vehículo',
+    card_desc: 'Consumo de combustible y energía de un vehículo: indicadores, trayectos, gráfico mensual, repostajes y cargas',
+    mini_name: 'Minitarjeta de consumo del vehículo',
+    mini_desc: 'Vista compacta de un vehículo: depósito y batería, último trayecto y consumo medio',
+    zoom_in: 'Mostrar detalles',
+    zoom_out: 'Volver a la vista compacta',
+    ed_zoom: 'Botón de detalles (vista completa)',
+    estimated: 'Estimado',
   },
   it: {
     title: 'Veicolo',
@@ -292,6 +325,14 @@ const VC_I18N = {
     ed_add_button: 'Pulsante «Registra un rifornimento o una ricarica»',
     ed_language: 'Lingua',
     ed_language_helper: 'Lascia vuoto per seguire Home Assistant',
+    card_name: 'Scheda consumo veicolo',
+    card_desc: 'Consumo di carburante ed energia di un veicolo: indicatori, viaggi, grafico mensile, rifornimenti e ricariche',
+    mini_name: 'Mini scheda consumo veicolo',
+    mini_desc: 'Vista compatta di un veicolo: serbatoio e batteria, ultimo viaggio e consumo medio',
+    zoom_in: 'Mostra dettagli',
+    zoom_out: 'Torna alla vista compatta',
+    ed_zoom: 'Pulsante dettagli (vista completa)',
+    estimated: 'Stimato',
   },
   nl: {
     title: 'Voertuig',
@@ -349,6 +390,14 @@ const VC_I18N = {
     ed_add_button: 'Knop „Tankbeurt of laadbeurt invoeren”',
     ed_language: 'Taal',
     ed_language_helper: 'Laat leeg om Home Assistant te volgen',
+    card_name: 'Voertuigverbruikkaart',
+    card_desc: 'Brandstof- en energieverbruik van een voertuig: meters, ritten, maandgrafiek, tank- en laadbeurten',
+    mini_name: 'Voertuigverbruik-minikaart',
+    mini_desc: 'Compacte weergave van een voertuig: tank en accu, laatste rit en gemiddeld verbruik',
+    zoom_in: 'Details tonen',
+    zoom_out: 'Terug naar de compacte weergave',
+    ed_zoom: 'Detailknop (volledige weergave)',
+    estimated: 'Geschat',
   },
   pt: {
     title: 'Veículo',
@@ -406,6 +455,14 @@ const VC_I18N = {
     ed_add_button: 'Botão «Registar um abastecimento ou carregamento»',
     ed_language: 'Idioma',
     ed_language_helper: 'Deixe vazio para seguir o Home Assistant',
+    card_name: 'Cartão de consumo do veículo',
+    card_desc: 'Consumo de combustível e energia de um veículo: indicadores, viagens, gráfico mensal, abastecimentos e carregamentos',
+    mini_name: 'Mini cartão de consumo do veículo',
+    mini_desc: 'Vista compacta de um veículo: depósito e bateria, última viagem e consumo médio',
+    zoom_in: 'Mostrar detalhes',
+    zoom_out: 'Voltar à vista compacta',
+    ed_zoom: 'Botão de detalhes (vista completa)',
+    estimated: 'Estimado',
   },
   pl: {
     title: 'Pojazd',
@@ -463,6 +520,14 @@ const VC_I18N = {
     ed_add_button: 'Przycisk „Zapisz tankowanie lub ładowanie”',
     ed_language: 'Język',
     ed_language_helper: 'Pozostaw puste, aby używać języka Home Assistant',
+    card_name: 'Karta zużycia pojazdu',
+    card_desc: 'Zużycie paliwa i energii pojazdu: wskaźniki, przejazdy, wykres miesięczny, tankowania i ładowania',
+    mini_name: 'Mini karta zużycia pojazdu',
+    mini_desc: 'Kompaktowy widok pojazdu: zbiornik i akumulator, ostatni przejazd i średnie zużycie',
+    zoom_in: 'Pokaż szczegóły',
+    zoom_out: 'Wróć do widoku kompaktowego',
+    ed_zoom: 'Przycisk szczegółów (pełny widok)',
+    estimated: 'Szacowany',
   },
   ro: {
     title: 'Vehicul',
@@ -520,6 +585,14 @@ const VC_I18N = {
     ed_add_button: 'Butonul „Înregistrează o alimentare sau o încărcare”',
     ed_language: 'Limbă',
     ed_language_helper: 'Lasă gol pentru a urma Home Assistant',
+    card_name: 'Card consum vehicul',
+    card_desc: 'Consumul de combustibil și energie al unui vehicul: indicatoare, călătorii, grafic lunar, alimentări și încărcări',
+    mini_name: 'Mini card consum vehicul',
+    mini_desc: 'Vedere compactă a unui vehicul: rezervor și baterie, ultima călătorie și consumul mediu',
+    zoom_in: 'Afișează detaliile',
+    zoom_out: 'Înapoi la vederea compactă',
+    ed_zoom: 'Buton detalii (vedere completă)',
+    estimated: 'Estimat',
   },
   da: {
     title: 'Køretøj',
@@ -577,6 +650,14 @@ const VC_I18N = {
     ed_add_button: 'Knappen »Notér en tankning eller opladning«',
     ed_language: 'Sprog',
     ed_language_helper: 'Lad feltet stå tomt for at følge Home Assistant',
+    card_name: 'Køretøjsforbrugskort',
+    card_desc: 'Brændstof- og energiforbrug for et køretøj: målere, ture, månedsdiagram, tankninger og opladninger',
+    mini_name: 'Køretøjsforbrug-minikort',
+    mini_desc: 'Kompakt visning af et køretøj: tank og batteri, seneste tur og gennemsnitligt forbrug',
+    zoom_in: 'Vis detaljer',
+    zoom_out: 'Tilbage til kompakt visning',
+    ed_zoom: 'Detaljeknap (fuld visning)',
+    estimated: 'Anslået',
   },
   sv: {
     title: 'Fordon',
@@ -634,6 +715,14 @@ const VC_I18N = {
     ed_add_button: 'Knappen ”Registrera en tankning eller laddning”',
     ed_language: 'Språk',
     ed_language_helper: 'Lämna tomt för att följa Home Assistant',
+    card_name: 'Fordonsförbrukningskort',
+    card_desc: 'Bränsle- och energiförbrukning för ett fordon: mätare, resor, månadsdiagram, tankningar och laddningar',
+    mini_name: 'Fordonsförbrukning-minikort',
+    mini_desc: 'Kompakt vy av ett fordon: tank och batteri, senaste resa och genomsnittlig förbrukning',
+    zoom_in: 'Visa detaljer',
+    zoom_out: 'Tillbaka till kompakt vy',
+    ed_zoom: 'Detaljknapp (fullständig vy)',
+    estimated: 'Uppskattad',
   },
   bg: {
     title: 'Автомобил',
@@ -691,6 +780,14 @@ const VC_I18N = {
     ed_add_button: 'Бутон „Запиши зареждане с гориво или на батерията“',
     ed_language: 'Език',
     ed_language_helper: 'Оставете празно, за да се следва Home Assistant',
+    card_name: 'Карта за разход на автомобила',
+    card_desc: 'Разход на гориво и енергия на автомобил: индикатори, пътувания, месечна графика, зареждания с гориво и зареждания на батерията',
+    mini_name: 'Мини карта за разход на автомобила',
+    mini_desc: 'Компактен изглед на автомобил: резервоар и батерия, последно пътуване и среден разход',
+    zoom_in: 'Покажи подробности',
+    zoom_out: 'Обратно към компактния изглед',
+    ed_zoom: 'Бутон за подробности (пълен изглед)',
+    estimated: 'Приблизително',
   },
   ru: {
     title: 'Автомобиль',
@@ -748,6 +845,14 @@ const VC_I18N = {
     ed_add_button: 'Кнопка «Записать заправку или зарядку»',
     ed_language: 'Язык',
     ed_language_helper: 'Оставьте пустым, чтобы следовать языку Home Assistant',
+    card_name: 'Карточка расхода автомобиля',
+    card_desc: 'Расход топлива и энергии автомобиля: индикаторы, поездки, месячный график, заправки и зарядки',
+    mini_name: 'Мини-карточка расхода автомобиля',
+    mini_desc: 'Компактный вид автомобиля: бак и батарея, последняя поездка и средний расход',
+    zoom_in: 'Показать подробности',
+    zoom_out: 'Вернуться к компактному виду',
+    ed_zoom: 'Кнопка подробностей (полный вид)',
+    estimated: 'Оценка',
   },
   uk: {
     title: 'Автомобіль',
@@ -805,6 +910,14 @@ const VC_I18N = {
     ed_add_button: 'Кнопка «Записати заправку або заряджання»',
     ed_language: 'Мова',
     ed_language_helper: 'Залиште порожнім, щоб використовувати мову Home Assistant',
+    card_name: 'Картка витрати автомобіля',
+    card_desc: 'Витрата пального та енергії автомобіля: індикатори, поїздки, місячний графік, заправки та заряджання',
+    mini_name: 'Міні-картка витрати автомобіля',
+    mini_desc: 'Компактний вигляд автомобіля: бак і батарея, остання поїздка та середня витрата',
+    zoom_in: 'Показати подробиці',
+    zoom_out: 'Повернутися до компактного вигляду',
+    ed_zoom: 'Кнопка подробиць (повний вигляд)',
+    estimated: 'Оцінка',
   },
   hu: {
     title: 'Jármű',
@@ -862,6 +975,14 @@ const VC_I18N = {
     ed_add_button: '„Tankolás vagy töltés rögzítése” gomb',
     ed_language: 'Nyelv',
     ed_language_helper: 'Hagyd üresen a Home Assistant követéséhez',
+    card_name: 'Járműfogyasztás kártya',
+    card_desc: 'Egy jármű üzemanyag- és energiafogyasztása: kijelzők, utak, havi diagram, tankolások és töltések',
+    mini_name: 'Járműfogyasztás minikártya',
+    mini_desc: 'Egy jármű kompakt nézete: tank és akkumulátor, utolsó út és átlagfogyasztás',
+    zoom_in: 'Részletek megjelenítése',
+    zoom_out: 'Vissza a kompakt nézethez',
+    ed_zoom: 'Részletek gomb (teljes nézet)',
+    estimated: 'Becsült',
   },
   sk: {
     title: 'Vozidlo',
@@ -919,6 +1040,14 @@ const VC_I18N = {
     ed_add_button: 'Tlačidlo „Zaznamenať tankovanie alebo nabíjanie“',
     ed_language: 'Jazyk',
     ed_language_helper: 'Nechajte prázdne, ak sa má použiť jazyk Home Assistant',
+    card_name: 'Karta spotreby vozidla',
+    card_desc: 'Spotreba paliva a energie vozidla: ukazovatele, jazdy, mesačný graf, tankovania a nabíjania',
+    mini_name: 'Mini karta spotreby vozidla',
+    mini_desc: 'Kompaktné zobrazenie vozidla: nádrž a batéria, posledná jazda a priemerná spotreba',
+    zoom_in: 'Zobraziť podrobnosti',
+    zoom_out: 'Späť na kompaktné zobrazenie',
+    ed_zoom: 'Tlačidlo podrobností (úplné zobrazenie)',
+    estimated: 'Odhad',
   },
   cs: {
     title: 'Vozidlo',
@@ -976,6 +1105,14 @@ const VC_I18N = {
     ed_add_button: 'Tlačítko „Zaznamenat tankování nebo nabíjení“',
     ed_language: 'Jazyk',
     ed_language_helper: 'Ponechte prázdné, chcete-li použít jazyk Home Assistant',
+    card_name: 'Karta spotřeby vozidla',
+    card_desc: 'Spotřeba paliva a energie vozidla: ukazatele, jízdy, měsíční graf, tankování a nabíjení',
+    mini_name: 'Mini karta spotřeby vozidla',
+    mini_desc: 'Kompaktní zobrazení vozidla: nádrž a baterie, poslední jízda a průměrná spotřeba',
+    zoom_in: 'Zobrazit podrobnosti',
+    zoom_out: 'Zpět na kompaktní zobrazení',
+    ed_zoom: 'Tlačítko podrobností (úplné zobrazení)',
+    estimated: 'Odhad',
   },
   sl: {
     title: 'Vozilo',
@@ -1033,6 +1170,14 @@ const VC_I18N = {
     ed_add_button: 'Gumb »Zabeleži točenje goriva ali polnjenje«',
     ed_language: 'Jezik',
     ed_language_helper: 'Pustite prazno, da se sledi Home Assistant',
+    card_name: 'Kartica porabe vozila',
+    card_desc: 'Poraba goriva in energije vozila: merilniki, vožnje, mesečni graf, točenja goriva in polnjenja',
+    mini_name: 'Mini kartica porabe vozila',
+    mini_desc: 'Strnjen prikaz vozila: rezervoar in baterija, zadnja vožnja in povprečna poraba',
+    zoom_in: 'Pokaži podrobnosti',
+    zoom_out: 'Nazaj na strnjen prikaz',
+    ed_zoom: 'Gumb za podrobnosti (celoten prikaz)',
+    estimated: 'Ocena',
   },
   lv: {
     title: 'Automašīna',
@@ -1090,6 +1235,14 @@ const VC_I18N = {
     ed_add_button: 'Poga “Reģistrēt uzpildi vai uzlādi”',
     ed_language: 'Valoda',
     ed_language_helper: 'Atstājiet tukšu, lai sekotu Home Assistant',
+    card_name: 'Transportlīdzekļa patēriņa kartīte',
+    card_desc: 'Transportlīdzekļa degvielas un enerģijas patēriņš: rādītāji, braucieni, mēneša diagramma, uzpildes un uzlādes',
+    mini_name: 'Transportlīdzekļa patēriņa mini kartīte',
+    mini_desc: 'Transportlīdzekļa kompakts skats: tvertne un akumulators, pēdējais brauciens un vidējais patēriņš',
+    zoom_in: 'Rādīt detaļas',
+    zoom_out: 'Atpakaļ uz kompakto skatu',
+    ed_zoom: 'Detaļu poga (pilns skats)',
+    estimated: 'Aplēsts',
   },
   el: {
     title: 'Όχημα',
@@ -1147,6 +1300,14 @@ const VC_I18N = {
     ed_add_button: 'Κουμπί «Καταγραφή ανεφοδιασμού ή φόρτισης»',
     ed_language: 'Γλώσσα',
     ed_language_helper: 'Αφήστε κενό για να ακολουθεί το Home Assistant',
+    card_name: 'Κάρτα κατανάλωσης οχήματος',
+    card_desc: 'Κατανάλωση καυσίμου και ενέργειας ενός οχήματος: δείκτες, διαδρομές, μηνιαίο γράφημα, ανεφοδιασμοί και φορτίσεις',
+    mini_name: 'Μίνι κάρτα κατανάλωσης οχήματος',
+    mini_desc: 'Συμπαγής προβολή ενός οχήματος: ρεζερβουάρ και μπαταρία, τελευταία διαδρομή και μέση κατανάλωση',
+    zoom_in: 'Εμφάνιση λεπτομερειών',
+    zoom_out: 'Επιστροφή στη συμπαγή προβολή',
+    ed_zoom: 'Κουμπί λεπτομερειών (πλήρης προβολή)',
+    estimated: 'Εκτίμηση',
   },
   sr: {
     title: 'Возило',
@@ -1204,6 +1365,14 @@ const VC_I18N = {
     ed_add_button: 'Дугме „Унеси точење горива или пуњење“',
     ed_language: 'Језик',
     ed_language_helper: 'Оставите празно да би се пратио Home Assistant',
+    card_name: 'Картица потрошње возила',
+    card_desc: 'Потрошња горива и енергије возила: показивачи, вожње, месечни графикон, точења горива и пуњења',
+    mini_name: 'Мини картица потрошње возила',
+    mini_desc: 'Компактан приказ возила: резервоар и батерија, последња вожња и просечна потрошња',
+    zoom_in: 'Прикажи детаље',
+    zoom_out: 'Назад на компактан приказ',
+    ed_zoom: 'Дугме за детаље (пун приказ)',
+    estimated: 'Процена',
   },
   'sr-Latn': {
     title: 'Vozilo',
@@ -1261,6 +1430,14 @@ const VC_I18N = {
     ed_add_button: 'Dugme „Unesi točenje goriva ili punjenje“',
     ed_language: 'Jezik',
     ed_language_helper: 'Ostavite prazno da bi se pratio Home Assistant',
+    card_name: 'Kartica potrošnje vozila',
+    card_desc: 'Potrošnja goriva i energije vozila: pokazivači, vožnje, mesečni grafikon, točenja goriva i punjenja',
+    mini_name: 'Mini kartica potrošnje vozila',
+    mini_desc: 'Kompaktan prikaz vozila: rezervoar i baterija, poslednja vožnja i prosečna potrošnja',
+    zoom_in: 'Prikaži detalje',
+    zoom_out: 'Nazad na kompaktan prikaz',
+    ed_zoom: 'Dugme za detalje (pun prikaz)',
+    estimated: 'Procena',
   },
 };
 
@@ -1285,6 +1462,8 @@ const VC_DEFAULTS = {
   trips: true,
   refuels: true,
   add_button: true,
+  // Mini card: the detail button (top right) that opens the full view.
+  zoom: true,
 };
 const VC_METRICS = ['consumption', 'distance', 'cost', 'co2'];
 // Rows listed in a folded section, newest first.
@@ -1443,6 +1622,9 @@ const vcParse = (s) => {
   return String(s ?? '').trim() !== '' && Number.isFinite(v) ? v : null;
 };
 
+// A click inside a dialog opened from the card (more-info, a picker) is not a click outside it.
+const vcInDialog = (ev) => ev.composedPath().some((n) => ['ha-more-info-dialog', 'ha-dialog', 'dialog'].includes(n?.localName));
+
 // The badge: the gauge of the projects site, coloured by the card's level.
 const VC_ICON = 'mdi:gauge-low';
 const VC_KINDS = ['fuel', 'electric', 'plugin_hybrid'];
@@ -1464,6 +1646,7 @@ class VehicleConsumptionCard extends HTMLElement {
     this._onDocClick = (ev) => this._foldOutside(ev);
     this._onKey = (ev) => {
       if (ev.key === 'Escape' && this._popup) this._closePopup();
+      else if (ev.key === 'Tab' && this._popup) this._trapTab(ev);
     };
   }
 
@@ -1539,6 +1722,18 @@ class VehicleConsumptionCard extends HTMLElement {
     return { columns: 12, min_columns: 8, rows: 'auto' };
   }
 
+  // Compact view (the mini card until its detail button is pressed): header, gauges, last trip and average.
+  _compact() {
+    return false;
+  }
+
+  // The mini card's detail button: none on the full card.
+  _zoomButton() {
+    return '';
+  }
+
+  _zoomClick() {}
+
   _t(key, vars) {
     return vcT(vcLang(this._hass, this._config), key, vars);
   }
@@ -1557,7 +1752,8 @@ class VehicleConsumptionCard extends HTMLElement {
     const st = entity ? this._hass.states[entity] : undefined;
     const a = Array.isArray(st?.attributes?.months) ? st.attributes : null;
     const lang = vcLang(this._hass, c);
-    const sig = JSON.stringify([c, lang, this._hass.locale, entity, st?.state, a, [...this._open], this._popup?.mode, !!this._popup, this._width]);
+    const compact = this._compact();
+    const sig = JSON.stringify([c, lang, this._hass.locale, entity, st?.state, a, [...this._open], this._popup?.mode, !!this._popup, this._width, compact]);
     this._entity = entity;
     if (!force && sig === this._sig) return;
     // The popup is being filled in: the update waits until it closes, so typing is never interrupted.
@@ -1575,7 +1771,7 @@ class VehicleConsumptionCard extends HTMLElement {
       const why = !entity ? 'not_loaded' : st && ['unavailable', 'unknown'].includes(st.state) ? 'unavailable' : 'not_found';
       this.shadowRoot.innerHTML = `
       <style>${VehicleConsumptionCard.styles}</style>
-      <ha-card class="lvl-na">
+      <ha-card class="lvl-na${this.hasAttribute?.('mini') ? ' mini' : ''}">
         <div class="head">
           <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
           <div class="title"><span class="tname">${vcEsc(c.title || this._t('title'))}</span></div>
@@ -1596,8 +1792,11 @@ class VehicleConsumptionCard extends HTMLElement {
     ].filter(Boolean);
     const low = gauges.some((g) => g.low);
     const level = a.driving ? 'drive' : low ? 'warn' : 'ok';
-    const unit = st.attributes.unit_of_measurement || (tracks.fuel ? vcUnits(a).fuel : vcUnits(a).energy);
-    const avg = vcFinite(st.state) ? `${f.num(st.state, 1)} ${unit}` : VC_DASH;
+    // The sensor keeps its metric unit (statistics): with imperial units, its figure in mpg / mi/kWh is an attribute.
+    const imperial = 'imperial_value' in a;
+    const value = imperial ? a.imperial_value : st.state;
+    const unit = (imperial && a.imperial_unit) || st.attributes.unit_of_measurement || (tracks.fuel ? vcUnits(a).fuel : vcUnits(a).energy);
+    const avg = vcFinite(value) ? `${f.num(value, 1)} ${unit}` : VC_DASH;
 
     // First-render animations: started at the first render, resumed (negative delay) by a re-render inside the window.
     this._born ??= Date.now();
@@ -1605,7 +1804,7 @@ class VehicleConsumptionCard extends HTMLElement {
     const anim = elapsed < VC_ANIM_MS ? ` anim" style="--vc-t:${-elapsed}ms` : '';
 
     const add =
-      c.add_button !== false && a.entry_id
+      !compact && c.add_button !== false && a.entry_id
         ? `<button class="icon-btn add" title="${vcEsc(this._t('add'))}" aria-label="${vcEsc(this._t('add'))}"><ha-icon icon="mdi:plus"></ha-icon></button>`
         : '';
     const driving = a.driving
@@ -1614,18 +1813,19 @@ class VehicleConsumptionCard extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>${VehicleConsumptionCard.styles}</style>
-      <ha-card class="lvl-${level}${this._popup ? ' has-popup' : ''}${anim}">
+      <ha-card class="lvl-${level}${this.hasAttribute?.('mini') ? ' mini' : ''}${this._popup ? ' has-popup' : ''}${anim}">
         <div class="head">
           <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
           <div class="title"><span class="tname">${vcEsc(c.title || a.vehicle || this._t('title'))}</span>${driving}</div>
           ${add}
           ${this._pill(avg)}
+          ${this._zoomButton()}
         </div>
         <div class="gauges">${gauges.map((g) => g.html).join('')}</div>
-        <div class="kpis">${this._kpis(a, kind, f)}</div>
-        ${c.chart !== false ? this._chart(a, kind, f) : ''}
-        ${this._sections(a, kind, f)}
-        ${this._popup ? this._popupHtml(a, kind, f) : ''}
+        <div class="kpis">${this._kpis(a, kind, f, compact)}</div>
+        ${!compact && c.chart !== false ? this._chart(a, kind, f) : ''}
+        ${compact ? '' : this._sections(a, kind, f)}
+        ${this._popup && !compact ? this._popupHtml(a, kind, f) : ''}
       </ha-card>`;
 
     this._bind();
@@ -1654,6 +1854,7 @@ class VehicleConsumptionCard extends HTMLElement {
   _bind() {
     const root = this.shadowRoot;
     root.querySelector('.add')?.addEventListener('click', () => this._openPopup());
+    root.querySelector('.zoom')?.addEventListener('click', (ev) => this._zoomClick(ev));
     for (const el of root.querySelectorAll('.fold')) el.addEventListener('click', () => this._toggle(el.dataset.key));
     if (!this._popup) return;
     for (const el of root.querySelectorAll('[data-act]')) {
@@ -1709,7 +1910,8 @@ class VehicleConsumptionCard extends HTMLElement {
           </div>`;
   }
 
-  _kpis(a, kind, f) {
+  // The compact view keeps the last trip and the average.
+  _kpis(a, kind, f, compact = false) {
     const u = vcUnits(a);
     const km = (v) => (vcFinite(v) ? `${f.num(v, Number(v) < 100 ? 1 : 0)} ${u.dist}` : '');
     const trip = a.trip || {};
@@ -1717,10 +1919,13 @@ class VehicleConsumptionCard extends HTMLElement {
     const month = a.month || {};
     const total = a.total || {};
     const cpk = vcFinite(total.cost_per_km) ? total.cost_per_km : month.cost_per_km;
+    const tripKpi = this._kpi('k-trip', this._t(a.driving ? 'trip_now' : 'trip'), 'mdi:map-marker-distance', this._cons(trip, kind, f), tripSub);
+    const avgKpi = this._kpi('k-avg', this._t('average'), 'mdi:chart-line', this._cons(total, kind, f), km(total.distance));
+    if (compact) return tripKpi + avgKpi;
     return [
-      this._kpi('k-trip', this._t(a.driving ? 'trip_now' : 'trip'), 'mdi:map-marker-distance', this._cons(trip, kind, f), tripSub),
+      tripKpi,
       this._kpi('k-month', this._t('month'), 'mdi:calendar-month-outline', this._cons(month, kind, f), km(month.distance)),
-      this._kpi('k-avg', this._t('average'), 'mdi:chart-line', this._cons(total, kind, f), km(total.distance)),
+      avgKpi,
       this._kpi(
         'k-cost',
         this._t('cost_km', { u: u.dist }),
@@ -1813,7 +2018,14 @@ class VehicleConsumptionCard extends HTMLElement {
         const cons = this._cons(t, kind, f)
           .filter((l) => l.v !== VC_DASH)
           .map((l) => `${l.v} ${l.unit}`);
-        const sub = [vcFinite(t.distance) ? `${f.num(t.distance, 1)} ${u.dist}` : '', t.open ? this._t('driving') : ''].filter(Boolean).join(' · ');
+        // A trip whose use a coarse sensor (whole litres) could not measure: estimated by the integration, marked so.
+        const sub = [
+          vcFinite(t.distance) ? `${f.num(t.distance, 1)} ${u.dist}` : '',
+          t.open ? this._t('driving') : '',
+          t.estimated ? `≈ ${this._t('estimated')}` : '',
+        ]
+          .filter(Boolean)
+          .join(' · ');
         return this._row(f.date(t.start), sub || VC_DASH, cons.length ? cons : VC_DASH, f.money(t.cost));
       });
       // The count of everything kept (a year): the list only holds the newest.
@@ -1899,6 +2111,8 @@ class VehicleConsumptionCard extends HTMLElement {
     const kind = this._attrs?.kind;
     if (!this._attrs?.entry_id) return;
     this._popup = { mode: kind === 'electric' ? 'charge' : 'refuel', values: {}, error: '', busy: false };
+    // The focus goes back to the add button once the popup closes.
+    this._refocus = true;
     document.addEventListener('keydown', this._onKey);
     this._render(true);
     // Opened from the keyboard with the card scrolled out of view: the popup is brought into view (as little as
@@ -1911,6 +2125,25 @@ class VehicleConsumptionCard extends HTMLElement {
     this._popup = null;
     document.removeEventListener('keydown', this._onKey);
     this._render(true);
+    if (this._refocus) this.shadowRoot?.querySelector?.('.add')?.focus?.({ preventScroll: true });
+    this._refocus = false;
+  }
+
+  // A modal popup: Tab and Shift+Tab go round its fields and buttons, never out to the card or the dashboard.
+  _trapTab(ev) {
+    const root = this.shadowRoot;
+    const items = [...(root?.querySelector?.('.sheet')?.querySelectorAll?.('button:not([disabled]), input') || [])];
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    const inside = items.includes(root.activeElement);
+    if (ev.shiftKey && (!inside || root.activeElement === first)) {
+      ev.preventDefault();
+      last.focus();
+    } else if (!ev.shiftKey && (!inside || root.activeElement === last)) {
+      ev.preventDefault();
+      first.focus();
+    }
   }
 
   _setMode(mode) {
@@ -1973,7 +2206,7 @@ class VehicleConsumptionCard extends HTMLElement {
       `<button class="tab${p.mode === mode ? ' on' : ''}" data-mode="${mode}" aria-pressed="${p.mode === mode}"><ha-icon icon="${icon}"></ha-icon>${vcEsc(this._t(`mode_${mode}`))}</button>`;
     return `
         <div class="veil" data-act="cancel"></div>
-        <div class="sheet" role="dialog" aria-label="${vcEsc(title)}">
+        <div class="sheet" role="dialog" aria-modal="true" aria-label="${vcEsc(title)}">
           <div class="shead">
             <span class="ic"><ha-icon icon="${charge ? 'mdi:ev-station' : 'mdi:gas-station'}"></ha-icon></span>
             <span class="stitle">${vcEsc(title)}</span>
@@ -2011,6 +2244,7 @@ class VehicleConsumptionCard extends HTMLElement {
          0 min-content one, so a 1fr grid track still shrinks it, even through a wrapper (a div, hui-card) that keeps
          min-width: auto. (An intrinsic-size containment would be a min-content width there: the card would overflow.) */
       :host::before { content: ""; display: grid; grid-template-columns: minmax(0, 300px); height: 0; }
+      :host([mini])::before { grid-template-columns: minmax(0, 240px); }
       ha-card { position: relative; padding: 12px; overflow: hidden; container-type: inline-size;
                 --ci: color-mix(in srgb, var(--c) 40%, var(--primary-text-color)); }
       ha-card.lvl-ok    { --c: var(--vc-ok); }
@@ -2045,6 +2279,12 @@ class VehicleConsumptionCard extends HTMLElement {
       .icon-btn:hover { background: color-mix(in srgb, var(--secondary-text-color) 14%, transparent); color: var(--primary-text-color); }
       .icon-btn:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
       .icon-btn ha-icon { --mdc-icon-size: 18px; }
+      /* The mini card's detail button, at the top right of the header. */
+      .zoom { all: unset; flex: none; cursor: pointer; width: 24px; height: 24px; margin: -4px -4px 0 0; border-radius: 50%; align-self: flex-start;
+              display: grid; place-items: center; color: var(--secondary-text-color); }
+      .zoom:hover { background: color-mix(in srgb, var(--secondary-text-color) 14%, transparent); color: var(--primary-text-color); }
+      .zoom:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
+      .zoom ha-icon { --mdc-icon-size: 16px; }
       .empty { margin-top: 10px; font-size: 13px; color: var(--secondary-text-color); }
 
       /* Driving: a pulsing dot next to the name */
@@ -2187,6 +2427,77 @@ class VehicleConsumptionCard extends HTMLElement {
   }
 }
 
+/**
+ * Compact card: header (badge, name, average), the gauges, the last trip and the average. Its detail button (top
+ * right, `zoom: false` removes it) switches it to the full card and back; a click outside the card brings the compact
+ * view back.
+ */
+class VehicleConsumptionMiniCard extends VehicleConsumptionCard {
+  static getConfigElement() {
+    return document.createElement('vehicle-consumption-mini-card-editor');
+  }
+
+  constructor() {
+    super();
+    this._zoomed = false;
+    this._onOutside = (ev) => {
+      if (this._zoomed && !ev.composedPath().includes(this) && !vcInDialog(ev)) this._setZoom(false);
+    };
+  }
+
+  setConfig(config) {
+    // The host attribute behind the mini card's styles; never set in the constructor.
+    this.setAttribute?.('mini', '');
+    super.setConfig(config);
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    document.addEventListener('click', this._onOutside, true);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    document.removeEventListener('click', this._onOutside, true);
+  }
+
+  getCardSize() {
+    return this._zoomed ? super.getCardSize() : 3;
+  }
+
+  getGridOptions() {
+    return this._zoomed ? super.getGridOptions() : { columns: 6, min_columns: 6, rows: 'auto' };
+  }
+
+  _compact() {
+    return !this._zoomed;
+  }
+
+  _zoomButton() {
+    if (this._config?.zoom === false) return '';
+    const label = vcEsc(this._t(this._zoomed ? 'zoom_out' : 'zoom_in'));
+    return `<button class="zoom" title="${label}" aria-label="${label}" aria-expanded="${this._zoomed}"><ha-icon icon="mdi:${this._zoomed ? 'arrow-collapse' : 'arrow-expand'}"></ha-icon></button>`;
+  }
+
+  _zoomClick(ev) {
+    ev?.stopPropagation?.();
+    this._setZoom(!this._zoomed);
+    // Keyboard use (Enter / Space: no click count) keeps the focus on the button, without scrolling the page.
+    if (!ev?.detail) this.shadowRoot?.querySelector?.('.zoom')?.focus?.({ preventScroll: true });
+  }
+
+  _setZoom(zoomed) {
+    this._zoomed = zoomed;
+    // The popup is only on the full view: folding drops it.
+    if (!zoomed && this._popup) {
+      this._popup = null;
+      this._refocus = false;
+      document.removeEventListener('keydown', this._onKey);
+    }
+    this._render(true);
+  }
+}
+
 // ── Editor ───────────────────────────────────────────────────────────────────
 const VC_HELPERS = ['entity', 'title', 'language'];
 
@@ -2250,6 +2561,7 @@ class VehicleConsumptionCardEditor extends HTMLElement {
       { name: 'trips', selector: { boolean: {} } },
       { name: 'refuels', selector: { boolean: {} } },
       { name: 'add_button', selector: { boolean: {} } },
+      ...(this.constructor.mini ? [{ name: 'zoom', selector: { boolean: {} } }] : []),
       {
         name: 'language',
         selector: {
@@ -2286,17 +2598,52 @@ class VehicleConsumptionCardEditor extends HTMLElement {
   }
 }
 
-if (!customElements.get('vehicle-consumption-card')) {
-  customElements.define('vehicle-consumption-card', VehicleConsumptionCard);
-  customElements.define('vehicle-consumption-card-editor', VehicleConsumptionCardEditor);
-  window.customCards = window.customCards || [];
-  window.customCards.push({
-    type: 'vehicle-consumption-card',
-    name: 'Vehicle Consumption Card',
-    description: 'Fuel and energy consumption of a vehicle: gauges, trips, monthly chart, refuels and charges',
-    preview: true,
-    documentationURL: 'https://github.com/juju35/ha-vehicle-consumption',
-  });
+class VehicleConsumptionMiniCardEditor extends VehicleConsumptionCardEditor {
+  static get mini() {
+    return true;
+  }
+}
+
+// The card picker's language: Home Assistant's (its element, else the language it keeps), else the browser's.
+function vcPickerLang() {
+  let stored = null;
+  try {
+    stored = JSON.parse(window.localStorage?.getItem('selectedLanguage') || 'null');
+  } catch {
+    stored = null;
+  }
+  const hass = document.querySelector?.('home-assistant')?.hass;
+  return vcLang({ language: hass?.locale?.language || hass?.language || stored || globalThis.navigator?.language }, {});
+}
+
+// Loaded twice (resource and extra JS URL): the second copy registers and logs nothing.
+const vcFirstLoad = !customElements.get('vehicle-consumption-card');
+const vcDefine = (name, cls) => {
+  if (!customElements.get(name)) customElements.define(name, cls);
+};
+vcDefine('vehicle-consumption-card', VehicleConsumptionCard);
+vcDefine('vehicle-consumption-card-editor', VehicleConsumptionCardEditor);
+vcDefine('vehicle-consumption-mini-card', VehicleConsumptionMiniCard);
+vcDefine('vehicle-consumption-mini-card-editor', VehicleConsumptionMiniCardEditor);
+
+window.customCards = window.customCards || [];
+{
+  const lang = vcPickerLang();
+  for (const [type, name, description] of [
+    ['vehicle-consumption-card', 'card_name', 'card_desc'],
+    ['vehicle-consumption-mini-card', 'mini_name', 'mini_desc'],
+  ]) {
+    if (window.customCards.some((card) => card.type === type)) continue;
+    window.customCards.push({
+      type,
+      name: vcT(lang, name),
+      description: vcT(lang, description),
+      preview: true,
+      documentationURL: 'https://github.com/juju35/ha-vehicle-consumption',
+    });
+  }
+}
+if (vcFirstLoad) {
   console.info(
     `%c VEHICLE-CONSUMPTION-CARD %c v${VEHICLE_CONSUMPTION_CARD_VERSION} `,
     'background:#0ea5e9;color:#fff;font-weight:700',

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.5.0 - 2026-11-08
+
+### What's new
+- New mini card (`custom:vehicle-consumption-mini-card`): gauges, last trip and average, with a detail button that opens the full card.
+- The card picker names and describes both cards in Home Assistant's language.
+- The refuel popup is modal for assistive technology: Tab stays inside it and the focus goes back to the add button when it closes.
+
+### Fixes
+- In imperial units, the tank capacity, fixed fuel price and refuel threshold are typed in US gallons and per gallon (stored in litres), and a new vehicle defaults to imperial when Home Assistant uses US customary units.
+- Switching the units option no longer changes the sensors' native units, which broke their long-term statistics: consumption, cost and CO₂ per distance stay metric with the imperial figure in attributes, and distances and volumes are shown in miles and gallons by Home Assistant.
+- Short trips from a sensor in whole litres (Renault) no longer show 0 L and 0 € or a whole litre for 2 km: under 5 steps of the sensor, a trip's fuel or energy is estimated from its distance and the recent average consumption, marked `estimated` (≈ in the card); months and totals stay measured.
+
 ## 1.4.0 - 2026-11-08
 
 ### What's new

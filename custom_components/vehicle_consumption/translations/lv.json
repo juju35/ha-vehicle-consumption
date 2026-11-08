@@ -56,7 +56,7 @@
           "electricity_price": "Cena par kWh, tiek izmantota, ja nav cenas sensora vai tas nav pieejams.",
           "fuel_type": "Nosaka katra sadedzinātā litra CO₂: benzīns 2,31 kg, dīzelis 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Grami CO₂ uz uzlādēto kWh; 55 Francijas tīklam, aptuveni 380 Vācijas tīklam.",
-          "units": "Kartē un patēriņa sensoros rādīto vērtību mērvienības. Brauciena un mēneša attālumi un apjomi atbilst Home Assistant mērvienību sistēmai."
+          "units": "Kartē rādīto vērtību, kā arī brauciena un mēneša attālumu un apjomu mērvienības. Patēriņa, izmaksu un CO₂ uz attālumu sensori saglabā metrisko mērvienību (to statistika paliek derīga) un imperiālo vērtību norāda atribūtos. Tvertnes tilpumu, fiksēto degvielas cenu un uzpildes slieksni ievada rādītajās mērvienībās."
         }
       }
     },
@@ -122,7 +122,7 @@
           "charge_threshold": "Akumulatora pieaugums vismaz par šo daudzumu ir uzlāde; mazāki pieaugumi tiek ignorēti.",
           "fuel_type": "Nosaka katra sadedzinātā litra CO₂: benzīns 2,31 kg, dīzelis 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Grami CO₂ uz uzlādēto kWh; 55 Francijas tīklam, aptuveni 380 Vācijas tīklam.",
-          "units": "Kartē un patēriņa sensoros rādīto vērtību mērvienības. Brauciena un mēneša attālumi un apjomi atbilst Home Assistant mērvienību sistēmai."
+          "units": "Kartē rādīto vērtību, kā arī brauciena un mēneša attālumu un apjomu mērvienības. Patēriņa, izmaksu un CO₂ uz attālumu sensori saglabā metrisko mērvienību (to statistika paliek derīga) un imperiālo vērtību norāda atribūtos. Tvertnes tilpumu, fiksēto degvielas cenu un uzpildes slieksni ievada rādītajās mērvienībās."
         }
       }
     },

@@ -34,6 +34,7 @@ from .conftest import (
     ODOMETER,
     PERCENT,
     entity_id,
+    measured_trips,
     setup_vehicle,
     state_of,
 )
@@ -80,7 +81,7 @@ async def test_first_start_imports_history(recorder_mock, hass: HomeAssistant, f
     await _setup(hass, freezer, **{CONF_FUEL_PRICE: 2.0})
 
     attrs = _attrs(hass)
-    assert [(t["distance"], t["fuel"]) for t in attrs["trips"]] == [(50, 3), (30, 2), (20, 2)]
+    assert measured_trips(hass) == [(50, 3), (30, 2), (20, 2)]
     assert attrs["trips"][-1]["start"] == (START + timedelta(minutes=30)).isoformat()
     [refuel] = attrs["refuels"]
     assert refuel["liters"] == 13 and refuel["cost"] == 26 and refuel["odometer"] == 1050
@@ -193,7 +194,7 @@ async def test_hourly_statistics_before_the_states(
 
     attrs = _attrs(hass)
     # 60 km over two hours, then 40 km, then the three trips of the recorded states.
-    assert [(t["distance"], t["fuel"]) for t in attrs["trips"]] == [(50, 3), (30, 2), (20, 2), (40, 12), (60, 4)]
+    assert measured_trips(hass) == [(50, 3), (30, 2), (20, 2), (40, 12), (60, 4)]
     assert attrs["trips"][-1]["start"] == (first + timedelta(hours=2)).isoformat()
     assert [r["liters"] for r in attrs["refuels"]] == [13, 6]
     assert attrs["total"]["distance"] == 200 and attrs["total"]["since"] == (first + timedelta(hours=1)).isoformat()
@@ -263,7 +264,7 @@ async def test_hourly_statistics_of_a_level_in_percent(
 
     attrs = _attrs(hass)
     # 50 L tank: 16 % is 8 L over 100 km.
-    assert [(t["distance"], t["fuel"]) for t in attrs["trips"]] == [(100, 8)]
+    assert measured_trips(hass) == [(100, 8)]
     assert attrs["trips"][0]["fuel_consumption"] == 8.0
     assert attrs["total"]["fuel_consumption"] == 8.0
 
@@ -293,7 +294,7 @@ async def test_hourly_statistics_start_with_the_level(
     await _setup_level(hass, freezer)
 
     attrs = _attrs(hass)
-    assert [(t["distance"], t["fuel"]) for t in attrs["trips"]] == [(100, 8)]
+    assert measured_trips(hass) == [(100, 8)]
     assert attrs["total"]["distance"] == 100
 
 
@@ -374,7 +375,7 @@ async def test_level_next_to_quantity_is_not_replayed(
     attrs = _attrs(hass)
     assert [r["liters"] for r in attrs["refuels"]] == [13]
     assert attrs["total"]["fuel"] == 7
-    assert [(t["distance"], t["fuel"]) for t in attrs["trips"]] == [(50, 3), (30, 2), (20, 2)]
+    assert measured_trips(hass) == [(50, 3), (30, 2), (20, 2)]
     assert attrs["fuel_level"] == 92 and attrs["fuel_quantity"] == 46
 
 
@@ -412,7 +413,7 @@ async def test_hourly_statistics_without_a_level_next_to_quantity(
     await _setup(hass, freezer, **{CONF_FUEL_LEVEL: FUEL_LEVEL, CONF_TANK_CAPACITY: 50})
 
     attrs = _attrs(hass)
-    assert [(t["distance"], t["fuel"]) for t in attrs["trips"]] == [(50, 3), (30, 2), (20, 2), (40, 12), (60, 4)]
+    assert measured_trips(hass) == [(50, 3), (30, 2), (20, 2), (40, 12), (60, 4)]
     assert [r["liters"] for r in attrs["refuels"]] == [13, 6]
     assert attrs["total"]["distance"] == 200
 

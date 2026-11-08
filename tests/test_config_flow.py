@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from custom_components.vehicle_consumption.const import (
     CONF_BATTERY_CAPACITY,
@@ -300,6 +301,83 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     # Reloaded with the new options
     attrs = state_of(hass, "consumption").attributes
     assert attrs["tank_capacity"] == 55 and attrs["fuel_quantity"] == 27.5
+
+
+async def test_options_flow_imperial(hass: HomeAssistant) -> None:
+    """Imperial units: tank capacity, fixed fuel price and refuel threshold are shown and typed in gallons, stored in
+    litres."""
+    entry = await setup_vehicle(
+        hass,
+        {
+            CONF_ODOMETER: ODOMETER,
+            CONF_FUEL_LEVEL: "sensor.car_fuel_level",
+            CONF_TANK_CAPACITY: 56.781176761,
+            CONF_FUEL_PRICE: 0.5,
+            CONF_REFUEL_THRESHOLD: 3.785411784,
+            CONF_UNITS: "imperial",
+        },
+        states={ODOMETER: ("10000", KM), "sensor.car_fuel_level": ("50", PERCENT)},
+    )
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    schema = result["data_schema"].schema
+    suggested = {str(k): k.description["suggested_value"] for k in schema if k.description}
+    assert suggested[CONF_TANK_CAPACITY] == 15.0
+    assert schema[CONF_TANK_CAPACITY].config["unit_of_measurement"] == "gal"
+    assert schema[CONF_TANK_CAPACITY].config["step"] == "any"
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {CONF_ODOMETER: ODOMETER, CONF_FUEL_LEVEL: "sensor.car_fuel_level", CONF_TANK_CAPACITY: 20}
+    )
+    assert result["step_id"] == "prices"
+    schema = result["data_schema"].schema
+    suggested = {str(k): k.description["suggested_value"] for k in schema if k.description}
+    assert suggested[CONF_FUEL_PRICE] == 1.893  # per gallon
+    assert suggested[CONF_REFUEL_THRESHOLD] == 1.0
+    assert schema[CONF_FUEL_PRICE].config["unit_of_measurement"] == "EUR/gal"
+    assert schema[CONF_REFUEL_THRESHOLD].config["unit_of_measurement"] == "gal"
+    assert schema[CONF_REFUEL_THRESHOLD].config["step"] == "any"
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {
+            CONF_FUEL_PRICE: 4,
+            CONF_UNITS: "imperial",
+            CONF_TRIP_GAP: 30,
+            CONF_REFUEL_THRESHOLD: 2,
+            CONF_CHARGE_THRESHOLD: 1,
+        },
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert entry.options[CONF_TANK_CAPACITY] == pytest.approx(75.708, abs=1e-3)
+    assert entry.options[CONF_FUEL_PRICE] == pytest.approx(1.0567, abs=1e-4)
+    assert entry.options[CONF_REFUEL_THRESHOLD] == pytest.approx(7.571, abs=1e-3)
+    await hass.async_block_till_done()
+    attrs = state_of(hass, "consumption").attributes
+    assert attrs["tank_capacity"] == 20.0 and attrs["fuel_price"] == 4.0
+
+
+async def test_config_flow_us_customary_in_gallons(hass: HomeAssistant) -> None:
+    """Home Assistant in US customary units: a new vehicle is in gallons, imperial by default."""
+    hass.config.units = US_CUSTOMARY_SYSTEM
+    device = vehicle_device(hass, "Pickup")
+    add_sensor(hass, device, "pickup_mileage", "1000", KM, unique_id="vf4_mileage", translation_key="mileage")
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": "user"})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_DEVICE_ID: device})
+    assert result["data_schema"].schema[CONF_TANK_CAPACITY].config["unit_of_measurement"] == "gal"
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ODOMETER: "sensor.pickup_mileage", CONF_FUEL_LEVEL: "sensor.pickup_fuel", CONF_TANK_CAPACITY: 10},
+    )
+    schema = result["data_schema"].schema
+    assert schema[CONF_FUEL_PRICE].config["unit_of_measurement"].endswith("/gal")
+    units = next(k for k in schema if str(k) == CONF_UNITS)
+    assert units.default() == "imperial"
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_FUEL_PRICE: 3.785411784})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["options"][CONF_TANK_CAPACITY] == pytest.approx(37.854, abs=1e-3)
+    assert result["options"][CONF_FUEL_PRICE] == pytest.approx(1.0)
+    assert result["options"][CONF_UNITS] == "imperial"
+    assert result["options"][CONF_REFUEL_THRESHOLD] == 3.0  # the default, in litres
 
 
 # Units of each source, for the sensors of the known integrations below.

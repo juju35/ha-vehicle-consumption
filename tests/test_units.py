@@ -52,7 +52,9 @@ async def test_imperial_attributes_and_sensors(hass: HomeAssistant, freezer: Fro
 
     state = state_of(hass, "consumption")
     attrs = state.attributes
-    assert state.attributes["unit_of_measurement"] == "mpg" and float(state.state) == 37.9
+    # The native unit stays metric (statistics); the figure in mpg is an attribute.
+    assert state.attributes["unit_of_measurement"] == "L/100 km" and float(state.state) == 6.2
+    assert attrs["imperial_value"] == 37.9 and attrs["imperial_unit"] == "mpg"
     assert attrs["units"] == "imperial" and attrs["odometer_unit"] == "km"
     assert attrs["odometer"] == 6313.7
     assert attrs["fuel_quantity"] == 7.93
@@ -60,12 +62,20 @@ async def test_imperial_attributes_and_sensors(hass: HomeAssistant, freezer: Fro
     assert attrs["trip"]["distance"] == 100.0 and attrs["trip"]["fuel_consumption"] == 37.9
     assert attrs["month"]["distance"] == 100.0 and attrs["total"]["cost_per_km"] == 0.2
 
-    assert state_of(hass, "fuel_consumption_trip").attributes["unit_of_measurement"] == "mpg"
-    assert state_of(hass, "cost_per_km").attributes["unit_of_measurement"] == "EUR/mi"
-    assert state_of(hass, "co2_per_km").attributes["unit_of_measurement"] == "g/mi"
-    # Distances and volumes stay in km and L: Home Assistant converts them itself.
+    def imperial(key: str) -> tuple[str, float, str]:
+        attributes = state_of(hass, key).attributes
+        return attributes["unit_of_measurement"], attributes["imperial_value"], attributes["imperial_unit"]
+
+    assert imperial("fuel_consumption_trip") == ("L/100 km", 37.9, "mpg")
+    assert imperial("fuel_consumption_average") == ("L/100 km", 37.9, "mpg")
+    assert imperial("cost_per_km") == ("EUR/km", 0.2, "EUR/mi")
+    assert state_of(hass, "co2_per_km").attributes["unit_of_measurement"] == "g/km"
+    assert state_of(hass, "co2_per_km").attributes["imperial_unit"] == "g/mi"
+    # Distances and volumes: km and L natively, shown in mi and gal by Home Assistant (suggested unit).
     distance = state_of(hass, "distance_trip")
-    assert distance.attributes["unit_of_measurement"] == "km" and float(distance.state) == 160.9
+    assert distance.attributes["unit_of_measurement"] == "mi" and round(float(distance.state), 1) == 100.0
+    assert "imperial_value" not in distance.attributes
+    assert state_of(hass, "fuel_used_month").attributes["unit_of_measurement"] == "gal"
 
 
 async def test_electric_imperial_unit(hass: HomeAssistant) -> None:
@@ -74,8 +84,10 @@ async def test_electric_imperial_unit(hass: HomeAssistant) -> None:
         {CONF_ODOMETER: ODOMETER, CONF_BATTERY_ENERGY: BATTERY, CONF_UNITS: "imperial"},
         states={ODOMETER: ("10000", KM), BATTERY: ("50", KWH)},
     )
-    assert state_of(hass, "consumption").attributes["unit_of_measurement"] == "mi/kWh"
-    assert state_of(hass, "energy_consumption_month").attributes["unit_of_measurement"] == "mi/kWh"
+    assert state_of(hass, "consumption").attributes["unit_of_measurement"] == "kWh/100 km"
+    assert state_of(hass, "consumption").attributes["imperial_unit"] == "mi/kWh"
+    month = state_of(hass, "energy_consumption_month").attributes
+    assert month["unit_of_measurement"] == "kWh/100 km" and month["imperial_unit"] == "mi/kWh"
 
 
 async def test_metric_by_default(hass: HomeAssistant) -> None:
@@ -83,6 +95,39 @@ async def test_metric_by_default(hass: HomeAssistant) -> None:
     state = state_of(hass, "consumption")
     assert state.attributes["unit_of_measurement"] == "L/100 km" and state.attributes["units"] == "metric"
     assert state_of(hass, "cost_per_km").attributes["unit_of_measurement"] == "EUR/km"
+    assert "imperial_value" not in state.attributes
+    assert "imperial_value" not in state_of(hass, "cost_per_km").attributes
+
+
+async def test_units_switch_keeps_native_units(hass: HomeAssistant) -> None:
+    """Switching the units option never changes a sensor's native unit (its statistics stay valid): distances and
+    volumes follow through the unit Home Assistant shows them in, the others through their attributes; and back."""
+    entry = await setup_vehicle(hass)
+    keys = ("consumption", "fuel_consumption_trip", "cost_per_km", "co2_per_km", "distance_trip", "fuel_used_month")
+
+    def units() -> dict[str, str]:
+        return {key: state_of(hass, key).attributes["unit_of_measurement"] for key in keys}
+
+    metric = units()
+    assert metric == {
+        "consumption": "L/100 km",
+        "fuel_consumption_trip": "L/100 km",
+        "cost_per_km": "EUR/km",
+        "co2_per_km": "g/km",
+        "distance_trip": "km",
+        "fuel_used_month": "L",
+    }
+    hass.config_entries.async_update_entry(entry, options={**entry.options, CONF_UNITS: "imperial"})
+    await hass.config_entries.async_reload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert units() == {**metric, "distance_trip": "mi", "fuel_used_month": "gal"}
+    assert state_of(hass, "cost_per_km").attributes["imperial_unit"] == "EUR/mi"
+
+    hass.config_entries.async_update_entry(entry, options={**entry.options, CONF_UNITS: "metric"})
+    await hass.config_entries.async_reload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert units() == metric
+    assert "imperial_unit" not in state_of(hass, "cost_per_km").attributes
 
 
 async def test_manual_odometer_in_the_source_unit(hass: HomeAssistant) -> None:

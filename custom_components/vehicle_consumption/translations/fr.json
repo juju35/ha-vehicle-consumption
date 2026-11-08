@@ -56,7 +56,7 @@
           "electricity_price": "Prix du kWh, utilisé sans capteur de prix ou quand celui-ci est indisponible.",
           "fuel_type": "Donne le CO₂ de chaque litre brûlé : essence 2,31 kg, gazole 2,68 kg, GPL 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Grammes de CO₂ par kWh chargé ; 55 pour le réseau français, environ 380 pour l'allemand.",
-          "units": "Unités des valeurs affichées sur la carte et dans les capteurs de consommation. Les distances et volumes des trajets et du mois suivent le système d'unités de Home Assistant."
+          "units": "Unités des valeurs affichées sur la carte, et des distances et volumes des trajets et du mois. Les capteurs de consommation, de coût et de CO₂ par distance gardent leur unité métrique (leurs statistiques restent valides) et donnent la valeur impériale dans leurs attributs. Capacité du réservoir, prix fixe du carburant et seuil de plein se saisissent dans les unités affichées."
         }
       }
     },
@@ -122,7 +122,7 @@
           "charge_threshold": "Une hausse de la batterie d'au moins cette quantité est une recharge ; les hausses plus faibles sont ignorées.",
           "fuel_type": "Donne le CO₂ de chaque litre brûlé : essence 2,31 kg, gazole 2,68 kg, GPL 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Grammes de CO₂ par kWh chargé ; 55 pour le réseau français, environ 380 pour l'allemand.",
-          "units": "Unités des valeurs affichées sur la carte et dans les capteurs de consommation. Les distances et volumes des trajets et du mois suivent le système d'unités de Home Assistant."
+          "units": "Unités des valeurs affichées sur la carte, et des distances et volumes des trajets et du mois. Les capteurs de consommation, de coût et de CO₂ par distance gardent leur unité métrique (leurs statistiques restent valides) et donnent la valeur impériale dans leurs attributs. Capacité du réservoir, prix fixe du carburant et seuil de plein se saisissent dans les unités affichées."
         }
       }
     },

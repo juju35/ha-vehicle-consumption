@@ -177,3 +177,9 @@ def state_of(hass: HomeAssistant, key: str, name: str = "My car"):
     """State of the sensor `key` of the vehicle `name` (None when the entity doesn't exist)."""
     eid = entity_id(hass, key, name)
     return hass.states.get(eid) if eid else None
+
+
+def measured_trips(hass: HomeAssistant, name: str = "My car") -> list[tuple[float, float]]:
+    """(distance, fuel) of the stored trips, newest first, as measured (the attributes may show estimates)."""
+    entry = next(e for e in hass.config_entries.async_entries(DOMAIN) if e.title == name)
+    return [(round(t.totals.distance, 2), round(t.totals.fuel, 2)) for t in entry.runtime_data.trips]

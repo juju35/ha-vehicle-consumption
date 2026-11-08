@@ -56,7 +56,7 @@
           "electricity_price": "Pris pr. kWh, bruges når der ikke er nogen prissensor, eller den ikke er tilgængelig.",
           "fuel_type": "Giver CO₂ for hver brændt liter: benzin 2,31 kg, diesel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Gram CO₂ pr. opladet kWh; 55 for det franske net, omkring 380 for det tyske.",
-          "units": "Enheder for tallene på kortet og i forbrugssensorerne. Turens og månedens afstande og mængder følger Home Assistants enhedssystem."
+          "units": "Enheder for tallene på kortet og for turens og månedens afstande og mængder. Sensorerne for forbrug, pris og CO₂ pr. afstand beholder deres metriske enhed (deres statistik forbliver gyldig) og angiver den imperiale værdi i deres attributter. Tankkapacitet, fast brændstofpris og tankningstærskel indtastes i de viste enheder."
         }
       }
     },
@@ -122,7 +122,7 @@
           "charge_threshold": "En stigning i batteriet på mindst denne mængde er en opladning; mindre stigninger ignoreres.",
           "fuel_type": "Giver CO₂ for hver brændt liter: benzin 2,31 kg, diesel 2,68 kg, LPG 1,66 kg, E85 1,61 kg.",
           "co2_electricity": "Gram CO₂ pr. opladet kWh; 55 for det franske net, omkring 380 for det tyske.",
-          "units": "Enheder for tallene på kortet og i forbrugssensorerne. Turens og månedens afstande og mængder følger Home Assistants enhedssystem."
+          "units": "Enheder for tallene på kortet og for turens og månedens afstande og mængder. Sensorerne for forbrug, pris og CO₂ pr. afstand beholder deres metriske enhed (deres statistik forbliver gyldig) og angiver den imperiale værdi i deres attributter. Tankkapacitet, fast brændstofpris og tankningstærskel indtastes i de viste enheder."
         }
       }
     },
