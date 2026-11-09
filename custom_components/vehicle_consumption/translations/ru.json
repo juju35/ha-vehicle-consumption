@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Файл",
-          "description": "Путь к CSV-файлу; пусто — vehicle_consumption_<автомобиль>.csv в папке конфигурации."
+          "description": "Путь к CSV-файлу; пусто — vehicle_consumption_[автомобиль].csv в папке конфигурации."
         }
       }
     }

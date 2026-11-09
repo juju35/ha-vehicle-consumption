@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Fișier",
-          "description": "Calea fișierului CSV; gol: vehicle_consumption_<vehicul>.csv în dosarul de configurare."
+          "description": "Calea fișierului CSV; gol: vehicle_consumption_[vehicul].csv în dosarul de configurare."
         }
       }
     }

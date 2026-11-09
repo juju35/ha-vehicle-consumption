@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Αρχείο",
-          "description": "Διαδρομή του αρχείου CSV· κενό: vehicle_consumption_<όχημα>.csv στον φάκελο ρυθμίσεων."
+          "description": "Διαδρομή του αρχείου CSV· κενό: vehicle_consumption_[όχημα].csv στον φάκελο ρυθμίσεων."
         }
       }
     }

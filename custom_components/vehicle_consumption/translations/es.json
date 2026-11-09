@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Archivo",
-          "description": "Ruta del archivo CSV; vehicle_consumption_<vehículo>.csv en la carpeta de configuración si está vacía."
+          "description": "Ruta del archivo CSV; vehicle_consumption_[vehículo].csv en la carpeta de configuración si está vacía."
         }
       }
     }

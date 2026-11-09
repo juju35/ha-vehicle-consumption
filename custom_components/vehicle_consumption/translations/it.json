@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "File",
-          "description": "Percorso del file CSV; vehicle_consumption_<veicolo>.csv nella cartella di configurazione se vuoto."
+          "description": "Percorso del file CSV; vehicle_consumption_[veicolo].csv nella cartella di configurazione se vuoto."
         }
       }
     }

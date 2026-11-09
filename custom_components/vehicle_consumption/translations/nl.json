@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Bestand",
-          "description": "Pad van het CSV-bestand; leeg: vehicle_consumption_<voertuig>.csv in de configuratiemap."
+          "description": "Pad van het CSV-bestand; leeg: vehicle_consumption_[voertuig].csv in de configuratiemap."
         }
       }
     }

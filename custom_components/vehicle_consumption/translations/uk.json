@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Файл",
-          "description": "Шлях до CSV-файлу; порожньо — vehicle_consumption_<автомобіль>.csv у теці конфігурації."
+          "description": "Шлях до CSV-файлу; порожньо — vehicle_consumption_[автомобіль].csv у теці конфігурації."
         }
       }
     }

@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Plik",
-          "description": "Ścieżka pliku CSV; puste: vehicle_consumption_<pojazd>.csv w folderze konfiguracji."
+          "description": "Ścieżka pliku CSV; puste: vehicle_consumption_[pojazd].csv w folderze konfiguracji."
         }
       }
     }

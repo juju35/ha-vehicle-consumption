@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Ficheiro",
-          "description": "Caminho do ficheiro CSV; vehicle_consumption_<veículo>.csv na pasta de configuração se vazio."
+          "description": "Caminho do ficheiro CSV; vehicle_consumption_[veículo].csv na pasta de configuração se vazio."
         }
       }
     }

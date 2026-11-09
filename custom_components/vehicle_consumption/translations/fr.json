@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Fichier",
-          "description": "Chemin du fichier CSV ; vehicle_consumption_<véhicule>.csv dans le dossier de configuration si vide."
+          "description": "Chemin du fichier CSV ; vehicle_consumption_[véhicule].csv dans le dossier de configuration si vide."
         }
       }
     }

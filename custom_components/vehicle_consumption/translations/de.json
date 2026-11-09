@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Datei",
-          "description": "Pfad der CSV-Datei; leer: vehicle_consumption_<Fahrzeug>.csv im Konfigurationsordner."
+          "description": "Pfad der CSV-Datei; leer: vehicle_consumption_[Fahrzeug].csv im Konfigurationsordner."
         }
       }
     }

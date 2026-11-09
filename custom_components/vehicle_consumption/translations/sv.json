@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Fil",
-          "description": "Sökväg till CSV-filen; tom: vehicle_consumption_<fordon>.csv i konfigurationsmappen."
+          "description": "Sökväg till CSV-filen; tom: vehicle_consumption_[fordon].csv i konfigurationsmappen."
         }
       }
     }

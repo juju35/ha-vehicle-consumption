@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Датотека",
-          "description": "Путања CSV датотеке; празно: vehicle_consumption_<возило>.csv у фасцикли конфигурације."
+          "description": "Путања CSV датотеке; празно: vehicle_consumption_[возило].csv у фасцикли конфигурације."
         }
       }
     }

@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Datoteka",
-          "description": "Putanja CSV datoteke; prazno: vehicle_consumption_<vozilo>.csv u fascikli konfiguracije."
+          "description": "Putanja CSV datoteke; prazno: vehicle_consumption_[vozilo].csv u fascikli konfiguracije."
         }
       }
     }

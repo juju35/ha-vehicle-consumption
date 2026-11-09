@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Fájl",
-          "description": "A CSV-fájl útvonala; üresen: vehicle_consumption_<jármű>.csv a konfigurációs mappában."
+          "description": "A CSV-fájl útvonala; üresen: vehicle_consumption_[jármű].csv a konfigurációs mappában."
         }
       }
     }

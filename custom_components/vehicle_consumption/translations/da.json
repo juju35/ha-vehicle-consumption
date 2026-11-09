@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Fil",
-          "description": "Sti til CSV-filen; tom: vehicle_consumption_<køretøj>.csv i konfigurationsmappen."
+          "description": "Sti til CSV-filen; tom: vehicle_consumption_[køretøj].csv i konfigurationsmappen."
         }
       }
     }

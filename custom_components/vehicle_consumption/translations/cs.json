@@ -421,7 +421,7 @@
         },
         "path": {
           "name": "Soubor",
-          "description": "Cesta k souboru CSV; prázdné: vehicle_consumption_<vozidlo>.csv ve složce konfigurace."
+          "description": "Cesta k souboru CSV; prázdné: vehicle_consumption_[vozidlo].csv ve složce konfigurace."
         }
       }
     }
