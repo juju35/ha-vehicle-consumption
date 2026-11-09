@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ per km"
+      },
+      "next_service": {
+        "name": "Prossimo tagliando",
+        "state_attributes": {
+          "last_service": {
+            "name": "Ultimo tagliando"
+          },
+          "last_service_odometer": {
+            "name": "Contachilometri all'ultimo tagliando"
+          },
+          "interval": {
+            "name": "Intervallo"
+          },
+          "overdue": {
+            "name": "In ritardo"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Quanto indietro ricostruire (365 per impostazione predefinita). Vengono usati gli stati registrati dove il registratore li ha ancora (10 giorni per impostazione predefinita), prima le statistiche orarie dei sensori. I mesi che la cronologia non copre per intero mantengono i dati già registrati."
         }
       }
+    },
+    "log_service": {
+      "name": "Registra un tagliando",
+      "description": "Registra un tagliando del veicolo: il sensore Prossimo tagliando conta alla rovescia da lì.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Veicolo",
+          "description": "Il veicolo revisionato."
+        },
+        "odometer": {
+          "name": "Contachilometri",
+          "description": "Contachilometri al tagliando, nell'unità del sensore. La lettura attuale se omesso."
+        },
+        "interval": {
+          "name": "Intervallo",
+          "description": "Distanza al prossimo tagliando, nell'unità del sensore del contachilometri. Quella registrata prima se omessa; 0 disattiva il promemoria."
+        }
+      }
+    },
+    "export": {
+      "name": "Esporta in CSV",
+      "description": "Scrive ogni viaggio, rifornimento e ricarica conservati in un file CSV. Solo amministratori.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Veicolo",
+          "description": "Il veicolo da esportare."
+        },
+        "path": {
+          "name": "File",
+          "description": "Percorso del file CSV; vehicle_consumption_<veicolo>.csv nella cartella di configurazione se vuoto."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "Il registratore non è configurato: non c'è uno storico da importare."
+    },
+    "no_odometer": {
+      "message": "Ancora nessuna lettura del contachilometri: indica quella del tagliando."
+    },
+    "no_interval": {
+      "message": "Ancora nessun intervallo: indica la distanza al prossimo tagliando."
+    },
+    "path_not_allowed": {
+      "message": "{path} è fuori dalle cartelle consentite (cartella di configurazione o allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} si trova in una cartella nascosta (come .storage): l'esportazione non scrive lì."
+    },
+    "path_not_csv": {
+      "message": "{path} non è un file CSV (.csv): l'esportazione scrive solo file CSV."
     }
   },
   "selector": {

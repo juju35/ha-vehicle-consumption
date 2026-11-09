@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ per km"
+      },
+      "next_service": {
+        "name": "Nästa service",
+        "state_attributes": {
+          "last_service": {
+            "name": "Senaste service"
+          },
+          "last_service_odometer": {
+            "name": "Mätarställning vid senaste service"
+          },
+          "interval": {
+            "name": "Intervall"
+          },
+          "overdue": {
+            "name": "Försenad"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Hur långt bakåt som byggs upp (365 som standard). De registrerade tillstånden används där inspelaren fortfarande har dem (10 dagar som standard), och före det sensorernas timstatistik. Månader som historiken inte täcker helt behåller det som följdes upp."
         }
       }
+    },
+    "log_service": {
+      "name": "Registrera en service",
+      "description": "Registrerar en service på fordonet: sensorn Nästa service räknar ner därifrån.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Fordon",
+          "description": "Fordonet som servades."
+        },
+        "odometer": {
+          "name": "Vägmätare",
+          "description": "Mätarställning vid servicen, i mätarsensorns enhet. Utan: aktuell avläsning."
+        },
+        "interval": {
+          "name": "Intervall",
+          "description": "Sträcka till nästa service, i mätarsensorns enhet. Utan: den tidigare; 0 stänger av påminnelsen."
+        }
+      }
+    },
+    "export": {
+      "name": "Exportera till CSV",
+      "description": "Skriver varje sparad resa, tankning och laddning till en CSV-fil. Endast administratörer.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Fordon",
+          "description": "Fordonet som exporteras."
+        },
+        "path": {
+          "name": "Fil",
+          "description": "Sökväg till CSV-filen; tom: vehicle_consumption_<fordon>.csv i konfigurationsmappen."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "Inspelaren är inte konfigurerad: det finns ingen historik att importera."
+    },
+    "no_odometer": {
+      "message": "Ingen mätaravläsning ännu: ange den vid servicen."
+    },
+    "no_interval": {
+      "message": "Inget intervall ännu: ange sträckan till nästa service."
+    },
+    "path_not_allowed": {
+      "message": "{path} ligger utanför de tillåtna mapparna (konfigurationsmappen eller allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} ligger i en dold mapp (som .storage): exporten skriver inte där."
+    },
+    "path_not_csv": {
+      "message": "{path} är inte en CSV-fil (.csv): exporten skriver bara CSV-filer."
     }
   },
   "selector": {

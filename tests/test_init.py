@@ -47,6 +47,7 @@ async def test_setup_and_entities(hass: HomeAssistant) -> None:
             "co2_month",
             "co2_per_km",
             "last_refuel",
+            "next_service",
         ]
     )
     assert all(e.unique_id == f"{entry.entry_id}_{e.translation_key}" for e in entities)

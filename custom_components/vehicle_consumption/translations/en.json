@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ per km"
+      },
+      "next_service": {
+        "name": "Next service",
+        "state_attributes": {
+          "last_service": {
+            "name": "Last service"
+          },
+          "last_service_odometer": {
+            "name": "Odometer at the last service"
+          },
+          "interval": {
+            "name": "Interval"
+          },
+          "overdue": {
+            "name": "Overdue"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "How far back to rebuild (365 by default). The recorded states are used where the recorder still has them (10 days by default), the hourly statistics of the sensors before. Months the history does not fully cover keep what was tracked."
         }
       }
+    },
+    "log_service": {
+      "name": "Log a service",
+      "description": "Logs a service done on the vehicle: the Next service sensor counts down from there.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Vehicle",
+          "description": "The vehicle serviced."
+        },
+        "odometer": {
+          "name": "Odometer",
+          "description": "Odometer at the service, in the unit of the odometer sensor. The current reading when left out."
+        },
+        "interval": {
+          "name": "Interval",
+          "description": "Distance to the next service, in the unit of the odometer sensor. The one logged before when left out; 0 turns the reminder off."
+        }
+      }
+    },
+    "export": {
+      "name": "Export to CSV",
+      "description": "Writes every trip, refuel and charge kept to a CSV file. Administrators only.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Vehicle",
+          "description": "The vehicle to export."
+        },
+        "path": {
+          "name": "File",
+          "description": "Path of the CSV file; vehicle_consumption_<vehicle>.csv in the configuration folder when empty."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "The recorder is not set up: there is no history to import."
+    },
+    "no_odometer": {
+      "message": "No odometer reading yet: give the odometer of the service."
+    },
+    "no_interval": {
+      "message": "No interval yet: give the distance to the next service."
+    },
+    "path_not_allowed": {
+      "message": "{path} is outside the allowed folders (configuration folder, or allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} is in a hidden folder (such as .storage): the export does not write there."
+    },
+    "path_not_csv": {
+      "message": "{path} is not a CSV file (.csv): the export only writes CSV files."
     }
   },
   "selector": {

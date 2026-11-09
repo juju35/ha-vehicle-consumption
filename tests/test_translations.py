@@ -70,6 +70,8 @@ _LATIN_NAMES = re.compile(
     r"Vehicle Consumption|Home Assistant|Renault|Tesla|Kia|Volkswagen|OBD|evcc|Wallbox|Easee|Zaptec|Ohme"
     # Units, formulas and fuel names stay in Latin letters in Cyrillic text (CO₂, E85, LPG as written on pumps).
     r"|\b(?:km|mi|L|gal|kWh|Wh|kg|CO₂|E85|LPG)\b|\{\w+\}"
+    # File and setting names of the CSV export, written as Home Assistant spells them.
+    r"|CSV|allowlist_external_dirs|vehicle_consumption_|\.csv\b"
 )
 
 

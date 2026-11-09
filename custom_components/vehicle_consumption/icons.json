@@ -2,6 +2,7 @@
   "entity": {
     "sensor": {
       "consumption": { "default": "mdi:chart-line" },
+      "next_service": { "default": "mdi:car-wrench" },
       "fuel_consumption_trip": { "default": "mdi:gas-station-outline" },
       "fuel_consumption_month": { "default": "mdi:gas-station-outline" },
       "fuel_consumption_average": { "default": "mdi:gas-station" },
@@ -19,6 +20,8 @@
     }
   },
   "services": {
+    "log_service": { "service": "mdi:car-wrench" },
+    "export": { "service": "mdi:file-delimited-outline" },
     "add_refuel": { "service": "mdi:gas-station" },
     "add_charge": { "service": "mdi:ev-station" },
     "reset_statistics": { "service": "mdi:restart" },

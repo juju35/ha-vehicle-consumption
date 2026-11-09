@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ na km"
+      },
+      "next_service": {
+        "name": "Ďalší servis",
+        "state_attributes": {
+          "last_service": {
+            "name": "Posledný servis"
+          },
+          "last_service_odometer": {
+            "name": "Stav tachometra pri poslednom servise"
+          },
+          "interval": {
+            "name": "Interval"
+          },
+          "overdue": {
+            "name": "Po termíne"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Ako ďaleko do minulosti sa má obnoviť (predvolene 365). Zaznamenané stavy sa použijú tam, kde ich zapisovač ešte má (predvolene 10 dní), predtým hodinové štatistiky senzorov. Mesiace, ktoré história nepokrýva úplne, si ponechajú sledované údaje."
         }
       }
+    },
+    "log_service": {
+      "name": "Zapísať servis",
+      "description": "Zapíše servis vozidla: senzor Ďalší servis odpočítava odtiaľ.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Vozidlo",
+          "description": "Servisované vozidlo."
+        },
+        "odometer": {
+          "name": "Počítadlo kilometrov",
+          "description": "Stav tachometra pri servise, v jednotke senzora. Bez neho: aktuálny stav."
+        },
+        "interval": {
+          "name": "Interval",
+          "description": "Vzdialenosť do ďalšieho servisu, v jednotke senzora tachometra. Bez neho: predchádzajúci; 0 vypne pripomienku."
+        }
+      }
+    },
+    "export": {
+      "name": "Exportovať do CSV",
+      "description": "Zapíše každú uchovanú jazdu, tankovanie a nabíjanie do súboru CSV. Len správcovia.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Vozidlo",
+          "description": "Vozidlo na export."
+        },
+        "path": {
+          "name": "Súbor",
+          "description": "Cesta k súboru CSV; prázdne: vehicle_consumption_<vozidlo>.csv v priečinku konfigurácie."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "Zapisovač nie je nastavený: nie je k dispozícii žiadna história na import."
+    },
+    "no_odometer": {
+      "message": "Zatiaľ žiadny stav tachometra: zadajte stav pri servise."
+    },
+    "no_interval": {
+      "message": "Zatiaľ žiadny interval: zadajte vzdialenosť do ďalšieho servisu."
+    },
+    "path_not_allowed": {
+      "message": "{path} je mimo povolených priečinkov (konfiguračný priečinok alebo allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} je v skrytom priečinku (napríklad .storage): export tam nezapisuje."
+    },
+    "path_not_csv": {
+      "message": "{path} nie je súbor CSV (.csv): export zapisuje iba súbory CSV."
     }
   },
   "selector": {

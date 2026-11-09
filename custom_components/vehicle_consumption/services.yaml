@@ -107,3 +107,39 @@ import_history:
           step: 1
           mode: box
           unit_of_measurement: d
+
+log_service:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: vehicle_consumption
+    odometer:
+      example: 45210
+      selector:
+        number:
+          min: 0
+          max: 2000000
+          step: 1
+          mode: box
+    interval:
+      example: 15000
+      selector:
+        number:
+          min: 0
+          max: 200000
+          step: 100
+          mode: box
+
+export:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: vehicle_consumption
+    path:
+      example: "exports/car.csv"
+      selector:
+        text:

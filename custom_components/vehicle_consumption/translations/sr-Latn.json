@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ po km"
+      },
+      "next_service": {
+        "name": "Sledeći servis",
+        "state_attributes": {
+          "last_service": {
+            "name": "Poslednji servis"
+          },
+          "last_service_odometer": {
+            "name": "Kilometraža na poslednjem servisu"
+          },
+          "interval": {
+            "name": "Interval"
+          },
+          "overdue": {
+            "name": "Kasni"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Koliko dana unazad se ponovo gradi (podrazumevano 365). Zabeležena stanja se koriste tamo gde ih rekorder još ima (podrazumevano 10 dana), a pre toga satna statistika senzora. Meseci koje istorija ne pokriva u potpunosti zadržavaju već praćene podatke."
         }
       }
+    },
+    "log_service": {
+      "name": "Zabeleži servis",
+      "description": "Beleži servis vozila: senzor Sledeći servis odbrojava odatle.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Vozilo",
+          "description": "Servisirano vozilo."
+        },
+        "odometer": {
+          "name": "Kilometraža",
+          "description": "Kilometraža na servisu, u jedinici senzora. Bez nje: trenutno stanje."
+        },
+        "interval": {
+          "name": "Interval",
+          "description": "Rastojanje do sledećeg servisa, u jedinici senzora kilometraže. Bez njega: prethodni; 0 isključuje podsetnik."
+        }
+      }
+    },
+    "export": {
+      "name": "Izvezi u CSV",
+      "description": "Upisuje svaku sačuvanu vožnju, točenje i punjenje u CSV datoteku. Samo administratori.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Vozilo",
+          "description": "Vozilo za izvoz."
+        },
+        "path": {
+          "name": "Datoteka",
+          "description": "Putanja CSV datoteke; prazno: vehicle_consumption_<vozilo>.csv u fascikli konfiguracije."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "Rekorder nije podešen: nema istorije za uvoz."
+    },
+    "no_odometer": {
+      "message": "Još nema kilometraže: unesite onu sa servisa."
+    },
+    "no_interval": {
+      "message": "Još nema intervala: unesite rastojanje do sledećeg servisa."
+    },
+    "path_not_allowed": {
+      "message": "{path} je izvan dozvoljenih fascikli (fascikla konfiguracije ili allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} je u skrivenoj fascikli: izvoz tamo ne piše."
+    },
+    "path_not_csv": {
+      "message": "{path} nije CSV datoteka: izvoz piše samo CSV datoteke."
     }
   },
   "selector": {

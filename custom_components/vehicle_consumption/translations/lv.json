@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ uz km"
+      },
+      "next_service": {
+        "name": "Nākamā apkope",
+        "state_attributes": {
+          "last_service": {
+            "name": "Pēdējā apkope"
+          },
+          "last_service_odometer": {
+            "name": "Odometrs pēdējā apkopē"
+          },
+          "interval": {
+            "name": "Intervāls"
+          },
+          "overdue": {
+            "name": "Nokavēta"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Cik tālu pagātnē atjaunot (pēc noklusējuma 365). Ierakstītie stāvokļi tiek izmantoti tur, kur ierakstītājs tos vēl glabā (pēc noklusējuma 10 dienas), pirms tam sensoru stundas statistika. Mēneši, kurus vēsture pilnībā nesedz, saglabā uzskaitīto."
         }
       }
+    },
+    "log_service": {
+      "name": "Reģistrēt apkopi",
+      "description": "Reģistrē transportlīdzekļa apkopi: sensors Nākamā apkope atskaita no turienes.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Transportlīdzeklis",
+          "description": "Apkoptais transportlīdzeklis."
+        },
+        "odometer": {
+          "name": "Odometrs",
+          "description": "Odometrs apkopē, odometra sensora vienībā. Ja nav norādīts — pašreizējais rādījums."
+        },
+        "interval": {
+          "name": "Intervāls",
+          "description": "Attālums līdz nākamajai apkopei, odometra sensora vienībā. Ja nav norādīts — iepriekšējais; 0 izslēdz atgādinājumu."
+        }
+      }
+    },
+    "export": {
+      "name": "Eksportēt uz CSV",
+      "description": "Ieraksta katru saglabāto braucienu, uzpildi un uzlādi CSV failā. Tikai administratoriem.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Transportlīdzeklis",
+          "description": "Eksportējamais transportlīdzeklis."
+        },
+        "path": {
+          "name": "Fails",
+          "description": "CSV faila ceļš; tukšs — vehicle_consumption_<transportlīdzeklis>.csv konfigurācijas mapē."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "Ierakstītājs nav iestatīts: nav vēstures, ko importēt."
+    },
+    "no_odometer": {
+      "message": "Vēl nav odometra rādījuma: norādiet to apkopē."
+    },
+    "no_interval": {
+      "message": "Vēl nav intervāla: norādiet attālumu līdz nākamajai apkopei."
+    },
+    "path_not_allowed": {
+      "message": "{path} ir ārpus atļautajām mapēm (konfigurācijas mape vai allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} atrodas slēptā mapē (piemēram, .storage): eksports tur neraksta."
+    },
+    "path_not_csv": {
+      "message": "{path} nav CSV fails (.csv): eksports raksta tikai CSV failus."
     }
   },
   "selector": {

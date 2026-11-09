@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ km-enként"
+      },
+      "next_service": {
+        "name": "Következő szerviz",
+        "state_attributes": {
+          "last_service": {
+            "name": "Utolsó szerviz"
+          },
+          "last_service_odometer": {
+            "name": "Kilométeróra az utolsó szerviznél"
+          },
+          "interval": {
+            "name": "Intervallum"
+          },
+          "overdue": {
+            "name": "Késésben"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Milyen messzire visszamenőleg építse újra (alapértelmezés szerint 365). A rögzített állapotokat ott használjuk, ahol a rögzítő még megőrizte őket (alapértelmezés szerint 10 nap), előtte az érzékelők óránkénti statisztikáit. Azok a hónapok, amelyeket az előzmények nem fednek le teljesen, megtartják a követett értékeket."
         }
       }
+    },
+    "log_service": {
+      "name": "Szerviz rögzítése",
+      "description": "Rögzíti a jármű szervizét: a Következő szerviz érzékelő onnan számol vissza.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Jármű",
+          "description": "A szervizelt jármű."
+        },
+        "odometer": {
+          "name": "Kilométer-számláló",
+          "description": "Kilométeróra a szerviznél, a kilométeróra-érzékelő egységében. Nélküle: a jelenlegi állás."
+        },
+        "interval": {
+          "name": "Intervallum",
+          "description": "Távolság a következő szervizig, a kilométeróra-érzékelő egységében. Nélküle: a korábbi; 0 kikapcsolja az emlékeztetőt."
+        }
+      }
+    },
+    "export": {
+      "name": "Exportálás CSV-be",
+      "description": "Minden megőrzött utat, tankolást és töltést CSV-fájlba ír. Csak rendszergazdáknak.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Jármű",
+          "description": "Az exportálandó jármű."
+        },
+        "path": {
+          "name": "Fájl",
+          "description": "A CSV-fájl útvonala; üresen: vehicle_consumption_<jármű>.csv a konfigurációs mappában."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "A rögzítő nincs beállítva: nincsenek importálható előzmények."
+    },
+    "no_odometer": {
+      "message": "Még nincs kilométeróra-állás: add meg a szerviznél lévőt."
+    },
+    "no_interval": {
+      "message": "Még nincs intervallum: add meg a távolságot a következő szervizig."
+    },
+    "path_not_allowed": {
+      "message": "{path} az engedélyezett mappákon kívül van (konfigurációs mappa vagy allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} rejtett mappában van (például .storage): az exportálás oda nem ír."
+    },
+    "path_not_csv": {
+      "message": "{path} nem CSV-fájl (.csv): az exportálás csak CSV-fájlokat ír."
     }
   },
   "selector": {

@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ por km"
+      },
+      "next_service": {
+        "name": "Próxima revisão",
+        "state_attributes": {
+          "last_service": {
+            "name": "Última revisão"
+          },
+          "last_service_odometer": {
+            "name": "Conta-quilómetros na última revisão"
+          },
+          "interval": {
+            "name": "Intervalo"
+          },
+          "overdue": {
+            "name": "Em atraso"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Quantos dias recuar na reconstrução (365 por predefinição). São usados os estados gravados onde o gravador ainda os tem (10 dias por predefinição) e, antes disso, as estatísticas horárias dos sensores. Os meses que o histórico não cobre por completo mantêm os dados já registados."
         }
       }
+    },
+    "log_service": {
+      "name": "Registar uma revisão",
+      "description": "Regista uma revisão do veículo: o sensor Próxima revisão conta a partir daí.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Veículo",
+          "description": "O veículo revisto."
+        },
+        "odometer": {
+          "name": "Conta-quilómetros",
+          "description": "Conta-quilómetros na revisão, na unidade do sensor. A leitura atual se omitido."
+        },
+        "interval": {
+          "name": "Intervalo",
+          "description": "Distância até à próxima revisão, na unidade do sensor do conta-quilómetros. A registada antes se omitida; 0 desativa o lembrete."
+        }
+      }
+    },
+    "export": {
+      "name": "Exportar para CSV",
+      "description": "Escreve cada viagem, abastecimento e carregamento guardados num ficheiro CSV. Só administradores.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Veículo",
+          "description": "O veículo a exportar."
+        },
+        "path": {
+          "name": "Ficheiro",
+          "description": "Caminho do ficheiro CSV; vehicle_consumption_<veículo>.csv na pasta de configuração se vazio."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "O gravador não está configurado: não há histórico para importar."
+    },
+    "no_odometer": {
+      "message": "Ainda sem leitura do conta-quilómetros: indique a da revisão."
+    },
+    "no_interval": {
+      "message": "Ainda sem intervalo: indique a distância até à próxima revisão."
+    },
+    "path_not_allowed": {
+      "message": "{path} está fora das pastas permitidas (pasta de configuração ou allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} está numa pasta oculta (como .storage): a exportação não escreve aí."
+    },
+    "path_not_csv": {
+      "message": "{path} não é um ficheiro CSV (.csv): a exportação só escreve ficheiros CSV."
     }
   },
   "selector": {

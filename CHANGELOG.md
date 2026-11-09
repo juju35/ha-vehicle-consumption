@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.0 - 2026-11-09
+
+### Features
+- **Service reminder**: `vehicle_consumption.log_service` logs a service (at the current or a given odometer) and the distance to the next one; the new **Next service** sensor gives the distance left, negative once overdue, with the last service and the interval as attributes. Kept across restarts and through `reset_statistics`; `interval: 0` turns it off.
+- **CSV export**: `vehicle_consumption.export` writes every trip, refuel and charge kept to a CSV file (in the configuration folder or `allowlist_external_dirs`, never a hidden folder), one row each with the same columns. Administrators only; returns the path and the number of rows.
+
 ## 1.6.0 - 2026-11-09
 
 ### Performance

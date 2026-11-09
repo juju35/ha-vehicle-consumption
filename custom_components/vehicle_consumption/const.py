@@ -6,7 +6,7 @@ from datetime import timedelta
 from typing import Final
 
 DOMAIN: Final = "vehicle_consumption"
-VERSION: Final = "1.6.0"
+VERSION: Final = "1.7.0"
 
 # Entry data
 CONF_DEVICE_ID: Final = "device_id"
@@ -104,6 +104,10 @@ SERVICE_ADD_REFUEL: Final = "add_refuel"
 SERVICE_ADD_CHARGE: Final = "add_charge"
 SERVICE_RESET_STATISTICS: Final = "reset_statistics"
 SERVICE_IMPORT_HISTORY: Final = "import_history"
+SERVICE_LOG_SERVICE: Final = "log_service"
+SERVICE_EXPORT: Final = "export"
+ATTR_INTERVAL: Final = "interval"
+ATTR_PATH: Final = "path"
 # How far back the history is read by default (days): the recorded states first, the hourly statistics before.
 DEFAULT_HISTORY_DAYS: Final = HISTORY_DAYS
 MAX_HISTORY_DAYS: Final = 730
