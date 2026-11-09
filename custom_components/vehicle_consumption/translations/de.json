@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ pro km"
+      },
+      "next_service": {
+        "name": "Nächster Service",
+        "state_attributes": {
+          "last_service": {
+            "name": "Letzter Service"
+          },
+          "last_service_odometer": {
+            "name": "Kilometerstand beim letzten Service"
+          },
+          "interval": {
+            "name": "Intervall"
+          },
+          "overdue": {
+            "name": "Überfällig"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Wie weit zurück neu aufgebaut wird (standardmäßig 365). Wo der Recorder die Zustände noch hat (standardmäßig 10 Tage), werden sie verwendet, davor die stündlichen Statistiken der Sensoren. Monate, die der Verlauf nicht vollständig abdeckt, behalten die erfassten Werte."
         }
       }
+    },
+    "log_service": {
+      "name": "Service eintragen",
+      "description": "Trägt einen Service am Fahrzeug ein: der Sensor Nächster Service zählt von dort herunter.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Fahrzeug",
+          "description": "Das gewartete Fahrzeug."
+        },
+        "odometer": {
+          "name": "Kilometerzähler",
+          "description": "Kilometerstand beim Service, in der Einheit des Kilometerzählers. Ohne Angabe der aktuelle Stand."
+        },
+        "interval": {
+          "name": "Intervall",
+          "description": "Strecke bis zum nächsten Service, in der Einheit des Kilometerzählers. Ohne Angabe das zuvor eingetragene; 0 schaltet die Erinnerung aus."
+        }
+      }
+    },
+    "export": {
+      "name": "Als CSV exportieren",
+      "description": "Schreibt jede gespeicherte Fahrt, Betankung und Ladung in eine CSV-Datei. Nur für Administratoren.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Fahrzeug",
+          "description": "Das zu exportierende Fahrzeug."
+        },
+        "path": {
+          "name": "Datei",
+          "description": "Pfad der CSV-Datei; leer: vehicle_consumption_[Fahrzeug].csv im Konfigurationsordner."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "Der Recorder ist nicht eingerichtet: Es gibt keinen Verlauf zum Importieren."
+    },
+    "no_odometer": {
+      "message": "Noch kein Kilometerstand: gib den des Services an."
+    },
+    "no_interval": {
+      "message": "Noch kein Intervall: gib die Strecke bis zum nächsten Service an."
+    },
+    "path_not_allowed": {
+      "message": "{path} liegt außerhalb der erlaubten Ordner (Konfigurationsordner oder allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} liegt in einem versteckten Ordner (wie .storage): Der Export schreibt dort nicht."
+    },
+    "path_not_csv": {
+      "message": "{path} ist keine CSV-Datei (.csv): Der Export schreibt nur CSV-Dateien."
     }
   },
   "selector": {

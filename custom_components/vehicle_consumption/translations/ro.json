@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ pe km"
+      },
+      "next_service": {
+        "name": "Următoarea revizie",
+        "state_attributes": {
+          "last_service": {
+            "name": "Ultima revizie"
+          },
+          "last_service_odometer": {
+            "name": "Kilometraj la ultima revizie"
+          },
+          "interval": {
+            "name": "Interval"
+          },
+          "overdue": {
+            "name": "Întârziată"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Cât de departe în trecut se reconstruiește (365 implicit). Stările înregistrate sunt folosite acolo unde înregistratorul le mai are (10 zile implicit), iar înainte de asta statisticile orare ale senzorilor. Lunile pe care istoricul nu le acoperă complet păstrează ce a fost urmărit."
         }
       }
+    },
+    "log_service": {
+      "name": "Înregistrează o revizie",
+      "description": "Înregistrează o revizie a vehiculului: senzorul Următoarea revizie numără de acolo.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Vehicul",
+          "description": "Vehiculul revizuit."
+        },
+        "odometer": {
+          "name": "Kilometraj",
+          "description": "Kilometrajul la revizie, în unitatea senzorului. Citirea actuală dacă lipsește."
+        },
+        "interval": {
+          "name": "Interval",
+          "description": "Distanța până la următoarea revizie, în unitatea senzorului de kilometraj. Cea de dinainte dacă lipsește; 0 oprește memento-ul."
+        }
+      }
+    },
+    "export": {
+      "name": "Exportă în CSV",
+      "description": "Scrie fiecare călătorie, alimentare și încărcare păstrate într-un fișier CSV. Doar administratori.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Vehicul",
+          "description": "Vehiculul de exportat."
+        },
+        "path": {
+          "name": "Fișier",
+          "description": "Calea fișierului CSV; gol: vehicle_consumption_[vehicul].csv în dosarul de configurare."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "Înregistratorul nu este configurat: nu există istoric de importat."
+    },
+    "no_odometer": {
+      "message": "Încă nu există kilometraj: indică-l pe cel de la revizie."
+    },
+    "no_interval": {
+      "message": "Încă nu există interval: indică distanța până la următoarea revizie."
+    },
+    "path_not_allowed": {
+      "message": "{path} este în afara dosarelor permise (dosarul de configurare sau allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} se află într-un dosar ascuns (precum .storage): exportul nu scrie acolo."
+    },
+    "path_not_csv": {
+      "message": "{path} nu este un fișier CSV (.csv): exportul scrie doar fișiere CSV."
     }
   },
   "selector": {

@@ -21,7 +21,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import VehicleConsumptionConfigEntry
 from .const import UNIT_ENERGY_CONSUMPTION, UNIT_FUEL_CONSUMPTION, UNIT_MI_PER_KWH, UNIT_MPG
 from .entity import VehicleConsumptionEntity
-from .tracker import ENERGY, FUEL, ConsumptionTracker, Refill
+from .tracker import ENERGY, FUEL, KM_PER_MILE, ConsumptionTracker, Refill
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -172,6 +172,16 @@ SENSORS: tuple[VehicleSensorDescription, ...] = (
 )
 
 
+# Distance left before the next service (negative once overdue): unknown until vehicle_consumption.log_service.
+NEXT_SERVICE = VehicleSensorDescription(
+    key="next_service",
+    device_class=SensorDeviceClass.DISTANCE,
+    native_unit_of_measurement=UnitOfLength.KILOMETERS,
+    suggested_display_precision=0,
+    value_fn=lambda t, imperial: t.service_remaining(),
+)
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: VehicleConsumptionConfigEntry,
@@ -181,6 +191,7 @@ async def async_setup_entry(
     tracked = {FUEL: tracker.tracks_fuel, ENERGY: tracker.tracks_energy}
     entities: list[SensorEntity] = [ConsumptionSensor(tracker)]
     entities.extend(VehicleSensor(tracker, d) for d in SENSORS if d.kind is None or tracked[d.kind])
+    entities.append(NextServiceSensor(tracker, NEXT_SERVICE))
     if tracker.tracks_fuel:
         entities.append(LastRefillSensor(tracker, FUEL))
     if tracker.tracks_energy:
@@ -332,3 +343,20 @@ class LastRefillSensor(VehicleConsumptionEntity, SensorEntity):
         summary = last.summary("liters" if self._kind == FUEL else "energy") if last else {}
         amount = "liters" if self._kind == FUEL else "energy"
         return {key: summary.get(key) for key in (amount, "cost", "odometer", "source")}
+
+
+class NextServiceSensor(VehicleSensor):
+    """Distance left before the next service, with the last service logged and the interval."""
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any] | None:
+        service = self.tracker.service
+        if not service:
+            return None
+        miles = KM_PER_MILE if self.tracker.imperial else 1.0
+        return {
+            "last_service": service.get("date"),
+            "last_service_odometer": round(service["odometer"] / miles, 1),
+            "interval": round(service["interval"] / miles, 1),
+            "overdue": (self.tracker.service_remaining() or 0) < 0,
+        }

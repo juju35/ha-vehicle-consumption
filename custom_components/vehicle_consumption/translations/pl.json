@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ na km"
+      },
+      "next_service": {
+        "name": "Następny serwis",
+        "state_attributes": {
+          "last_service": {
+            "name": "Ostatni serwis"
+          },
+          "last_service_odometer": {
+            "name": "Przebieg przy ostatnim serwisie"
+          },
+          "interval": {
+            "name": "Interwał"
+          },
+          "overdue": {
+            "name": "Zaległy"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Jak daleko wstecz odtworzyć (domyślnie 365). Używane są zarejestrowane stany tam, gdzie rejestrator je jeszcze ma (domyślnie 10 dni), a wcześniej godzinowe statystyki sensorów. Miesiące, których historia nie obejmuje w całości, zachowują już zebrane dane."
         }
       }
+    },
+    "log_service": {
+      "name": "Zapisz serwis",
+      "description": "Zapisuje serwis pojazdu: czujnik Następny serwis odlicza od tego miejsca.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Pojazd",
+          "description": "Serwisowany pojazd."
+        },
+        "odometer": {
+          "name": "Licznik przebiegu",
+          "description": "Przebieg przy serwisie, w jednostce czujnika przebiegu. Bez podania: bieżący odczyt."
+        },
+        "interval": {
+          "name": "Interwał",
+          "description": "Dystans do następnego serwisu, w jednostce czujnika przebiegu. Bez podania: poprzedni; 0 wyłącza przypomnienie."
+        }
+      }
+    },
+    "export": {
+      "name": "Eksportuj do CSV",
+      "description": "Zapisuje każdą zachowaną podróż, tankowanie i ładowanie do pliku CSV. Tylko administratorzy.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Pojazd",
+          "description": "Pojazd do eksportu."
+        },
+        "path": {
+          "name": "Plik",
+          "description": "Ścieżka pliku CSV; puste: vehicle_consumption_[pojazd].csv w folderze konfiguracji."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "Rejestrator nie jest skonfigurowany: brak historii do zaimportowania."
+    },
+    "no_odometer": {
+      "message": "Brak odczytu przebiegu: podaj przebieg przy serwisie."
+    },
+    "no_interval": {
+      "message": "Brak interwału: podaj dystans do następnego serwisu."
+    },
+    "path_not_allowed": {
+      "message": "{path} jest poza dozwolonymi folderami (folder konfiguracji lub allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} znajduje się w ukrytym folderze (np. .storage): eksport tam nie zapisuje."
+    },
+    "path_not_csv": {
+      "message": "{path} nie jest plikiem CSV (.csv): eksport zapisuje tylko pliki CSV."
     }
   },
   "selector": {

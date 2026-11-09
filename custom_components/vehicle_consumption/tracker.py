@@ -26,6 +26,7 @@ from typing import Any
 
 from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import CALLBACK_TYPE, Event, EventStateChangedData, HomeAssistant, State, callback
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.event import async_track_state_change_event, async_track_time_interval
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
@@ -58,6 +59,7 @@ from .const import (
     DEFAULT_HISTORY_DAYS,
     DEFAULT_REFUEL_THRESHOLD,
     DEFAULT_TRIP_GAP,
+    DOMAIN,
     ESTIMATE_STEPS,
     ESTIMATE_WINDOW_KM,
     EVENT_TRIP_ENDED,
@@ -424,6 +426,9 @@ class ConsumptionTracker:
         # While replaying an hourly statistic: the hour it counts (start, end], shared between the months it spans.
         self._span: tuple[datetime, datetime] | None = None
         # The recorder's history has been read once (at the first start, or after an update adding it).
+        # Service reminder ({odometer (km), date, interval (km)}), from vehicle_consumption.log_service. Not part of
+        # the statistics: a reset of the statistics keeps it.
+        self.service: dict[str, Any] | None = None
         self.history_imported = False
         # Oldest time the recorder's history was read from: nothing older is ever asked for again.
         self.history_from: datetime | None = None
@@ -1514,6 +1519,17 @@ class ConsumptionTracker:
         self._known_prices = {
             str(k): price for k, v in (data.get("prices") or {}).items() if (price := _float(v)) is not None
         }
+        service = data.get("service")
+        if (
+            isinstance(service, dict)
+            and _float(service.get("odometer")) is not None
+            and _positive(service.get("interval"))
+        ):
+            self.service = {
+                "odometer": _float(service["odometer"]),
+                "date": service.get("date"),
+                "interval": _float(service["interval"]),
+            }
 
     def _dump(self) -> dict[str, Any]:
         return {
@@ -1538,7 +1554,50 @@ class ConsumptionTracker:
             "history_from": _iso(self.history_from),
             "trip_announced": _iso(self._announced),
             "prices": dict(self._known_prices),
+            "service": dict(self.service) if self.service else None,
         }
+
+    # ── Service reminder ────────────────────────────────────────────────────
+
+    @callback
+    def async_log_service(self, odometer: float | None = None, interval: float | None = None) -> None:
+        """A service was done: at `odometer` (the odometer sensor's unit), else the current odometer.
+
+        `interval`: the distance to the next one (the odometer sensor's unit), else the one logged before; 0 turns the
+        reminder off.
+        """
+        factor = _UNIT_FACTORS[CONF_ODOMETER].get(self.odometer_unit, 1.0)
+        if interval is not None and interval <= 0:
+            self.service = None
+        else:
+            at = odometer * factor if odometer is not None else self.odometer
+            every = interval * factor if interval is not None else (self.service or {}).get("interval")
+            if at is None:
+                raise ServiceValidationError(translation_domain=DOMAIN, translation_key="no_odometer")
+            if not every:
+                raise ServiceValidationError(translation_domain=DOMAIN, translation_key="no_interval")
+            self.service = {"odometer": at, "date": dt_util.utcnow().isoformat(), "interval": every}
+        self._store.async_delay_save(self._dump, SAVE_DELAY)
+        self._notify_listeners()
+
+    def service_remaining(self) -> float | None:
+        """Kilometres left before the next service (negative once overdue), None without a reminder."""
+        if not self.service or self.odometer is None:
+            return None
+        return round(self.service["odometer"] + self.service["interval"] - self.odometer, 1)
+
+    # ── CSV export ──────────────────────────────────────────────────────────
+
+    def export_rows(self) -> list[dict[str, Any]]:
+        """Every trip, refuel and charge kept, newest first, in the units chosen: one row each, the same columns."""
+        rows: list[dict[str, Any]] = []
+        rows += [{"type": "trip", **self._trip_summary(t, self.imperial)} for t in self.trips]
+        rows += [{"type": "refuel", **e.summary("liters", self.imperial)} for e in self.refuels]
+        rows += [{"type": "charge", **e.summary("energy", self.imperial)} for e in self.charges]
+        for row in rows:
+            row.setdefault("start", row.get("time"))
+        rows.sort(key=lambda r: str(r.get("start") or ""), reverse=True)
+        return rows
 
     async def async_save(self) -> None:
         """Write now (on unload: a reload must lose nothing)."""

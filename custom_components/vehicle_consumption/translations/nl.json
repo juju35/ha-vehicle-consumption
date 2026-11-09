@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ per km"
+      },
+      "next_service": {
+        "name": "Volgende onderhoudsbeurt",
+        "state_attributes": {
+          "last_service": {
+            "name": "Laatste onderhoudsbeurt"
+          },
+          "last_service_odometer": {
+            "name": "Kilometerstand bij de laatste beurt"
+          },
+          "interval": {
+            "name": "Interval"
+          },
+          "overdue": {
+            "name": "Te laat"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Hoe ver terug opnieuw op te bouwen (standaard 365). De vastgelegde statussen worden gebruikt waar de recorder ze nog heeft (standaard 10 dagen), daarvoor de uurstatistieken van de sensoren. Maanden die de geschiedenis niet volledig dekt, behouden de al bijgehouden gegevens."
         }
       }
+    },
+    "log_service": {
+      "name": "Onderhoudsbeurt noteren",
+      "description": "Noteert een onderhoudsbeurt van het voertuig: de sensor Volgende onderhoudsbeurt telt vanaf daar af.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Voertuig",
+          "description": "Het onderhouden voertuig."
+        },
+        "odometer": {
+          "name": "Kilometerstand",
+          "description": "Kilometerstand bij de beurt, in de eenheid van de kilometerteller. Zonder: de huidige stand."
+        },
+        "interval": {
+          "name": "Interval",
+          "description": "Afstand tot de volgende beurt, in de eenheid van de kilometerteller. Zonder: het eerder genoteerde; 0 zet de herinnering uit."
+        }
+      }
+    },
+    "export": {
+      "name": "Exporteren naar CSV",
+      "description": "Schrijft elke bewaarde rit, tankbeurt en laadbeurt naar een CSV-bestand. Alleen beheerders.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Voertuig",
+          "description": "Het te exporteren voertuig."
+        },
+        "path": {
+          "name": "Bestand",
+          "description": "Pad van het CSV-bestand; leeg: vehicle_consumption_[voertuig].csv in de configuratiemap."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "De recorder is niet ingesteld: er is geen geschiedenis om te importeren."
+    },
+    "no_odometer": {
+      "message": "Nog geen kilometerstand: geef die van de beurt op."
+    },
+    "no_interval": {
+      "message": "Nog geen interval: geef de afstand tot de volgende beurt op."
+    },
+    "path_not_allowed": {
+      "message": "{path} ligt buiten de toegestane mappen (configuratiemap of allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} staat in een verborgen map (zoals .storage): de export schrijft daar niet."
+    },
+    "path_not_csv": {
+      "message": "{path} is geen CSV-bestand (.csv): de export schrijft alleen CSV-bestanden."
     }
   },
   "selector": {

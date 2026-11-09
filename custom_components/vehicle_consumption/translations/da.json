@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ pr. km"
+      },
+      "next_service": {
+        "name": "Næste service",
+        "state_attributes": {
+          "last_service": {
+            "name": "Seneste service"
+          },
+          "last_service_odometer": {
+            "name": "Kilometertal ved seneste service"
+          },
+          "interval": {
+            "name": "Interval"
+          },
+          "overdue": {
+            "name": "Forsinket"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Hvor langt tilbage der genopbygges (365 som standard). De optagede tilstande bruges, hvor optageren stadig har dem (10 dage som standard), og før det sensorernes timestatistik. Måneder, som historikken ikke dækker helt, beholder det, der blev registreret."
         }
       }
+    },
+    "log_service": {
+      "name": "Registrér en service",
+      "description": "Registrerer en service på køretøjet: sensoren Næste service tæller ned derfra.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Køretøj",
+          "description": "Køretøjet, der blev serviceret."
+        },
+        "odometer": {
+          "name": "Kilometertæller",
+          "description": "Kilometertal ved servicen, i kilometertællerens enhed. Uden: den aktuelle aflæsning."
+        },
+        "interval": {
+          "name": "Interval",
+          "description": "Afstand til næste service, i kilometertællerens enhed. Uden: den tidligere; 0 slår påmindelsen fra."
+        }
+      }
+    },
+    "export": {
+      "name": "Eksportér til CSV",
+      "description": "Skriver hver gemt tur, tankning og opladning til en CSV-fil. Kun administratorer.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Køretøj",
+          "description": "Køretøjet, der eksporteres."
+        },
+        "path": {
+          "name": "Fil",
+          "description": "Sti til CSV-filen; tom: vehicle_consumption_[køretøj].csv i konfigurationsmappen."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "Optageren er ikke konfigureret: der er ingen historik at importere."
+    },
+    "no_odometer": {
+      "message": "Ingen kilometeraflæsning endnu: angiv den ved servicen."
+    },
+    "no_interval": {
+      "message": "Intet interval endnu: angiv afstanden til næste service."
+    },
+    "path_not_allowed": {
+      "message": "{path} er uden for de tilladte mapper (konfigurationsmappen eller allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} ligger i en skjult mappe (som .storage): eksporten skriver ikke der."
+    },
+    "path_not_csv": {
+      "message": "{path} er ikke en CSV-fil (.csv): eksporten skriver kun CSV-filer."
     }
   },
   "selector": {

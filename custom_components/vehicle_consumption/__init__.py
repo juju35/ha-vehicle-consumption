@@ -11,8 +11,8 @@ from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import EVENT_HOMEASSISTANT_STARTED, Platform
-from homeassistant.core import CoreState, Event, HomeAssistant, ServiceCall
-from homeassistant.exceptions import ServiceValidationError
+from homeassistant.core import CoreState, Event, HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
+from homeassistant.exceptions import ServiceValidationError, Unauthorized, UnknownUser
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.service import async_register_admin_service
 from homeassistant.helpers.typing import ConfigType
@@ -22,8 +22,10 @@ from .const import (
     ATTR_COST,
     ATTR_DAYS,
     ATTR_ENERGY,
+    ATTR_INTERVAL,
     ATTR_LITERS,
     ATTR_ODOMETER,
+    ATTR_PATH,
     ATTR_PRICE,
     CARD_URL,
     CONF_NAME,
@@ -32,10 +34,13 @@ from .const import (
     MAX_HISTORY_DAYS,
     SERVICE_ADD_CHARGE,
     SERVICE_ADD_REFUEL,
+    SERVICE_EXPORT,
     SERVICE_IMPORT_HISTORY,
+    SERVICE_LOG_SERVICE,
     SERVICE_RESET_STATISTICS,
     VERSION,
 )
+from .export import async_export
 from .tracker import ENERGY, FUEL, ConsumptionTracker
 
 _LOGGER = logging.getLogger(__name__)
@@ -131,6 +136,35 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     async def import_history(call: ServiceCall) -> None:
         if not await tracker(call).async_import_history(call.data[ATTR_DAYS]):
             raise ServiceValidationError(translation_domain=DOMAIN, translation_key="no_recorder")
+
+    async def log_service(call: ServiceCall) -> None:
+        tracker(call).async_log_service(call.data.get(ATTR_ODOMETER), call.data.get(ATTR_INTERVAL))
+
+    # Logged from a dashboard like a refuel: open to every user.
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_LOG_SERVICE,
+        log_service,
+        _ENTRY_SCHEMA.extend({vol.Optional(ATTR_ODOMETER): _POSITIVE, vol.Optional(ATTR_INTERVAL): vol.Coerce(float)}),
+    )
+
+    async def export(call: ServiceCall) -> ServiceResponse:
+        # Admin only, as async_register_admin_service does (it takes no supports_response before 2025.1).
+        if call.context.user_id:
+            user = await hass.auth.async_get_user(call.context.user_id)
+            if user is None:
+                raise UnknownUser(context=call.context)
+            if not user.is_admin:
+                raise Unauthorized(context=call.context)
+        return await async_export(hass, tracker(call), call.data.get(ATTR_PATH))
+
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_EXPORT,
+        export,
+        schema=_ENTRY_SCHEMA.extend({vol.Optional(ATTR_PATH): cv.string}),
+        supports_response=SupportsResponse.OPTIONAL,
+    )
 
     # Destructive or heavy: admins only. Refuels and charges stay open, logged from dashboards by any user.
     async_register_admin_service(hass, DOMAIN, SERVICE_RESET_STATISTICS, reset, _ENTRY_SCHEMA)

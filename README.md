@@ -36,6 +36,8 @@ It comes with a **Lovelace card** showing the tank and battery gauges, the key f
 - **CO₂**: the CO₂ of the fuel burnt (by fuel type: petrol, diesel, LPG, E85) and of the energy charged (grid factor in g/kWh, French grid by default), per trip, per month and per km
 - **History** kept across restarts: the last 24 months, and every trip, refuel and charge of the last 365 days, rebuilt from the recorder for the days the tracking does not cover yet
 - **Actions** to log a refuel or a charge by hand (`add_refuel`, `add_charge`) to start over (`reset_statistics`) or to rebuild everything from the recorded history (`import_history`)
+- **Service reminder**: log a service with its interval (`log_service`), and the **Next service** sensor counts the distance left, negative once overdue
+- **CSV export** of every trip, refuel and charge kept (`export`), for a spreadsheet
 - **Lovelace card bundled with the integration**, added automatically to the dashboard resources (nothing to add by hand): fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart (consumption, distance, cost or CO₂), CO₂ per km under the cost per km, recent trips and refuels or charges, a pulsing dot while driving, a popup to log a refuel or a charge; visual editor
 - UI setup, no YAML; English, French, German, Spanish, Italian, Dutch, Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian, Greek and Serbian (Cyrillic and Latin)
 
@@ -199,6 +201,42 @@ data:
   config_entry_id: 01JC0EXAMPLE0000000000000
   energy: 31.2
   price: 0.2516
+```
+
+#### `vehicle_consumption.log_service`
+
+Logs a service done on the vehicle, at `odometer` (the odometer sensor's unit; the current reading when left out), with `interval`, the distance to the next one (the odometer sensor's unit; the one logged before when left out, `0` turns the reminder off). The **Next service** sensor (`sensor.<vehicle>_next_service`) then gives the distance left, negative once overdue, with `last_service`, `last_service_odometer`, `interval` and `overdue` as attributes. Kept across restarts and through `reset_statistics`. Open to every user, like a refuel.
+
+```yaml
+action: vehicle_consumption.log_service
+data:
+  config_entry_id: 01JC0EXAMPLE0000000000000
+  interval: 15000
+```
+
+A reminder 500 km before:
+
+```yaml
+triggers:
+  - trigger: numeric_state
+    entity_id: sensor.my_car_next_service
+    below: 500
+actions:
+  - action: notify.mobile_app_phone
+    data:
+      message: "Service due in {{ states('sensor.my_car_next_service') | int }} km"
+```
+
+#### `vehicle_consumption.export`
+
+Writes every trip, refuel and charge kept (the last 365 days) to a CSV file, newest first, in the units chosen: one row each with `type` (`trip`, `refuel`, `charge`), `start`, `end`, `distance`, `fuel`, `energy`, `liters`, `cost`, `price`, `odometer`, the consumptions, `co2`, `source` and `estimated`. `path` is optional: `vehicle_consumption_<vehicle>.csv` in the configuration folder by default; a relative path is inside the configuration folder, an absolute one must be in the configuration folder or in `allowlist_external_dirs`; it must end in `.csv`, and hidden folders such as `.storage` are refused. Returns the path and the number of rows. Administrators only.
+
+```yaml
+action: vehicle_consumption.export
+data:
+  config_entry_id: 01JC0EXAMPLE0000000000000
+  path: exports/car.csv
+response_variable: result  # {"path": "/config/exports/car.csv", "rows": 412}
 ```
 
 #### `vehicle_consumption.reset_statistics`

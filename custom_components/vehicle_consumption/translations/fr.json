@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ par km"
+      },
+      "next_service": {
+        "name": "Prochain entretien",
+        "state_attributes": {
+          "last_service": {
+            "name": "Dernier entretien"
+          },
+          "last_service_odometer": {
+            "name": "Kilométrage au dernier entretien"
+          },
+          "interval": {
+            "name": "Intervalle"
+          },
+          "overdue": {
+            "name": "En retard"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Jusqu’où remonter (365 par défaut). Les états enregistrés servent là où l’enregistreur les a encore (10 jours par défaut), les statistiques horaires des capteurs avant. Les mois que l’historique ne couvre pas entièrement gardent ce qui a été suivi."
         }
       }
+    },
+    "log_service": {
+      "name": "Noter un entretien",
+      "description": "Note un entretien du véhicule : le capteur Prochain entretien décompte à partir de là.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Véhicule",
+          "description": "Le véhicule entretenu."
+        },
+        "odometer": {
+          "name": "Compteur kilométrique",
+          "description": "Kilométrage à l'entretien, dans l'unité du capteur de kilométrage. Le relevé actuel si absent."
+        },
+        "interval": {
+          "name": "Intervalle",
+          "description": "Distance jusqu'au prochain entretien, dans l'unité du capteur de kilométrage. Celle notée avant si absente ; 0 désactive le rappel."
+        }
+      }
+    },
+    "export": {
+      "name": "Exporter en CSV",
+      "description": "Écrit chaque trajet, plein et recharge conservés dans un fichier CSV. Administrateurs uniquement.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Véhicule",
+          "description": "Le véhicule à exporter."
+        },
+        "path": {
+          "name": "Fichier",
+          "description": "Chemin du fichier CSV ; vehicle_consumption_[véhicule].csv dans le dossier de configuration si vide."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "L’enregistreur n’est pas configuré : il n’y a pas d’historique à importer."
+    },
+    "no_odometer": {
+      "message": "Pas encore de kilométrage : indiquez celui de l'entretien."
+    },
+    "no_interval": {
+      "message": "Pas encore d'intervalle : indiquez la distance jusqu'au prochain entretien."
+    },
+    "path_not_allowed": {
+      "message": "{path} est en dehors des dossiers autorisés (dossier de configuration ou allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} est dans un dossier caché (comme .storage) : l'export n'y écrit pas."
+    },
+    "path_not_csv": {
+      "message": "{path} n'est pas un fichier CSV (.csv) : l'export n'écrit que des fichiers CSV."
     }
   },
   "selector": {

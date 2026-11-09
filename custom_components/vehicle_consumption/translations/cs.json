@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ na km"
+      },
+      "next_service": {
+        "name": "Další servis",
+        "state_attributes": {
+          "last_service": {
+            "name": "Poslední servis"
+          },
+          "last_service_odometer": {
+            "name": "Stav tachometru při posledním servisu"
+          },
+          "interval": {
+            "name": "Interval"
+          },
+          "overdue": {
+            "name": "Po termínu"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Jak daleko do minulosti se má obnovit (výchozí 365). Zaznamenané stavy se použijí tam, kde je zapisovač ještě má (výchozí 10 dní), předtím hodinové statistiky senzorů. Měsíce, které historie nepokrývá úplně, si ponechají sledované údaje."
         }
       }
+    },
+    "log_service": {
+      "name": "Zapsat servis",
+      "description": "Zapíše servis vozidla: senzor Další servis odpočítává odtud.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Vozidlo",
+          "description": "Servisované vozidlo."
+        },
+        "odometer": {
+          "name": "Počítadlo kilometrů",
+          "description": "Stav tachometru při servisu, v jednotce senzoru. Bez něj: aktuální stav."
+        },
+        "interval": {
+          "name": "Interval",
+          "description": "Vzdálenost do dalšího servisu, v jednotce senzoru tachometru. Bez něj: předchozí; 0 vypne připomínku."
+        }
+      }
+    },
+    "export": {
+      "name": "Exportovat do CSV",
+      "description": "Zapíše každou uchovanou jízdu, tankování a nabíjení do souboru CSV. Pouze správci.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Vozidlo",
+          "description": "Vozidlo k exportu."
+        },
+        "path": {
+          "name": "Soubor",
+          "description": "Cesta k souboru CSV; prázdné: vehicle_consumption_[vozidlo].csv ve složce konfigurace."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "Zapisovač není nastaven: není k dispozici žádná historie k importu."
+    },
+    "no_odometer": {
+      "message": "Zatím žádný stav tachometru: zadejte stav při servisu."
+    },
+    "no_interval": {
+      "message": "Zatím žádný interval: zadejte vzdálenost do dalšího servisu."
+    },
+    "path_not_allowed": {
+      "message": "{path} je mimo povolené složky (konfigurační složka nebo allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} je ve skryté složce (například .storage): export tam nezapisuje."
+    },
+    "path_not_csv": {
+      "message": "{path} není soubor CSV (.csv): export zapisuje pouze soubory CSV."
     }
   },
   "selector": {

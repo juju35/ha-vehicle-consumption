@@ -296,6 +296,23 @@
       },
       "co2_per_km": {
         "name": "CO₂ por km"
+      },
+      "next_service": {
+        "name": "Próximo mantenimiento",
+        "state_attributes": {
+          "last_service": {
+            "name": "Último mantenimiento"
+          },
+          "last_service_odometer": {
+            "name": "Odómetro en el último mantenimiento"
+          },
+          "interval": {
+            "name": "Intervalo"
+          },
+          "overdue": {
+            "name": "Atrasado"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,38 @@
           "description": "Hasta dónde reconstruir (365 por defecto). Se usan los estados registrados donde el registrador aún los tiene (10 días por defecto) y, antes, las estadísticas horarias de los sensores. Los meses que el historial no cubre por completo conservan los datos ya registrados."
         }
       }
+    },
+    "log_service": {
+      "name": "Registrar un mantenimiento",
+      "description": "Registra un mantenimiento del vehículo: el sensor Próximo mantenimiento cuenta desde ahí.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Vehículo",
+          "description": "El vehículo revisado."
+        },
+        "odometer": {
+          "name": "Cuentakilómetros",
+          "description": "Odómetro en el mantenimiento, en la unidad del sensor de odómetro. La lectura actual si se omite."
+        },
+        "interval": {
+          "name": "Intervalo",
+          "description": "Distancia hasta el próximo mantenimiento, en la unidad del sensor de odómetro. La registrada antes si se omite; 0 desactiva el recordatorio."
+        }
+      }
+    },
+    "export": {
+      "name": "Exportar a CSV",
+      "description": "Escribe cada trayecto, repostaje y carga guardados en un archivo CSV. Solo administradores.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Vehículo",
+          "description": "El vehículo a exportar."
+        },
+        "path": {
+          "name": "Archivo",
+          "description": "Ruta del archivo CSV; vehicle_consumption_[vehículo].csv en la carpeta de configuración si está vacía."
+        }
+      }
     }
   },
   "exceptions": {
@@ -386,6 +435,21 @@
     },
     "no_recorder": {
       "message": "El registrador no está configurado: no hay historial que importar."
+    },
+    "no_odometer": {
+      "message": "Aún no hay lectura del odómetro: indica la del mantenimiento."
+    },
+    "no_interval": {
+      "message": "Aún no hay intervalo: indica la distancia hasta el próximo mantenimiento."
+    },
+    "path_not_allowed": {
+      "message": "{path} está fuera de las carpetas permitidas (carpeta de configuración o allowlist_external_dirs)."
+    },
+    "path_hidden": {
+      "message": "{path} está en una carpeta oculta (como .storage): la exportación no escribe allí."
+    },
+    "path_not_csv": {
+      "message": "{path} no es un archivo CSV (.csv): la exportación solo escribe archivos CSV."
     }
   },
   "selector": {
