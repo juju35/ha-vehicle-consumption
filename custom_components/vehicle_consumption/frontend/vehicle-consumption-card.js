@@ -6,7 +6,7 @@
  * Served and added to the dashboard resources by the integration.
  * https://github.com/juju35/ha-vehicle-consumption
  */
-var VEHICLE_CONSUMPTION_CARD_VERSION = '1.7.1';
+var VEHICLE_CONSUMPTION_CARD_VERSION = '1.8.0';
 
 const VC_I18N = {
   en: {
@@ -56,6 +56,7 @@ const VC_I18N = {
     ed_entity: 'Vehicle',
     ed_entity_helper: 'Found automatically; leave empty to use the first vehicle',
     ed_title: 'Title',
+    ed_show_title: 'Show title',
     ed_title_helper: 'Leave empty for the vehicle name',
     ed_chart: 'Monthly chart',
     ed_chart_metric: 'Chart shows',
@@ -121,6 +122,7 @@ const VC_I18N = {
     ed_entity: 'Véhicule',
     ed_entity_helper: 'Trouvé automatiquement ; laisser vide pour utiliser le premier véhicule',
     ed_title: 'Titre',
+    ed_show_title: 'Afficher le titre',
     ed_title_helper: 'Laisser vide pour le nom du véhicule',
     ed_chart: 'Graphique mensuel',
     ed_chart_metric: 'Le graphique montre',
@@ -186,6 +188,7 @@ const VC_I18N = {
     ed_entity: 'Fahrzeug',
     ed_entity_helper: 'Automatisch gefunden; leer lassen, um das erste Fahrzeug zu verwenden',
     ed_title: 'Titel',
+    ed_show_title: 'Titel anzeigen',
     ed_title_helper: 'Leer lassen für den Fahrzeugnamen',
     ed_chart: 'Monatsdiagramm',
     ed_chart_metric: 'Diagramm zeigt',
@@ -251,6 +254,7 @@ const VC_I18N = {
     ed_entity: 'Vehículo',
     ed_entity_helper: 'Encontrado automáticamente; déjalo vacío para usar el primer vehículo',
     ed_title: 'Título',
+    ed_show_title: 'Mostrar el título',
     ed_title_helper: 'Déjalo vacío para el nombre del vehículo',
     ed_chart: 'Gráfico mensual',
     ed_chart_metric: 'El gráfico muestra',
@@ -316,6 +320,7 @@ const VC_I18N = {
     ed_entity: 'Veicolo',
     ed_entity_helper: 'Trovato automaticamente; lascia vuoto per usare il primo veicolo',
     ed_title: 'Titolo',
+    ed_show_title: 'Mostra il titolo',
     ed_title_helper: 'Lascia vuoto per il nome del veicolo',
     ed_chart: 'Grafico mensile',
     ed_chart_metric: 'Il grafico mostra',
@@ -381,6 +386,7 @@ const VC_I18N = {
     ed_entity: 'Voertuig',
     ed_entity_helper: 'Automatisch gevonden; laat leeg om het eerste voertuig te gebruiken',
     ed_title: 'Titel',
+    ed_show_title: 'Titel tonen',
     ed_title_helper: 'Laat leeg voor de naam van het voertuig',
     ed_chart: 'Maandgrafiek',
     ed_chart_metric: 'Grafiek toont',
@@ -446,6 +452,7 @@ const VC_I18N = {
     ed_entity: 'Veículo',
     ed_entity_helper: 'Encontrado automaticamente; deixe vazio para usar o primeiro veículo',
     ed_title: 'Título',
+    ed_show_title: 'Mostrar o título',
     ed_title_helper: 'Deixe vazio para o nome do veículo',
     ed_chart: 'Gráfico mensal',
     ed_chart_metric: 'O gráfico mostra',
@@ -511,6 +518,7 @@ const VC_I18N = {
     ed_entity: 'Pojazd',
     ed_entity_helper: 'Wyszukiwany automatycznie; pozostaw puste, aby użyć pierwszego pojazdu',
     ed_title: 'Tytuł',
+    ed_show_title: 'Pokaż tytuł',
     ed_title_helper: 'Pozostaw puste, aby użyć nazwy pojazdu',
     ed_chart: 'Wykres miesięczny',
     ed_chart_metric: 'Wykres pokazuje',
@@ -576,6 +584,7 @@ const VC_I18N = {
     ed_entity: 'Vehicul',
     ed_entity_helper: 'Găsit automat; lasă gol pentru a folosi primul vehicul',
     ed_title: 'Titlu',
+    ed_show_title: 'Afișează titlul',
     ed_title_helper: 'Lasă gol pentru numele vehiculului',
     ed_chart: 'Grafic lunar',
     ed_chart_metric: 'Graficul arată',
@@ -641,6 +650,7 @@ const VC_I18N = {
     ed_entity: 'Køretøj',
     ed_entity_helper: 'Findes automatisk; lad feltet stå tomt for at bruge det første køretøj',
     ed_title: 'Titel',
+    ed_show_title: 'Vis titel',
     ed_title_helper: 'Lad feltet stå tomt for køretøjets navn',
     ed_chart: 'Månedligt diagram',
     ed_chart_metric: 'Diagrammet viser',
@@ -706,6 +716,7 @@ const VC_I18N = {
     ed_entity: 'Fordon',
     ed_entity_helper: 'Hittas automatiskt; lämna tomt för att använda det första fordonet',
     ed_title: 'Titel',
+    ed_show_title: 'Visa rubrik',
     ed_title_helper: 'Lämna tomt för fordonets namn',
     ed_chart: 'Månadsdiagram',
     ed_chart_metric: 'Diagrammet visar',
@@ -771,6 +782,7 @@ const VC_I18N = {
     ed_entity: 'Превозно средство',
     ed_entity_helper: 'Намира се автоматично; оставете празно, за да се използва първото превозно средство',
     ed_title: 'Заглавие',
+    ed_show_title: 'Показване на заглавието',
     ed_title_helper: 'Оставете празно за името на превозното средство',
     ed_chart: 'Месечна диаграма',
     ed_chart_metric: 'Диаграмата показва',
@@ -836,6 +848,7 @@ const VC_I18N = {
     ed_entity: 'Автомобиль',
     ed_entity_helper: 'Находится автоматически; оставьте пустым, чтобы использовать первый автомобиль',
     ed_title: 'Заголовок',
+    ed_show_title: 'Показывать заголовок',
     ed_title_helper: 'Оставьте пустым, чтобы использовать название автомобиля',
     ed_chart: 'Ежемесячная диаграмма',
     ed_chart_metric: 'Диаграмма показывает',
@@ -901,6 +914,7 @@ const VC_I18N = {
     ed_entity: 'Автомобіль',
     ed_entity_helper: 'Знаходиться автоматично; залиште порожнім, щоб використати перший автомобіль',
     ed_title: 'Заголовок',
+    ed_show_title: 'Показувати заголовок',
     ed_title_helper: 'Залиште порожнім, щоб використати назву автомобіля',
     ed_chart: 'Щомісячна діаграма',
     ed_chart_metric: 'Діаграма показує',
@@ -966,6 +980,7 @@ const VC_I18N = {
     ed_entity: 'Jármű',
     ed_entity_helper: 'Automatikusan megtalálva; hagyd üresen az első jármű használatához',
     ed_title: 'Cím',
+    ed_show_title: 'Cím megjelenítése',
     ed_title_helper: 'Hagyd üresen a jármű nevéhez',
     ed_chart: 'Havi diagram',
     ed_chart_metric: 'A diagram mutatja',
@@ -1031,6 +1046,7 @@ const VC_I18N = {
     ed_entity: 'Vozidlo',
     ed_entity_helper: 'Nájdené automaticky; nechajte prázdne, ak chcete použiť prvé vozidlo',
     ed_title: 'Názov',
+    ed_show_title: 'Zobraziť názov',
     ed_title_helper: 'Nechajte prázdne pre názov vozidla',
     ed_chart: 'Mesačný graf',
     ed_chart_metric: 'Graf zobrazuje',
@@ -1096,6 +1112,7 @@ const VC_I18N = {
     ed_entity: 'Vozidlo',
     ed_entity_helper: 'Nalezeno automaticky; ponechte prázdné, chcete-li použít první vozidlo',
     ed_title: 'Název',
+    ed_show_title: 'Zobrazit název',
     ed_title_helper: 'Ponechte prázdné pro název vozidla',
     ed_chart: 'Měsíční graf',
     ed_chart_metric: 'Graf zobrazuje',
@@ -1161,6 +1178,7 @@ const VC_I18N = {
     ed_entity: 'Vozilo',
     ed_entity_helper: 'Najdeno samodejno; pustite prazno, da se uporabi prvo vozilo',
     ed_title: 'Naslov',
+    ed_show_title: 'Prikaži naslov',
     ed_title_helper: 'Pustite prazno za ime vozila',
     ed_chart: 'Mesečni graf',
     ed_chart_metric: 'Graf prikazuje',
@@ -1226,6 +1244,7 @@ const VC_I18N = {
     ed_entity: 'Transportlīdzeklis',
     ed_entity_helper: 'Atrasts automātiski; atstājiet tukšu, lai izmantotu pirmo transportlīdzekli',
     ed_title: 'Virsraksts',
+    ed_show_title: 'Rādīt virsrakstu',
     ed_title_helper: 'Atstājiet tukšu, lai izmantotu transportlīdzekļa nosaukumu',
     ed_chart: 'Mēneša diagramma',
     ed_chart_metric: 'Diagramma rāda',
@@ -1291,6 +1310,7 @@ const VC_I18N = {
     ed_entity: 'Όχημα',
     ed_entity_helper: 'Βρίσκεται αυτόματα· αφήστε κενό για να χρησιμοποιηθεί το πρώτο όχημα',
     ed_title: 'Τίτλος',
+    ed_show_title: 'Εμφάνιση τίτλου',
     ed_title_helper: 'Αφήστε κενό για το όνομα του οχήματος',
     ed_chart: 'Μηνιαίο γράφημα',
     ed_chart_metric: 'Το γράφημα δείχνει',
@@ -1356,6 +1376,7 @@ const VC_I18N = {
     ed_entity: 'Возило',
     ed_entity_helper: 'Проналази се аутоматски; оставите празно да би се користило прво возило',
     ed_title: 'Наслов',
+    ed_show_title: 'Прикажи наслов',
     ed_title_helper: 'Оставите празно за назив возила',
     ed_chart: 'Месечни графикон',
     ed_chart_metric: 'Графикон приказује',
@@ -1421,6 +1442,7 @@ const VC_I18N = {
     ed_entity: 'Vozilo',
     ed_entity_helper: 'Pronalazi se automatski; ostavite prazno da bi se koristilo prvo vozilo',
     ed_title: 'Naslov',
+    ed_show_title: 'Prikaži naslov',
     ed_title_helper: 'Ostavite prazno za naziv vozila',
     ed_chart: 'Mesečni grafikon',
     ed_chart_metric: 'Grafikon prikazuje',
@@ -1456,6 +1478,7 @@ const vcEsc = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 const VC_DEFAULTS = {
+  show_title: true,
   chart: true,
   chart_metric: 'consumption',
   months: 6,
@@ -1652,6 +1675,8 @@ class VehicleConsumptionCard extends HTMLElement {
 
   setConfig(config) {
     this._config = { ...VC_DEFAULTS, ...config };
+    // show_title: the header's title, hidden by the stylesheet (the driving chip stays)
+    this.toggleAttribute?.('hide-title', config.show_title === false);
     if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
     this._sig = null;
     this._render();
@@ -2261,6 +2286,7 @@ class VehicleConsumptionCard extends HTMLElement {
                color: var(--primary-text-color); white-space: nowrap; }
       .title:has(.drive) { min-width: calc(4ch + 18px); }
       .tname { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+      :host([hide-title]) .head .tname { display: none; }
       .pill { flex: 0 1 auto; min-width: 0; max-width: 50%; overflow: hidden; text-overflow: ellipsis; font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 999px; white-space: nowrap;
               color: var(--ci); background: color-mix(in srgb, var(--c) 14%, transparent); font-variant-numeric: tabular-nums; }
       .pdot { display: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
@@ -2545,6 +2571,7 @@ class VehicleConsumptionCardEditor extends HTMLElement {
     this._form.schema = [
       { name: 'entity', selector: { select: { mode: 'dropdown', options: vehicles } } },
       { name: 'title', selector: { text: {} } },
+      { name: 'show_title', selector: { boolean: {} } },
       { name: 'chart', selector: { boolean: {} } },
       // What the chart shows only matters with the chart.
       ...(c.chart === false
