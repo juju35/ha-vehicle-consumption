@@ -325,6 +325,7 @@ entity: sensor.my_car_consumption
 |---|---|---|
 | `entity` | Auto | The vehicle: its **Consumption** sensor. Leave empty for the first vehicle |
 | `title` | Vehicle name | Card title |
+| `show_title` | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `chart` | `true` | Monthly bar chart |
 | `chart_metric` | `consumption` | What the chart shows: `consumption`, `distance`, `cost` or `co2` (kg) |
 | `months` | `6` | Number of months in the chart (3–12) |
