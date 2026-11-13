@@ -8,12 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/juju35/ha-vehicle-consumption/blob/main/LICENSE)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/julienstep9)
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/custom_components/vehicle_consumption/brand/dark_logo.png">
-    <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/custom_components/vehicle_consumption/brand/logo.png" alt="Vehicle Consumption" height="64" width="400">
-  </picture>
-</p>
+<p align="center"><img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/custom_components/vehicle_consumption/brand/icon.png" alt="Vehicle Consumption" width="120"></p>
 
 Home Assistant integration that turns your car's own sensors into a **fuel and energy logbook**: consumption in **L/100 km or kWh/100 km** per trip, per month and on average, **refuels and charges detected on their own**, and what driving **costs you per kilometre**. Fuel, electric and plug-in hybrid vehicles alike.
 
