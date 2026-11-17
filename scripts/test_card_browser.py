@@ -32,8 +32,8 @@ SHEET = """() => {
 }"""
 
 
-# The illustrated header: the pill shows its whole label from 245 to 500 px, right after a readable title (at most
-# about half of the title row) or on its own line under the subtitle; the header buttons (log a refuel, the mini
+# The illustrated header: the pill shows its whole label (or its dot alone) from 245 to 500 px, right after the whole
+# title or on its own line under the subtitle (placed by measurement, see _fitPill); the header buttons (log a refuel, the mini
 # card's expand / collapse) are 24 px, on one line at the banner's top right corner, the zoom 5 px from it.
 PILL = """async ([hass, tag, zoom, width]) => {
     const frames = (n) => new Promise((r) => { const step = () => (n-- > 0 ? requestAnimationFrame(step) : r()); step(); });
@@ -52,13 +52,13 @@ PILL = """async ([hass, tag, zoom, width]) => {
     const pill = r.querySelector(".banner .pill");
     if (!pill) return ["no pill"];
     const txt = pill.querySelector(".ptxt");
-    if (txt.scrollWidth > txt.clientWidth + 0.5 || !txt.clientWidth) out.push("label cut");
+    if (getComputedStyle(txt).display !== "none" && txt.scrollWidth > txt.clientWidth + 0.5) out.push("label cut");
     const nb = r.querySelector(".banner .tname").getBoundingClientRect();
     if (nb.width < 24) out.push(`title ${Math.round(nb.width)}px`);
     const pb = pill.getBoundingClientRect();
     const onRow = Math.abs(pb.top + pb.height / 2 - (nb.top + nb.height / 2)) < 3;
-    const row = r.querySelector(".trow").getBoundingClientRect();
-    if (onRow && pb.width > row.width * 0.51 + 0.5) out.push(`pill ${Math.round(pb.width)} of ${Math.round(row.width)}px`);
+    if (onRow && r.querySelector(".banner .tname").scrollWidth > r.querySelector(".banner .tname").clientWidth + 1 && txt.clientWidth)
+      out.push("title cut beside the pill");
     const bb = r.querySelector(".banner").getBoundingClientRect();
     if (pb.right > bb.right - 4 || pb.bottom > bb.bottom - 10) out.push("pill out of the banner");
     const btns = [...r.querySelectorAll(".hbtns > *")].map((b) => b.getBoundingClientRect());

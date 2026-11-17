@@ -56,6 +56,7 @@ const context = {
   HTMLElement: class {},
   customElements: { get: () => true, define() {} },
   window: {},
+  getComputedStyle: () => ({ columnGap: '8px', display: 'flex' }),
   document: {
     createElement: () => fakeNode(),
     addEventListener: (type, fn) => (listeners[type] = fn),
@@ -367,8 +368,8 @@ test('the average is the pill\'s: its tile gives the odometer, the average back 
   assert.match(out, /<span class="ks pill-echo">Average 6.1 L\/100 km<\/span>/);
   const css = styles();
   assert.match(css, /\.ks\.pill-echo \{ display: none; \}/);
-  assert.match(css, /\.head:has\(\.pill\.dot\) ~ \.kpis \.ks\.pill-echo \{ display: block; \}/);
-  assert.match(css, /@container \(max-width: 200px\) \{ \.banner ~ \.kpis \.ks\.pill-echo \{ display: block; \} \}/);
+  assert.match(css, /:is\(\.head, \.banner\):has\(\.titles\.dotonly\) ~ \.kpis \.ks\.pill-echo \{ display: block; \}/);
+  assert.match(css, /@container \(max-width: 200px\) \{ :is\(\.head, \.banner\) ~ \.kpis \.ks\.pill-echo \{ display: block; \} \}/);
   // Without an odometer, the average tile stays; a plug-in hybrid keeps its two averages (the pill gives one).
   card.hass = hassWith(fuelAttrs({ odometer: null }));
   assert.match(html(card), /k-avg/);
@@ -775,22 +776,24 @@ const contrast = (a, b) => {
   return (x + 0.05) / (y + 0.05);
 };
 
-test('header: the title keeps a few letters, the pill shrinks and turns into a dot on a narrow card', () => {
-  // A zero basis: a long title no longer takes the pill's room (the pill keeps its whole label while it fits).
-  assert.match(rule('.title'), /flex: 1 1 0;/);
-  assert.match(rule('.title'), /min-width: 4ch/);
+test('header: the pill right after the whole title, else under the subtitle, else its dot (both headers)', () => {
   assert.match(rule('.tname'), /text-overflow: ellipsis/);
-  const pill = rule('.pill');
-  for (const p of ['flex: 0 1 auto', 'min-width: 0', 'max-width: 50%', 'overflow: hidden', 'text-overflow: ellipsis']) {
-    assert.ok(pill.includes(p), p);
-  }
-  assert.match(rule('.pill.dot .ptxt'), /display: none/);
-  assert.match(rule('.pill.dot .pdot'), /display: block/);
+  // On the title row the pill keeps its whole label; the title is only cut when it does not fit alone.
+  assert.match(styles(), /\.titles \.trow > \.title \{ flex: 0 1 auto; min-width: 0; \}/);
+  assert.match(styles(), /\.titles \.trow > \.pill \{ flex: none; max-width: none; margin: 0; align-self: center; \}/);
+  assert.match(styles(), /\.titles\.below \.trow \{ display: contents; \}/);
+  assert.match(styles(), /\.titles\.dotonly \.trow > \.pill \.ptxt \{ display: none; \}/);
+  assert.match(styles(), /\.titles\.dotonly \.trow > \.pill \.pdot \{ display: block; \}/);
   for (const sel of ['.icon-btn', '.badge']) assert.match(rule(sel), /flex: none/);
-  const card = makeCard({ illustration: false });
-  card.hass = hassWith(fuelAttrs());
-  // The value stays readable for assistive technology and in the tooltip once only the dot shows.
-  assert.match(html(card), /class="pill" title="6.1 L\/100 km" aria-label="6.1 L\/100 km"><span class="pdot"><\/span><span class="ptxt">6.1 L\/100 km<\/span>/);
+  for (const illustration of [false, true]) {
+    const card = makeCard({ illustration });
+    card.hass = hassWith(fuelAttrs());
+    // The pill on the title row, right after the title; the value stays in the tooltip and for screen readers.
+    assert.match(
+      html(card),
+      /class="htxt titles">\s*<div class="trow"><div class="title"><span class="tname">Family car<\/span><\/div><div class="pill" title="6.1 L\/100 km" aria-label="6.1 L\/100 km"><span class="pdot"><\/span><span class="ptxt">6.1 L\/100 km<\/span>/,
+    );
+  }
 });
 
 test('width: the card keeps a width in a parent sized by its content, and still shrinks in a 1fr column', () => {
@@ -812,79 +815,74 @@ test('width: the card keeps a width in a parent sized by its content, and still 
   assert.doesNotMatch(css, /contain-intrinsic/);
 });
 
-test('narrow: 8 of 12 columns at least, tighter header gaps when the label needs them (measured, no width)', () => {
+test('narrow: 8 of 12 columns at least; the pill is placed by measurement, never by a container width', () => {
   assert.equal(makeCard().getGridOptions().min_columns, 8);
-  assert.match(styles(), /\.head:has\(\.pill\.tight\), \.head:has\(\.pill\.tight\) \.title \{ gap: 6px; \}/);
-  assert.match(styles(), /\.pill\.tight \{ padding: 1px 6px; \}/);
-  // A container width for them let a label fitting tight just under it turn into a dot just over it (277-278 px).
-  assert.doesNotMatch(styles(), /@container \(max-width: \d+px\) \{\s*\.head/);
+  assert.doesNotMatch(styles(), /@container \(max-width: \d+px\) \{\s*\.(head|banner \.(trow|pill))/);
+  assert.doesNotMatch(styles(), /data-wrap|\.pill\.(tight|dot)/);
 });
 
-// A pill stand-in: its label is `need` px wide in a box of `room` px (what the flex layout leaves it), `tight` px
-// more with the tighter header gaps.
-const fakePill = (need, room, tight = 0) => {
+// A title row stand-in: a `title` px title and a `pill` px pill in a row of `room` px; the classes the card sets on
+// the titles block.
+const fakeRow = (title, pill, room) => {
   const classes = new Set();
-  return {
+  const box = (w) => ({ getBoundingClientRect: () => ({ width: typeof w === 'function' ? w() : w }), style: {} });
+  const t = {
     classes,
-    classList: {
-      add: (...names) => {
-        for (const name of names) classes.add(name);
-      },
-      remove: (...names) => {
-        for (const name of names) classes.delete(name);
-      },
-    },
-    get scrollWidth() {
-      return classes.has('dot') ? 18 : need;
-    },
-    get clientWidth() {
-      return this.room + (classes.has('tight') ? tight : 0);
-    },
     room,
+    classList: {
+      add: (...n) => {
+        for (const c of n) classes.add(c);
+      },
+      remove: (...n) => {
+        for (const c of n) classes.delete(c);
+      },
+      replace: (a, b) => classes.delete(a) && classes.add(b),
+    },
+    closest: () => null,
   };
+  const name = box(title);
+  const chip = box(pill);
+  const row = { ...box(() => t.room), querySelector: () => name, querySelectorAll: () => [chip] };
+  t.querySelector = () => row;
+  return t;
 };
-const cardWithPill = (pill) => {
-  const card = makeCard();
+const cardWithRow = (t) => {
+  const card = makeCard({ illustration: false });
   card.hass = hassWith(fuelAttrs());
-  card.shadowRoot.querySelector = (sel) => (sel === '.pill' ? pill : null);
+  card.shadowRoot.querySelectorAll = (sel) => (sel === '.titles' ? [t] : []);
   return card;
 };
 
-test('pill: the whole label while it fits, else only the dot (measured on the label, any length)', () => {
-  // A long label (kWh/100 km) cut by 6 px: only the dot, not a label cut with an ellipsis.
-  const cut = fakePill(101, 95);
-  cardWithPill(cut)._fitPill();
-  assert.ok(cut.classes.has('dot'));
-  // The same room with a label that fits (L/100 km): the whole label.
-  const fits = fakePill(90, 95);
-  cardWithPill(fits)._fitPill();
-  assert.ok(!fits.classes.has('dot') && !fits.classes.has('tight'));
-  // Cut with the normal gaps, whole with the tighter ones: the label, tight, not the dot.
-  const tight = fakePill(101, 95, 8);
-  cardWithPill(tight)._fitPill();
-  assert.ok(tight.classes.has('tight') && !tight.classes.has('dot'));
-  // Measured again from the normal gaps at each call: room again, the normal gaps.
-  tight.room = 110;
-  cardWithPill(tight)._fitPill();
-  assert.ok(!tight.classes.has('tight') && !tight.classes.has('dot'));
+test('pill: beside the whole title, else under the subtitle, else its dot alone (measured, any length)', () => {
+  // 74 px title + 8 px gap + 92 px pill = 174 px: beside the title in 174 px, not in 173.
+  const fits = fakeRow(74, 92, 174);
+  cardWithRow(fits)._fitPill();
+  assert.deepEqual([...fits.classes], []);
+  const below = fakeRow(74, 92, 173);
+  cardWithRow(below)._fitPill();
+  assert.deepEqual([...below.classes], ['below']);
+  // A label wider than the whole row (classic header): its dot alone, not a label cut with an ellipsis.
+  const dot = fakeRow(74, 101, 95);
+  cardWithRow(dot)._fitPill();
+  assert.deepEqual([...dot.classes], ['dotonly']);
 });
 
 test('pill: a resize of a few pixels (no re-render) measures it again, both ways', () => {
-  const pill = fakePill(101, 95);
-  const card = cardWithPill(pill);
+  const t = fakeRow(74, 92, 173);
+  const card = cardWithRow(t);
   card.connectedCallback();
   const ro = observers[observers.length - 1];
   ro.fire(240);
   nextFrame();
   card._fitPill();
-  assert.ok(pill.classes.has('dot'));
-  // 5 px wider: under the re-render step, but the label now fits.
-  pill.room = 101;
+  assert.ok(t.classes.has('below'));
+  // 5 px wider: under the re-render step, but the pill now fits beside the title.
+  t.room = 180;
   ro.fire(245);
-  assert.ok(!pill.classes.has('dot'));
-  pill.room = 99;
+  assert.ok(!t.classes.has('below'));
+  t.room = 170;
   ro.fire(242);
-  assert.ok(pill.classes.has('dot'));
+  assert.ok(t.classes.has('below'));
   card.disconnectedCallback();
 });
 

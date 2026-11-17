@@ -1856,28 +1856,17 @@ const VC_BANNER_STYLE = `
       .banner .badge { position: relative; background: rgba(255,255,255,.62); box-shadow: inset 0 0 0 1px rgba(13,42,69,.12); }
       .banner.night .badge { background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14);
                              color: color-mix(in srgb, var(--c) 72%, #fff); }
-      .htxt { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-      /* The pill right after the title, in the level's colour on a frosted tint; the title is cut first (about four
-         characters kept). When it does not fit there (measured by the card, or a narrow card) it goes on its own
-         line under the subtitle, where it may run over the left of the scene; very narrow, its dot alone. */
-      .trow { display: flex; align-items: center; gap: 8px; min-width: 0; }
-      .banner .title { flex: 0 100 auto; min-width: 4ch; color: var(--sky-text); }
+      .htxt { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+      /* The pill in the level's colour on a frosted tint (where it goes: the rule in the card's styles, _fitPill). */
+      .banner .title { color: var(--sky-text); }
+      /* The title keeps about four characters even where the picture leaves almost no room (mini card, 2 buttons). */
+      .banner .titles .trow > .title { min-width: 4ch; }
       .banner .pill { display: inline-flex; align-items: center; gap: 4px; max-width: 51%; line-height: 16px; box-sizing: border-box; border-radius: 12px;
                       background: color-mix(in srgb, var(--c) 18%, rgba(255,255,255,.78)); color: color-mix(in srgb, var(--c) 45%, #0d2a45); }
       .banner.night .pill { background: color-mix(in srgb, var(--c) 30%, rgba(8,18,38,.55)); color: color-mix(in srgb, var(--c) 35%, #ffffff); }
       .banner .pdot { display: block; width: 7px; height: 7px; flex: none; }
       .banner .ptxt { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-      .banner[data-wrap] .htxt { gap: 0; }
-      .banner[data-wrap] .trow { display: contents; }
-      .banner[data-wrap] .pill { order: 9; align-self: flex-start; max-width: calc(100cqw - 80px); margin-top: 3px; }
-      @container (max-width: 260px) {
-        .banner .trow { display: contents; }
-        .banner .pill { order: 9; align-self: flex-start; max-width: calc(100cqw - 80px); margin-top: 3px; }
-      }
-      @container (max-width: 200px) {
-        .banner .pill { padding: 0; background: none; }
-        .banner .ptxt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-      }
+      .banner .titles.below { gap: 0; }
       .hsub { font-size: 13px; color: var(--sky-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
               font-variant-numeric: tabular-nums; }
       /* The header buttons (log a refuel, the mini card's expand / collapse) on one line at the banner's top right
@@ -2014,6 +2003,7 @@ class VehicleConsumptionCard extends HTMLElement {
       });
       this._ro.observe(this);
     }
+    document.fonts?.ready?.then(() => this._fitPill());
   }
 
   disconnectedCallback() {
@@ -2090,8 +2080,7 @@ class VehicleConsumptionCard extends HTMLElement {
             ? this._banner({ level: 'na', kind: 'fuel', name: c.title || this._t('title'), pill: this._t(why), scene: this._sceneData(null, 'fuel', null, 'na') })
             : `<div class="head">
           <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
-          <div class="title"><span class="tname">${vcEsc(c.title || this._t('title'))}</span></div>
-          ${this._pill(this._t(why))}
+          <div class="htxt titles"><div class="trow"><div class="title"><span class="tname">${vcEsc(c.title || this._t('title'))}</span></div>${this._pill(this._t(why))}</div></div>
         </div>`
         }
         <div class="empty">${vcEsc(this._t(`${why}_hint`, { entity }))}</div>
@@ -2136,9 +2125,8 @@ class VehicleConsumptionCard extends HTMLElement {
             ? this._banner({ level, kind, name: c.title || a.vehicle || this._t('title'), pill: avg, sub: this._t(a.driving ? 'driving' : 'average'), driving, buttons: add + this._zoomButton(), scene: this._sceneData(a, kind, f, level) })
             : `<div class="head">
           <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
-          <div class="title"><span class="tname">${vcEsc(c.title || a.vehicle || this._t('title'))}</span>${driving}</div>
+          <div class="htxt titles"><div class="trow"><div class="title"><span class="tname">${vcEsc(c.title || a.vehicle || this._t('title'))}</span>${driving}</div>${this._pill(avg)}</div></div>
           ${add}
-          ${this._pill(avg)}
           ${this._zoomButton()}
         </div>`
         }
@@ -2174,7 +2162,7 @@ class VehicleConsumptionCard extends HTMLElement {
           ${vcSceneSvg(scene)}
           <div class="head">
             <div class="badge"><ha-icon icon="${icon}"></ha-icon></div>
-            <div class="htxt">
+            <div class="htxt titles">
               <div class="trow"><div class="title"><span class="tname">${vcEsc(name)}</span>${driving}</div>${pill ? this._pill(pill) : ''}</div>
               ${sub ? `<div class="hsub" title="${vcEsc(sub)}">${vcEsc(sub)}</div>` : ''}
             </div>
@@ -2232,31 +2220,43 @@ class VehicleConsumptionCard extends HTMLElement {
     return `<div class="pill" title="${t}" aria-label="${t}"><span class="pdot"></span><span class="ptxt">${t}</span></div>`;
   }
 
-  // The whole label while it fits: the title (flex basis 0) gives its room down to 4 characters before the pill
-  // shrinks, so a cut label means the room is really missing; then tighter header gaps, then only the dot. Each
-  // step is measured, so a wider card never shows less (a dot) than a narrower one. Not laid out: the label.
+  // The status pill goes right after the title only when the whole title and the pill's whole label fit on that row;
+  // otherwise it takes a line of its own under the subtitle (.titles.below, the subtitle cut to one line). In the
+  // banner (where that line may run over the picture), when the titles still run below the top of the ground strip or
+  // out of the banner, and in the classic header when the label does not fit even alone, the pill keeps its dot alone,
+  // beside the title (.titles.dotonly). Measured in fractional pixels.
   _fitPill() {
-    const pill = this.shadowRoot?.querySelector('.pill');
-    if (!pill?.classList) return;
-    const banner = pill.closest?.('.banner');
-    if (banner) {
-      // Illustrated header: a pill cut next to the title goes on its own line under the subtitle. Fractional
-      // widths: scrollWidth / clientWidth are rounded and miss a label cut by less than a pixel.
-      banner.removeAttribute('data-wrap');
-      const have = pill.getBoundingClientRect().width;
-      pill.style.maxWidth = 'none';
-      pill.style.flex = 'none';
-      const need = pill.getBoundingClientRect().width;
-      pill.style.maxWidth = '';
-      pill.style.flex = '';
-      if (need > have + 0.01) banner.setAttribute('data-wrap', '');
-      return;
+    for (const t of this.shadowRoot?.querySelectorAll?.('.titles') || []) {
+      const row = t.querySelector('.trow');
+      const chips = row ? [...row.querySelectorAll(':scope > .pill')] : [];
+      if (!chips.length || !row.getBoundingClientRect) continue;
+      t.classList.remove('below', 'dotonly');
+      const name = row.querySelector(':scope > .title');
+      const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+      const widths = chips.map((c) => c.getBoundingClientRect().width);
+      let need = -gap;
+      if (name && getComputedStyle(name).display !== 'none') {
+        name.style.flex = 'none';
+        need = name.getBoundingClientRect().width;
+        name.style.flex = '';
+      }
+      for (const w of widths) need += gap + w;
+      const room = row.getBoundingClientRect().width + 0.01;
+      if (need <= room) continue;
+      t.classList.add('below');
+      const banner = t.closest('.banner');
+      const cut = !banner && widths.some((w) => w > room);
+      let out = false;
+      if (banner) {
+        const b = banner.getBoundingClientRect();
+        const floor = b.bottom - (banner.querySelector('.vc-road')?.getBoundingClientRect().height ?? 10) + 0.5;
+        out = [...t.querySelectorAll('.title, .hsub, .pill')].some((e) => {
+          const r = e.getBoundingClientRect();
+          return r.height && (r.bottom > floor || r.top < b.top - 0.5 || r.right > b.right + 0.5);
+        });
+      }
+      if (cut || out) t.classList.replace('below', 'dotonly');
     }
-    const cut = () => pill.scrollWidth > pill.clientWidth;
-    pill.classList.remove('tight', 'dot');
-    if (!cut()) return;
-    pill.classList.add('tight');
-    if (cut()) pill.classList.add('dot');
   }
 
   _bind() {
@@ -2688,16 +2688,25 @@ class VehicleConsumptionCard extends HTMLElement {
       .pill { flex: 0 1 auto; min-width: 0; max-width: 50%; overflow: hidden; text-overflow: ellipsis; font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 999px; white-space: nowrap;
               color: var(--ci); background: color-mix(in srgb, var(--c) 14%, transparent); font-variant-numeric: tabular-nums; }
       .pdot { display: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
-      /* Tighter header gaps once the whole label no longer fits with the normal ones (measured by _fitPill, not a
-         container width: a fixed width let a label that fitted tight just under it turn into a dot just over it). */
-      .head:has(.pill.tight), .head:has(.pill.tight) .title { gap: 6px; }
-      .pill.tight { padding: 1px 6px; }
-      /* Only the coloured dot (the text stays in title / aria-label) once the whole label no longer fits next to a
-         4-character title: measured on the label itself at each render and resize (_fitPill), so a longer label
-         (kWh/100 km, a translation) or a driving title turns into a dot only when the room is really missing. */
-      .pill.dot { padding: 5px; }
-      .pill.dot .ptxt { display: none; }
-      .pill.dot .pdot { display: block; }
+      .head > .titles { flex: 1 1 0; min-width: 0; }
+      /* The status pill, in every header: on the title row right after the title only when the whole title and the pill's
+         whole label fit there; otherwise on its own line under the subtitle, cut to one line; its dot alone, beside the
+         title, when the banner has no room left above its ground strip, or on a card of 200 px or less. Decided by
+         measurement (see _fitPill), so that every language and every width gets it right. */
+      .titles .trow { display: flex; align-items: center; gap: 8px; min-width: 0; width: 100%; }
+      .titles .trow > .title { flex: 0 1 auto; min-width: 0; }
+      .titles .trow > .pill { flex: none; max-width: none; margin: 0; align-self: center; }
+      .titles.below { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+      .titles.below > * { max-width: 100%; }
+      .titles.below .trow { display: contents; }
+      .titles.below .trow > .title { max-width: 100%; }
+      .titles.below .trow > .pill { order: 9; max-width: 100%; margin-top: 2px; align-self: flex-start; }
+      /* In the banner, a pill on its own line may run over the picture, up to the banner's edge. */
+      .banner .titles.below .trow > .pill { max-width: none; }
+      .titles.below :is(.hsub) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .titles.dotonly .trow > .pill { padding: 4px; } .titles.dotonly .trow > .pill .ptxt { display: none; }
+      .titles.dotonly .trow > .pill .pdot { display: block; }
+      @container (max-width: 200px) { .titles .trow > .pill { padding: 4px; } .titles .trow > .pill .ptxt { display: none; } .titles .trow > .pill .pdot { display: block; } }
       .icon-btn { all: unset; cursor: pointer; flex: none; width: 26px; height: 26px; border-radius: 50%;
                   display: grid; place-items: center; color: var(--secondary-text-color); }
       .icon-btn:hover { background: color-mix(in srgb, var(--secondary-text-color) 14%, transparent); color: var(--primary-text-color); }
@@ -2748,8 +2757,8 @@ class VehicleConsumptionCard extends HTMLElement {
             font-variant-numeric: tabular-nums; }
       /* The average is the header pill's: under the odometer only when the pill keeps just its dot. */
       .ks.pill-echo { display: none; }
-      .head:has(.pill.dot) ~ .kpis .ks.pill-echo { display: block; }
-      @container (max-width: 200px) { .banner ~ .kpis .ks.pill-echo { display: block; } }
+      :is(.head, .banner):has(.titles.dotonly) ~ .kpis .ks.pill-echo { display: block; }
+      @container (max-width: 200px) { :is(.head, .banner) ~ .kpis .ks.pill-echo { display: block; } }
       /* Narrow card (6 columns of a section): the unit under the value, long labels on two lines. */
       @container (max-width: 250px) {
         .kv small { display: block; margin-left: 0; white-space: normal; }
