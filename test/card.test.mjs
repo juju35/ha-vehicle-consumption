@@ -357,6 +357,23 @@ test('fuel: one fuel gauge, L/100 km tiles, refuels section but no charges, aver
   assert.match(out, /Logged by hand/);
 });
 
+test('the average is the pill\'s: its tile gives the odometer, the average back only when the pill keeps its dot', () => {
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs());
+  const out = html(card);
+  assert.match(out, /<div class="pill" title="6.1 L\/100 km"/);
+  assert.doesNotMatch(out, /k-avg/);
+  assert.match(out, /class="kpi k-odo"[\s\S]*?Odometer[\s\S]*?48,210<small>km<\/small>[\s\S]*?<span class="ks">9,800 km tracked<\/span>/);
+  assert.match(out, /<span class="ks pill-echo">Average 6.1 L\/100 km<\/span>/);
+  const css = styles();
+  assert.match(css, /\.ks\.pill-echo \{ display: none; \}/);
+  assert.match(css, /\.head:has\(\.pill\.dot\) ~ \.kpis \.ks\.pill-echo \{ display: block; \}/);
+  assert.match(css, /@container \(max-width: 200px\) \{ \.banner ~ \.kpis \.ks\.pill-echo \{ display: block; \} \}/);
+  // Without an odometer, the average tile stays; a plug-in hybrid keeps its two averages (the pill gives one).
+  card.hass = hassWith(fuelAttrs({ odometer: null }));
+  assert.match(html(card), /k-avg/);
+});
+
 test('electric: one battery gauge, kWh/100 km, charges section only', () => {
   const card = makeCard();
   const hass = hassWith(evAttrs());
@@ -1167,7 +1184,7 @@ function makeMini(config = {}) {
   return card;
 }
 
-test('mini card: compact view (gauges, last trip, average), its detail button opens the full card and back', () => {
+test('mini card: compact view (gauges, last trip, odometer), its detail button opens the full card and back', () => {
   const card = makeMini();
   card.hass = hassWith(fuelAttrs());
   let out = html(card);
@@ -1175,7 +1192,7 @@ test('mini card: compact view (gauges, last trip, average), its detail button op
   assert.match(out, /<ha-card class="lvl-ok mini/);
   assert.match(out, /class="gauge g-fuel/);
   assert.match(out, /k-trip/);
-  assert.match(out, /k-avg/);
+  assert.match(out, /k-odo/);
   assert.doesNotMatch(out, /k-month|k-cost|class="chart"|class="sections"|class="icon-btn add"/);
   assert.match(out, /class="zoom" title="Show details" aria-label="Show details" aria-expanded="false"/);
   // The badge keeps its 40 px.

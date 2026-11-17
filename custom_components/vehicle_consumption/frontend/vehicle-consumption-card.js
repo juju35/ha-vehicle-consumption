@@ -48,6 +48,7 @@ const VC_I18N = {
     liters: 'Fuel added',
     energy: 'Energy added',
     total_cost: 'Total cost',
+    tracked: '{v} tracked',
     odometer: 'Odometer',
     optional: 'optional',
     save: 'Save',
@@ -119,6 +120,7 @@ const VC_I18N = {
     liters: 'Carburant ajouté',
     energy: 'Énergie ajoutée',
     total_cost: 'Coût total',
+    tracked: '{v} suivis',
     odometer: 'Compteur',
     optional: 'facultatif',
     save: 'Enregistrer',
@@ -190,6 +192,7 @@ const VC_I18N = {
     liters: 'Getankte Menge',
     energy: 'Geladene Energie',
     total_cost: 'Gesamtkosten',
+    tracked: '{v} erfasst',
     odometer: 'Kilometerstand',
     optional: 'optional',
     save: 'Speichern',
@@ -261,6 +264,7 @@ const VC_I18N = {
     liters: 'Combustible añadido',
     energy: 'Energía añadida',
     total_cost: 'Coste total',
+    tracked: '{v} registrados',
     odometer: 'Cuentakilómetros',
     optional: 'opcional',
     save: 'Guardar',
@@ -332,6 +336,7 @@ const VC_I18N = {
     liters: 'Carburante aggiunto',
     energy: 'Energia aggiunta',
     total_cost: 'Costo totale',
+    tracked: '{v} registrati',
     odometer: 'Contachilometri',
     optional: 'facoltativo',
     save: 'Salva',
@@ -403,6 +408,7 @@ const VC_I18N = {
     liters: 'Getankte brandstof',
     energy: 'Geladen energie',
     total_cost: 'Totale kosten',
+    tracked: '{v} gevolgd',
     odometer: 'Kilometerstand',
     optional: 'optioneel',
     save: 'Opslaan',
@@ -474,6 +480,7 @@ const VC_I18N = {
     liters: 'Combustível abastecido',
     energy: 'Energia carregada',
     total_cost: 'Custo total',
+    tracked: '{v} registados',
     odometer: 'Conta-quilómetros',
     optional: 'opcional',
     save: 'Guardar',
@@ -545,6 +552,7 @@ const VC_I18N = {
     liters: 'Zatankowane paliwo',
     energy: 'Doładowana energia',
     total_cost: 'Koszt całkowity',
+    tracked: '{v} zarejestrowano',
     odometer: 'Licznik przebiegu',
     optional: 'opcjonalnie',
     save: 'Zapisz',
@@ -616,6 +624,7 @@ const VC_I18N = {
     liters: 'Combustibil adăugat',
     energy: 'Energie adăugată',
     total_cost: 'Cost total',
+    tracked: '{v} înregistrați',
     odometer: 'Kilometraj',
     optional: 'opțional',
     save: 'Salvează',
@@ -687,6 +696,7 @@ const VC_I18N = {
     liters: 'Tanket brændstof',
     energy: 'Tilført energi',
     total_cost: 'Samlet pris',
+    tracked: '{v} registreret',
     odometer: 'Kilometertæller',
     optional: 'valgfri',
     save: 'Gem',
@@ -758,6 +768,7 @@ const VC_I18N = {
     liters: 'Tankat bränsle',
     energy: 'Tillförd energi',
     total_cost: 'Total kostnad',
+    tracked: '{v} registrerade',
     odometer: 'Vägmätare',
     optional: 'valfritt',
     save: 'Spara',
@@ -829,6 +840,7 @@ const VC_I18N = {
     liters: 'Добавено гориво',
     energy: 'Добавена енергия',
     total_cost: 'Обща сума',
+    tracked: '{v} проследени',
     odometer: 'Одометър',
     optional: 'по избор',
     save: 'Запази',
@@ -900,6 +912,7 @@ const VC_I18N = {
     liters: 'Залитое топливо',
     energy: 'Полученная энергия',
     total_cost: 'Сумма',
+    tracked: '{v} учтено',
     odometer: 'Одометр',
     optional: 'необязательно',
     save: 'Сохранить',
@@ -971,6 +984,7 @@ const VC_I18N = {
     liters: 'Залите пальне',
     energy: 'Отримана енергія',
     total_cost: 'Сума',
+    tracked: '{v} враховано',
     odometer: 'Одометр',
     optional: "необов'язково",
     save: 'Зберегти',
@@ -1042,6 +1056,7 @@ const VC_I18N = {
     liters: 'Tankolt üzemanyag',
     energy: 'Töltött energia',
     total_cost: 'Teljes költség',
+    tracked: '{v} rögzítve',
     odometer: 'Kilométeróra',
     optional: 'nem kötelező',
     save: 'Mentés',
@@ -1113,6 +1128,7 @@ const VC_I18N = {
     liters: 'Natankované palivo',
     energy: 'Dodaná energia',
     total_cost: 'Celková cena',
+    tracked: '{v} zaznamenaných',
     odometer: 'Počítadlo kilometrov',
     optional: 'voliteľné',
     save: 'Uložiť',
@@ -1184,6 +1200,7 @@ const VC_I18N = {
     liters: 'Natankované palivo',
     energy: 'Dodaná energie',
     total_cost: 'Celková cena',
+    tracked: '{v} zaznamenáno',
     odometer: 'Počítadlo kilometrů',
     optional: 'volitelné',
     save: 'Uložit',
@@ -1255,6 +1272,7 @@ const VC_I18N = {
     liters: 'Natočeno gorivo',
     energy: 'Dodana energija',
     total_cost: 'Skupni strošek',
+    tracked: '{v} zabeleženih',
     odometer: 'Števec kilometrov',
     optional: 'neobvezno',
     save: 'Shrani',
@@ -1326,6 +1344,7 @@ const VC_I18N = {
     liters: 'Uzpildītā degviela',
     energy: 'Uzlādētā enerģija',
     total_cost: 'Kopējās izmaksas',
+    tracked: '{v} reģistrēti',
     odometer: 'Odometrs',
     optional: 'neobligāti',
     save: 'Saglabāt',
@@ -1397,6 +1416,7 @@ const VC_I18N = {
     liters: 'Καύσιμο που προστέθηκε',
     energy: 'Ενέργεια που προστέθηκε',
     total_cost: 'Κόστος',
+    tracked: '{v} καταγεγραμμένα',
     odometer: 'Χιλιομετρητής',
     optional: 'προαιρετικό',
     save: 'Αποθήκευση',
@@ -1468,6 +1488,7 @@ const VC_I18N = {
     liters: 'Сипано гориво',
     energy: 'Додата енергија',
     total_cost: 'Укупан трошак',
+    tracked: '{v} забележено',
     odometer: 'Километража',
     optional: 'опционо',
     save: 'Сачувај',
@@ -1539,6 +1560,7 @@ const VC_I18N = {
     liters: 'Sipano gorivo',
     energy: 'Dodata energija',
     total_cost: 'Ukupan trošak',
+    tracked: '{v} zabeleženo',
     odometer: 'Kilometraža',
     optional: 'opciono',
     save: 'Sačuvaj',
@@ -2284,7 +2306,7 @@ class VehicleConsumptionCard extends HTMLElement {
     ].filter(Boolean);
   }
 
-  _kpi(cls, label, icon, lines, sub) {
+  _kpi(cls, label, icon, lines, sub, echo = '') {
     const values = lines
       .map((l) => `<span class="kv">${vcEsc(l.v)}${l.v === VC_DASH || !l.unit ? '' : `<small>${vcEsc(l.unit)}</small>`}</span>`)
       .join('');
@@ -2292,7 +2314,8 @@ class VehicleConsumptionCard extends HTMLElement {
           <div class="kpi ${cls}">
             <span class="kl"><ha-icon icon="${icon}"></ha-icon>${vcEsc(label)}</span>
             ${values}
-            <span class="ks">${vcEsc(sub || VC_DASH)}</span>
+            <span class="ks">${vcEsc(sub || VC_DASH)}</span>${echo ? `
+            <span class="ks pill-echo">${vcEsc(`${this._t('average')} ${echo}`)}</span>` : ''}
           </div>`;
   }
 
@@ -2306,7 +2329,21 @@ class VehicleConsumptionCard extends HTMLElement {
     const total = a.total || {};
     const cpk = vcFinite(total.cost_per_km) ? total.cost_per_km : month.cost_per_km;
     const tripKpi = this._kpi('k-trip', this._t(a.driving ? 'trip_now' : 'trip'), 'mdi:map-marker-distance', this._cons(trip, kind, f), tripSub);
-    const avgKpi = this._kpi('k-avg', this._t('average'), 'mdi:chart-line', this._cons(total, kind, f), km(total.distance));
+    // The average is the header pill's figure: in its place the odometer, with the distance tracked under it (and the
+    // average, shown only when the pill keeps just its dot). A plug-in hybrid keeps its two averages (the pill gives one).
+    const avgKpi =
+      kind !== 'plugin_hybrid' && vcFinite(a.odometer)
+        ? this._kpi(
+            'k-odo',
+            this._t('odometer'),
+            'mdi:counter',
+            [{ v: f.num(a.odometer, 0), unit: u.dist }],
+            vcFinite(total.distance) ? this._t('tracked', { v: km(total.distance) }) : '',
+            this._cons(total, kind, f)
+              .map((l) => `${l.v} ${l.unit}`)
+              .join(' · '),
+          )
+        : this._kpi('k-avg', this._t('average'), 'mdi:chart-line', this._cons(total, kind, f), km(total.distance));
     if (compact) return tripKpi + avgKpi;
     return [
       tripKpi,
@@ -2699,7 +2736,7 @@ class VehicleConsumptionCard extends HTMLElement {
 
       .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
       @container (min-width: 560px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-      .kpi { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 8px 10px; border-radius: 10px;
+      .kpi { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 8px 10px; border-radius: 12px;
              background: var(--secondary-background-color, rgba(127,127,127,.08)); }
       .kl { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; color: var(--secondary-text-color);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -2709,6 +2746,10 @@ class VehicleConsumptionCard extends HTMLElement {
       .kv small { margin-left: 3px; font-size: 11px; font-weight: 500; color: var(--secondary-text-color); }
       .ks { font-size: 11px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             font-variant-numeric: tabular-nums; }
+      /* The average is the header pill's: under the odometer only when the pill keeps just its dot. */
+      .ks.pill-echo { display: none; }
+      .head:has(.pill.dot) ~ .kpis .ks.pill-echo { display: block; }
+      @container (max-width: 200px) { .banner ~ .kpis .ks.pill-echo { display: block; } }
       /* Narrow card (6 columns of a section): the unit under the value, long labels on two lines. */
       @container (max-width: 250px) {
         .kv small { display: block; margin-left: 0; }
