@@ -56,6 +56,7 @@ const context = {
   HTMLElement: class {},
   customElements: { get: () => true, define() {} },
   window: {},
+  getComputedStyle: () => ({ columnGap: '8px', display: 'flex' }),
   document: {
     createElement: () => fakeNode(),
     addEventListener: (type, fn) => (listeners[type] = fn),
@@ -344,16 +345,34 @@ test('fuel: one fuel gauge, L/100 km tiles, refuels section but no charges, aver
   const card = makeCard();
   card.hass = hassWith(fuelAttrs());
   const out = html(card);
-  assert.match(out, /mdi:gauge-low"/);
+  assert.match(out, /class="badge"><ha-icon icon="mdi:gas-station"/);
   assert.match(out, /g-fuel/);
   assert.doesNotMatch(out, /g-battery/);
   assert.match(out, /63 % · 31.5 L/);
-  assert.match(out, /class="ptxt">6.1 L\/100 km</);
+  assert.match(out, /class="trow"><div class="title"><span class="tname">[^<]*<\/span><\/div><div class="pill" title="6.1 L\/100 km"/, "the average in the pill, right after the title");
+  assert.match(out, /class="hsub" title="Average">Average</, "and what it is under it");
   assert.match(out, /5.7<small>L\/100 km/);
   assert.match(out, /€0.107<small>\/km/);
   assert.match(out, /data-section="refuels"/);
   assert.doesNotMatch(out, /data-section="charges"/);
   assert.match(out, /Logged by hand/);
+});
+
+test('the average is the pill\'s: its tile gives the odometer, the average back only when the pill keeps its dot', () => {
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs());
+  const out = html(card);
+  assert.match(out, /<div class="pill" title="6.1 L\/100 km"/);
+  assert.doesNotMatch(out, /k-avg/);
+  assert.match(out, /class="kpi k-odo"[\s\S]*?Odometer[\s\S]*?48,210<small>km<\/small>[\s\S]*?<span class="ks">9,800 km tracked<\/span>/);
+  assert.match(out, /<span class="ks pill-echo">Average 6.1 L\/100 km<\/span>/);
+  const css = styles();
+  assert.match(css, /\.ks\.pill-echo \{ display: none; \}/);
+  assert.match(css, /:is\(\.head, \.banner\):has\(\.titles\.dotonly\) ~ \.kpis \.ks\.pill-echo \{ display: block; \}/);
+  assert.match(css, /@container \(max-width: 200px\) \{ :is\(\.head, \.banner\) ~ \.kpis \.ks\.pill-echo \{ display: block; \} \}/);
+  // Without an odometer, the average tile stays; a plug-in hybrid keeps its two averages (the pill gives one).
+  card.hass = hassWith(fuelAttrs({ odometer: null }));
+  assert.match(html(card), /k-avg/);
 });
 
 test('electric: one battery gauge, kWh/100 km, charges section only', () => {
@@ -363,7 +382,7 @@ test('electric: one battery gauge, kWh/100 km, charges section only', () => {
   hass.states[SENSOR].attributes.unit_of_measurement = 'kWh/100 km';
   card.hass = hass;
   const out = html(card);
-  assert.match(out, /mdi:gauge-low"/);
+  assert.match(out, /class="badge"><ha-icon icon="mdi:ev-station"/);
   assert.match(out, /g-battery/);
   assert.doesNotMatch(out, /g-fuel/);
   assert.match(out, /16.1<small>kWh\/100 km/);
@@ -397,7 +416,7 @@ test('plugin hybrid: two gauges, both consumptions in the tiles, refuels and cha
     }),
   );
   const out = html(card);
-  assert.match(out, /mdi:gauge-low"/);
+  assert.match(out, /class="badge"><ha-icon icon="mdi:gas-station"/);
   assert.match(out, /g-fuel/);
   assert.match(out, /g-battery/);
   assert.match(out, /2.1<small>L\/100 km.*12.4<small>kWh\/100 km/s);
@@ -757,22 +776,24 @@ const contrast = (a, b) => {
   return (x + 0.05) / (y + 0.05);
 };
 
-test('header: the title keeps a few letters, the pill shrinks and turns into a dot on a narrow card', () => {
-  // A zero basis: a long title no longer takes the pill's room (the pill keeps its whole label while it fits).
-  assert.match(rule('.title'), /flex: 1 1 0;/);
-  assert.match(rule('.title'), /min-width: 4ch/);
+test('header: the pill right after the whole title, else under the subtitle, else its dot (both headers)', () => {
   assert.match(rule('.tname'), /text-overflow: ellipsis/);
-  const pill = rule('.pill');
-  for (const p of ['flex: 0 1 auto', 'min-width: 0', 'max-width: 50%', 'overflow: hidden', 'text-overflow: ellipsis']) {
-    assert.ok(pill.includes(p), p);
-  }
-  assert.match(rule('.pill.dot .ptxt'), /display: none/);
-  assert.match(rule('.pill.dot .pdot'), /display: block/);
+  // On the title row the pill keeps its whole label; the title is only cut when it does not fit alone.
+  assert.match(styles(), /\.titles \.trow > \.title \{ flex: 0 1 auto; min-width: 0; \}/);
+  assert.match(styles(), /\.titles \.trow > \.pill \{ flex: none; max-width: none; margin: 0; align-self: center; \}/);
+  assert.match(styles(), /\.titles\.below \.trow \{ display: contents; \}/);
+  assert.match(styles(), /\.titles\.dotonly \.trow > \.pill \.ptxt \{ display: none; \}/);
+  assert.match(styles(), /\.titles\.dotonly \.trow > \.pill \.pdot \{ display: block; \}/);
   for (const sel of ['.icon-btn', '.badge']) assert.match(rule(sel), /flex: none/);
-  const card = makeCard();
-  card.hass = hassWith(fuelAttrs());
-  // The value stays readable for assistive technology and in the tooltip once only the dot shows.
-  assert.match(html(card), /class="pill" title="6.1 L\/100 km" aria-label="6.1 L\/100 km"><span class="pdot"><\/span><span class="ptxt">6.1 L\/100 km<\/span>/);
+  for (const illustration of [false, true]) {
+    const card = makeCard({ illustration });
+    card.hass = hassWith(fuelAttrs());
+    // The pill on the title row, right after the title; the value stays in the tooltip and for screen readers.
+    assert.match(
+      html(card),
+      /class="htxt titles">\s*<div class="trow"><div class="title"><span class="tname">Family car<\/span><\/div><div class="pill" title="6.1 L\/100 km" aria-label="6.1 L\/100 km"><span class="pdot"><\/span><span class="ptxt">6.1 L\/100 km<\/span>/,
+    );
+  }
 });
 
 test('width: the card keeps a width in a parent sized by its content, and still shrinks in a 1fr column', () => {
@@ -794,79 +815,74 @@ test('width: the card keeps a width in a parent sized by its content, and still 
   assert.doesNotMatch(css, /contain-intrinsic/);
 });
 
-test('narrow: 8 of 12 columns at least, tighter header gaps when the label needs them (measured, no width)', () => {
+test('narrow: 8 of 12 columns at least; the pill is placed by measurement, never by a container width', () => {
   assert.equal(makeCard().getGridOptions().min_columns, 8);
-  assert.match(styles(), /\.head:has\(\.pill\.tight\), \.head:has\(\.pill\.tight\) \.title \{ gap: 6px; \}/);
-  assert.match(styles(), /\.pill\.tight \{ padding: 1px 6px; \}/);
-  // A container width for them let a label fitting tight just under it turn into a dot just over it (277-278 px).
-  assert.doesNotMatch(styles(), /@container \(max-width: \d+px\) \{\s*\.head/);
+  assert.doesNotMatch(styles(), /@container \(max-width: \d+px\) \{\s*\.(head|banner \.(trow|pill))/);
+  assert.doesNotMatch(styles(), /data-wrap|\.pill\.(tight|dot)/);
 });
 
-// A pill stand-in: its label is `need` px wide in a box of `room` px (what the flex layout leaves it), `tight` px
-// more with the tighter header gaps.
-const fakePill = (need, room, tight = 0) => {
+// A title row stand-in: a `title` px title and a `pill` px pill in a row of `room` px; the classes the card sets on
+// the titles block.
+const fakeRow = (title, pill, room) => {
   const classes = new Set();
-  return {
+  const box = (w) => ({ getBoundingClientRect: () => ({ width: typeof w === 'function' ? w() : w }), style: {} });
+  const t = {
     classes,
-    classList: {
-      add: (...names) => {
-        for (const name of names) classes.add(name);
-      },
-      remove: (...names) => {
-        for (const name of names) classes.delete(name);
-      },
-    },
-    get scrollWidth() {
-      return classes.has('dot') ? 18 : need;
-    },
-    get clientWidth() {
-      return this.room + (classes.has('tight') ? tight : 0);
-    },
     room,
+    classList: {
+      add: (...n) => {
+        for (const c of n) classes.add(c);
+      },
+      remove: (...n) => {
+        for (const c of n) classes.delete(c);
+      },
+      replace: (a, b) => classes.delete(a) && classes.add(b),
+    },
+    closest: () => null,
   };
+  const name = box(title);
+  const chip = box(pill);
+  const row = { ...box(() => t.room), querySelector: () => name, querySelectorAll: () => [chip] };
+  t.querySelector = () => row;
+  return t;
 };
-const cardWithPill = (pill) => {
-  const card = makeCard();
+const cardWithRow = (t) => {
+  const card = makeCard({ illustration: false });
   card.hass = hassWith(fuelAttrs());
-  card.shadowRoot.querySelector = (sel) => (sel === '.pill' ? pill : null);
+  card.shadowRoot.querySelectorAll = (sel) => (sel === '.titles' ? [t] : []);
   return card;
 };
 
-test('pill: the whole label while it fits, else only the dot (measured on the label, any length)', () => {
-  // A long label (kWh/100 km) cut by 6 px: only the dot, not a label cut with an ellipsis.
-  const cut = fakePill(101, 95);
-  cardWithPill(cut)._fitPill();
-  assert.ok(cut.classes.has('dot'));
-  // The same room with a label that fits (L/100 km): the whole label.
-  const fits = fakePill(90, 95);
-  cardWithPill(fits)._fitPill();
-  assert.ok(!fits.classes.has('dot') && !fits.classes.has('tight'));
-  // Cut with the normal gaps, whole with the tighter ones: the label, tight, not the dot.
-  const tight = fakePill(101, 95, 8);
-  cardWithPill(tight)._fitPill();
-  assert.ok(tight.classes.has('tight') && !tight.classes.has('dot'));
-  // Measured again from the normal gaps at each call: room again, the normal gaps.
-  tight.room = 110;
-  cardWithPill(tight)._fitPill();
-  assert.ok(!tight.classes.has('tight') && !tight.classes.has('dot'));
+test('pill: beside the whole title, else under the subtitle, else its dot alone (measured, any length)', () => {
+  // 74 px title + 8 px gap + 92 px pill = 174 px: beside the title in 174 px, not in 173.
+  const fits = fakeRow(74, 92, 174);
+  cardWithRow(fits)._fitPill();
+  assert.deepEqual([...fits.classes], []);
+  const below = fakeRow(74, 92, 173);
+  cardWithRow(below)._fitPill();
+  assert.deepEqual([...below.classes], ['below']);
+  // A label wider than the whole row (classic header): its dot alone, not a label cut with an ellipsis.
+  const dot = fakeRow(74, 101, 95);
+  cardWithRow(dot)._fitPill();
+  assert.deepEqual([...dot.classes], ['dotonly']);
 });
 
 test('pill: a resize of a few pixels (no re-render) measures it again, both ways', () => {
-  const pill = fakePill(101, 95);
-  const card = cardWithPill(pill);
+  const t = fakeRow(74, 92, 173);
+  const card = cardWithRow(t);
   card.connectedCallback();
   const ro = observers[observers.length - 1];
   ro.fire(240);
   nextFrame();
   card._fitPill();
-  assert.ok(pill.classes.has('dot'));
-  // 5 px wider: under the re-render step, but the label now fits.
-  pill.room = 101;
+  assert.ok(t.classes.has('below'));
+  // 5 px wider: under the re-render step, but the pill now fits beside the title.
+  t.room = 180;
   ro.fire(245);
-  assert.ok(!pill.classes.has('dot'));
-  pill.room = 99;
+  assert.ok(!t.classes.has('below'));
+  t.room = 170;
   ro.fire(242);
-  assert.ok(pill.classes.has('dot'));
+  assert.ok(t.classes.has('below'));
   card.disconnectedCallback();
 });
 
@@ -975,13 +991,13 @@ test('resize: re-rendered at the next frame, never in the observer callback, onc
 test('not set up, unavailable or not found: each says so, with the sensor', () => {
   const missing = makeCard({ entity: 'sensor.typo' });
   missing.hass = hassWith(fuelAttrs());
-  assert.match(html(missing), /class="ptxt">Not found</);
+  assert.match(html(missing), /class="pill" title="Not found"/);
   assert.match(html(missing), /sensor\.typo is not a Vehicle Consumption sensor/);
   const down = makeCard({ entity: SENSOR });
   const hass = hassWith(null);
   hass.states[SENSOR] = { state: 'unavailable', attributes: { restored: true, friendly_name: 'Family car Consumption' } };
   down.hass = hass;
-  assert.match(html(down), /class="ptxt">Unavailable</);
+  assert.match(html(down), /class="pill" title="Unavailable"/);
   assert.match(html(down), /sensor\.family_car_consumption is unavailable/);
   assert.doesNotMatch(html(down), /Settings → Devices/);
   const none = makeCard();
@@ -1005,7 +1021,7 @@ test('no entity set, the only vehicle unavailable (Home Assistant starting): una
     { 'sensor.family_car_distance_trip': { platform: 'vehicle_consumption', translation_key: 'distance_trip' }, [SENSOR]: { platform: 'vehicle_consumption', translation_key: 'consumption' } },
     { 'sensor.family_car_distance_trip': { state: '42.3', attributes: {} }, [SENSOR]: restored },
   );
-  assert.match(named, /class="ptxt">Unavailable</);
+  assert.match(named, /class="pill" title="Unavailable"/);
   assert.match(named, /sensor\.family_car_consumption is unavailable/);
   assert.doesNotMatch(named, /Not set up/);
   // Without translation keys, every sensor of the integration down (unknown just after a start).
@@ -1013,7 +1029,7 @@ test('no entity set, the only vehicle unavailable (Home Assistant starting): una
     'sensor.family_car_distance_trip': { state: 'unknown', attributes: {} },
     [SENSOR]: { ...restored, state: 'unknown' },
   });
-  assert.match(all, /class="ptxt">Unavailable</);
+  assert.match(all, /class="pill" title="Unavailable"/);
   assert.doesNotMatch(all, /Not set up/);
   // A vehicle that works is still picked over one that is down.
   const card = makeCard();
@@ -1039,8 +1055,12 @@ test('KPIs on a narrow card: the unit goes under the value, labels and sub-lines
   const at = css.search(/@container \(max-width: \d+px\) \{[^@]*\.kv small/);
   assert.ok(at >= 0);
   const block = css.slice(at, css.indexOf('} }', at));
-  assert.match(block, /\.kv small \{ display: block; margin-left: 0; \}/);
+  // The unit wraps too ("kWh/100" over "km" rather than cut), and the chart's title row wraps its period.
+  assert.match(block, /\.kv small \{ display: block; margin-left: 0; white-space: normal; \}/);
   assert.match(block, /\.kl, \.ks \{ white-space: normal;/);
+  assert.match(block, /\.chead \{ flex-wrap: wrap; row-gap: 0;/);
+  // Under 200 px, the tile labels keep their words without their icon ("Odometer" was cut in two).
+  assert.match(css, /@container \(max-width: 200px\) \{ \.kl ha-icon \{ display: none !important; \} \}/);
 });
 
 test('editor: the chart options are hidden while the chart is off', () => {
@@ -1166,7 +1186,7 @@ function makeMini(config = {}) {
   return card;
 }
 
-test('mini card: compact view (gauges, last trip, average), its detail button opens the full card and back', () => {
+test('mini card: compact view (gauges, last trip, odometer), its detail button opens the full card and back', () => {
   const card = makeMini();
   card.hass = hassWith(fuelAttrs());
   let out = html(card);
@@ -1174,7 +1194,7 @@ test('mini card: compact view (gauges, last trip, average), its detail button op
   assert.match(out, /<ha-card class="lvl-ok mini/);
   assert.match(out, /class="gauge g-fuel/);
   assert.match(out, /k-trip/);
-  assert.match(out, /k-avg/);
+  assert.match(out, /k-odo/);
   assert.doesNotMatch(out, /k-month|k-cost|class="chart"|class="sections"|class="icon-btn add"/);
   assert.match(out, /class="zoom" title="Show details" aria-label="Show details" aria-expanded="false"/);
   // The badge keeps its 40 px.
@@ -1303,4 +1323,116 @@ test('trips: an estimated trip (coarse fuel sensor) is marked in the list', () =
   assert.match(out, /11.0 km · ≈ Estimated/);
   assert.doesNotMatch(out, /300.0 km · ≈/);
   assert.equal(vcT('fr', 'estimated'), 'Estimé');
+});
+
+test('illustration: fuel pump on a road, the tank on its screen, the months tracked and the last refuel worked out', () => {
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs({ fuel_type: 'diesel' }));
+  const out = html(card);
+  // The scene moves left of the header buttons (one: the add button) so the pump stays clear of them.
+  assert.match(out, /<div class="banner lvl-ok k-fuel" data-uid="\d+" style="--vc-sr: 21px;">/);
+  assert.match(out, /class="vc-road"/);
+  assert.match(out, /class="vc-cnt" y="-40">31.5L</);
+  assert.match(out, /class="vc-grade" y="-24.6">B7</);
+  assert.match(out, /class="vc-ctxt" y="3.2">41.2 L · €74.10</);
+  assert.match(out, /class="vc-unit" x="0" y="-.6">L\/100 km</);
+  // Seven months, the current one coloured, a month without data as a stub, the average dashed.
+  assert.equal(out.match(/class="vc-(bar|stub)/g).length, 7);
+  assert.equal(out.match(/vc-bar vc-now/g).length, 1);
+  assert.match(out, /class="vc-avg"/);
+  assert.doesNotMatch(out, /class="vc-car"/);
+  // Unique per instance.
+  const other = makeCard();
+  other.hass = hassWith(fuelAttrs());
+  assert.notEqual(out.match(/data-uid="(\d+)"/)[1], html(other).match(/data-uid="(\d+)"/)[1]);
+});
+
+test('illustration: electric shows the charging station, the battery and the last charge', () => {
+  const card = makeCard();
+  card.hass = hassWith(evAttrs());
+  const out = html(card);
+  assert.match(out, /class="banner lvl-ok k-ev"/);
+  assert.match(out, /class="vc-cnt" y="-40">72%</);
+  assert.match(out, /class="vc-bolt"/);
+  assert.doesNotMatch(out, /class="vc-grade"/);
+  assert.match(out, /class="vc-ctxt" y="3.2">30.5 kWh · €7.60</);
+});
+
+test('illustration: the icon colour follows the state (driving, low, not set up), a car drives by while driving', () => {
+  const drive = makeCard();
+  drive.hass = hassWith(fuelAttrs({ driving: true }));
+  assert.match(html(drive), /class="banner lvl-drive/);
+  assert.match(html(drive), /class="vc-car"/);
+  const low = makeCard();
+  low.hass = hassWith(fuelAttrs({ fuel_level: 9 }));
+  assert.match(html(low), /class="banner lvl-warn/);
+  const none = makeCard();
+  none.hass = hassWith(null);
+  assert.match(html(none), /class="banner lvl-na/);
+  assert.match(html(none), /class="vc-cnt" y="-40">--</);
+  // The badge takes the level colour, day and night.
+  assert.match(rule('.badge'), /color: var\(--c\)/);
+  assert.match(rule('.banner.night .badge'), /color: color-mix\(in srgb, var\(--c\) 72%, #fff\)/);
+  for (const lvl of ['ok', 'drive', 'warn', 'na']) assert.match(styles(), new RegExp(`ha-card\\.lvl-${lvl} \\{ --c:`));
+});
+
+test('illustration: night by the sun or the dark theme, forced by illustration_theme; off gives the classic header', () => {
+  const night = (config, extra) => {
+    const card = makeCard(config);
+    card.hass = hassWith(fuelAttrs(), extra);
+    return /class="banner [^"]*night/.test(html(card));
+  };
+  const sun = (state) => ({ states: { ...hassWith(fuelAttrs()).states, 'sun.sun': { state, attributes: {} } } });
+  assert.equal(night({}, sun('below_horizon')), true);
+  assert.equal(night({}, sun('above_horizon')), false);
+  assert.equal(night({}, { themes: { darkMode: true } }), true);
+  assert.equal(night({ illustration_theme: 'day' }, sun('below_horizon')), false);
+  assert.equal(night({ illustration_theme: 'night' }, sun('above_horizon')), true);
+  const sunUp = (dark) => ({ ...sun('above_horizon'), themes: { darkMode: dark } });
+  assert.equal(night({}, sunUp(true)), true, 'dark theme while the sun is up: night');
+  assert.equal(night({}, sunUp(false)), false, 'light theme while the sun is up: day');
+  assert.equal(night({ illustration_theme: 'day' }, sunUp(true)), false, 'forced day wins over the dark theme');
+  assert.equal(night({ illustration_theme: 'night' }, sunUp(false)), true, 'forced night wins over the sun');
+  const classic = makeCard({ illustration: false });
+  classic.hass = hassWith(fuelAttrs());
+  assert.doesNotMatch(html(classic), /class="banner/);
+  assert.match(html(classic), /mdi:gauge-low"/);
+  assert.match(html(classic), /class="pill"/);
+  // The banner is 90 px, edge to edge, with a 10 px road strip; motion stops when reduced.
+  assert.match(rule('.banner'), /height: 90px; margin: -12px -12px 0;/);
+  assert.match(rule('.banner'), /--vc-g: 10px;/);
+  assert.match(styles(), /prefers-reduced-motion: reduce\) \{ \.vc-car, \.vc-bar, \.vc-cnt, \.vc-bolt \{ animation: none !important; \}/);
+});
+
+test('illustration: the sun setting re-renders the card', () => {
+  const card = makeCard();
+  const hass = hassWith(fuelAttrs());
+  hass.states['sun.sun'] = { state: 'above_horizon', attributes: {} };
+  card.hass = hass;
+  assert.doesNotMatch(html(card), /class="banner [^"]*night/);
+  card.hass = { ...hass, states: { ...hass.states, 'sun.sun': { state: 'below_horizon', attributes: {} } } };
+  assert.match(html(card), /class="banner [^"]*night/);
+});
+
+test('illustration: the mini card has the same banner, its detail button on it; both editors offer the options', () => {
+  const mini = makeMini();
+  mini.hass = hassWith(fuelAttrs());
+  assert.match(html(mini), /class="banner lvl-ok k-fuel/);
+  assert.match(html(mini), /<div class="hbtns"><button class="zoom"/);
+  assert.match(html(mini), /<div class="banner [^"]*" data-uid="\d+" style="--vc-sr: 21px;">/);
+  mini._zoomClick({ detail: 1 });
+  assert.match(html(mini), /<div class="banner [^"]*" data-uid="\d+" style="--vc-sr: 49px;">/, 'add + collapse: two buttons');
+  assert.match(styles(), /\.vc-scene \{ position: absolute; right: var\(--vc-sr, 0px\);/);
+  assert.match(styles(), /\.banner \.head \{[^}]*right: calc\(var\(--vc-scene-w\) \+ var\(--vc-sr, 0px\)\);/);
+  for (const Editor of [VehicleConsumptionCardEditor, VehicleConsumptionMiniCardEditor]) {
+    const editor = new Editor();
+    editor.appendChild = () => {};
+    editor.setConfig({});
+    editor.hass = hassWith(fuelAttrs());
+    const names = editor._form.schema.map((s) => s.name);
+    assert.ok(names.includes('illustration') && names.includes('illustration_theme'), Editor.name);
+    editor.setConfig({ illustration: false });
+    assert.ok(!editor._form.schema.some((s) => s.name === 'illustration_theme'));
+    assert.equal(editor._form.computeLabel({ name: 'illustration' }), 'Illustrated header');
+  }
 });

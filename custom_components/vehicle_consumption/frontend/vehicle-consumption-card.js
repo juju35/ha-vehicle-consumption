@@ -6,7 +6,7 @@
  * Served and added to the dashboard resources by the integration.
  * https://github.com/juju35/ha-vehicle-consumption
  */
-var VEHICLE_CONSUMPTION_CARD_VERSION = '1.8.0';
+var VEHICLE_CONSUMPTION_CARD_VERSION = '1.9.0';
 
 const VC_I18N = {
   en: {
@@ -48,6 +48,7 @@ const VC_I18N = {
     liters: 'Fuel added',
     energy: 'Energy added',
     total_cost: 'Total cost',
+    tracked: '{v} tracked',
     odometer: 'Odometer',
     optional: 'optional',
     save: 'Save',
@@ -57,6 +58,11 @@ const VC_I18N = {
     ed_entity_helper: 'Found automatically; leave empty to use the first vehicle',
     ed_title: 'Title',
     ed_show_title: 'Show title',
+    ed_illustration: 'Illustrated header',
+    ed_illustration_theme: 'Header picture',
+    theme_auto: 'Automatic (sun or dark theme)',
+    theme_day: 'Day',
+    theme_night: 'Night',
     ed_title_helper: 'Leave empty for the vehicle name',
     ed_chart: 'Monthly chart',
     ed_chart_metric: 'Chart shows',
@@ -114,6 +120,7 @@ const VC_I18N = {
     liters: 'Carburant ajouté',
     energy: 'Énergie ajoutée',
     total_cost: 'Coût total',
+    tracked: '{v} suivis',
     odometer: 'Compteur',
     optional: 'facultatif',
     save: 'Enregistrer',
@@ -123,6 +130,11 @@ const VC_I18N = {
     ed_entity_helper: 'Trouvé automatiquement ; laisser vide pour utiliser le premier véhicule',
     ed_title: 'Titre',
     ed_show_title: 'Afficher le titre',
+    ed_illustration: 'En-tête illustré',
+    ed_illustration_theme: "Image de l'en-tête",
+    theme_auto: 'Automatique (soleil ou thème sombre)',
+    theme_day: 'Jour',
+    theme_night: 'Nuit',
     ed_title_helper: 'Laisser vide pour le nom du véhicule',
     ed_chart: 'Graphique mensuel',
     ed_chart_metric: 'Le graphique montre',
@@ -180,6 +192,7 @@ const VC_I18N = {
     liters: 'Getankte Menge',
     energy: 'Geladene Energie',
     total_cost: 'Gesamtkosten',
+    tracked: '{v} erfasst',
     odometer: 'Kilometerstand',
     optional: 'optional',
     save: 'Speichern',
@@ -189,6 +202,11 @@ const VC_I18N = {
     ed_entity_helper: 'Automatisch gefunden; leer lassen, um das erste Fahrzeug zu verwenden',
     ed_title: 'Titel',
     ed_show_title: 'Titel anzeigen',
+    ed_illustration: 'Illustrierte Kopfzeile',
+    ed_illustration_theme: 'Kopfzeilenbild',
+    theme_auto: 'Automatisch (Sonne oder dunkles Design)',
+    theme_day: 'Tag',
+    theme_night: 'Nacht',
     ed_title_helper: 'Leer lassen für den Fahrzeugnamen',
     ed_chart: 'Monatsdiagramm',
     ed_chart_metric: 'Diagramm zeigt',
@@ -246,6 +264,7 @@ const VC_I18N = {
     liters: 'Combustible añadido',
     energy: 'Energía añadida',
     total_cost: 'Coste total',
+    tracked: '{v} registrados',
     odometer: 'Cuentakilómetros',
     optional: 'opcional',
     save: 'Guardar',
@@ -255,6 +274,11 @@ const VC_I18N = {
     ed_entity_helper: 'Encontrado automáticamente; déjalo vacío para usar el primer vehículo',
     ed_title: 'Título',
     ed_show_title: 'Mostrar el título',
+    ed_illustration: 'Encabezado ilustrado',
+    ed_illustration_theme: 'Imagen del encabezado',
+    theme_auto: 'Automático (sol o tema oscuro)',
+    theme_day: 'Día',
+    theme_night: 'Noche',
     ed_title_helper: 'Déjalo vacío para el nombre del vehículo',
     ed_chart: 'Gráfico mensual',
     ed_chart_metric: 'El gráfico muestra',
@@ -312,6 +336,7 @@ const VC_I18N = {
     liters: 'Carburante aggiunto',
     energy: 'Energia aggiunta',
     total_cost: 'Costo totale',
+    tracked: '{v} registrati',
     odometer: 'Contachilometri',
     optional: 'facoltativo',
     save: 'Salva',
@@ -321,6 +346,11 @@ const VC_I18N = {
     ed_entity_helper: 'Trovato automaticamente; lascia vuoto per usare il primo veicolo',
     ed_title: 'Titolo',
     ed_show_title: 'Mostra il titolo',
+    ed_illustration: 'Intestazione illustrata',
+    ed_illustration_theme: "Immagine dell'intestazione",
+    theme_auto: 'Automatico (sole o tema scuro)',
+    theme_day: 'Giorno',
+    theme_night: 'Notte',
     ed_title_helper: 'Lascia vuoto per il nome del veicolo',
     ed_chart: 'Grafico mensile',
     ed_chart_metric: 'Il grafico mostra',
@@ -378,6 +408,7 @@ const VC_I18N = {
     liters: 'Getankte brandstof',
     energy: 'Geladen energie',
     total_cost: 'Totale kosten',
+    tracked: '{v} gevolgd',
     odometer: 'Kilometerstand',
     optional: 'optioneel',
     save: 'Opslaan',
@@ -387,6 +418,11 @@ const VC_I18N = {
     ed_entity_helper: 'Automatisch gevonden; laat leeg om het eerste voertuig te gebruiken',
     ed_title: 'Titel',
     ed_show_title: 'Titel tonen',
+    ed_illustration: 'Geïllustreerde koptekst',
+    ed_illustration_theme: 'Afbeelding koptekst',
+    theme_auto: 'Automatisch (zon of donker thema)',
+    theme_day: 'Dag',
+    theme_night: 'Nacht',
     ed_title_helper: 'Laat leeg voor de naam van het voertuig',
     ed_chart: 'Maandgrafiek',
     ed_chart_metric: 'Grafiek toont',
@@ -444,6 +480,7 @@ const VC_I18N = {
     liters: 'Combustível abastecido',
     energy: 'Energia carregada',
     total_cost: 'Custo total',
+    tracked: '{v} registados',
     odometer: 'Conta-quilómetros',
     optional: 'opcional',
     save: 'Guardar',
@@ -453,6 +490,11 @@ const VC_I18N = {
     ed_entity_helper: 'Encontrado automaticamente; deixe vazio para usar o primeiro veículo',
     ed_title: 'Título',
     ed_show_title: 'Mostrar o título',
+    ed_illustration: 'Cabeçalho ilustrado',
+    ed_illustration_theme: 'Imagem do cabeçalho',
+    theme_auto: 'Automático (sol ou tema escuro)',
+    theme_day: 'Dia',
+    theme_night: 'Noite',
     ed_title_helper: 'Deixe vazio para o nome do veículo',
     ed_chart: 'Gráfico mensal',
     ed_chart_metric: 'O gráfico mostra',
@@ -510,6 +552,7 @@ const VC_I18N = {
     liters: 'Zatankowane paliwo',
     energy: 'Doładowana energia',
     total_cost: 'Koszt całkowity',
+    tracked: '{v} zarejestrowano',
     odometer: 'Licznik przebiegu',
     optional: 'opcjonalnie',
     save: 'Zapisz',
@@ -519,6 +562,11 @@ const VC_I18N = {
     ed_entity_helper: 'Wyszukiwany automatycznie; pozostaw puste, aby użyć pierwszego pojazdu',
     ed_title: 'Tytuł',
     ed_show_title: 'Pokaż tytuł',
+    ed_illustration: 'Ilustrowany nagłówek',
+    ed_illustration_theme: 'Obraz nagłówka',
+    theme_auto: 'Automatycznie (słońce lub ciemny motyw)',
+    theme_day: 'Dzień',
+    theme_night: 'Noc',
     ed_title_helper: 'Pozostaw puste, aby użyć nazwy pojazdu',
     ed_chart: 'Wykres miesięczny',
     ed_chart_metric: 'Wykres pokazuje',
@@ -576,6 +624,7 @@ const VC_I18N = {
     liters: 'Combustibil adăugat',
     energy: 'Energie adăugată',
     total_cost: 'Cost total',
+    tracked: '{v} înregistrați',
     odometer: 'Kilometraj',
     optional: 'opțional',
     save: 'Salvează',
@@ -585,6 +634,11 @@ const VC_I18N = {
     ed_entity_helper: 'Găsit automat; lasă gol pentru a folosi primul vehicul',
     ed_title: 'Titlu',
     ed_show_title: 'Afișează titlul',
+    ed_illustration: 'Antet ilustrat',
+    ed_illustration_theme: 'Imaginea antetului',
+    theme_auto: 'Automat (soare sau temă întunecată)',
+    theme_day: 'Zi',
+    theme_night: 'Noapte',
     ed_title_helper: 'Lasă gol pentru numele vehiculului',
     ed_chart: 'Grafic lunar',
     ed_chart_metric: 'Graficul arată',
@@ -642,6 +696,7 @@ const VC_I18N = {
     liters: 'Tanket brændstof',
     energy: 'Tilført energi',
     total_cost: 'Samlet pris',
+    tracked: '{v} registreret',
     odometer: 'Kilometertæller',
     optional: 'valgfri',
     save: 'Gem',
@@ -651,6 +706,11 @@ const VC_I18N = {
     ed_entity_helper: 'Findes automatisk; lad feltet stå tomt for at bruge det første køretøj',
     ed_title: 'Titel',
     ed_show_title: 'Vis titel',
+    ed_illustration: 'Illustreret overskrift',
+    ed_illustration_theme: 'Overskriftsbillede',
+    theme_auto: 'Automatisk (sol eller mørkt tema)',
+    theme_day: 'Dag',
+    theme_night: 'Nat',
     ed_title_helper: 'Lad feltet stå tomt for køretøjets navn',
     ed_chart: 'Månedligt diagram',
     ed_chart_metric: 'Diagrammet viser',
@@ -708,6 +768,7 @@ const VC_I18N = {
     liters: 'Tankat bränsle',
     energy: 'Tillförd energi',
     total_cost: 'Total kostnad',
+    tracked: '{v} registrerade',
     odometer: 'Vägmätare',
     optional: 'valfritt',
     save: 'Spara',
@@ -717,6 +778,11 @@ const VC_I18N = {
     ed_entity_helper: 'Hittas automatiskt; lämna tomt för att använda det första fordonet',
     ed_title: 'Titel',
     ed_show_title: 'Visa rubrik',
+    ed_illustration: 'Illustrerad rubrik',
+    ed_illustration_theme: 'Rubrikbild',
+    theme_auto: 'Automatiskt (sol eller mörkt tema)',
+    theme_day: 'Dag',
+    theme_night: 'Natt',
     ed_title_helper: 'Lämna tomt för fordonets namn',
     ed_chart: 'Månadsdiagram',
     ed_chart_metric: 'Diagrammet visar',
@@ -774,6 +840,7 @@ const VC_I18N = {
     liters: 'Добавено гориво',
     energy: 'Добавена енергия',
     total_cost: 'Обща сума',
+    tracked: '{v} проследени',
     odometer: 'Одометър',
     optional: 'по избор',
     save: 'Запази',
@@ -783,6 +850,11 @@ const VC_I18N = {
     ed_entity_helper: 'Намира се автоматично; оставете празно, за да се използва първото превозно средство',
     ed_title: 'Заглавие',
     ed_show_title: 'Показване на заглавието',
+    ed_illustration: 'Илюстрирано заглавие',
+    ed_illustration_theme: 'Изображение в заглавието',
+    theme_auto: 'Автоматично (слънце или тъмна тема)',
+    theme_day: 'Ден',
+    theme_night: 'Нощ',
     ed_title_helper: 'Оставете празно за името на превозното средство',
     ed_chart: 'Месечна диаграма',
     ed_chart_metric: 'Диаграмата показва',
@@ -840,6 +912,7 @@ const VC_I18N = {
     liters: 'Залитое топливо',
     energy: 'Полученная энергия',
     total_cost: 'Сумма',
+    tracked: '{v} учтено',
     odometer: 'Одометр',
     optional: 'необязательно',
     save: 'Сохранить',
@@ -849,6 +922,11 @@ const VC_I18N = {
     ed_entity_helper: 'Находится автоматически; оставьте пустым, чтобы использовать первый автомобиль',
     ed_title: 'Заголовок',
     ed_show_title: 'Показывать заголовок',
+    ed_illustration: 'Иллюстрированный заголовок',
+    ed_illustration_theme: 'Изображение заголовка',
+    theme_auto: 'Автоматически (солнце или тёмная тема)',
+    theme_day: 'День',
+    theme_night: 'Ночь',
     ed_title_helper: 'Оставьте пустым, чтобы использовать название автомобиля',
     ed_chart: 'Ежемесячная диаграмма',
     ed_chart_metric: 'Диаграмма показывает',
@@ -906,6 +984,7 @@ const VC_I18N = {
     liters: 'Залите пальне',
     energy: 'Отримана енергія',
     total_cost: 'Сума',
+    tracked: '{v} враховано',
     odometer: 'Одометр',
     optional: "необов'язково",
     save: 'Зберегти',
@@ -915,6 +994,11 @@ const VC_I18N = {
     ed_entity_helper: 'Знаходиться автоматично; залиште порожнім, щоб використати перший автомобіль',
     ed_title: 'Заголовок',
     ed_show_title: 'Показувати заголовок',
+    ed_illustration: 'Ілюстрований заголовок',
+    ed_illustration_theme: 'Зображення заголовка',
+    theme_auto: 'Автоматично (сонце або темна тема)',
+    theme_day: 'День',
+    theme_night: 'Ніч',
     ed_title_helper: 'Залиште порожнім, щоб використати назву автомобіля',
     ed_chart: 'Щомісячна діаграма',
     ed_chart_metric: 'Діаграма показує',
@@ -972,6 +1056,7 @@ const VC_I18N = {
     liters: 'Tankolt üzemanyag',
     energy: 'Töltött energia',
     total_cost: 'Teljes költség',
+    tracked: '{v} rögzítve',
     odometer: 'Kilométeróra',
     optional: 'nem kötelező',
     save: 'Mentés',
@@ -981,6 +1066,11 @@ const VC_I18N = {
     ed_entity_helper: 'Automatikusan megtalálva; hagyd üresen az első jármű használatához',
     ed_title: 'Cím',
     ed_show_title: 'Cím megjelenítése',
+    ed_illustration: 'Illusztrált fejléc',
+    ed_illustration_theme: 'Fejléckép',
+    theme_auto: 'Automatikus (nap vagy sötét téma)',
+    theme_day: 'Nappal',
+    theme_night: 'Éjszaka',
     ed_title_helper: 'Hagyd üresen a jármű nevéhez',
     ed_chart: 'Havi diagram',
     ed_chart_metric: 'A diagram mutatja',
@@ -1038,6 +1128,7 @@ const VC_I18N = {
     liters: 'Natankované palivo',
     energy: 'Dodaná energia',
     total_cost: 'Celková cena',
+    tracked: '{v} zaznamenaných',
     odometer: 'Počítadlo kilometrov',
     optional: 'voliteľné',
     save: 'Uložiť',
@@ -1047,6 +1138,11 @@ const VC_I18N = {
     ed_entity_helper: 'Nájdené automaticky; nechajte prázdne, ak chcete použiť prvé vozidlo',
     ed_title: 'Názov',
     ed_show_title: 'Zobraziť názov',
+    ed_illustration: 'Ilustrovaná hlavička',
+    ed_illustration_theme: 'Obrázok hlavičky',
+    theme_auto: 'Automaticky (slnko alebo tmavá téma)',
+    theme_day: 'Deň',
+    theme_night: 'Noc',
     ed_title_helper: 'Nechajte prázdne pre názov vozidla',
     ed_chart: 'Mesačný graf',
     ed_chart_metric: 'Graf zobrazuje',
@@ -1104,6 +1200,7 @@ const VC_I18N = {
     liters: 'Natankované palivo',
     energy: 'Dodaná energie',
     total_cost: 'Celková cena',
+    tracked: '{v} zaznamenáno',
     odometer: 'Počítadlo kilometrů',
     optional: 'volitelné',
     save: 'Uložit',
@@ -1113,6 +1210,11 @@ const VC_I18N = {
     ed_entity_helper: 'Nalezeno automaticky; ponechte prázdné, chcete-li použít první vozidlo',
     ed_title: 'Název',
     ed_show_title: 'Zobrazit název',
+    ed_illustration: 'Ilustrované záhlaví',
+    ed_illustration_theme: 'Obrázek záhlaví',
+    theme_auto: 'Automaticky (slunce nebo tmavý motiv)',
+    theme_day: 'Den',
+    theme_night: 'Noc',
     ed_title_helper: 'Ponechte prázdné pro název vozidla',
     ed_chart: 'Měsíční graf',
     ed_chart_metric: 'Graf zobrazuje',
@@ -1170,6 +1272,7 @@ const VC_I18N = {
     liters: 'Natočeno gorivo',
     energy: 'Dodana energija',
     total_cost: 'Skupni strošek',
+    tracked: '{v} zabeleženih',
     odometer: 'Števec kilometrov',
     optional: 'neobvezno',
     save: 'Shrani',
@@ -1179,6 +1282,11 @@ const VC_I18N = {
     ed_entity_helper: 'Najdeno samodejno; pustite prazno, da se uporabi prvo vozilo',
     ed_title: 'Naslov',
     ed_show_title: 'Prikaži naslov',
+    ed_illustration: 'Ilustrirana glava',
+    ed_illustration_theme: 'Slika glave',
+    theme_auto: 'Samodejno (sonce ali temna tema)',
+    theme_day: 'Dan',
+    theme_night: 'Noč',
     ed_title_helper: 'Pustite prazno za ime vozila',
     ed_chart: 'Mesečni graf',
     ed_chart_metric: 'Graf prikazuje',
@@ -1236,6 +1344,7 @@ const VC_I18N = {
     liters: 'Uzpildītā degviela',
     energy: 'Uzlādētā enerģija',
     total_cost: 'Kopējās izmaksas',
+    tracked: '{v} reģistrēti',
     odometer: 'Odometrs',
     optional: 'neobligāti',
     save: 'Saglabāt',
@@ -1245,6 +1354,11 @@ const VC_I18N = {
     ed_entity_helper: 'Atrasts automātiski; atstājiet tukšu, lai izmantotu pirmo transportlīdzekli',
     ed_title: 'Virsraksts',
     ed_show_title: 'Rādīt virsrakstu',
+    ed_illustration: 'Ilustrēta galvene',
+    ed_illustration_theme: 'Galvenes attēls',
+    theme_auto: 'Automātiski (saule vai tumšā tēma)',
+    theme_day: 'Diena',
+    theme_night: 'Nakts',
     ed_title_helper: 'Atstājiet tukšu, lai izmantotu transportlīdzekļa nosaukumu',
     ed_chart: 'Mēneša diagramma',
     ed_chart_metric: 'Diagramma rāda',
@@ -1302,6 +1416,7 @@ const VC_I18N = {
     liters: 'Καύσιμο που προστέθηκε',
     energy: 'Ενέργεια που προστέθηκε',
     total_cost: 'Κόστος',
+    tracked: '{v} καταγεγραμμένα',
     odometer: 'Χιλιομετρητής',
     optional: 'προαιρετικό',
     save: 'Αποθήκευση',
@@ -1311,6 +1426,11 @@ const VC_I18N = {
     ed_entity_helper: 'Βρίσκεται αυτόματα· αφήστε κενό για να χρησιμοποιηθεί το πρώτο όχημα',
     ed_title: 'Τίτλος',
     ed_show_title: 'Εμφάνιση τίτλου',
+    ed_illustration: 'Εικονογραφημένη κεφαλίδα',
+    ed_illustration_theme: 'Εικόνα κεφαλίδας',
+    theme_auto: 'Αυτόματα (ήλιος ή σκούρο θέμα)',
+    theme_day: 'Ημέρα',
+    theme_night: 'Νύχτα',
     ed_title_helper: 'Αφήστε κενό για το όνομα του οχήματος',
     ed_chart: 'Μηνιαίο γράφημα',
     ed_chart_metric: 'Το γράφημα δείχνει',
@@ -1368,6 +1488,7 @@ const VC_I18N = {
     liters: 'Сипано гориво',
     energy: 'Додата енергија',
     total_cost: 'Укупан трошак',
+    tracked: '{v} забележено',
     odometer: 'Километража',
     optional: 'опционо',
     save: 'Сачувај',
@@ -1377,6 +1498,11 @@ const VC_I18N = {
     ed_entity_helper: 'Проналази се аутоматски; оставите празно да би се користило прво возило',
     ed_title: 'Наслов',
     ed_show_title: 'Прикажи наслов',
+    ed_illustration: 'Илустровано заглавље',
+    ed_illustration_theme: 'Слика заглавља',
+    theme_auto: 'Аутоматски (сунце или тамна тема)',
+    theme_day: 'Дан',
+    theme_night: 'Ноћ',
     ed_title_helper: 'Оставите празно за назив возила',
     ed_chart: 'Месечни графикон',
     ed_chart_metric: 'Графикон приказује',
@@ -1434,6 +1560,7 @@ const VC_I18N = {
     liters: 'Sipano gorivo',
     energy: 'Dodata energija',
     total_cost: 'Ukupan trošak',
+    tracked: '{v} zabeleženo',
     odometer: 'Kilometraža',
     optional: 'opciono',
     save: 'Sačuvaj',
@@ -1443,6 +1570,11 @@ const VC_I18N = {
     ed_entity_helper: 'Pronalazi se automatski; ostavite prazno da bi se koristilo prvo vozilo',
     ed_title: 'Naslov',
     ed_show_title: 'Prikaži naslov',
+    ed_illustration: 'Ilustrovano zaglavlje',
+    ed_illustration_theme: 'Slika zaglavlja',
+    theme_auto: 'Automatski (sunce ili tamna tema)',
+    theme_day: 'Dan',
+    theme_night: 'Noć',
     ed_title_helper: 'Ostavite prazno za naziv vozila',
     ed_chart: 'Mesečni grafikon',
     ed_chart_metric: 'Grafikon prikazuje',
@@ -1479,6 +1611,9 @@ const vcEsc = (s) =>
 
 const VC_DEFAULTS = {
   show_title: true,
+  // The illustrated header (fuel pump or charging station on a road), its picture following the sun.
+  illustration: true,
+  illustration_theme: 'auto',
   chart: true,
   chart_metric: 'consumption',
   months: 6,
@@ -1652,6 +1787,146 @@ const vcInDialog = (ev) => ev.composedPath().some((n) => ['ha-more-info-dialog',
 const VC_ICON = 'mdi:gauge-low';
 const VC_KINDS = ['fuel', 'electric', 'plugin_hybrid'];
 
+// ── Illustrated header ───────────────────────────────────────────────────────
+// A 200 × 80 picture at the right of a 90 px banner, over a 10 px road strip: the fuel pump (fuel, plug-in hybrid)
+// or the charging station (electric), whose screen shows the tank / battery, beside the tracking: the last months'
+// consumption (bars, the current month coloured, the average dashed) and the last refuel or charge worked out
+// (amount and cost). The left of the banner is open sky for the title. No ids in the picture: several cards on
+// one page cannot clash (`uid` still tells the instances apart, for the tests and the styles).
+const VC_GRADE = { petrol: 'E10', diesel: 'B7', lpg: 'LPG', e85: 'E85' };
+let vcUid = 0;
+
+// Night picture: forced by illustration_theme, else the sun below the horizon or Home Assistant's dark theme (even
+// with the sun up).
+const vcIsNight = (hass, config) => {
+  const theme = config?.illustration_theme;
+  if (theme === 'night') return true;
+  if (theme === 'day') return false;
+  const sun = hass?.states?.['sun.sun'];
+  if (sun && !['unavailable', 'unknown'].includes(String(sun.state)) && sun.state === 'below_horizon') return true;
+  return !!hass?.themes?.darkMode;
+};
+
+// The scene: `s` = { ev, hybrid, bars: [number|null] (oldest first), avg, unit, calc, screen, grade, level }.
+function vcSceneSvg(s) {
+  const vals = s.bars.filter((v) => v != null);
+  // The range holds the average too, so its dashed line sits among the bars.
+  const span = vcFinite(s.avg) ? [...vals, Number(s.avg)] : vals;
+  const mx = vals.length ? Math.max(...span) : 1;
+  const mn = vals.length ? Math.min(...span) * 0.85 : 0;
+  const h = (v) => 6 + ((v - mn) / (mx - mn || 1)) * 22;
+  const last = s.bars.length - 1;
+  const bars = s.bars
+    .map((v, i) => {
+      const bh = v == null ? 3 : h(v);
+      const cls = v == null ? 'vc-stub' : i === last ? 'vc-bar vc-now' : 'vc-bar';
+      return `<rect class="${cls}" style="--i:${i}" x="${2 + i * 7}" y="${(30 - bh).toFixed(1)}" width="5" height="${bh.toFixed(1)}" rx="1"/>`;
+    })
+    .join('');
+  const avg = vcFinite(s.avg) && vals.length ? `<path class="vc-avg" d="M1 ${(30 - h(Number(s.avg))).toFixed(1)} h50"/>` : '';
+  const chart = `<g class="vc-hist" transform="translate(96 16)"><rect class="vc-box" x="-4" y="-4" width="58" height="42" rx="4"/>${bars}${avg}<text class="vc-unit" x="0" y="-.6">${vcEsc(s.unit)}</text></g>`;
+  // The calculation: a pill centred under the chart, as wide as its text.
+  const cw = Math.min(66, Math.max(40, String(s.calc || '').length * 3.5 + 8));
+  const calc = s.calc
+    ? `<g class="vc-calc" transform="translate(117 62)"><rect class="vc-cbox" x="${(-cw / 2).toFixed(1)}" y="-6" width="${cw.toFixed(1)}" height="14" rx="3"/><text class="vc-ctxt" y="3.2">${vcEsc(s.calc)}</text></g>`
+    : '';
+  const bolt = (x, y) => `<path class="vc-bolt" d="M${x + 1} ${y} l-4 6 h3 l-2 5 l6 -7 h-3 l2 -4z"/>`;
+  const panel = s.ev
+    ? bolt(0, -31)
+    : `<text class="vc-grade" y="-24.6">${vcEsc(s.grade)}</text>`;
+  const pump = `<g class="vc-pump" transform="translate(176 78)"><rect class="vc-body" x="-12" y="-52" width="24" height="52" rx="3"/><rect class="vc-screen" x="-9" y="-48" width="18" height="12" rx="1.5"/><text class="vc-cnt" y="-40">${vcEsc(s.screen)}</text><rect class="vc-panel" x="-8" y="-32" width="16" height="10" rx="1.5"/>${panel}<rect class="vc-foot" x="-14" y="-2" width="28" height="3" rx="1"/><path class="vc-hose" d="M12 -30 q10 0 10 10 v14"/><rect class="vc-nozzle" x="18" y="-8" width="8" height="5" rx="1"/>${s.hybrid ? '<g class="vc-plug" transform="translate(-12 -14)"><circle r="4.6"/><path d="M.3 -3.3l-2.4 3.6h1.8l-1.2 3 3.6 -4.2h-1.8l1.2 -2.4z"/></g>' : ''}</g>`;
+  // Driving: a car goes by on the road, behind the calculation and the pump.
+  const car =
+    s.level === 'drive'
+      ? `<g class="vc-car"><g transform="translate(60 80)"><path class="vc-carbody" d="M0 -5 Q1 -10 8 -11 L14 -15 H26 L33 -11 Q40 -10 40 -5 V-3.4 H0Z"/><path class="vc-carglass" d="M15 -14 H25 L30 -11 H11Z"/><circle class="vc-wheel" cx="9" cy="-3.4" r="3.4"/><circle class="vc-wheel" cx="31" cy="-3.4" r="3.4"/></g></g>`
+      : '';
+  const stars = '<g class="vc-stars"><circle cx="70" cy="8" r=".6"/><circle cx="84" cy="22" r=".5"/><circle cx="150" cy="5" r=".6"/><circle cx="196" cy="12" r=".5"/></g>';
+  return `<svg class="vc-scene" viewBox="0 0 200 80" preserveAspectRatio="xMaxYMax slice" aria-hidden="true" focusable="false">${stars}<g transform="translate(200 80) scale(1.08) translate(-200 -80)">${chart}${car}${calc}${pump}</g></svg>`;
+}
+
+// The banner's styles: sky (day / night), title on its left, the scene at its right, the road strip under it all.
+const VC_BANNER_STYLE = `
+      .banner { position: relative; height: 90px; margin: -12px -12px 0; overflow: hidden; --vc-g: 10px;
+                --vc-scene-w: min(200px, 62%); --sky-text: #0d2a45; --sky-muted: #3b5b78;
+                background: linear-gradient(90deg, #f1f8ff 0%, #e2f1fd 34%, #b9def8 70%, #9fd0f3 100%); }
+      .banner.night { --sky-text: #fff; --sky-muted: rgba(255,255,255,.78);
+                      background: linear-gradient(90deg, #1b2f52 0%, #15284a 36%, #0f1f3d 72%, #0a1830 100%); }
+      .banner .head { position: absolute; z-index: 1; left: 0; top: 0; bottom: var(--vc-g); right: calc(var(--vc-scene-w) + var(--vc-sr, 0px));
+                      padding: 8px 8px 8px 14px; box-sizing: border-box; min-width: 0; color: var(--sky-text); }
+      .banner .badge { position: relative; background: rgba(255,255,255,.62); box-shadow: inset 0 0 0 1px rgba(13,42,69,.12); }
+      .banner.night .badge { background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14);
+                             color: color-mix(in srgb, var(--c) 72%, #fff); }
+      .htxt { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+      /* The pill in the level's colour on a frosted tint (where it goes: the rule in the card's styles, _fitPill). */
+      .banner .title { color: var(--sky-text); }
+      /* The title keeps about four characters even where the picture leaves almost no room (mini card, 2 buttons). */
+      .banner .titles .trow > .title { min-width: 4ch; }
+      .banner .pill { display: inline-flex; align-items: center; gap: 4px; max-width: 51%; line-height: 16px; box-sizing: border-box; border-radius: 12px;
+                      background: color-mix(in srgb, var(--c) 18%, rgba(255,255,255,.78)); color: color-mix(in srgb, var(--c) 45%, #0d2a45); }
+      .banner.night .pill { background: color-mix(in srgb, var(--c) 30%, rgba(8,18,38,.55)); color: color-mix(in srgb, var(--c) 35%, #ffffff); }
+      .banner .pdot { display: block; width: 7px; height: 7px; flex: none; }
+      .banner .ptxt { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+      .banner .titles.below { gap: 0; }
+      .hsub { font-size: 13px; color: var(--sky-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+              font-variant-numeric: tabular-nums; }
+      /* The header buttons (log a refuel, the mini card's expand / collapse) on one line at the banner's top right
+         corner: 24 px frosted round buttons, 4 px apart, the scene moved left of them (--vc-sr). */
+      .hbtns { position: absolute; z-index: 2; top: 5px; right: 5px; display: flex; gap: 4px; }
+      .hbtns .icon-btn, .hbtns .zoom { margin: 0; width: 24px; height: 24px; color: #33506b; background: rgba(255,255,255,.55);
+                                       box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); backdrop-filter: blur(4px); }
+      .hbtns .icon-btn ha-icon, .hbtns .zoom ha-icon { --mdc-icon-size: 16px; }
+      .hbtns .icon-btn:hover, .hbtns .zoom:hover { background: rgba(255,255,255,.75); color: #33506b; }
+      .banner.night .hbtns .icon-btn, .banner.night .hbtns .zoom { color: #fff; background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+      .banner.night .hbtns .icon-btn:hover, .banner.night .hbtns .zoom:hover { background: rgba(255,255,255,.22); color: #fff; }
+      .vc-road { position: absolute; left: 0; right: 0; bottom: 0; height: var(--vc-g); background: #858c94; box-shadow: inset 0 1px 0 #6f767d; }
+      .vc-road::after { content: ""; position: absolute; left: 0; right: 0; top: calc(50% - .8px); height: 1.6px;
+                        background: repeating-linear-gradient(90deg, rgba(255,255,255,.85) 0 9px, transparent 9px 18px); }
+      .night .vc-road { background: #2c323b; box-shadow: inset 0 1px 0 #3a414b; }
+      .night .vc-road::after { background: repeating-linear-gradient(90deg, rgba(255,255,255,.4) 0 9px, transparent 9px 18px); }
+      .vc-scene { position: absolute; right: var(--vc-sr, 0px); bottom: var(--vc-g); height: calc(100% - var(--vc-g)); width: var(--vc-scene-w); }
+      .vc-scene text { font-family: Roboto, system-ui, sans-serif; }
+      .vc-stars { fill: #fff; opacity: 0; } .night .vc-stars { opacity: .8; }
+      .vc-box { fill: #fff; stroke: #dbe2ea; stroke-width: 1; } .night .vc-box { fill: #2a3446; stroke: #3a4456; }
+      .vc-unit { font-size: 4.4px; fill: #5c6470; } .night .vc-unit { fill: #a0a6ae; }
+      .vc-bar { fill: #c9d2de; transform-box: fill-box; transform-origin: 50% 100%; } .night .vc-bar { fill: #4a5568; }
+      .vc-stub { fill: #e3e8ee; } .night .vc-stub { fill: #343e50; }
+      .banner { --vc-k: #f58220; } .banner.k-ev { --vc-k: #43a047; } .banner.lvl-na { --vc-k: #9aa1a9; }
+      .vc-bar.vc-now, .night .vc-bar.vc-now { fill: var(--vc-k); }
+      .vc-avg { fill: none; stroke: var(--vc-k); stroke-width: .8; stroke-dasharray: 2 2; }
+      .vc-cbox { fill: #fff; stroke: var(--vc-k); stroke-width: 1; } .night .vc-cbox { fill: #2a3446; }
+      .vc-ctxt { font-size: 6.2px; font-weight: 700; text-anchor: middle; fill: color-mix(in srgb, var(--vc-k) 80%, #000); }
+      .night .vc-ctxt { fill: color-mix(in srgb, var(--vc-k) 75%, #fff); }
+      .vc-body { fill: var(--vc-k); }
+      .vc-screen { fill: #101418; }
+      .vc-cnt { font-size: 5.6px; font-weight: 700; font-family: ui-monospace, monospace; text-anchor: middle; fill: #ffd65a; }
+      .lvl-warn .vc-cnt { fill: #ffb020; animation: vc-blink 1.2s steps(2) infinite; }
+      .vc-panel { fill: #fff; opacity: .9; } .night .vc-panel { fill: #e6e9ee; }
+      .vc-grade { font-size: 5px; font-weight: 700; text-anchor: middle; fill: var(--vc-k); }
+      .vc-bolt { fill: var(--vc-k); }
+      .k-ev .vc-panel + .vc-bolt { animation: vc-glow 2s ease-in-out infinite; }
+      .vc-plug circle { fill: #43a047; stroke: #fff; stroke-width: .8; } .vc-plug path { fill: #fff; }
+      .vc-foot { fill: #5f6b7a; }
+      .vc-hose { fill: none; stroke: #2a3038; stroke-width: 2; } .night .vc-hose { stroke: #3a424e; }
+      .vc-nozzle { fill: #2a3038; }
+      .vc-carbody { fill: #1f4aa8; } .night .vc-carbody { fill: #2c5bc4; }
+      .vc-carglass { fill: #cfe6f7; } .night .vc-carglass { fill: #3b4b5e; }
+      .vc-wheel { fill: #22262b; }
+      .vc-car { animation: vc-drive 7s linear infinite; }
+      .vc-bar { animation: vc-bars 6s ease-out infinite; animation-delay: calc(var(--i, 0) * 100ms); }
+      /* Narrow card (the mini card in a phone's section): only the pump or the charging station beside the title. */
+      @container (max-width: 340px) {
+        .banner { --vc-scene-w: 66px; }
+        .vc-hist, .vc-calc { display: none; }
+      }
+      @keyframes vc-drive { from { transform: translateX(-110px); } to { transform: translateX(150px); } }
+      @keyframes vc-bars { 0% { transform: scaleY(.1); } 30%, 100% { transform: scaleY(1); } }
+      @keyframes vc-blink { 50% { opacity: .25; } }
+      @keyframes vc-glow { 50% { opacity: .45; } }
+      @media (prefers-reduced-motion: reduce) {
+        .vc-car, .vc-bar, .vc-cnt, .vc-bolt { animation: none !important; }
+      }
+`;
+
 class VehicleConsumptionCard extends HTMLElement {
   static getConfigElement() {
     return document.createElement('vehicle-consumption-card-editor');
@@ -1666,6 +1941,7 @@ class VehicleConsumptionCard extends HTMLElement {
   constructor() {
     super();
     this._open = new Set();
+    this._uid = ++vcUid;
     this._onDocClick = (ev) => this._foldOutside(ev);
     this._onKey = (ev) => {
       if (ev.key === 'Escape' && this._popup) this._closePopup();
@@ -1694,7 +1970,8 @@ class VehicleConsumptionCard extends HTMLElement {
       hass.states[entity] === old.states[entity] &&
       hass.entities === old.entities &&
       hass.locale === old.locale &&
-      vcLang(hass, this._config) === vcLang(old, this._config)
+      vcLang(hass, this._config) === vcLang(old, this._config) &&
+      vcIsNight(hass, this._config) === vcIsNight(old, this._config)
     ) {
       return;
     }
@@ -1726,6 +2003,7 @@ class VehicleConsumptionCard extends HTMLElement {
       });
       this._ro.observe(this);
     }
+    document.fonts?.ready?.then(() => this._fitPill());
   }
 
   disconnectedCallback() {
@@ -1778,7 +2056,7 @@ class VehicleConsumptionCard extends HTMLElement {
     const a = Array.isArray(st?.attributes?.months) ? st.attributes : null;
     const lang = vcLang(this._hass, c);
     const compact = this._compact();
-    const sig = JSON.stringify([c, lang, this._hass.locale, entity, st?.state, a, [...this._open], this._popup?.mode, !!this._popup, this._width, compact]);
+    const sig = JSON.stringify([c, lang, this._hass.locale, entity, st?.state, a, [...this._open], this._popup?.mode, !!this._popup, this._width, compact, this._illustrated() && vcIsNight(this._hass, c)]);
     this._entity = entity;
     if (!force && sig === this._sig) return;
     // The popup is being filled in: the update waits until it closes, so typing is never interrupted.
@@ -1797,11 +2075,14 @@ class VehicleConsumptionCard extends HTMLElement {
       this.shadowRoot.innerHTML = `
       <style>${VehicleConsumptionCard.styles}</style>
       <ha-card class="lvl-na${this.hasAttribute?.('mini') ? ' mini' : ''}">
-        <div class="head">
+        ${
+          this._illustrated()
+            ? this._banner({ level: 'na', kind: 'fuel', name: c.title || this._t('title'), pill: this._t(why), scene: this._sceneData(null, 'fuel', null, 'na') })
+            : `<div class="head">
           <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
-          <div class="title"><span class="tname">${vcEsc(c.title || this._t('title'))}</span></div>
-          ${this._pill(this._t(why))}
-        </div>
+          <div class="htxt titles"><div class="trow"><div class="title"><span class="tname">${vcEsc(c.title || this._t('title'))}</span></div>${this._pill(this._t(why))}</div></div>
+        </div>`
+        }
         <div class="empty">${vcEsc(this._t(`${why}_hint`, { entity }))}</div>
       </ha-card>`;
       this._fitPill();
@@ -1839,13 +2120,16 @@ class VehicleConsumptionCard extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>${VehicleConsumptionCard.styles}</style>
       <ha-card class="lvl-${level}${this.hasAttribute?.('mini') ? ' mini' : ''}${this._popup ? ' has-popup' : ''}${anim}">
-        <div class="head">
+        ${
+          this._illustrated()
+            ? this._banner({ level, kind, name: c.title || a.vehicle || this._t('title'), pill: avg, sub: this._t(a.driving ? 'driving' : 'average'), driving, buttons: add + this._zoomButton(), scene: this._sceneData(a, kind, f, level) })
+            : `<div class="head">
           <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
-          <div class="title"><span class="tname">${vcEsc(c.title || a.vehicle || this._t('title'))}</span>${driving}</div>
+          <div class="htxt titles"><div class="trow"><div class="title"><span class="tname">${vcEsc(c.title || a.vehicle || this._t('title'))}</span>${driving}</div>${this._pill(avg)}</div></div>
           ${add}
-          ${this._pill(avg)}
           ${this._zoomButton()}
-        </div>
+        </div>`
+        }
         <div class="gauges">${gauges.map((g) => g.html).join('')}</div>
         <div class="kpis">${this._kpis(a, kind, f, compact)}</div>
         ${!compact && c.chart !== false ? this._chart(a, kind, f) : ''}
@@ -1857,23 +2141,122 @@ class VehicleConsumptionCard extends HTMLElement {
     this._fitPill();
   }
 
+  _illustrated() {
+    return this._config?.illustration !== false;
+  }
+
+  // The illustrated header: the round icon (fuel pump or charging station, coloured by the card's level) with the
+  // title, the pill (the average, in the level's colour) right after it and what the pill is under it, on the sky;
+  // the scene at the right, the road strip under it; the buttons at the banner's top right corner.
+  _banner({ level, kind, name, pill, sub = '', driving = '', buttons = '', scene }) {
+    const icon = kind === 'electric' ? 'mdi:ev-station' : 'mdi:gas-station';
+    const night = vcIsNight(this._hass, this._config);
+    const cls = `banner lvl-${level} k-${kind === 'electric' ? 'ev' : 'fuel'}${night ? ' night' : ''}`;
+    // The scene keeps clear of the header buttons: it moves left so that the pump's body ends 2 px left of them
+    // (each button 24 px, 4 px apart, 5 px from the edge; the pump's body ends 13 px left of the scene's edge, its
+    // hose and nozzle stay low, under the buttons).
+    const n = (buttons.match(/<button/g) || []).length;
+    const shift = n ? `--vc-sr: ${28 * n - 7}px;` : '';
+    return `<div class="${cls}" data-uid="${this._uid}"${shift ? ` style="${shift}"` : ''}>
+          <div class="vc-road" aria-hidden="true"></div>
+          ${vcSceneSvg(scene)}
+          <div class="head">
+            <div class="badge"><ha-icon icon="${icon}"></ha-icon></div>
+            <div class="htxt titles">
+              <div class="trow"><div class="title"><span class="tname">${vcEsc(name)}</span>${driving}</div>${pill ? this._pill(pill) : ''}</div>
+              ${sub ? `<div class="hsub" title="${vcEsc(sub)}">${vcEsc(sub)}</div>` : ''}
+            </div>
+          </div>
+          ${buttons ? `<div class="hbtns">${buttons}</div>` : ''}
+        </div>`;
+  }
+
+  // What the scene shows: the last 7 months' consumption of the main energy and its average, the last refuel or
+  // charge (amount · cost), the tank or battery on the pump's screen.
+  _sceneData(a, kind, f, level) {
+    const ev = kind === 'electric';
+    const primary = ev ? 'energy' : 'fuel';
+    const u = vcUnits(a);
+    const months = Array.isArray(a?.months) ? a.months : [];
+    const byKey = new Map(months.map((m) => [m?.month, m]));
+    const keys = vcMonthKeys(a?.month?.month || months[months.length - 1]?.month, 7);
+    const bars = keys.map((k) => {
+      const v = byKey.get(k)?.[`${primary}_consumption`];
+      return vcFinite(v) ? Number(v) : null;
+    });
+    let calc = '';
+    let screen = '--';
+    if (a && f) {
+      const ev0 = (ev ? a.charges : a.refuels)?.[0];
+      const amount = ev0?.[ev ? 'energy' : 'liters'];
+      if (vcFinite(amount)) {
+        calc = [`${f.num(amount, 1)} ${ev ? 'kWh' : u.vol}`, vcFinite(ev0.cost) ? f.money(ev0.cost) : ''].filter(Boolean).join(' · ');
+      }
+      if (ev) {
+        if (vcFinite(a.battery_level)) screen = `${f.num(a.battery_level, 0)}%`;
+      } else if (vcFinite(a.fuel_quantity)) {
+        const q = `${f.num(a.fuel_quantity, Number(a.fuel_quantity) < 100 ? 1 : 0)}`;
+        screen = q.length + u.vol.length <= 5 ? `${q}${u.vol}` : q;
+      } else if (vcFinite(a.fuel_level)) {
+        screen = `${f.num(a.fuel_level, 0)}%`;
+      }
+    }
+    return {
+      ev,
+      hybrid: kind === 'plugin_hybrid',
+      bars,
+      avg: a?.total?.[`${primary}_consumption`],
+      unit: ev ? u.energy : u.fuel,
+      calc,
+      screen,
+      grade: VC_GRADE[a?.fuel_type] || VC_GRADE.petrol,
+      level,
+    };
+  }
+
   // The header pill: its text, or only its coloured dot on a narrow card (the text stays in the tooltip and label).
   _pill(text) {
     const t = vcEsc(text);
     return `<div class="pill" title="${t}" aria-label="${t}"><span class="pdot"></span><span class="ptxt">${t}</span></div>`;
   }
 
-  // The whole label while it fits: the title (flex basis 0) gives its room down to 4 characters before the pill
-  // shrinks, so a cut label means the room is really missing; then tighter header gaps, then only the dot. Each
-  // step is measured, so a wider card never shows less (a dot) than a narrower one. Not laid out: the label.
+  // The status pill goes right after the title only when the whole title and the pill's whole label fit on that row;
+  // otherwise it takes a line of its own under the subtitle (.titles.below, the subtitle cut to one line). In the
+  // banner (where that line may run over the picture), when the titles still run below the top of the ground strip or
+  // out of the banner, and in the classic header when the label does not fit even alone, the pill keeps its dot alone,
+  // beside the title (.titles.dotonly). Measured in fractional pixels.
   _fitPill() {
-    const pill = this.shadowRoot?.querySelector('.pill');
-    if (!pill?.classList) return;
-    const cut = () => pill.scrollWidth > pill.clientWidth;
-    pill.classList.remove('tight', 'dot');
-    if (!cut()) return;
-    pill.classList.add('tight');
-    if (cut()) pill.classList.add('dot');
+    for (const t of this.shadowRoot?.querySelectorAll?.('.titles') || []) {
+      const row = t.querySelector('.trow');
+      const chips = row ? [...row.querySelectorAll(':scope > .pill')] : [];
+      if (!chips.length || !row.getBoundingClientRect) continue;
+      t.classList.remove('below', 'dotonly');
+      const name = row.querySelector(':scope > .title');
+      const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+      const widths = chips.map((c) => c.getBoundingClientRect().width);
+      let need = -gap;
+      if (name && getComputedStyle(name).display !== 'none') {
+        name.style.flex = 'none';
+        need = name.getBoundingClientRect().width;
+        name.style.flex = '';
+      }
+      for (const w of widths) need += gap + w;
+      const room = row.getBoundingClientRect().width + 0.01;
+      if (need <= room) continue;
+      t.classList.add('below');
+      const banner = t.closest('.banner');
+      const cut = !banner && widths.some((w) => w > room);
+      let out = false;
+      if (banner) {
+        const b = banner.getBoundingClientRect();
+        const floor = b.bottom - (banner.querySelector('.vc-road')?.getBoundingClientRect().height ?? 10) + 0.5;
+        out = [...t.querySelectorAll('.title, .hsub, .pill')].some((e) => {
+          const r = e.getBoundingClientRect();
+          return r.height && (r.bottom > floor || r.top < b.top - 0.5 || r.right > b.right + 0.5);
+        });
+      }
+      if (cut || out) t.classList.replace('below', 'dotonly');
+    }
   }
 
   _bind() {
@@ -1923,7 +2306,7 @@ class VehicleConsumptionCard extends HTMLElement {
     ].filter(Boolean);
   }
 
-  _kpi(cls, label, icon, lines, sub) {
+  _kpi(cls, label, icon, lines, sub, echo = '') {
     const values = lines
       .map((l) => `<span class="kv">${vcEsc(l.v)}${l.v === VC_DASH || !l.unit ? '' : `<small>${vcEsc(l.unit)}</small>`}</span>`)
       .join('');
@@ -1931,7 +2314,8 @@ class VehicleConsumptionCard extends HTMLElement {
           <div class="kpi ${cls}">
             <span class="kl"><ha-icon icon="${icon}"></ha-icon>${vcEsc(label)}</span>
             ${values}
-            <span class="ks">${vcEsc(sub || VC_DASH)}</span>
+            <span class="ks">${vcEsc(sub || VC_DASH)}</span>${echo ? `
+            <span class="ks pill-echo">${vcEsc(`${this._t('average')} ${echo}`)}</span>` : ''}
           </div>`;
   }
 
@@ -1945,7 +2329,21 @@ class VehicleConsumptionCard extends HTMLElement {
     const total = a.total || {};
     const cpk = vcFinite(total.cost_per_km) ? total.cost_per_km : month.cost_per_km;
     const tripKpi = this._kpi('k-trip', this._t(a.driving ? 'trip_now' : 'trip'), 'mdi:map-marker-distance', this._cons(trip, kind, f), tripSub);
-    const avgKpi = this._kpi('k-avg', this._t('average'), 'mdi:chart-line', this._cons(total, kind, f), km(total.distance));
+    // The average is the header pill's figure: in its place the odometer, with the distance tracked under it (and the
+    // average, shown only when the pill keeps just its dot). A plug-in hybrid keeps its two averages (the pill gives one).
+    const avgKpi =
+      kind !== 'plugin_hybrid' && vcFinite(a.odometer)
+        ? this._kpi(
+            'k-odo',
+            this._t('odometer'),
+            'mdi:counter',
+            [{ v: f.num(a.odometer, 0), unit: u.dist }],
+            vcFinite(total.distance) ? this._t('tracked', { v: km(total.distance) }) : '',
+            this._cons(total, kind, f)
+              .map((l) => `${l.v} ${l.unit}`)
+              .join(' · '),
+          )
+        : this._kpi('k-avg', this._t('average'), 'mdi:chart-line', this._cons(total, kind, f), km(total.distance));
     if (compact) return tripKpi + avgKpi;
     return [
       tripKpi,
@@ -2290,16 +2688,25 @@ class VehicleConsumptionCard extends HTMLElement {
       .pill { flex: 0 1 auto; min-width: 0; max-width: 50%; overflow: hidden; text-overflow: ellipsis; font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 999px; white-space: nowrap;
               color: var(--ci); background: color-mix(in srgb, var(--c) 14%, transparent); font-variant-numeric: tabular-nums; }
       .pdot { display: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
-      /* Tighter header gaps once the whole label no longer fits with the normal ones (measured by _fitPill, not a
-         container width: a fixed width let a label that fitted tight just under it turn into a dot just over it). */
-      .head:has(.pill.tight), .head:has(.pill.tight) .title { gap: 6px; }
-      .pill.tight { padding: 1px 6px; }
-      /* Only the coloured dot (the text stays in title / aria-label) once the whole label no longer fits next to a
-         4-character title: measured on the label itself at each render and resize (_fitPill), so a longer label
-         (kWh/100 km, a translation) or a driving title turns into a dot only when the room is really missing. */
-      .pill.dot { padding: 5px; }
-      .pill.dot .ptxt { display: none; }
-      .pill.dot .pdot { display: block; }
+      .head > .titles { flex: 1 1 0; min-width: 0; }
+      /* The status pill, in every header: on the title row right after the title only when the whole title and the pill's
+         whole label fit there; otherwise on its own line under the subtitle, cut to one line; its dot alone, beside the
+         title, when the banner has no room left above its ground strip, or on a card of 200 px or less. Decided by
+         measurement (see _fitPill), so that every language and every width gets it right. */
+      .titles .trow { display: flex; align-items: center; gap: 8px; min-width: 0; width: 100%; }
+      .titles .trow > .title { flex: 0 1 auto; min-width: 0; }
+      .titles .trow > .pill { flex: none; max-width: none; margin: 0; align-self: center; }
+      .titles.below { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+      .titles.below > * { max-width: 100%; }
+      .titles.below .trow { display: contents; }
+      .titles.below .trow > .title { max-width: 100%; }
+      .titles.below .trow > .pill { order: 9; max-width: 100%; margin-top: 2px; align-self: flex-start; }
+      /* In the banner, a pill on its own line may run over the picture, up to the banner's edge. */
+      .banner .titles.below .trow > .pill { max-width: none; }
+      .titles.below :is(.hsub) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .titles.dotonly .trow > .pill { padding: 4px; } .titles.dotonly .trow > .pill .ptxt { display: none; }
+      .titles.dotonly .trow > .pill .pdot { display: block; }
+      @container (max-width: 200px) { .titles .trow > .pill { padding: 4px; } .titles .trow > .pill .ptxt { display: none; } .titles .trow > .pill .pdot { display: block; } }
       .icon-btn { all: unset; cursor: pointer; flex: none; width: 26px; height: 26px; border-radius: 50%;
                   display: grid; place-items: center; color: var(--secondary-text-color); }
       .icon-btn:hover { background: color-mix(in srgb, var(--secondary-text-color) 14%, transparent); color: var(--primary-text-color); }
@@ -2338,7 +2745,7 @@ class VehicleConsumptionCard extends HTMLElement {
 
       .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
       @container (min-width: 560px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-      .kpi { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 8px 10px; border-radius: 10px;
+      .kpi { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 8px 10px; border-radius: 12px;
              background: var(--secondary-background-color, rgba(127,127,127,.08)); }
       .kl { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; color: var(--secondary-text-color);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -2348,14 +2755,23 @@ class VehicleConsumptionCard extends HTMLElement {
       .kv small { margin-left: 3px; font-size: 11px; font-weight: 500; color: var(--secondary-text-color); }
       .ks { font-size: 11px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             font-variant-numeric: tabular-nums; }
+      /* The average is the header pill's: under the odometer only when the pill keeps just its dot. */
+      .ks.pill-echo { display: none; }
+      :is(.head, .banner):has(.titles.dotonly) ~ .kpis .ks.pill-echo { display: block; }
+      @container (max-width: 200px) { :is(.head, .banner) ~ .kpis .ks.pill-echo { display: block; } }
       /* Narrow card (6 columns of a section): the unit under the value, long labels on two lines. */
       @container (max-width: 250px) {
-        .kv small { display: block; margin-left: 0; }
+        .kv small { display: block; margin-left: 0; white-space: normal; }
         .kl, .ks { white-space: normal; overflow-wrap: anywhere; }
         .kl { align-items: flex-start; }
+        .chead { flex-wrap: wrap; row-gap: 0; }
+      }
+      /* Two tiles of about 60 px of text: the labels ("Odometer", "Cost per km") keep their words without their icon. */
+      @container (max-width: 200px) {
+        .kl ha-icon { display: none !important; }
       }
 
-      .chart { margin-top: 12px; padding: 10px 10px 4px; border-radius: 10px;
+      .chart { margin-top: 12px; padding: 10px 10px 4px; border-radius: 12px;
                background: var(--secondary-background-color, rgba(127,127,127,.08)); }
       .chead { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
       .ctitle { font-size: 12px; font-weight: 500; color: var(--primary-text-color); }
@@ -2449,7 +2865,7 @@ class VehicleConsumptionCard extends HTMLElement {
         .drive::after, .anim .fill, .anim .chart .bar, .anim .chart .bv, .veil, .sheet { animation: none !important; }
         .chev, .body { transition: none; }
       }
-    `;
+    ${VC_BANNER_STYLE}`;
   }
 }
 
@@ -2572,6 +2988,18 @@ class VehicleConsumptionCardEditor extends HTMLElement {
       { name: 'entity', selector: { select: { mode: 'dropdown', options: vehicles } } },
       { name: 'title', selector: { text: {} } },
       { name: 'show_title', selector: { boolean: {} } },
+      { name: 'illustration', selector: { boolean: {} } },
+      // The picture's day / night only matters with the picture.
+      ...(c.illustration === false
+        ? []
+        : [
+            {
+              name: 'illustration_theme',
+              selector: {
+                select: { mode: 'dropdown', options: ['auto', 'day', 'night'].map((v) => ({ value: v, label: vcT(lang, `theme_${v}`) })) },
+              },
+            },
+          ]),
       { name: 'chart', selector: { boolean: {} } },
       // What the chart shows only matters with the chart.
       ...(c.chart === false

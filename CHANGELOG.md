@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.0 - 2026-11-17
+
+### Features
+- Animated illustrated header on the card and the mini card (90 px, over a road strip): a fuel pump (fuel, plug-in hybrid) or a charging station (electric) whose screen shows the tank or the battery, beside the tracking (the last 7 months' consumption with the average, the last refuel or charge worked out in amount and cost). The round icon takes the state colour (ok, driving, low, unavailable), a car drives by while driving, night after sunset or with Home Assistant's dark theme. New options `illustration` (`false` for the classic header) and `illustration_theme` (`auto`, `day`, `night`), also in the visual editor.
+- Illustrated header: the average consumption is a pill after the title again (dot and value in the level's colour on a frosted tint, "Average" or "Driving" under the title). In both headers it is placed by measurement, in every language: on the title row right after the title only when the whole title and its whole label fit there, otherwise on its own line under the subtitle (cut to one line); only its dot when the banner has no room left above the road strip, when the label does not fit even alone, and on a card of 200 px or less. The header buttons (log a refuel or a charge, the mini card's expand / collapse) are 24 px frosted round buttons on one line at the banner's top right corner.
+- Night picture with the dark theme even while the sun is up.
+- Illustrated header: the pump or charging station and the chart move left of the header buttons, which no longer cover them (mini card compact and expanded, full card).
+
+### Fixes
+- The average consumption is no longer said twice (header pill and "Average" tile): the tile now gives the odometer, with the distance tracked under it, on the card and the mini card; the average comes back in it only when the pill keeps just its dot. A plug-in hybrid keeps its two averages (the pill gives one); without an odometer, the Average tile stays. Tiles get the common 12 px corners. Narrow card (6 columns): units wrap instead of being cut ("kWh/100 km"), the chart's period wraps under its title instead of running out of its box, and under 200 px the tile labels drop their icon instead of breaking words ("Odomet-er"); the chart box gets 12 px corners too.
+
 ## 1.8.0 - 2026-11-12
 
 ### Features

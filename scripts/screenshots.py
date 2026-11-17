@@ -57,6 +57,7 @@ ICONS = {
     "map-marker-distance": "M6.5,8.11C5.61,8.11 4.89,7.39 4.89,6.5A1.61,1.61 0 0,1 6.5,4.89C7.39,4.89 8.11,5.61 8.11,6.5V6.5A1.61,1.61 0 0,1 6.5,8.11M6.5,2C4,2 2,4 2,6.5C2,9.87 6.5,14.86 6.5,14.86C6.5,14.86 11,9.87 11,6.5C11,4 9,2 6.5,2M17.5,8.11A1.61,1.61 0 0,1 15.89,6.5C15.89,5.61 16.61,4.89 17.5,4.89C18.39,4.89 19.11,5.61 19.11,6.5A1.61,1.61 0 0,1 17.5,8.11M17.5,2C15,2 13,4 13,6.5C13,9.87 17.5,14.86 17.5,14.86C17.5,14.86 22,9.87 22,6.5C22,4 20,2 17.5,2M17.5,16C16.23,16 15.1,16.8 14.68,18H9.32C8.77,16.44 7.05,15.62 5.5,16.17C3.93,16.72 3.11,18.44 3.66,20C4.22,21.56 5.93,22.38 7.5,21.83C8.35,21.53 9,20.85 9.32,20H14.69C15.24,21.56 16.96,22.38 18.5,21.83C20.08,21.28 20.9,19.56 20.35,18C19.92,16.8 18.78,16 17.5,16V16M17.5,20.5A1.5,1.5 0 0,1 16,19A1.5,1.5 0 0,1 17.5,17.5A1.5,1.5 0 0,1 19,19A1.5,1.5 0 0,1 17.5,20.5Z",
     "calendar-month-outline": "M7 11H9V13H7V11M21 5V19C21 20.11 20.11 21 19 21H5C3.89 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H6V1H8V3H16V1H18V3H19C20.11 3 21 3.9 21 5M5 7H19V5H5V7M19 19V9H5V19H19M15 13V11H17V13H15M11 13V11H13V13H11M7 15H9V17H7V15M15 17V15H17V17H15M11 17V15H13V17H11Z",
     "chart-line": "M16,11.78L20.24,4.45L21.97,5.45L16.74,14.5L10.23,10.75L5.46,19H22V21H2V3H4V17.54L9.5,8L16,11.78Z",
+    "counter": "M4,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M4,6V18H11V6H4M20,18V6H18.76C19,6.54 18.95,7.07 18.95,7.13C18.88,7.8 18.41,8.5 18.24,8.75L15.91,11.3L19.23,11.28L19.24,12.5L14.04,12.47L14,11.47C14,11.47 17.05,8.24 17.2,7.95C17.34,7.67 17.91,6 16.5,6C15.27,6.05 15.41,7.3 15.41,7.3L13.87,7.31C13.87,7.31 13.88,6.65 14.25,6H13V18H15.58L15.57,17.14L16.54,17.13C16.54,17.13 17.45,16.97 17.46,16.08C17.5,15.08 16.65,15.08 16.5,15.08C16.37,15.08 15.43,15.13 15.43,15.95H13.91C13.91,15.95 13.95,13.89 16.5,13.89C19.1,13.89 18.96,15.91 18.96,15.91C18.96,15.91 19,17.16 17.85,17.63L18.37,18H20M8.92,16H7.42V10.2L5.62,10.76V9.53L8.76,8.41H8.92V16Z",
     "cash": "M3,6H21V18H3V6M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M7,8A2,2 0 0,1 5,10V14A2,2 0 0,1 7,16H17A2,2 0 0,1 19,14V10A2,2 0 0,1 17,8H7Z",
     "chevron-right": "M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z",
     "map-marker-path": "M18,15A3,3 0 0,1 21,18A3,3 0 0,1 18,21C16.69,21 15.58,20.17 15.17,19H14V17H15.17C15.58,15.83 16.69,15 18,15M18,17A1,1 0 0,0 17,18A1,1 0 0,0 18,19A1,1 0 0,0 19,18A1,1 0 0,0 18,17M18,8A1.43,1.43 0 0,0 19.43,6.57C19.43,5.78 18.79,5.14 18,5.14C17.21,5.14 16.57,5.78 16.57,6.57A1.43,1.43 0 0,0 18,8M18,2.57A4,4 0 0,1 22,6.57C22,9.56 18,14 18,14C18,14 14,9.56 14,6.57A4,4 0 0,1 18,2.57M8.83,17H10V19H8.83C8.42,20.17 7.31,21 6,21A3,3 0 0,1 3,18C3,16.69 3.83,15.58 5,15.17V14H7V15.17C7.85,15.47 8.53,16.15 8.83,17M6,17A1,1 0 0,0 5,18A1,1 0 0,0 6,19A1,1 0 0,0 7,18A1,1 0 0,0 6,17M6,3A3,3 0 0,1 9,6C9,7.31 8.17,8.42 7,8.83V10H5V8.83C3.83,8.42 3,7.31 3,6A3,3 0 0,1 6,3M6,5A1,1 0 0,0 5,6A1,1 0 0,0 6,7A1,1 0 0,0 7,6A1,1 0 0,0 6,5M11,19V17H13V19H11M7,13H5V11H7V13Z",
@@ -331,6 +332,18 @@ SHOTS = [
         "tag": "vehicle-consumption-mini-card",
         "width": 260,
     },
+    # The mini card expanded with its top right button: the full card, at the full card's width.
+    *(
+        {
+            "file": f"mini-card-zoom{suffix}",
+            "theme": theme,
+            "kind": "fuel",
+            "config": {},
+            "tag": "vehicle-consumption-mini-card",
+            "zoom": True,
+        }
+        for theme, suffix in (("light", ""), ("dark", "-dark"))
+    ),
 ]
 
 # One GIF per animation, on a compact card. `names`: the animations stepped; the others are shown finished.
@@ -358,6 +371,23 @@ LIGHT_GIFS = [
         "extra": {"driving": True},
         "names": ["vc-pulse"],
         "seconds": 1.6,
+    },
+    # The illustrated header: the months' bars growing, and the car driving by.
+    {
+        "file": "header",
+        "kind": "fuel",
+        "config": {**COMPACT, "chart": False},
+        "names": ["vc-bars"],
+        "seconds": 2.4,
+    },
+    {
+        "file": "header-driving",
+        "kind": "fuel",
+        "config": {**COMPACT, "chart": False},
+        "extra": {"driving": True},
+        "names": ["vc-drive"],
+        "seconds": 7.0,
+        "fps": 10,
     },
 ]
 GIFS = [{**g, "theme": "light"} for g in LIGHT_GIFS] + [
@@ -414,8 +444,9 @@ body {{ margin: 0; padding: 16px; background: var(--primary-background-color);
 </style></head><body><div id="root"></div></body></html>"""
 
 
-# Mounts the card on a new page; `open` unfolds sections, `popup` opens the add popup and types in its fields.
-MOUNT = """([hass, config, open, popup, tag]) => {
+# Mounts the card on a new page; `open` unfolds sections, `popup` opens the add popup and types in its fields,
+# `zoom` expands the mini card.
+MOUNT = """([hass, config, open, popup, tag, zoom]) => {
     const el = document.createElement(tag);
     el.setConfig({ type: `custom:${tag}`, ...config });
     el.hass = { ...hass, callService: async () => {} };
@@ -434,6 +465,11 @@ MOUNT = """([hass, config, open, popup, tag]) => {
         }
         el.shadowRoot.activeElement?.blur();
     }
+    // The mini card's expand button; the click leaves no focus ring.
+    if (zoom) {
+        el.shadowRoot.querySelector(".zoom").click();
+        el.shadowRoot.activeElement?.blur();
+    }
 }"""
 
 
@@ -446,8 +482,10 @@ def open_card(browser, shot):
     page.add_script_tag(content=HA_ELEMENTS)
     page.add_script_tag(content=CARD_JS)
     hass = mock_hass(shot["kind"], **shot.get("extra", {}))
+    # The illustrated header follows Home Assistant's dark mode when there is no sun.sun: night on the dark twins.
+    hass["themes"] = {"darkMode": shot.get("theme") == "dark"}
     tag = shot.get("tag", "vehicle-consumption-card")
-    page.evaluate(MOUNT, [hass, shot["config"], shot.get("open"), shot.get("popup"), tag])
+    page.evaluate(MOUNT, [hass, shot["config"], shot.get("open"), shot.get("popup"), tag, shot.get("zoom")])
     page.wait_for_timeout(400)
     box = page.locator("#root").bounding_box()
     clip = {"x": 0, "y": 0, "width": width + 32, "height": int(box["height"] + 0.999) + 32}
@@ -455,6 +493,7 @@ def open_card(browser, shot):
 
 
 def animate(browser, shot, *, fps=20):
+    fps = shot.get("fps", fps)
     """Record one animation as a looping screenshots/<file>.gif (needs ffmpeg). Every animation is paused and stepped
     frame by frame, so the GIF is identical whatever the machine's speed; the other animations are shown finished."""
     page, clip = open_card(browser, shot)
