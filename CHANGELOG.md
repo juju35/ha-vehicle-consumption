@@ -9,7 +9,7 @@
 - Illustrated header: the pump or charging station and the chart move left of the header buttons, which no longer cover them (mini card compact and expanded, full card).
 
 ### Fixes
-- The average consumption is no longer said twice (header pill and "Average" tile): the tile now gives the odometer, with the distance tracked under it, on the card and the mini card; the average comes back in it only when the pill keeps just its dot. A plug-in hybrid keeps its two averages (the pill gives one); without an odometer, the Average tile stays. Tiles get the common 12 px corners.
+- The average consumption is no longer said twice (header pill and "Average" tile): the tile now gives the odometer, with the distance tracked under it, on the card and the mini card; the average comes back in it only when the pill keeps just its dot. A plug-in hybrid keeps its two averages (the pill gives one); without an odometer, the Average tile stays. Tiles get the common 12 px corners. Narrow card (6 columns): units wrap instead of being cut ("kWh/100 km"), the chart's period wraps under its title instead of running out of its box, and under 200 px the tile labels drop their icon instead of breaking words ("Odomet-er"); the chart box gets 12 px corners too.
 
 ## 1.8.0 - 2026-11-12
 

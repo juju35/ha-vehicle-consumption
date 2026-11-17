@@ -1057,8 +1057,12 @@ test('KPIs on a narrow card: the unit goes under the value, labels and sub-lines
   const at = css.search(/@container \(max-width: \d+px\) \{[^@]*\.kv small/);
   assert.ok(at >= 0);
   const block = css.slice(at, css.indexOf('} }', at));
-  assert.match(block, /\.kv small \{ display: block; margin-left: 0; \}/);
+  // The unit wraps too ("kWh/100" over "km" rather than cut), and the chart's title row wraps its period.
+  assert.match(block, /\.kv small \{ display: block; margin-left: 0; white-space: normal; \}/);
   assert.match(block, /\.kl, \.ks \{ white-space: normal;/);
+  assert.match(block, /\.chead \{ flex-wrap: wrap; row-gap: 0;/);
+  // Under 200 px, the tile labels keep their words without their icon ("Odometer" was cut in two).
+  assert.match(css, /@container \(max-width: 200px\) \{ \.kl ha-icon \{ display: none !important; \} \}/);
 });
 
 test('editor: the chart options are hidden while the chart is off', () => {

@@ -2752,12 +2752,17 @@ class VehicleConsumptionCard extends HTMLElement {
       @container (max-width: 200px) { .banner ~ .kpis .ks.pill-echo { display: block; } }
       /* Narrow card (6 columns of a section): the unit under the value, long labels on two lines. */
       @container (max-width: 250px) {
-        .kv small { display: block; margin-left: 0; }
+        .kv small { display: block; margin-left: 0; white-space: normal; }
         .kl, .ks { white-space: normal; overflow-wrap: anywhere; }
         .kl { align-items: flex-start; }
+        .chead { flex-wrap: wrap; row-gap: 0; }
+      }
+      /* Two tiles of about 60 px of text: the labels ("Odometer", "Cost per km") keep their words without their icon. */
+      @container (max-width: 200px) {
+        .kl ha-icon { display: none !important; }
       }
 
-      .chart { margin-top: 12px; padding: 10px 10px 4px; border-radius: 10px;
+      .chart { margin-top: 12px; padding: 10px 10px 4px; border-radius: 12px;
                background: var(--secondary-background-color, rgba(127,127,127,.08)); }
       .chead { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
       .ctitle { font-size: 12px; font-weight: 500; color: var(--primary-text-color); }
