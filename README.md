@@ -404,6 +404,12 @@ Mini card:
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/mini-card.png" alt="mini card" width="292"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/mini-card-dark.png" alt="mini card dark" width="292"> |
 
+Mini card expanded with its top right button:
+
+| Light | Dark |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/mini-card-zoom.png" alt="mini card expanded to the full card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/mini-card-zoom-dark.png" alt="mini card expanded to the full card, dark" width="400"> |
+
 Recent trips and refuels unfolded:
 
 | Light | Dark |

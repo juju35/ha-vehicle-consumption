@@ -331,6 +331,18 @@ SHOTS = [
         "tag": "vehicle-consumption-mini-card",
         "width": 260,
     },
+    # The mini card expanded with its top right button: the full card, at the full card's width.
+    *(
+        {
+            "file": f"mini-card-zoom{suffix}",
+            "theme": theme,
+            "kind": "fuel",
+            "config": {},
+            "tag": "vehicle-consumption-mini-card",
+            "zoom": True,
+        }
+        for theme, suffix in (("light", ""), ("dark", "-dark"))
+    ),
 ]
 
 # One GIF per animation, on a compact card. `names`: the animations stepped; the others are shown finished.
@@ -431,8 +443,9 @@ body {{ margin: 0; padding: 16px; background: var(--primary-background-color);
 </style></head><body><div id="root"></div></body></html>"""
 
 
-# Mounts the card on a new page; `open` unfolds sections, `popup` opens the add popup and types in its fields.
-MOUNT = """([hass, config, open, popup, tag]) => {
+# Mounts the card on a new page; `open` unfolds sections, `popup` opens the add popup and types in its fields,
+# `zoom` expands the mini card.
+MOUNT = """([hass, config, open, popup, tag, zoom]) => {
     const el = document.createElement(tag);
     el.setConfig({ type: `custom:${tag}`, ...config });
     el.hass = { ...hass, callService: async () => {} };
@@ -451,6 +464,11 @@ MOUNT = """([hass, config, open, popup, tag]) => {
         }
         el.shadowRoot.activeElement?.blur();
     }
+    // The mini card's expand button; the click leaves no focus ring.
+    if (zoom) {
+        el.shadowRoot.querySelector(".zoom").click();
+        el.shadowRoot.activeElement?.blur();
+    }
 }"""
 
 
@@ -466,7 +484,7 @@ def open_card(browser, shot):
     # The illustrated header follows Home Assistant's dark mode when there is no sun.sun: night on the dark twins.
     hass["themes"] = {"darkMode": shot.get("theme") == "dark"}
     tag = shot.get("tag", "vehicle-consumption-card")
-    page.evaluate(MOUNT, [hass, shot["config"], shot.get("open"), shot.get("popup"), tag])
+    page.evaluate(MOUNT, [hass, shot["config"], shot.get("open"), shot.get("popup"), tag, shot.get("zoom")])
     page.wait_for_timeout(400)
     box = page.locator("#root").bounding_box()
     clip = {"x": 0, "y": 0, "width": width + 32, "height": int(box["height"] + 0.999) + 32}
