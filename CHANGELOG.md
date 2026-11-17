@@ -4,6 +4,7 @@
 
 ### Features
 - Animated illustrated header on the card and the mini card (90 px, over a road strip): a fuel pump (fuel, plug-in hybrid) or a charging station (electric) whose screen shows the tank or the battery, beside the tracking (the last 7 months' consumption with the average, the last refuel or charge worked out in amount and cost). The round icon takes the state colour (ok, driving, low, unavailable), a car drives by while driving, the picture follows the sun (night after sunset, else Home Assistant's dark mode). New options `illustration` (`false` for the classic header) and `illustration_theme` (`auto`, `day`, `night`), also in the visual editor.
+- Illustrated header: the average consumption is a pill right after the title again (dot and value in the level's colour on a frosted tint, "Average" or "Driving" under the title), on its own line under it when it does not fit, its dot only under 200 px. The header buttons (log a refuel or a charge, the mini card's expand / collapse) are 24 px frosted round buttons on one line at the banner's top right corner.
 
 ## 1.8.0 - 2026-11-12
 

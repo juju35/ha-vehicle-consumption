@@ -348,7 +348,8 @@ test('fuel: one fuel gauge, L/100 km tiles, refuels section but no charges, aver
   assert.match(out, /g-fuel/);
   assert.doesNotMatch(out, /g-battery/);
   assert.match(out, /63 % · 31.5 L/);
-  assert.match(out, /class="hsub" title="6.1 L\/100 km">6.1 L\/100 km</);
+  assert.match(out, /class="trow"><div class="title"><span class="tname">[^<]*<\/span><\/div><div class="pill" title="6.1 L\/100 km"/, "the average in the pill, right after the title");
+  assert.match(out, /class="hsub" title="Average">Average</, "and what it is under it");
   assert.match(out, /5.7<small>L\/100 km/);
   assert.match(out, /€0.107<small>\/km/);
   assert.match(out, /data-section="refuels"/);
@@ -975,13 +976,13 @@ test('resize: re-rendered at the next frame, never in the observer callback, onc
 test('not set up, unavailable or not found: each says so, with the sensor', () => {
   const missing = makeCard({ entity: 'sensor.typo' });
   missing.hass = hassWith(fuelAttrs());
-  assert.match(html(missing), /class="hsub" title="Not found">Not found</);
+  assert.match(html(missing), /class="pill" title="Not found"/);
   assert.match(html(missing), /sensor\.typo is not a Vehicle Consumption sensor/);
   const down = makeCard({ entity: SENSOR });
   const hass = hassWith(null);
   hass.states[SENSOR] = { state: 'unavailable', attributes: { restored: true, friendly_name: 'Family car Consumption' } };
   down.hass = hass;
-  assert.match(html(down), /class="hsub" title="Unavailable">Unavailable</);
+  assert.match(html(down), /class="pill" title="Unavailable"/);
   assert.match(html(down), /sensor\.family_car_consumption is unavailable/);
   assert.doesNotMatch(html(down), /Settings → Devices/);
   const none = makeCard();
@@ -1005,7 +1006,7 @@ test('no entity set, the only vehicle unavailable (Home Assistant starting): una
     { 'sensor.family_car_distance_trip': { platform: 'vehicle_consumption', translation_key: 'distance_trip' }, [SENSOR]: { platform: 'vehicle_consumption', translation_key: 'consumption' } },
     { 'sensor.family_car_distance_trip': { state: '42.3', attributes: {} }, [SENSOR]: restored },
   );
-  assert.match(named, /class="hsub" title="Unavailable">Unavailable</);
+  assert.match(named, /class="pill" title="Unavailable"/);
   assert.match(named, /sensor\.family_car_consumption is unavailable/);
   assert.doesNotMatch(named, /Not set up/);
   // Without translation keys, every sensor of the integration down (unknown just after a start).
@@ -1013,7 +1014,7 @@ test('no entity set, the only vehicle unavailable (Home Assistant starting): una
     'sensor.family_car_distance_trip': { state: 'unknown', attributes: {} },
     [SENSOR]: { ...restored, state: 'unknown' },
   });
-  assert.match(all, /class="hsub" title="Unavailable">Unavailable</);
+  assert.match(all, /class="pill" title="Unavailable"/);
   assert.doesNotMatch(all, /Not set up/);
   // A vehicle that works is still picked over one that is down.
   const card = makeCard();
@@ -1122,7 +1123,7 @@ test('imperial units: miles, gallons, mpg, cost and CO₂ per mile; the popup se
   card.hass = hass;
   const out = html(card);
   // The sensor stays in L/100 km (its statistics): the pill shows its imperial figure.
-  assert.match(out, /class="hsub" title="38.6 mpg"/);
+  assert.match(out, /class="pill" title="38.6 mpg"/);
   assert.match(out, /63 % · 8.3 gal/);
   assert.match(out, /41.7<small>mpg/);
   assert.match(out, /26.3 mi/);

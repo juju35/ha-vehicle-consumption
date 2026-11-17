@@ -1834,12 +1834,38 @@ const VC_BANNER_STYLE = `
       .banner.night .badge { background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14);
                              color: color-mix(in srgb, var(--c) 72%, #fff); }
       .htxt { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-      .banner .title { flex: none; min-width: 0; color: var(--sky-text); }
+      /* The pill right after the title, in the level's colour on a frosted tint; the title is cut first (about four
+         characters kept). When it does not fit there (measured by the card, or a narrow card) it goes on its own
+         line under the subtitle, where it may run over the left of the scene; very narrow, its dot alone. */
+      .trow { display: flex; align-items: center; gap: 8px; min-width: 0; }
+      .banner .title { flex: 0 100 auto; min-width: 4ch; color: var(--sky-text); }
+      .banner .pill { display: inline-flex; align-items: center; gap: 4px; max-width: 51%; line-height: 16px; box-sizing: border-box; border-radius: 12px;
+                      background: color-mix(in srgb, var(--c) 18%, rgba(255,255,255,.78)); color: color-mix(in srgb, var(--c) 45%, #0d2a45); }
+      .banner.night .pill { background: color-mix(in srgb, var(--c) 30%, rgba(8,18,38,.55)); color: color-mix(in srgb, var(--c) 35%, #ffffff); }
+      .banner .pdot { display: block; width: 7px; height: 7px; flex: none; }
+      .banner .ptxt { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+      .banner[data-wrap] .htxt { gap: 0; }
+      .banner[data-wrap] .trow { display: contents; }
+      .banner[data-wrap] .pill { order: 9; align-self: flex-start; max-width: calc(100cqw - 80px); margin-top: 3px; }
+      @container (max-width: 260px) {
+        .banner .trow { display: contents; }
+        .banner .pill { order: 9; align-self: flex-start; max-width: calc(100cqw - 80px); margin-top: 3px; }
+      }
+      @container (max-width: 200px) {
+        .banner .pill { padding: 0; background: none; }
+        .banner .ptxt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+      }
       .hsub { font-size: 13px; color: var(--sky-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
               font-variant-numeric: tabular-nums; }
-      .hbtns { flex: none; align-self: flex-start; display: flex; gap: 4px; }
-      .hbtns .icon-btn, .hbtns .zoom { margin: 0; color: #10283f; background: rgba(255,255,255,.6); }
-      .banner.night .hbtns .icon-btn, .banner.night .hbtns .zoom { color: #fff; background: rgba(10,20,40,.45); }
+      /* The header buttons (log a refuel, the mini card's expand / collapse) on one line at the banner's top right
+         corner: 24 px frosted round buttons, 4 px apart, over the scene. */
+      .hbtns { position: absolute; z-index: 2; top: 5px; right: 5px; display: flex; gap: 4px; }
+      .hbtns .icon-btn, .hbtns .zoom { margin: 0; width: 24px; height: 24px; color: #33506b; background: rgba(255,255,255,.55);
+                                       box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); backdrop-filter: blur(4px); }
+      .hbtns .icon-btn ha-icon, .hbtns .zoom ha-icon { --mdc-icon-size: 16px; }
+      .hbtns .icon-btn:hover, .hbtns .zoom:hover { background: rgba(255,255,255,.75); color: #33506b; }
+      .banner.night .hbtns .icon-btn, .banner.night .hbtns .zoom { color: #fff; background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+      .banner.night .hbtns .icon-btn:hover, .banner.night .hbtns .zoom:hover { background: rgba(255,255,255,.22); color: #fff; }
       .vc-road { position: absolute; left: 0; right: 0; bottom: 0; height: var(--vc-g); background: #858c94; box-shadow: inset 0 1px 0 #6f767d; }
       .vc-road::after { content: ""; position: absolute; left: 0; right: 0; top: calc(50% - .8px); height: 1.6px;
                         background: repeating-linear-gradient(90deg, rgba(255,255,255,.85) 0 9px, transparent 9px 18px); }
@@ -2038,7 +2064,7 @@ class VehicleConsumptionCard extends HTMLElement {
       <ha-card class="lvl-na${this.hasAttribute?.('mini') ? ' mini' : ''}">
         ${
           this._illustrated()
-            ? this._banner({ level: 'na', kind: 'fuel', name: c.title || this._t('title'), sub: this._t(why), scene: this._sceneData(null, 'fuel', null, 'na') })
+            ? this._banner({ level: 'na', kind: 'fuel', name: c.title || this._t('title'), pill: this._t(why), scene: this._sceneData(null, 'fuel', null, 'na') })
             : `<div class="head">
           <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
           <div class="title"><span class="tname">${vcEsc(c.title || this._t('title'))}</span></div>
@@ -2084,7 +2110,7 @@ class VehicleConsumptionCard extends HTMLElement {
       <ha-card class="lvl-${level}${this.hasAttribute?.('mini') ? ' mini' : ''}${this._popup ? ' has-popup' : ''}${anim}">
         ${
           this._illustrated()
-            ? this._banner({ level, kind, name: c.title || a.vehicle || this._t('title'), sub: avg, driving, buttons: add + this._zoomButton(), scene: this._sceneData(a, kind, f, level) })
+            ? this._banner({ level, kind, name: c.title || a.vehicle || this._t('title'), pill: avg, sub: this._t(a.driving ? 'driving' : 'average'), driving, buttons: add + this._zoomButton(), scene: this._sceneData(a, kind, f, level) })
             : `<div class="head">
           <div class="badge"><ha-icon icon="${VC_ICON}"></ha-icon></div>
           <div class="title"><span class="tname">${vcEsc(c.title || a.vehicle || this._t('title'))}</span>${driving}</div>
@@ -2109,8 +2135,9 @@ class VehicleConsumptionCard extends HTMLElement {
   }
 
   // The illustrated header: the round icon (fuel pump or charging station, coloured by the card's level) with the
-  // title and the average on the sky, the scene at the right, the road strip under it.
-  _banner({ level, kind, name, sub, driving = '', buttons = '', scene }) {
+  // title, the pill (the average, in the level's colour) right after it and what the pill is under it, on the sky;
+  // the scene at the right, the road strip under it; the buttons at the banner's top right corner.
+  _banner({ level, kind, name, pill, sub = '', driving = '', buttons = '', scene }) {
     const icon = kind === 'electric' ? 'mdi:ev-station' : 'mdi:gas-station';
     const night = vcIsNight(this._hass, this._config);
     const cls = `banner lvl-${level} k-${kind === 'electric' ? 'ev' : 'fuel'}${night ? ' night' : ''}`;
@@ -2120,11 +2147,11 @@ class VehicleConsumptionCard extends HTMLElement {
           <div class="head">
             <div class="badge"><ha-icon icon="${icon}"></ha-icon></div>
             <div class="htxt">
-              <div class="title"><span class="tname">${vcEsc(name)}</span>${driving}</div>
-              <div class="hsub" title="${vcEsc(sub)}">${vcEsc(sub)}</div>
+              <div class="trow"><div class="title"><span class="tname">${vcEsc(name)}</span>${driving}</div>${pill ? this._pill(pill) : ''}</div>
+              ${sub ? `<div class="hsub" title="${vcEsc(sub)}">${vcEsc(sub)}</div>` : ''}
             </div>
-            ${buttons ? `<div class="hbtns">${buttons}</div>` : ''}
           </div>
+          ${buttons ? `<div class="hbtns">${buttons}</div>` : ''}
         </div>`;
   }
 
@@ -2183,6 +2210,20 @@ class VehicleConsumptionCard extends HTMLElement {
   _fitPill() {
     const pill = this.shadowRoot?.querySelector('.pill');
     if (!pill?.classList) return;
+    const banner = pill.closest?.('.banner');
+    if (banner) {
+      // Illustrated header: a pill cut next to the title goes on its own line under the subtitle. Fractional
+      // widths: scrollWidth / clientWidth are rounded and miss a label cut by less than a pixel.
+      banner.removeAttribute('data-wrap');
+      const have = pill.getBoundingClientRect().width;
+      pill.style.maxWidth = 'none';
+      pill.style.flex = 'none';
+      const need = pill.getBoundingClientRect().width;
+      pill.style.maxWidth = '';
+      pill.style.flex = '';
+      if (need > have + 0.01) banner.setAttribute('data-wrap', '');
+      return;
+    }
     const cut = () => pill.scrollWidth > pill.clientWidth;
     pill.classList.remove('tight', 'dot');
     if (!cut()) return;
