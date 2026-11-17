@@ -33,7 +33,7 @@ It comes with a **Lovelace card** showing the tank and battery gauges, the key f
 - **Actions** to log a refuel or a charge by hand (`add_refuel`, `add_charge`) to start over (`reset_statistics`) or to rebuild everything from the recorded history (`import_history`)
 - **Service reminder**: log a service with its interval (`log_service`), and the **Next service** sensor counts the distance left, negative once overdue
 - **CSV export** of every trip, refuel and charge kept (`export`), for a spreadsheet
-- **Lovelace card bundled with the integration**, added automatically to the dashboard resources (nothing to add by hand): fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart (consumption, distance, cost or CO₂), CO₂ per km under the cost per km, recent trips and refuels or charges, a pulsing dot while driving, a popup to log a refuel or a charge; visual editor
+- **Lovelace card bundled with the integration**, added automatically to the dashboard resources (nothing to add by hand): an animated illustrated header (fuel pump or charging station, day and night), fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart (consumption, distance, cost or CO₂), CO₂ per km under the cost per km, recent trips and refuels or charges, a pulsing dot while driving, a popup to log a refuel or a charge; visual editor
 - UI setup, no YAML; English, French, German, Spanish, Italian, Dutch, Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian, Greek and Serbian (Cyrillic and Latin)
 
 ## Supported integrations
@@ -321,6 +321,8 @@ entity: sensor.my_car_consumption
 | `entity` | Auto | The vehicle: its **Consumption** sensor. Leave empty for the first vehicle |
 | `title` | Vehicle name | Card title |
 | `show_title` | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
+| `illustration` | `true` | Illustrated header: a fuel pump (fuel, plug-in hybrid) or a charging station (electric) on a road, with the tracking beside it. `false` for the classic header |
+| `illustration_theme` | `auto` | Day or night picture: `auto` (night when `sun.sun` is below the horizon, else with Home Assistant's dark mode), `day` or `night` |
 | `chart` | `true` | Monthly bar chart |
 | `chart_metric` | `consumption` | What the chart shows: `consumption`, `distance`, `cost` or `co2` (kg) |
 | `months` | `6` | Number of months in the chart (3–12) |
@@ -331,7 +333,9 @@ entity: sensor.my_car_consumption
 
 In the visual editor, **Vehicle** lists every vehicle set up in Vehicle Consumption, by name: nothing to look up, and a vehicle added later shows up in the list. The card picker previews the card with your first vehicle.
 
-The badge in the header is a gauge whose colour gives the state of the vehicle: the primary colour when all is well, green while driving, orange when the fuel or battery is low, grey when the vehicle is not available.
+The header is an illustration 90 px high, over a road strip: the title and the average consumption on the sky at its left; at its right the fuel pump (fuel and plug-in hybrid, with its fuel grade) or the charging station (electric), whose screen shows the fuel in the tank or the battery level, beside the tracking: the last 7 months' consumption (the current month coloured, the average dashed) and the last refuel or charge worked out (amount · cost). A car drives by while the vehicle is driving, the pump's screen blinks when the fuel or battery is low. The picture switches to night after sunset, and its motion stops with the system's reduced-motion setting. On a narrow card only the pump or the charging station stays beside the title.
+
+The round icon in the header (a fuel pump, or a charging station for an electric vehicle) is coloured by the state of the vehicle: the primary colour when all is well, green while driving, orange when the fuel or battery is low, grey when the vehicle is not available. With `illustration: false`, the classic header keeps its gauge badge in the same colours.
 
 The **+** button opens a popup at the top of the card to log a refuel (litres) or a charge (kWh), its total cost and, optionally, the odometer. The popup is modal: Tab stays inside it, Escape closes it and the focus goes back to the **+** button. The sections fold and unfold with a tap, and fold back on their own when you tap elsewhere.
 
@@ -352,7 +356,19 @@ The card picker shows both cards with their name and description in Home Assista
 
 ## Screenshots
 
-The card animates in three places, and stays still with `prefers-reduced-motion`:
+The card animates in these places, and stays still with `prefers-reduced-motion`:
+
+- **Header**: the months' consumption bars grow beside the fuel pump or the charging station
+
+  | Light | Dark |
+  |---|---|
+  | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/header.gif" alt="header animation" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/header-dark.gif" alt="header animation dark" width="400"> |
+
+- **Header while driving**: a car drives by on the road
+
+  | Light | Dark |
+  |---|---|
+  | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/header-driving.gif" alt="header driving animation" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/header-driving-dark.gif" alt="header driving animation dark" width="400"> |
 
 - **Gauges**: the fuel and battery gauges fill up to their level when the card appears
 

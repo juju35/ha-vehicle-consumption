@@ -359,6 +359,23 @@ LIGHT_GIFS = [
         "names": ["vc-pulse"],
         "seconds": 1.6,
     },
+    # The illustrated header: the months' bars growing, and the car driving by.
+    {
+        "file": "header",
+        "kind": "fuel",
+        "config": {**COMPACT, "chart": False},
+        "names": ["vc-bars"],
+        "seconds": 2.4,
+    },
+    {
+        "file": "header-driving",
+        "kind": "fuel",
+        "config": {**COMPACT, "chart": False},
+        "extra": {"driving": True},
+        "names": ["vc-drive"],
+        "seconds": 7.0,
+        "fps": 10,
+    },
 ]
 GIFS = [{**g, "theme": "light"} for g in LIGHT_GIFS] + [
     {**g, "file": f"{g['file']}-dark", "theme": "dark"} for g in LIGHT_GIFS
@@ -446,6 +463,8 @@ def open_card(browser, shot):
     page.add_script_tag(content=HA_ELEMENTS)
     page.add_script_tag(content=CARD_JS)
     hass = mock_hass(shot["kind"], **shot.get("extra", {}))
+    # The illustrated header follows Home Assistant's dark mode when there is no sun.sun: night on the dark twins.
+    hass["themes"] = {"darkMode": shot.get("theme") == "dark"}
     tag = shot.get("tag", "vehicle-consumption-card")
     page.evaluate(MOUNT, [hass, shot["config"], shot.get("open"), shot.get("popup"), tag])
     page.wait_for_timeout(400)
@@ -455,6 +474,7 @@ def open_card(browser, shot):
 
 
 def animate(browser, shot, *, fps=20):
+    fps = shot.get("fps", fps)
     """Record one animation as a looping screenshots/<file>.gif (needs ffmpeg). Every animation is paused and stepped
     frame by frame, so the GIF is identical whatever the machine's speed; the other animations are shown finished."""
     page, clip = open_card(browser, shot)

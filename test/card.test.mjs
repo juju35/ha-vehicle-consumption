@@ -344,11 +344,11 @@ test('fuel: one fuel gauge, L/100 km tiles, refuels section but no charges, aver
   const card = makeCard();
   card.hass = hassWith(fuelAttrs());
   const out = html(card);
-  assert.match(out, /mdi:gauge-low"/);
+  assert.match(out, /class="badge"><ha-icon icon="mdi:gas-station"/);
   assert.match(out, /g-fuel/);
   assert.doesNotMatch(out, /g-battery/);
   assert.match(out, /63 % · 31.5 L/);
-  assert.match(out, /class="ptxt">6.1 L\/100 km</);
+  assert.match(out, /class="hsub" title="6.1 L\/100 km">6.1 L\/100 km</);
   assert.match(out, /5.7<small>L\/100 km/);
   assert.match(out, /€0.107<small>\/km/);
   assert.match(out, /data-section="refuels"/);
@@ -363,7 +363,7 @@ test('electric: one battery gauge, kWh/100 km, charges section only', () => {
   hass.states[SENSOR].attributes.unit_of_measurement = 'kWh/100 km';
   card.hass = hass;
   const out = html(card);
-  assert.match(out, /mdi:gauge-low"/);
+  assert.match(out, /class="badge"><ha-icon icon="mdi:ev-station"/);
   assert.match(out, /g-battery/);
   assert.doesNotMatch(out, /g-fuel/);
   assert.match(out, /16.1<small>kWh\/100 km/);
@@ -397,7 +397,7 @@ test('plugin hybrid: two gauges, both consumptions in the tiles, refuels and cha
     }),
   );
   const out = html(card);
-  assert.match(out, /mdi:gauge-low"/);
+  assert.match(out, /class="badge"><ha-icon icon="mdi:gas-station"/);
   assert.match(out, /g-fuel/);
   assert.match(out, /g-battery/);
   assert.match(out, /2.1<small>L\/100 km.*12.4<small>kWh\/100 km/s);
@@ -769,7 +769,7 @@ test('header: the title keeps a few letters, the pill shrinks and turns into a d
   assert.match(rule('.pill.dot .ptxt'), /display: none/);
   assert.match(rule('.pill.dot .pdot'), /display: block/);
   for (const sel of ['.icon-btn', '.badge']) assert.match(rule(sel), /flex: none/);
-  const card = makeCard();
+  const card = makeCard({ illustration: false });
   card.hass = hassWith(fuelAttrs());
   // The value stays readable for assistive technology and in the tooltip once only the dot shows.
   assert.match(html(card), /class="pill" title="6.1 L\/100 km" aria-label="6.1 L\/100 km"><span class="pdot"><\/span><span class="ptxt">6.1 L\/100 km<\/span>/);
@@ -975,13 +975,13 @@ test('resize: re-rendered at the next frame, never in the observer callback, onc
 test('not set up, unavailable or not found: each says so, with the sensor', () => {
   const missing = makeCard({ entity: 'sensor.typo' });
   missing.hass = hassWith(fuelAttrs());
-  assert.match(html(missing), /class="ptxt">Not found</);
+  assert.match(html(missing), /class="hsub" title="Not found">Not found</);
   assert.match(html(missing), /sensor\.typo is not a Vehicle Consumption sensor/);
   const down = makeCard({ entity: SENSOR });
   const hass = hassWith(null);
   hass.states[SENSOR] = { state: 'unavailable', attributes: { restored: true, friendly_name: 'Family car Consumption' } };
   down.hass = hass;
-  assert.match(html(down), /class="ptxt">Unavailable</);
+  assert.match(html(down), /class="hsub" title="Unavailable">Unavailable</);
   assert.match(html(down), /sensor\.family_car_consumption is unavailable/);
   assert.doesNotMatch(html(down), /Settings → Devices/);
   const none = makeCard();
@@ -1005,7 +1005,7 @@ test('no entity set, the only vehicle unavailable (Home Assistant starting): una
     { 'sensor.family_car_distance_trip': { platform: 'vehicle_consumption', translation_key: 'distance_trip' }, [SENSOR]: { platform: 'vehicle_consumption', translation_key: 'consumption' } },
     { 'sensor.family_car_distance_trip': { state: '42.3', attributes: {} }, [SENSOR]: restored },
   );
-  assert.match(named, /class="ptxt">Unavailable</);
+  assert.match(named, /class="hsub" title="Unavailable">Unavailable</);
   assert.match(named, /sensor\.family_car_consumption is unavailable/);
   assert.doesNotMatch(named, /Not set up/);
   // Without translation keys, every sensor of the integration down (unknown just after a start).
@@ -1013,7 +1013,7 @@ test('no entity set, the only vehicle unavailable (Home Assistant starting): una
     'sensor.family_car_distance_trip': { state: 'unknown', attributes: {} },
     [SENSOR]: { ...restored, state: 'unknown' },
   });
-  assert.match(all, /class="ptxt">Unavailable</);
+  assert.match(all, /class="hsub" title="Unavailable">Unavailable</);
   assert.doesNotMatch(all, /Not set up/);
   // A vehicle that works is still picked over one that is down.
   const card = makeCard();
@@ -1122,7 +1122,7 @@ test('imperial units: miles, gallons, mpg, cost and CO₂ per mile; the popup se
   card.hass = hass;
   const out = html(card);
   // The sensor stays in L/100 km (its statistics): the pill shows its imperial figure.
-  assert.match(out, /class="pill" title="38.6 mpg"/);
+  assert.match(out, /class="hsub" title="38.6 mpg"/);
   assert.match(out, /63 % · 8.3 gal/);
   assert.match(out, /41.7<small>mpg/);
   assert.match(out, /26.3 mi/);
@@ -1303,4 +1303,105 @@ test('trips: an estimated trip (coarse fuel sensor) is marked in the list', () =
   assert.match(out, /11.0 km · ≈ Estimated/);
   assert.doesNotMatch(out, /300.0 km · ≈/);
   assert.equal(vcT('fr', 'estimated'), 'Estimé');
+});
+
+test('illustration: fuel pump on a road, the tank on its screen, the months tracked and the last refuel worked out', () => {
+  const card = makeCard();
+  card.hass = hassWith(fuelAttrs({ fuel_type: 'diesel' }));
+  const out = html(card);
+  assert.match(out, /<div class="banner lvl-ok k-fuel" data-uid="\d+">/);
+  assert.match(out, /class="vc-road"/);
+  assert.match(out, /class="vc-cnt" y="-40">31.5L</);
+  assert.match(out, /class="vc-grade" y="-24.6">B7</);
+  assert.match(out, /class="vc-ctxt" y="3.2">41.2 L · €74.10</);
+  assert.match(out, /class="vc-unit" x="0" y="-.6">L\/100 km</);
+  // Seven months, the current one coloured, a month without data as a stub, the average dashed.
+  assert.equal(out.match(/class="vc-(bar|stub)/g).length, 7);
+  assert.equal(out.match(/vc-bar vc-now/g).length, 1);
+  assert.match(out, /class="vc-avg"/);
+  assert.doesNotMatch(out, /class="vc-car"/);
+  // Unique per instance.
+  const other = makeCard();
+  other.hass = hassWith(fuelAttrs());
+  assert.notEqual(out.match(/data-uid="(\d+)"/)[1], html(other).match(/data-uid="(\d+)"/)[1]);
+});
+
+test('illustration: electric shows the charging station, the battery and the last charge', () => {
+  const card = makeCard();
+  card.hass = hassWith(evAttrs());
+  const out = html(card);
+  assert.match(out, /class="banner lvl-ok k-ev"/);
+  assert.match(out, /class="vc-cnt" y="-40">72%</);
+  assert.match(out, /class="vc-bolt"/);
+  assert.doesNotMatch(out, /class="vc-grade"/);
+  assert.match(out, /class="vc-ctxt" y="3.2">30.5 kWh · €7.60</);
+});
+
+test('illustration: the icon colour follows the state (driving, low, not set up), a car drives by while driving', () => {
+  const drive = makeCard();
+  drive.hass = hassWith(fuelAttrs({ driving: true }));
+  assert.match(html(drive), /class="banner lvl-drive/);
+  assert.match(html(drive), /class="vc-car"/);
+  const low = makeCard();
+  low.hass = hassWith(fuelAttrs({ fuel_level: 9 }));
+  assert.match(html(low), /class="banner lvl-warn/);
+  const none = makeCard();
+  none.hass = hassWith(null);
+  assert.match(html(none), /class="banner lvl-na/);
+  assert.match(html(none), /class="vc-cnt" y="-40">--</);
+  // The badge takes the level colour, day and night.
+  assert.match(rule('.badge'), /color: var\(--c\)/);
+  assert.match(rule('.banner.night .badge'), /color: color-mix\(in srgb, var\(--c\) 72%, #fff\)/);
+  for (const lvl of ['ok', 'drive', 'warn', 'na']) assert.match(styles(), new RegExp(`ha-card\\.lvl-${lvl} \\{ --c:`));
+});
+
+test('illustration: night by the sun, else the dark theme, forced by illustration_theme; off gives the classic header', () => {
+  const night = (config, extra) => {
+    const card = makeCard(config);
+    card.hass = hassWith(fuelAttrs(), extra);
+    return /class="banner [^"]*night/.test(html(card));
+  };
+  const sun = (state) => ({ states: { ...hassWith(fuelAttrs()).states, 'sun.sun': { state, attributes: {} } } });
+  assert.equal(night({}, sun('below_horizon')), true);
+  assert.equal(night({}, sun('above_horizon')), false);
+  assert.equal(night({}, { themes: { darkMode: true } }), true);
+  assert.equal(night({ illustration_theme: 'day' }, sun('below_horizon')), false);
+  assert.equal(night({ illustration_theme: 'night' }, sun('above_horizon')), true);
+  const classic = makeCard({ illustration: false });
+  classic.hass = hassWith(fuelAttrs());
+  assert.doesNotMatch(html(classic), /class="banner/);
+  assert.match(html(classic), /mdi:gauge-low"/);
+  assert.match(html(classic), /class="pill"/);
+  // The banner is 90 px, edge to edge, with a 10 px road strip; motion stops when reduced.
+  assert.match(rule('.banner'), /height: 90px; margin: -12px -12px 0;/);
+  assert.match(rule('.banner'), /--vc-g: 10px;/);
+  assert.match(styles(), /prefers-reduced-motion: reduce\) \{ \.vc-car, \.vc-bar, \.vc-cnt, \.vc-bolt \{ animation: none !important; \}/);
+});
+
+test('illustration: the sun setting re-renders the card', () => {
+  const card = makeCard();
+  const hass = hassWith(fuelAttrs());
+  hass.states['sun.sun'] = { state: 'above_horizon', attributes: {} };
+  card.hass = hass;
+  assert.doesNotMatch(html(card), /class="banner [^"]*night/);
+  card.hass = { ...hass, states: { ...hass.states, 'sun.sun': { state: 'below_horizon', attributes: {} } } };
+  assert.match(html(card), /class="banner [^"]*night/);
+});
+
+test('illustration: the mini card has the same banner, its detail button on it; both editors offer the options', () => {
+  const mini = makeMini();
+  mini.hass = hassWith(fuelAttrs());
+  assert.match(html(mini), /class="banner lvl-ok k-fuel/);
+  assert.match(html(mini), /<div class="hbtns"><button class="zoom"/);
+  for (const Editor of [VehicleConsumptionCardEditor, VehicleConsumptionMiniCardEditor]) {
+    const editor = new Editor();
+    editor.appendChild = () => {};
+    editor.setConfig({});
+    editor.hass = hassWith(fuelAttrs());
+    const names = editor._form.schema.map((s) => s.name);
+    assert.ok(names.includes('illustration') && names.includes('illustration_theme'), Editor.name);
+    editor.setConfig({ illustration: false });
+    assert.ok(!editor._form.schema.some((s) => s.name === 'illustration_theme'));
+    assert.equal(editor._form.computeLabel({ name: 'illustration' }), 'Illustrated header');
+  }
 });
