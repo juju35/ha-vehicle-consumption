@@ -322,7 +322,7 @@ entity: sensor.my_car_consumption
 | `title` | Vehicle name | Card title |
 | `show_title` | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `illustration` | `true` | Illustrated header: a fuel pump (fuel, plug-in hybrid) or a charging station (electric) on a road, with the tracking beside it. `false` for the classic header |
-| `illustration_theme` | `auto` | Day or night picture: `auto` (night when `sun.sun` is below the horizon, else with Home Assistant's dark mode), `day` or `night` |
+| `illustration_theme` | `auto` | Day or night picture: `auto` (night when `sun.sun` is below the horizon or Home Assistant's theme is dark), `day` or `night` |
 | `chart` | `true` | Monthly bar chart |
 | `chart_metric` | `consumption` | What the chart shows: `consumption`, `distance`, `cost` or `co2` (kg) |
 | `months` | `6` | Number of months in the chart (3–12) |
@@ -333,7 +333,7 @@ entity: sensor.my_car_consumption
 
 In the visual editor, **Vehicle** lists every vehicle set up in Vehicle Consumption, by name: nothing to look up, and a vehicle added later shows up in the list. The card picker previews the card with your first vehicle.
 
-The header is an illustration 90 px high, over a road strip: the title with the average consumption as a pill right after it on the sky at its left, the buttons at its top right corner; at its right the fuel pump (fuel and plug-in hybrid, with its fuel grade) or the charging station (electric), whose screen shows the fuel in the tank or the battery level, beside the tracking: the last 7 months' consumption (the current month coloured, the average dashed) and the last refuel or charge worked out (amount · cost). A car drives by while the vehicle is driving, the pump's screen blinks when the fuel or battery is low. The picture switches to night after sunset, and its motion stops with the system's reduced-motion setting. On a narrow card only the pump or the charging station stays beside the title.
+The header is an illustration 90 px high, over a road strip: the title with the average consumption as a pill right after it on the sky at its left, the buttons at its top right corner; at its right, left of the buttons, the fuel pump (fuel and plug-in hybrid, with its fuel grade) or the charging station (electric), whose screen shows the fuel in the tank or the battery level, beside the tracking: the last 7 months' consumption (the current month coloured, the average dashed) and the last refuel or charge worked out (amount · cost). A car drives by while the vehicle is driving, the pump's screen blinks when the fuel or battery is low. The picture switches to night after sunset or with a dark theme, and its motion stops with the system's reduced-motion setting. On a narrow card only the pump or the charging station stays beside the title.
 
 The round icon in the header (a fuel pump, or a charging station for an electric vehicle) is coloured by the state of the vehicle: the primary colour when all is well, green while driving, orange when the fuel or battery is low, grey when the vehicle is not available. With `illustration: false`, the classic header keeps its gauge badge in the same colours.
 

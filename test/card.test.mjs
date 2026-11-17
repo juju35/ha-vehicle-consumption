@@ -1310,7 +1310,8 @@ test('illustration: fuel pump on a road, the tank on its screen, the months trac
   const card = makeCard();
   card.hass = hassWith(fuelAttrs({ fuel_type: 'diesel' }));
   const out = html(card);
-  assert.match(out, /<div class="banner lvl-ok k-fuel" data-uid="\d+">/);
+  // The scene moves left of the header buttons (one: the add button) so the pump stays clear of them.
+  assert.match(out, /<div class="banner lvl-ok k-fuel" data-uid="\d+" style="--vc-sr: 21px;">/);
   assert.match(out, /class="vc-road"/);
   assert.match(out, /class="vc-cnt" y="-40">31.5L</);
   assert.match(out, /class="vc-grade" y="-24.6">B7</);
@@ -1356,7 +1357,7 @@ test('illustration: the icon colour follows the state (driving, low, not set up)
   for (const lvl of ['ok', 'drive', 'warn', 'na']) assert.match(styles(), new RegExp(`ha-card\\.lvl-${lvl} \\{ --c:`));
 });
 
-test('illustration: night by the sun, else the dark theme, forced by illustration_theme; off gives the classic header', () => {
+test('illustration: night by the sun or the dark theme, forced by illustration_theme; off gives the classic header', () => {
   const night = (config, extra) => {
     const card = makeCard(config);
     card.hass = hassWith(fuelAttrs(), extra);
@@ -1368,6 +1369,11 @@ test('illustration: night by the sun, else the dark theme, forced by illustratio
   assert.equal(night({}, { themes: { darkMode: true } }), true);
   assert.equal(night({ illustration_theme: 'day' }, sun('below_horizon')), false);
   assert.equal(night({ illustration_theme: 'night' }, sun('above_horizon')), true);
+  const sunUp = (dark) => ({ ...sun('above_horizon'), themes: { darkMode: dark } });
+  assert.equal(night({}, sunUp(true)), true, 'dark theme while the sun is up: night');
+  assert.equal(night({}, sunUp(false)), false, 'light theme while the sun is up: day');
+  assert.equal(night({ illustration_theme: 'day' }, sunUp(true)), false, 'forced day wins over the dark theme');
+  assert.equal(night({ illustration_theme: 'night' }, sunUp(false)), true, 'forced night wins over the sun');
   const classic = makeCard({ illustration: false });
   classic.hass = hassWith(fuelAttrs());
   assert.doesNotMatch(html(classic), /class="banner/);
@@ -1394,6 +1400,11 @@ test('illustration: the mini card has the same banner, its detail button on it; 
   mini.hass = hassWith(fuelAttrs());
   assert.match(html(mini), /class="banner lvl-ok k-fuel/);
   assert.match(html(mini), /<div class="hbtns"><button class="zoom"/);
+  assert.match(html(mini), /<div class="banner [^"]*" data-uid="\d+" style="--vc-sr: 21px;">/);
+  mini._zoomClick({ detail: 1 });
+  assert.match(html(mini), /<div class="banner [^"]*" data-uid="\d+" style="--vc-sr: 49px;">/, 'add + collapse: two buttons');
+  assert.match(styles(), /\.vc-scene \{ position: absolute; right: var\(--vc-sr, 0px\);/);
+  assert.match(styles(), /\.banner \.head \{[^}]*right: calc\(var\(--vc-scene-w\) \+ var\(--vc-sr, 0px\)\);/);
   for (const Editor of [VehicleConsumptionCardEditor, VehicleConsumptionMiniCardEditor]) {
     const editor = new Editor();
     editor.appendChild = () => {};

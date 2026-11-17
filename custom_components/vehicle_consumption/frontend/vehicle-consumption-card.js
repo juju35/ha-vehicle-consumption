@@ -1774,13 +1774,14 @@ const VC_KINDS = ['fuel', 'electric', 'plugin_hybrid'];
 const VC_GRADE = { petrol: 'E10', diesel: 'B7', lpg: 'LPG', e85: 'E85' };
 let vcUid = 0;
 
-// Night picture: forced by illustration_theme, else the sun below the horizon, else Home Assistant's dark mode.
+// Night picture: forced by illustration_theme, else the sun below the horizon or Home Assistant's dark theme (even
+// with the sun up).
 const vcIsNight = (hass, config) => {
   const theme = config?.illustration_theme;
   if (theme === 'night') return true;
   if (theme === 'day') return false;
   const sun = hass?.states?.['sun.sun'];
-  if (sun && !['unavailable', 'unknown'].includes(String(sun.state))) return sun.state === 'below_horizon';
+  if (sun && !['unavailable', 'unknown'].includes(String(sun.state)) && sun.state === 'below_horizon') return true;
   return !!hass?.themes?.darkMode;
 };
 
@@ -1828,7 +1829,7 @@ const VC_BANNER_STYLE = `
                 background: linear-gradient(90deg, #f1f8ff 0%, #e2f1fd 34%, #b9def8 70%, #9fd0f3 100%); }
       .banner.night { --sky-text: #fff; --sky-muted: rgba(255,255,255,.78);
                       background: linear-gradient(90deg, #1b2f52 0%, #15284a 36%, #0f1f3d 72%, #0a1830 100%); }
-      .banner .head { position: absolute; z-index: 1; left: 0; top: 0; bottom: var(--vc-g); right: var(--vc-scene-w);
+      .banner .head { position: absolute; z-index: 1; left: 0; top: 0; bottom: var(--vc-g); right: calc(var(--vc-scene-w) + var(--vc-sr, 0px));
                       padding: 8px 8px 8px 14px; box-sizing: border-box; min-width: 0; color: var(--sky-text); }
       .banner .badge { position: relative; background: rgba(255,255,255,.62); box-shadow: inset 0 0 0 1px rgba(13,42,69,.12); }
       .banner.night .badge { background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14);
@@ -1858,7 +1859,7 @@ const VC_BANNER_STYLE = `
       .hsub { font-size: 13px; color: var(--sky-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
               font-variant-numeric: tabular-nums; }
       /* The header buttons (log a refuel, the mini card's expand / collapse) on one line at the banner's top right
-         corner: 24 px frosted round buttons, 4 px apart, over the scene. */
+         corner: 24 px frosted round buttons, 4 px apart, the scene moved left of them (--vc-sr). */
       .hbtns { position: absolute; z-index: 2; top: 5px; right: 5px; display: flex; gap: 4px; }
       .hbtns .icon-btn, .hbtns .zoom { margin: 0; width: 24px; height: 24px; color: #33506b; background: rgba(255,255,255,.55);
                                        box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); backdrop-filter: blur(4px); }
@@ -1871,7 +1872,7 @@ const VC_BANNER_STYLE = `
                         background: repeating-linear-gradient(90deg, rgba(255,255,255,.85) 0 9px, transparent 9px 18px); }
       .night .vc-road { background: #2c323b; box-shadow: inset 0 1px 0 #3a414b; }
       .night .vc-road::after { background: repeating-linear-gradient(90deg, rgba(255,255,255,.4) 0 9px, transparent 9px 18px); }
-      .vc-scene { position: absolute; right: 0; bottom: var(--vc-g); height: calc(100% - var(--vc-g)); width: var(--vc-scene-w); }
+      .vc-scene { position: absolute; right: var(--vc-sr, 0px); bottom: var(--vc-g); height: calc(100% - var(--vc-g)); width: var(--vc-scene-w); }
       .vc-scene text { font-family: Roboto, system-ui, sans-serif; }
       .vc-stars { fill: #fff; opacity: 0; } .night .vc-stars { opacity: .8; }
       .vc-box { fill: #fff; stroke: #dbe2ea; stroke-width: 1; } .night .vc-box { fill: #2a3446; stroke: #3a4456; }
@@ -2141,7 +2142,12 @@ class VehicleConsumptionCard extends HTMLElement {
     const icon = kind === 'electric' ? 'mdi:ev-station' : 'mdi:gas-station';
     const night = vcIsNight(this._hass, this._config);
     const cls = `banner lvl-${level} k-${kind === 'electric' ? 'ev' : 'fuel'}${night ? ' night' : ''}`;
-    return `<div class="${cls}" data-uid="${this._uid}">
+    // The scene keeps clear of the header buttons: it moves left so that the pump's body ends 2 px left of them
+    // (each button 24 px, 4 px apart, 5 px from the edge; the pump's body ends 13 px left of the scene's edge, its
+    // hose and nozzle stay low, under the buttons).
+    const n = (buttons.match(/<button/g) || []).length;
+    const shift = n ? `--vc-sr: ${28 * n - 7}px;` : '';
+    return `<div class="${cls}" data-uid="${this._uid}"${shift ? ` style="${shift}"` : ''}>
           <div class="vc-road" aria-hidden="true"></div>
           ${vcSceneSvg(scene)}
           <div class="head">
