@@ -6,7 +6,7 @@
  * Served and added to the dashboard resources by the integration.
  * https://github.com/juju35/ha-vehicle-consumption
  */
-var VEHICLE_CONSUMPTION_CARD_VERSION = '1.9.0';
+var VEHICLE_CONSUMPTION_CARD_VERSION = '1.9.1';
 
 const VC_I18N = {
   en: {
@@ -60,7 +60,7 @@ const VC_I18N = {
     ed_show_title: 'Show title',
     ed_illustration: 'Illustrated header',
     ed_illustration_theme: 'Header picture',
-    theme_auto: 'Automatic (sun or dark theme)',
+    theme_auto: 'Automatic (follows the theme)',
     theme_day: 'Day',
     theme_night: 'Night',
     ed_title_helper: 'Leave empty for the vehicle name',
@@ -132,7 +132,7 @@ const VC_I18N = {
     ed_show_title: 'Afficher le titre',
     ed_illustration: 'En-tête illustré',
     ed_illustration_theme: "Image de l'en-tête",
-    theme_auto: 'Automatique (soleil ou thème sombre)',
+    theme_auto: 'Automatique (suit le thème)',
     theme_day: 'Jour',
     theme_night: 'Nuit',
     ed_title_helper: 'Laisser vide pour le nom du véhicule',
@@ -204,7 +204,7 @@ const VC_I18N = {
     ed_show_title: 'Titel anzeigen',
     ed_illustration: 'Illustrierte Kopfzeile',
     ed_illustration_theme: 'Kopfzeilenbild',
-    theme_auto: 'Automatisch (Sonne oder dunkles Design)',
+    theme_auto: 'Automatisch (folgt dem Design)',
     theme_day: 'Tag',
     theme_night: 'Nacht',
     ed_title_helper: 'Leer lassen für den Fahrzeugnamen',
@@ -276,7 +276,7 @@ const VC_I18N = {
     ed_show_title: 'Mostrar el título',
     ed_illustration: 'Encabezado ilustrado',
     ed_illustration_theme: 'Imagen del encabezado',
-    theme_auto: 'Automático (sol o tema oscuro)',
+    theme_auto: 'Automático (sigue el tema)',
     theme_day: 'Día',
     theme_night: 'Noche',
     ed_title_helper: 'Déjalo vacío para el nombre del vehículo',
@@ -348,7 +348,7 @@ const VC_I18N = {
     ed_show_title: 'Mostra il titolo',
     ed_illustration: 'Intestazione illustrata',
     ed_illustration_theme: "Immagine dell'intestazione",
-    theme_auto: 'Automatico (sole o tema scuro)',
+    theme_auto: 'Automatico (segue il tema)',
     theme_day: 'Giorno',
     theme_night: 'Notte',
     ed_title_helper: 'Lascia vuoto per il nome del veicolo',
@@ -420,7 +420,7 @@ const VC_I18N = {
     ed_show_title: 'Titel tonen',
     ed_illustration: 'Geïllustreerde koptekst',
     ed_illustration_theme: 'Afbeelding koptekst',
-    theme_auto: 'Automatisch (zon of donker thema)',
+    theme_auto: 'Automatisch (volgt het thema)',
     theme_day: 'Dag',
     theme_night: 'Nacht',
     ed_title_helper: 'Laat leeg voor de naam van het voertuig',
@@ -492,7 +492,7 @@ const VC_I18N = {
     ed_show_title: 'Mostrar o título',
     ed_illustration: 'Cabeçalho ilustrado',
     ed_illustration_theme: 'Imagem do cabeçalho',
-    theme_auto: 'Automático (sol ou tema escuro)',
+    theme_auto: 'Automático (segue o tema)',
     theme_day: 'Dia',
     theme_night: 'Noite',
     ed_title_helper: 'Deixe vazio para o nome do veículo',
@@ -564,7 +564,7 @@ const VC_I18N = {
     ed_show_title: 'Pokaż tytuł',
     ed_illustration: 'Ilustrowany nagłówek',
     ed_illustration_theme: 'Obraz nagłówka',
-    theme_auto: 'Automatycznie (słońce lub ciemny motyw)',
+    theme_auto: 'Automatycznie (zgodnie z motywem)',
     theme_day: 'Dzień',
     theme_night: 'Noc',
     ed_title_helper: 'Pozostaw puste, aby użyć nazwy pojazdu',
@@ -636,7 +636,7 @@ const VC_I18N = {
     ed_show_title: 'Afișează titlul',
     ed_illustration: 'Antet ilustrat',
     ed_illustration_theme: 'Imaginea antetului',
-    theme_auto: 'Automat (soare sau temă întunecată)',
+    theme_auto: 'Automat (urmează tema)',
     theme_day: 'Zi',
     theme_night: 'Noapte',
     ed_title_helper: 'Lasă gol pentru numele vehiculului',
@@ -708,7 +708,7 @@ const VC_I18N = {
     ed_show_title: 'Vis titel',
     ed_illustration: 'Illustreret overskrift',
     ed_illustration_theme: 'Overskriftsbillede',
-    theme_auto: 'Automatisk (sol eller mørkt tema)',
+    theme_auto: 'Automatisk (følger temaet)',
     theme_day: 'Dag',
     theme_night: 'Nat',
     ed_title_helper: 'Lad feltet stå tomt for køretøjets navn',
@@ -780,7 +780,7 @@ const VC_I18N = {
     ed_show_title: 'Visa rubrik',
     ed_illustration: 'Illustrerad rubrik',
     ed_illustration_theme: 'Rubrikbild',
-    theme_auto: 'Automatiskt (sol eller mörkt tema)',
+    theme_auto: 'Automatiskt (följer temat)',
     theme_day: 'Dag',
     theme_night: 'Natt',
     ed_title_helper: 'Lämna tomt för fordonets namn',
@@ -852,7 +852,7 @@ const VC_I18N = {
     ed_show_title: 'Показване на заглавието',
     ed_illustration: 'Илюстрирано заглавие',
     ed_illustration_theme: 'Изображение в заглавието',
-    theme_auto: 'Автоматично (слънце или тъмна тема)',
+    theme_auto: 'Автоматично (следва темата)',
     theme_day: 'Ден',
     theme_night: 'Нощ',
     ed_title_helper: 'Оставете празно за името на превозното средство',
@@ -924,7 +924,7 @@ const VC_I18N = {
     ed_show_title: 'Показывать заголовок',
     ed_illustration: 'Иллюстрированный заголовок',
     ed_illustration_theme: 'Изображение заголовка',
-    theme_auto: 'Автоматически (солнце или тёмная тема)',
+    theme_auto: 'Автоматически (по теме)',
     theme_day: 'День',
     theme_night: 'Ночь',
     ed_title_helper: 'Оставьте пустым, чтобы использовать название автомобиля',
@@ -996,7 +996,7 @@ const VC_I18N = {
     ed_show_title: 'Показувати заголовок',
     ed_illustration: 'Ілюстрований заголовок',
     ed_illustration_theme: 'Зображення заголовка',
-    theme_auto: 'Автоматично (сонце або темна тема)',
+    theme_auto: 'Автоматично (за темою)',
     theme_day: 'День',
     theme_night: 'Ніч',
     ed_title_helper: 'Залиште порожнім, щоб використати назву автомобіля',
@@ -1068,7 +1068,7 @@ const VC_I18N = {
     ed_show_title: 'Cím megjelenítése',
     ed_illustration: 'Illusztrált fejléc',
     ed_illustration_theme: 'Fejléckép',
-    theme_auto: 'Automatikus (nap vagy sötét téma)',
+    theme_auto: 'Automatikus (a témát követi)',
     theme_day: 'Nappal',
     theme_night: 'Éjszaka',
     ed_title_helper: 'Hagyd üresen a jármű nevéhez',
@@ -1140,7 +1140,7 @@ const VC_I18N = {
     ed_show_title: 'Zobraziť názov',
     ed_illustration: 'Ilustrovaná hlavička',
     ed_illustration_theme: 'Obrázok hlavičky',
-    theme_auto: 'Automaticky (slnko alebo tmavá téma)',
+    theme_auto: 'Automaticky (podľa témy)',
     theme_day: 'Deň',
     theme_night: 'Noc',
     ed_title_helper: 'Nechajte prázdne pre názov vozidla',
@@ -1212,7 +1212,7 @@ const VC_I18N = {
     ed_show_title: 'Zobrazit název',
     ed_illustration: 'Ilustrované záhlaví',
     ed_illustration_theme: 'Obrázek záhlaví',
-    theme_auto: 'Automaticky (slunce nebo tmavý motiv)',
+    theme_auto: 'Automaticky (podle motivu)',
     theme_day: 'Den',
     theme_night: 'Noc',
     ed_title_helper: 'Ponechte prázdné pro název vozidla',
@@ -1284,7 +1284,7 @@ const VC_I18N = {
     ed_show_title: 'Prikaži naslov',
     ed_illustration: 'Ilustrirana glava',
     ed_illustration_theme: 'Slika glave',
-    theme_auto: 'Samodejno (sonce ali temna tema)',
+    theme_auto: 'Samodejno (sledi temi)',
     theme_day: 'Dan',
     theme_night: 'Noč',
     ed_title_helper: 'Pustite prazno za ime vozila',
@@ -1356,7 +1356,7 @@ const VC_I18N = {
     ed_show_title: 'Rādīt virsrakstu',
     ed_illustration: 'Ilustrēta galvene',
     ed_illustration_theme: 'Galvenes attēls',
-    theme_auto: 'Automātiski (saule vai tumšā tēma)',
+    theme_auto: 'Automātiski (atbilstoši tēmai)',
     theme_day: 'Diena',
     theme_night: 'Nakts',
     ed_title_helper: 'Atstājiet tukšu, lai izmantotu transportlīdzekļa nosaukumu',
@@ -1428,7 +1428,7 @@ const VC_I18N = {
     ed_show_title: 'Εμφάνιση τίτλου',
     ed_illustration: 'Εικονογραφημένη κεφαλίδα',
     ed_illustration_theme: 'Εικόνα κεφαλίδας',
-    theme_auto: 'Αυτόματα (ήλιος ή σκούρο θέμα)',
+    theme_auto: 'Αυτόματο (ακολουθεί το θέμα)',
     theme_day: 'Ημέρα',
     theme_night: 'Νύχτα',
     ed_title_helper: 'Αφήστε κενό για το όνομα του οχήματος',
@@ -1500,7 +1500,7 @@ const VC_I18N = {
     ed_show_title: 'Прикажи наслов',
     ed_illustration: 'Илустровано заглавље',
     ed_illustration_theme: 'Слика заглавља',
-    theme_auto: 'Аутоматски (сунце или тамна тема)',
+    theme_auto: 'Аутоматски (прати тему)',
     theme_day: 'Дан',
     theme_night: 'Ноћ',
     ed_title_helper: 'Оставите празно за назив возила',
@@ -1572,7 +1572,7 @@ const VC_I18N = {
     ed_show_title: 'Prikaži naslov',
     ed_illustration: 'Ilustrovano zaglavlje',
     ed_illustration_theme: 'Slika zaglavlja',
-    theme_auto: 'Automatski (sunce ili tamna tema)',
+    theme_auto: 'Automatski (prati temu)',
     theme_day: 'Dan',
     theme_night: 'Noć',
     ed_title_helper: 'Ostavite prazno za naziv vozila',
@@ -1796,14 +1796,12 @@ const VC_KINDS = ['fuel', 'electric', 'plugin_hybrid'];
 const VC_GRADE = { petrol: 'E10', diesel: 'B7', lpg: 'LPG', e85: 'E85' };
 let vcUid = 0;
 
-// Night picture: forced by illustration_theme, else the sun below the horizon or Home Assistant's dark theme (even
-// with the sun up).
+// Night picture: forced by illustration_theme, else Home Assistant's dark theme alone (a light theme keeps the day
+// picture after sunset).
 const vcIsNight = (hass, config) => {
   const theme = config?.illustration_theme;
   if (theme === 'night') return true;
   if (theme === 'day') return false;
-  const sun = hass?.states?.['sun.sun'];
-  if (sun && !['unavailable', 'unknown'].includes(String(sun.state)) && sun.state === 'below_horizon') return true;
   return !!hass?.themes?.darkMode;
 };
 

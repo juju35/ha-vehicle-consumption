@@ -482,7 +482,7 @@ def open_card(browser, shot):
     page.add_script_tag(content=HA_ELEMENTS)
     page.add_script_tag(content=CARD_JS)
     hass = mock_hass(shot["kind"], **shot.get("extra", {}))
-    # The illustrated header follows Home Assistant's dark mode when there is no sun.sun: night on the dark twins.
+    # The illustrated header follows Home Assistant's dark mode alone: night on the dark twins.
     hass["themes"] = {"darkMode": shot.get("theme") == "dark"}
     tag = shot.get("tag", "vehicle-consumption-card")
     page.evaluate(MOUNT, [hass, shot["config"], shot.get("open"), shot.get("popup"), tag, shot.get("zoom")])

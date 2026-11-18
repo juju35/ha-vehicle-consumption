@@ -1383,7 +1383,8 @@ test('illustration: night by the sun or the dark theme, forced by illustration_t
     return /class="banner [^"]*night/.test(html(card));
   };
   const sun = (state) => ({ states: { ...hassWith(fuelAttrs()).states, 'sun.sun': { state, attributes: {} } } });
-  assert.equal(night({}, sun('below_horizon')), true);
+  assert.equal(night({}, sun('below_horizon')), false, 'light theme after sunset: day');
+  assert.equal(night({}, { ...sun('below_horizon'), themes: { darkMode: true } }), true, 'dark theme after sunset: night');
   assert.equal(night({}, sun('above_horizon')), false);
   assert.equal(night({}, { themes: { darkMode: true } }), true);
   assert.equal(night({ illustration_theme: 'day' }, sun('below_horizon')), false);
@@ -1392,7 +1393,7 @@ test('illustration: night by the sun or the dark theme, forced by illustration_t
   assert.equal(night({}, sunUp(true)), true, 'dark theme while the sun is up: night');
   assert.equal(night({}, sunUp(false)), false, 'light theme while the sun is up: day');
   assert.equal(night({ illustration_theme: 'day' }, sunUp(true)), false, 'forced day wins over the dark theme');
-  assert.equal(night({ illustration_theme: 'night' }, sunUp(false)), true, 'forced night wins over the sun');
+  assert.equal(night({ illustration_theme: 'night' }, sunUp(false)), true, 'forced night wins over the light theme');
   const classic = makeCard({ illustration: false });
   classic.hass = hassWith(fuelAttrs());
   assert.doesNotMatch(html(classic), /class="banner/);
@@ -1404,13 +1405,13 @@ test('illustration: night by the sun or the dark theme, forced by illustration_t
   assert.match(styles(), /prefers-reduced-motion: reduce\) \{ \.vc-car, \.vc-bar, \.vc-cnt, \.vc-bolt \{ animation: none !important; \}/);
 });
 
-test('illustration: the sun setting re-renders the card', () => {
+test('illustration: switching to the dark theme re-renders the card', () => {
   const card = makeCard();
   const hass = hassWith(fuelAttrs());
-  hass.states['sun.sun'] = { state: 'above_horizon', attributes: {} };
+  hass.themes = { darkMode: false };
   card.hass = hass;
   assert.doesNotMatch(html(card), /class="banner [^"]*night/);
-  card.hass = { ...hass, states: { ...hass.states, 'sun.sun': { state: 'below_horizon', attributes: {} } } };
+  card.hass = { ...hass, themes: { darkMode: true } };
   assert.match(html(card), /class="banner [^"]*night/);
 });
 
