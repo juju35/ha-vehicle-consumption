@@ -473,8 +473,25 @@ MOUNT = """([hass, config, open, popup, tag, zoom]) => {
 }"""
 
 
-def open_card(browser, shot):
-    page = browser.new_page(device_scale_factor=2, viewport={"width": 1000, "height": 1600})
+# Before a still: any animation left (one the reduced-motion rules do not cover) settled for good — a finite one at its
+# end, an endless one cancelled — then two frames drawn, so the screenshot shows that state.
+SETTLE = """() => {
+    const roots = [document, ...[...document.querySelectorAll("*")].flatMap((e) => e.shadowRoot || [])];
+    for (const a of roots.flatMap((r) => r.getAnimations())) {
+        if (a.effect?.getComputedTiming().iterations === Infinity) a.cancel();
+        else a.finish();
+    }
+    return new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+}"""
+
+
+def open_card(browser, shot, *, still=False):
+    # A still renders with reduced motion: the card then draws no animation at all (its own reduced-motion rules), so
+    # nothing can be caught mid-way — a re-render started by the resize observer restarted the header bars after they
+    # were settled, and the last one changed by a pixel from one run to the next.
+    page = browser.new_page(
+        device_scale_factor=2, viewport={"width": 1000, "height": 1600}, reduced_motion="reduce" if still else None
+    )
     page.on("pageerror", lambda err, name=shot["file"]: print(f"{name}: page error: {err}"))
     page.clock.set_fixed_time(NOW)
     width = shot.get("width", WIDTH)
@@ -502,13 +519,39 @@ def animate(browser, shot, *, fps=20):
     with tempfile.TemporaryDirectory() as frame_dir:
         for i in range(frames + hold):
             page.evaluate(
-                """([t, names]) => {
+                """async ([t, names]) => {
                     // The card's animations live in its shadow root: document.getAnimations() does not list them.
                     const roots = [document, ...[...document.querySelectorAll("*")].flatMap((e) => e.shadowRoot || [])];
-                    for (const a of roots.flatMap((r) => r.getAnimations())) {
+                    const frame = () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+                    // Kept from frame to frame: a cancelled animation is no longer listed.
+                    window.__vcRestore?.();
+                    const anims = (window.__vcAnims ??= []);
+                    for (const a of roots.flatMap((r) => r.getAnimations())) if (!anims.includes(a)) anims.push(a);
+                    for (const a of anims) {
                         a.pause();
                         a.currentTime = names.includes(a.animationName) ? t : 100000;
                     }
+                    await frame();
+                    // Each animated value copied as a plain style and the animation cancelled: the frame is painted as
+                    // a still. Left animating, a paused transform could be rastered at another scale from one run to
+                    // the next, and a growing bar's edge moved by a pixel.
+                    const fixed = [];
+                    for (const a of anims) {
+                        const el = a.effect?.target;
+                        if (!el) continue;
+                        const props = new Set(a.effect.getKeyframes().flatMap((k) => Object.keys(k)));
+                        for (const skip of ["offset", "computedOffset", "easing", "composite"]) props.delete(skip);
+                        const cs = getComputedStyle(el);
+                        const css = (p) => p.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+                        fixed.push([el, [...props].map((p) => [css(p), cs.getPropertyValue(css(p))])]);
+                    }
+                    for (const a of anims) a.cancel();
+                    for (const [el, values] of fixed) for (const [p, v] of values) el.style.setProperty(p, v);
+                    await frame();
+                    // Ready for the next frame: the animations back, the plain styles gone (an animation wins anyway).
+                    window.__vcRestore = () => {
+                        for (const [el, values] of fixed) for (const [p] of values) el.style.removeProperty(p);
+                    };
                 }""",
                 [min(i, frames) * 1000 / fps, shot["names"]],
             )
@@ -540,11 +583,17 @@ def animate(browser, shot, *, fps=20):
 def main():
     (ROOT / "screenshots").mkdir(exist_ok=True)
     with sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=os.environ.get("CHROMIUM_PATH") or None)
+        # Animations run on the main thread and every compositor stage runs before a frame is drawn: a GIF frame
+        # stepped to a time then never shows a compositor's half-applied transform (a bar's edge a pixel off).
+        browser = p.chromium.launch(
+            executable_path=os.environ.get("CHROMIUM_PATH") or None,
+            args=["--disable-threaded-animation", "--run-all-compositor-stages-before-draw", "--disable-gpu"],
+        )
         for shot in SHOTS:
-            page, clip = open_card(browser, shot)
+            page, clip = open_card(browser, shot, still=True)
             path = ROOT / "screenshots" / f"{shot['file']}.png"
             with tempfile.TemporaryDirectory() as tmp:
+                page.evaluate(SETTLE)
                 page.screenshot(path=f"{tmp}/new.png", clip=clip, animations="disabled")
                 written = save(f"{tmp}/new.png", path)
             print(path.relative_to(ROOT), "" if written else "(unchanged)")
