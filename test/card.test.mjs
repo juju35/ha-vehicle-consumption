@@ -1437,3 +1437,43 @@ test('illustration: the mini card has the same banner, its detail button on it; 
     assert.equal(editor._form.computeLabel({ name: 'illustration' }), 'Illustrated header');
   }
 });
+
+test('a tap elsewhere (pointer, iOS) folds the sections and the mini card back; leaving the page resets them', () => {
+  const card = makeMini();
+  card.hass = hassWith(fuelAttrs());
+  card._setZoom(true);
+  card._toggle('trips');
+  const inside = { composedPath: () => [{ dataset: { section: 'trips' } }, card], detail: 1 };
+  const outside = { composedPath: () => [{ localName: 'div', dataset: {} }], detail: 1 };
+  // Pressed in the card, released outside (a drag): nothing folds.
+  card._onOutsideDown(inside);
+  card._onOutsideUp(outside);
+  card._onDocDown(inside);
+  card._onDocUp(outside);
+  assert.equal(card._zoomed, true);
+  assert.ok(card._open.has('trips'));
+  // A mouse click outside is handled on the pointer: its click event changes nothing more.
+  card._onOutsideClick(outside);
+  card._onDocClick(outside);
+  assert.equal(card._zoomed, true);
+  assert.ok(card._open.has('trips'));
+  // A tap outside (no click event on iOS).
+  card._onDocDown(outside);
+  card._onDocUp(outside);
+  card._onOutsideDown(outside);
+  card._onOutsideUp(outside);
+  assert.equal(card._open.size, 0);
+  assert.equal(card._zoomed, false);
+  // Leaving the page: the popup closes unsaved, the sections fold, the mini card is compact again.
+  card._setZoom(true);
+  card._toggle('trips');
+  card._openPopup();
+  assert.ok(card._popup);
+  card.disconnectedCallback();
+  assert.equal(card._popup, null);
+  assert.equal(card._open.size, 0);
+  assert.equal(card._zoomed, false);
+  card.connectedCallback();
+  assert.doesNotMatch(html(card), /class="sheet"|section open|class="chart"/);
+  card.disconnectedCallback();
+});

@@ -145,7 +145,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         DOMAIN,
         SERVICE_LOG_SERVICE,
         log_service,
-        _ENTRY_SCHEMA.extend({vol.Optional(ATTR_ODOMETER): _POSITIVE, vol.Optional(ATTR_INTERVAL): vol.Coerce(float)}),
+        _ENTRY_SCHEMA.extend({vol.Optional(ATTR_ODOMETER): _POSITIVE, vol.Optional(ATTR_INTERVAL): _POSITIVE}),
     )
 
     async def export(call: ServiceCall) -> ServiceResponse:

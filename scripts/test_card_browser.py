@@ -127,6 +127,67 @@ class Popup(unittest.TestCase):
                     with self.subTest(kind=kind, width=width, tag=tag, zoom=zoom):
                         self.assertEqual(page.evaluate(PILL, [shots.mock_hass(kind), tag, zoom, width]), [])
 
+    def test_typed_amount_switched_mode_and_buttons_work_on_the_patched_popup(self):
+        page = self.page("plugin_hybrid")
+        page.evaluate("() => window.card.shadowRoot.querySelector('.add').click()")
+        page.locator("vehicle-consumption-card input[name=amount]").fill("12.5")
+        # Switching to a charge clears the typed amount (the field is kept, its value follows the markup).
+        page.evaluate("() => window.card.shadowRoot.querySelector('[data-mode=charge]').click()")
+        self.assertEqual(page.evaluate("() => window.card.shadowRoot.querySelector('input[name=amount]').value"), "")
+        page.evaluate("() => window.card.shadowRoot.querySelector('[data-act=cancel]').click()")
+        self.assertFalse(page.evaluate("() => !!window.card.shadowRoot.querySelector('.sheet')"))
+        # Opened again after several renders: one listener per button (a single popup, a single toggle).
+        page.evaluate("() => window.card.shadowRoot.querySelector('.add').click()")
+        self.assertEqual(page.evaluate("() => window.card.shadowRoot.querySelectorAll('.sheet').length"), 1)
+
+    def test_state_updates_patch_the_card_in_place_with_a_steady_height(self):
+        page = self.page("fuel")
+        page.wait_for_timeout(1500)  # past the first-render animations
+        result = page.evaluate(UPDATES, ["vehicle-consumption-card"])
+        self.assertEqual(result["unrelated"], 0, result)
+        self.assertEqual(result["removed"], 0, result)
+        self.assertTrue(result["sceneKept"], result)
+        self.assertEqual(len(result["heights"]), 1, result)
+
+
+# A state update must not make the page jump: an update of another entity changes nothing in the card, and an update
+# of its sensor patches the existing nodes (the scene, the chart, the gauges), the card keeping its height.
+UPDATES = """async ([tag]) => {
+    const frames = (n) => new Promise((r) => { const step = () => (n-- > 0 ? requestAnimationFrame(step) : r()); step(); });
+    const card = window.card;
+    await frames(4);
+    const scene = card.shadowRoot.querySelector("svg");
+    const heights = new Set();
+    let run = true;
+    const tick = () => { if (!run) return; heights.add(Math.round(card.getBoundingClientRect().height)); requestAnimationFrame(tick); };
+    tick();
+    const counts = { unrelated: 0, removed: 0 };
+    let phase = "unrelated";
+    const obs = new MutationObserver((recs) => {
+        for (const r of recs) {
+            if (phase === "unrelated") counts.unrelated += 1;
+            else if (r.type === "childList") counts.removed += [...r.removedNodes].filter((n) => n.nodeType === 1).length;
+        }
+    });
+    obs.observe(card.shadowRoot, { subtree: true, childList: true, attributes: true, characterData: true });
+    for (let i = 0; i < 5; i++) {
+        card.hass = { ...card._hass, states: { ...card._hass.states, "sensor.other": { state: String(i), attributes: {} } } };
+        await frames(2);
+    }
+    phase = "relevant";
+    const id = Object.keys(card._hass.states).find((k) => k.endsWith("_consumption"));
+    for (let i = 0; i < 5; i++) {
+        const st = structuredClone(card._hass.states[id]);
+        st.attributes.fuel_level = 40 + i;
+        st.attributes.fuel_quantity = 20 + i / 10;
+        card.hass = { ...card._hass, states: { ...card._hass.states, [id]: st } };
+        await frames(2);
+    }
+    run = false;
+    obs.disconnect();
+    return { ...counts, sceneKept: !!scene && card.shadowRoot.querySelector("svg") === scene, heights: [...heights] };
+}"""
+
 
 if __name__ == "__main__":
     unittest.main()
