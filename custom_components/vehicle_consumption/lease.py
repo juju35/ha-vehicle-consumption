@@ -119,7 +119,9 @@ class Lease:
             "prorata": _round(prorata),
             "balance": _round(driven - prorata) if driven is not None else None,
             "remaining": _round(remaining),
-            "per_month_left": _round(remaining / months_left) if remaining is not None and months_left >= 1 else None,
+            "per_month_left": _round(remaining / months_left)
+            if remaining is not None and remaining >= 0 and months_left >= 1
+            else None,
             "pace": _round(pace),
             "projected": _round(projected),
             "overage": _round(overage),

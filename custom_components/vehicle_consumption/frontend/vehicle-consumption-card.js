@@ -85,6 +85,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} ahead',
     lease_under: '{v} {u} under',
     lease_left: '{u} left',
+    lease_over: '{u} over the allowance',
     lease_per_month: '{u} / month to stay within',
     lease_cost: 'if the pace holds',
     lease_over_km: '{u} over at the end',
@@ -174,6 +175,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} d’avance',
     lease_under: '{v} {u} de marge',
     lease_left: '{u} restants',
+    lease_over: '{u} au-delà du forfait',
     lease_per_month: '{u} / mois pour tenir',
     lease_cost: 'si le rythme continue',
     lease_over_km: '{u} de dépassement',
@@ -263,6 +265,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} voraus',
     lease_under: '{v} {u} darunter',
     lease_left: '{u} übrig',
+    lease_over: '{u} über dem Kontingent',
     lease_per_month: '{u} / Monat, um im Rahmen zu bleiben',
     lease_cost: 'bei gleichem Tempo',
     lease_over_km: '{u} zu viel am Ende',
@@ -352,6 +355,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} de adelanto',
     lease_under: '{v} {u} de margen',
     lease_left: '{u} restantes',
+    lease_over: '{u} por encima de lo contratado',
     lease_per_month: '{u} / mes para cumplir',
     lease_cost: 'si se mantiene el ritmo',
     lease_over_km: '{u} de exceso al final',
@@ -441,6 +445,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} in anticipo',
     lease_under: '{v} {u} di margine',
     lease_left: '{u} rimanenti',
+    lease_over: '{u} oltre il previsto',
     lease_per_month: '{u} / mese per rientrare',
     lease_cost: 'se il ritmo resta questo',
     lease_over_km: '{u} in eccesso alla fine',
@@ -530,6 +535,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} voor',
     lease_under: '{v} {u} eronder',
     lease_left: '{u} over',
+    lease_over: '{u} boven de bundel',
     lease_per_month: '{u} / maand om binnen te blijven',
     lease_cost: 'bij dit tempo',
     lease_over_km: '{u} te veel aan het eind',
@@ -619,6 +625,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} de avanço',
     lease_under: '{v} {u} de margem',
     lease_left: '{u} restantes',
+    lease_over: '{u} acima do contratado',
     lease_per_month: '{u} / mês para cumprir',
     lease_cost: 'se o ritmo se mantiver',
     lease_over_km: '{u} de excesso no fim',
@@ -708,6 +715,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} ponad plan',
     lease_under: '{v} {u} poniżej planu',
     lease_left: '{u} pozostało',
+    lease_over: '{u} ponad limit',
     lease_per_month: '{u} / mies., aby się zmieścić',
     lease_cost: 'przy obecnym tempie',
     lease_over_km: '{u} ponad limit na koniec',
@@ -797,6 +805,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} în avans',
     lease_under: '{v} {u} sub plan',
     lease_left: '{u} rămași',
+    lease_over: '{u} peste limită',
     lease_per_month: '{u} / lună pentru încadrare',
     lease_cost: 'dacă ritmul rămâne',
     lease_over_km: '{u} depășire la final',
@@ -886,6 +895,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} foran',
     lease_under: '{v} {u} under',
     lease_left: '{u} tilbage',
+    lease_over: '{u} over rammen',
     lease_per_month: '{u} / måned for at holde grænsen',
     lease_cost: 'hvis tempoet holder',
     lease_over_km: '{u} over til sidst',
@@ -975,6 +985,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} före',
     lease_under: '{v} {u} under',
     lease_left: '{u} kvar',
+    lease_over: '{u} över ramen',
     lease_per_month: '{u} / månad för att klara gränsen',
     lease_cost: 'om takten håller',
     lease_over_km: '{u} över i slutet',
@@ -1064,6 +1075,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} напред',
     lease_under: '{v} {u} под плана',
     lease_left: 'Остават {u}',
+    lease_over: '{u} над лимита',
     lease_per_month: '{u} / месец, за да се вместите',
     lease_cost: 'при същото темпо',
     lease_over_km: '{u} превишение в края',
@@ -1153,6 +1165,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} с опережением',
     lease_under: '{v} {u} в запасе',
     lease_left: 'Осталось {u}',
+    lease_over: '{u} сверх лимита',
     lease_per_month: '{u} / мес., чтобы уложиться',
     lease_cost: 'если темп сохранится',
     lease_over_km: '{u} перепробега в конце',
@@ -1242,6 +1255,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} з випередженням',
     lease_under: '{v} {u} у запасі',
     lease_left: 'Залишилось {u}',
+    lease_over: '{u} понад ліміт',
     lease_per_month: '{u} / міс., щоб вкластися',
     lease_cost: 'якщо темп збережеться',
     lease_over_km: '{u} перевищення наприкінці',
@@ -1331,6 +1345,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} előnyben',
     lease_under: '{v} {u} a terv alatt',
     lease_left: '{u} maradt',
+    lease_over: '{u} a keret felett',
     lease_per_month: '{u} / hónap a keretben maradáshoz',
     lease_cost: 'ha a tempó marad',
     lease_over_km: '{u} túlfutás a végén',
@@ -1420,6 +1435,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} v predstihu',
     lease_under: '{v} {u} pod plánom',
     lease_left: 'Zostáva {u}',
+    lease_over: '{u} nad limit',
     lease_per_month: '{u} / mesiac na dodržanie',
     lease_cost: 'ak tempo vydrží',
     lease_over_km: '{u} prekročenie na konci',
@@ -1509,6 +1525,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} v předstihu',
     lease_under: '{v} {u} pod plánem',
     lease_left: 'Zbývá {u}',
+    lease_over: '{u} nad limit',
     lease_per_month: '{u} / měsíc pro dodržení',
     lease_cost: 'pokud tempo vydrží',
     lease_over_km: '{u} překročení na konci',
@@ -1598,6 +1615,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} pred načrtom',
     lease_under: '{v} {u} pod načrtom',
     lease_left: 'Ostane {u}',
+    lease_over: '{u} nad omejitvijo',
     lease_per_month: '{u} / mesec za omejitev',
     lease_cost: 'če se tempo ohrani',
     lease_over_km: '{u} prekoračitve ob koncu',
@@ -1687,6 +1705,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} pirms plāna',
     lease_under: '{v} {u} zem plāna',
     lease_left: 'Atlikuši {u}',
+    lease_over: '{u} virs limita',
     lease_per_month: '{u} / mēnesī, lai iekļautos',
     lease_cost: 'ja temps saglabāsies',
     lease_over_km: '{u} pārsniegums beigās',
@@ -1776,6 +1795,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} μπροστά',
     lease_under: '{v} {u} κάτω από το πλάνο',
     lease_left: 'Απομένουν {u}',
+    lease_over: '{u} πάνω από το όριο',
     lease_per_month: '{u} / μήνα για να μείνετε εντός',
     lease_cost: 'αν διατηρηθεί ο ρυθμός',
     lease_over_km: '{u} υπέρβαση στο τέλος',
@@ -1865,6 +1885,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} испред плана',
     lease_under: '{v} {u} испод плана',
     lease_left: 'Преостало {u}',
+    lease_over: '{u} преко ограничења',
     lease_per_month: '{u} / месец да бисте се уклопили',
     lease_cost: 'ако темпо остане',
     lease_over_km: '{u} прекорачења на крају',
@@ -1954,6 +1975,7 @@ const VC_I18N = {
     lease_ahead: '+{v} {u} ispred plana',
     lease_under: '{v} {u} ispod plana',
     lease_left: 'Preostalo {u}',
+    lease_over: '{u} preko ograničenja',
     lease_per_month: '{u} / mesec da biste se uklopili',
     lease_cost: 'ako tempo ostane',
     lease_over_km: '{u} prekoračenja na kraju',
@@ -2903,11 +2925,17 @@ class VehicleConsumptionCard extends HTMLElement {
     const cost = vcFinite(l.overage_cost)
       ? { v: f.money(l.overage_cost, 0), k: this._t('lease_cost') }
       : { v: `${n(l.overage)}`, k: this._t('lease_over_km', { u: u.dist }) };
+    // Past the allowance: the distance over it (in the tone's red) instead of a negative distance left, and no
+    // distance a month to stay within, which would be negative too.
+    const exceeded = vcFinite(l.remaining) && Number(l.remaining) < 0;
     const tiles = [
-      { v: n(l.remaining), k: this._t('lease_left', { u: u.dist }) },
-      { v: n(l.per_month_left), k: this._t('lease_per_month', { u: u.dist }) },
+      exceeded
+        ? { v: n(-Number(l.remaining)), k: this._t('lease_over', { u: u.dist }), warn: true }
+        : { v: n(l.remaining), k: this._t('lease_left', { u: u.dist }) },
+      exceeded ? null : { v: n(l.per_month_left), k: this._t('lease_per_month', { u: u.dist }) },
       { ...cost, warn: over },
     ]
+      .filter(Boolean)
       .map((t) => `<div class="ltile${t.warn ? ' warn' : ''}"><span class="lv">${vcEsc(t.v)}</span><span class="lk">${vcEsc(t.k)}</span></div>`)
       .join('');
     const foot = [
@@ -2920,7 +2948,7 @@ class VehicleConsumptionCard extends HTMLElement {
             <div class="lease lt-${tone}${curve ? ' curve' : ''}">
               <div class="lhead"><span class="lmonth">${vcEsc(this._t('lease_month', { n: l.month ?? 0, m: l.months ?? 0 }))}</span>${pill ? `<span class="lpill">${vcEsc(pill)}</span>` : ''}</div>
               <button class="lswap" type="button" aria-pressed="${curve}">${gauge}${chart}<span class="lhint">${vcEsc(this._t(curve ? 'lease_gauge' : 'lease_curve'))}</span></button>
-              <div class="ltiles">${tiles}</div>
+              <div class="ltiles${exceeded ? ' two' : ''}">${tiles}</div>
               ${foot ? `<div class="lfoot">${vcEsc(foot)}</div>` : ''}
             </div>`;
     return this._section('lease', 'mdi:car-key', this._t('lease'), `${l.month ?? 0}/${l.months ?? 0}`, [body], 'lease');
@@ -3297,6 +3325,7 @@ class VehicleConsumptionCard extends HTMLElement {
       .k-real::before { background: #43a047; } .k-plan::before { background: var(--secondary-text-color); } .k-proj::before { background: var(--lt); }
       .lhint { font-size: 11px; color: color-mix(in srgb, var(--primary-color) 40%, var(--primary-text-color)); }
       .ltiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+      .ltiles.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .ltile { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 6px 8px; border-radius: 8px;
                background: color-mix(in srgb, var(--secondary-text-color) 8%, transparent); }
       .ltile .lv { font-size: 14px; font-weight: 600; color: var(--primary-text-color); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

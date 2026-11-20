@@ -4,7 +4,7 @@
 
 ### Features
 - Lease mileage allowance: an optional last step of **Configure** takes the start, length and allowance of a lease (with the odometer at delivery and the price of an extra km). The integration follows the distance driven against the contract: distance left, ahead of or under the pro rata, distance a month to stay within, projection at the end at the pace of the last 3 complete months, and the cost of the overage. Four sensors (`lease_distance_left`, `lease_balance`, `lease_projected_distance`, `lease_overage_cost`) and a `lease` attribute on the main sensor; distances in miles with imperial units.
-- Card: **Lease allowance** section (option `lease`, also in the visual editor) with a gauge of the distance driven against the allowance and a mark at the pro rata, switching to the curve of the allowance, the distance driven and the projection with a tap; the distance left, the distance a month to stay within and the cost of the overage under it.
+- Card: **Lease allowance** section (option `lease`, also in the visual editor) with a gauge of the distance driven against the allowance and a mark at the pro rata, switching to the curve of the allowance, the distance driven and the projection with a tap; the distance left, the distance a month to stay within and the cost of the overage under it; past the allowance, the distance over it in red instead of the distance left and the distance a month.
 
 ## 1.9.1 - 2026-11-18
 

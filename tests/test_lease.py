@@ -83,6 +83,14 @@ def test_status_pace_falls_back_to_the_average_and_counts_the_cost() -> None:
     assert status["overage_cost"] == pytest.approx(status["overage"] * 0.06, abs=0.1)
 
 
+def test_status_past_the_allowance_before_the_end_has_no_pace_to_stay_within() -> None:
+    lease = Lease(date(2025, 1, 1), 24, 20000.0)
+    status = lease.status(21500.0, [], date(2026, 1, 1))
+    assert not status["ended"] and status["remaining"] == -1500
+    # No distance a month can keep it within the allowance any more: none rather than a negative one.
+    assert status["per_month_left"] is None
+
+
 def test_status_before_the_start_and_after_the_end() -> None:
     lease = Lease(date(2025, 1, 1), 12, 10000.0)
     before = lease.status(0.0, [], date(2024, 12, 1))
