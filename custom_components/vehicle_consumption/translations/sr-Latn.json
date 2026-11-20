@@ -124,6 +124,24 @@
           "co2_electricity": "Grama CO₂ po napunjenom kWh; 55 za francusku mrežu, oko 380 za nemačku.",
           "units": "Merne jedinice vrednosti na kartici i razdaljina i zapremina vožnje i meseca. Senzori potrošnje, troška i CO₂ po razdaljini zadržavaju metričku jedinicu (njihova statistika ostaje ispravna) i imperijalnu vrednost daju u atributima. Zapremina rezervoara, fiksna cena goriva i prag točenja unose se u prikazanim jedinicama."
         }
+      },
+      "lease": {
+        "title": "Ograničenje kilometraže lizinga",
+        "description": "Opciono: unesite početak, trajanje i ograničenje kilometraže ugovora (rastojanja u {unit}) da biste pratili kilometre u odnosu na ugovor. Ostavite prazno ako nema lizinga.",
+        "data": {
+          "lease_start": "Početak ugovora",
+          "lease_months": "Trajanje",
+          "lease_distance": "Ograničenje",
+          "lease_start_odometer": "Kilometraža pri preuzimanju",
+          "lease_extra_price": "Cena dodatne jedinice rastojanja"
+        },
+        "data_description": {
+          "lease_start": "Dan preuzimanja vozila.",
+          "lease_months": "Trajanje ugovora u mesecima.",
+          "lease_distance": "Dozvoljeno rastojanje za ceo ugovor.",
+          "lease_start_odometer": "Stanje brojača na početku ugovora (0 za novo vozilo).",
+          "lease_extra_price": "Koliko košta svaka jedinica preko ograničenja na kraju."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "Za korišćenje nivoa goriva potrebna je zapremina rezervoara.",
       "battery_capacity_required": "Za korišćenje nivoa baterije potreban je kapacitet baterije.",
       "duplicate_sensor": "Ovaj senzor se već koristi za drugi izvor.",
-      "charger_needs_battery": "Brojaču kućnog punjača potreban je senzor energije ili nivoa baterije."
+      "charger_needs_battery": "Brojaču kućnog punjača potreban je senzor energije ili nivoa baterije.",
+      "lease_incomplete": "Unesite zajedno početak, trajanje i ograničenje ili ostavite sva tri prazna."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Kasni"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Preostala kilometraža lizinga"
+      },
+      "lease_balance": {
+        "name": "Odstupanje od ograničenja"
+      },
+      "lease_projected": {
+        "name": "Predviđeno rastojanje na kraju"
+      },
+      "lease_overage_cost": {
+        "name": "Trošak prekoračenja"
       }
     }
   },

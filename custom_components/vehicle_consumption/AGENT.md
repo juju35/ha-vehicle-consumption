@@ -8,6 +8,7 @@ Home Assistant custom integration that works out the fuel and electricity consum
 ```
 custom_components/vehicle_consumption/
 ├── __init__.py      # Static path + dashboard resource for the card, actions add_refuel / add_charge / reset_statistics, entry setup
+├── lease.py         # Lease: the lease mileage allowance worked out at read time (driven, pro rata, projection, overage)
 ├── tracker.py       # ConsumptionTracker: levels → consumption / refuels / charges, odometer → distance / trips, months, costs (.storage)
 ├── detect.py        # async_detect(hass, device_id): exact keys of 26 integrations (_KNOWN), then keyword + unit + device class matching for any brand
 ├── diagnostics.py   # async_get_config_entry_diagnostics: entry, tracker attributes, source states (TO_REDACT)
@@ -37,6 +38,7 @@ custom_components/vehicle_consumption/
 - Storage: `.storage/vehicle_consumption.<entry_id>` (delayed save 10 s, immediate save on unload, deleted with the entry). Unreadable data is logged and tracking starts afresh. On load the current readings are applied, catching up what changed while stopped.
 - Main sensor attributes (the card relies on the exact keys): `vehicle, entry_id, kind, currency, odometer, fuel_quantity, fuel_level, tank_capacity, battery_energy, battery_level, battery_capacity, fuel_price, electricity_price, driving, trip, month, total, months, trips, refuels, charges`. `trip_count`, `refuel_count`, `charge_count`, `units`, `odometer_unit`. Unrecorded (`_unrecorded_attributes`): the lists, `trip`, `month`, `total`, prices, `odometer`, levels and counts.
 - The card is served at `/vehicle_consumption/vehicle-consumption-card.js` and added to the dashboard resources (storage mode) or loaded with `add_extra_js_url` (YAML mode); removed with the last entry. `_storage_resources()` reads `hass.data["lovelace"]` as a dict (before 2025.2) or a dataclass (`mode`, then `resource_mode` from 2026.2).
+- Lease (`lease.py`, options step `lease`, last of the options flow): `lease_start` (date), `lease_months`, `lease_distance` (km) make a lease, all three or none (error `lease_incomplete`); `lease_start_odometer` (km, 0 by default) and `lease_extra_price` (per km) are optional; typed in mi / per mi in imperial units. `Lease.status` works everything out at read time from the odometer and the tracked months (nothing stored): `month` (calendar months since the start, 1 the first, 0 before, `months` after the end), `prorata` (allowance × days elapsed / days of the contract), `balance` (driven − pro rata, + = ahead), `remaining`, `per_month_left` (None in the last month), `pace` (average of the last `LEASE_PACE_MONTHS` complete months since the start, else driven / months elapsed), `projected`, `overage`, `overage_cost`. The `lease` attribute (None without a lease) is in miles in imperial units; the four lease sensors (only with a lease) stay in km.
 - Entity IDs follow the translated names: tests look sensors up by unique ID `<entry_id>_<key>` (`tests/conftest.py`, `state_of`).
 - Minimum Home Assistant 2024.12.0 (`OptionsFlow.config_entry`).
 

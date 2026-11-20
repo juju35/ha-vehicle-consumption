@@ -124,6 +124,24 @@
           "co2_electricity": "Grammi di CO₂ per kWh caricato; 55 per la rete francese, circa 380 per quella tedesca.",
           "units": "Unità dei valori mostrati sulla scheda e delle distanze e dei volumi del viaggio e del mese. I sensori di consumo, costo e CO₂ per distanza mantengono la loro unità metrica (le loro statistiche restano valide) e danno il valore imperiale nei loro attributi. Capacità del serbatoio, prezzo fisso del carburante e soglia di rifornimento si inseriscono nelle unità mostrate."
         }
+      },
+      "lease": {
+        "title": "Chilometraggio del noleggio",
+        "description": "Facoltativo: indica inizio, durata e chilometraggio del contratto (distanze in {unit}) per seguire i chilometri rispetto al contratto. Lascia vuoto se non c'è contratto.",
+        "data": {
+          "lease_start": "Inizio del contratto",
+          "lease_months": "Durata",
+          "lease_distance": "Chilometraggio previsto",
+          "lease_start_odometer": "Contachilometri alla consegna",
+          "lease_extra_price": "Prezzo per unità di distanza in più"
+        },
+        "data_description": {
+          "lease_start": "Giorno di consegna del veicolo.",
+          "lease_months": "Durata del contratto in mesi.",
+          "lease_distance": "Distanza consentita per tutto il contratto.",
+          "lease_start_odometer": "Lettura del contachilometri all'inizio (0 per un veicolo nuovo).",
+          "lease_extra_price": "Quanto costa ogni unità oltre il chilometraggio alla fine."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "La capacità del serbatoio è necessaria per usare il livello del carburante.",
       "battery_capacity_required": "La capacità della batteria è necessaria per usare il livello della batteria.",
       "duplicate_sensor": "Questo sensore è già usato per un'altra fonte.",
-      "charger_needs_battery": "Un contatore della wallbox di casa richiede un sensore di energia o di livello della batteria."
+      "charger_needs_battery": "Un contatore della wallbox di casa richiede un sensore di energia o di livello della batteria.",
+      "lease_incomplete": "Indica insieme inizio, durata e chilometraggio, oppure lascia vuoti tutti e tre."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "In ritardo"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Distanza residua del contratto"
+      },
+      "lease_balance": {
+        "name": "Scostamento dal contratto"
+      },
+      "lease_projected": {
+        "name": "Distanza prevista a fine contratto"
+      },
+      "lease_overage_cost": {
+        "name": "Costo dell'eccedenza"
       }
     }
   },

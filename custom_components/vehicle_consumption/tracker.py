@@ -84,6 +84,7 @@ from .const import (
     UNITS_IMPERIAL,
     UNITS_METRIC,
 )
+from .lease import Lease, to_miles
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -401,6 +402,8 @@ class ConsumptionTracker:
         self.imperial = options.get(CONF_UNITS) == UNITS_IMPERIAL
         self.refuel_threshold = float(options.get(CONF_REFUEL_THRESHOLD, DEFAULT_REFUEL_THRESHOLD))
         self.charge_threshold = float(options.get(CONF_CHARGE_THRESHOLD, DEFAULT_CHARGE_THRESHOLD))
+        # Lease mileage allowance (options), None without one: worked out at read time, never stored.
+        self.lease = Lease.from_options(options)
 
         self.tracks_fuel = CONF_FUEL_QUANTITY in self.sensors or CONF_FUEL_LEVEL in self.sensors
         self.tracks_energy = CONF_BATTERY_ENERGY in self.sensors or CONF_BATTERY_LEVEL in self.sensors
@@ -1698,6 +1701,15 @@ class ConsumptionTracker:
         imperial = self.imperial if imperial is None else imperial
         return self.total.summary(None, imperial)[f"{kind}_consumption"]
 
+    def lease_status(self, imperial: bool | None = None) -> dict[str, Any] | None:
+        """Where the lease allowance stands (km, or miles in imperial units), None without a lease."""
+        if self.lease is None:
+            return None
+        months = [{"month": key, "distance": totals.distance} for key, totals in sorted(self.months.items())]
+        status = self.lease.status(self.odometer, months)
+        imperial = self.imperial if imperial is None else imperial
+        return to_miles(status, KM_PER_MILE) if imperial else status
+
     def attributes(self) -> dict[str, Any]:
         """Everything the card shows (exact keys: the card relies on them)."""
         month_key, month = self.month_totals()
@@ -1733,6 +1745,7 @@ class ConsumptionTracker:
             "trip_count": len(self.trips),
             "refuel_count": len(self.refuels),
             "charge_count": len(self.charges),
+            "lease": self.lease_status(),
         }
 
 

@@ -182,6 +182,43 @@ NEXT_SERVICE = VehicleSensorDescription(
 )
 
 
+def _lease(key: str) -> Callable[[ConsumptionTracker, bool], Any]:
+    return lambda t, imperial: (t.lease_status(False) or {}).get(key)
+
+
+# Lease mileage allowance, only with a lease set in the options: kilometres left, ahead of the pro rata (+) or under it
+# (-), projected at the end of the contract at the recent pace, and what the kilometres over the allowance would cost.
+LEASE_SENSORS: tuple[VehicleSensorDescription, ...] = (
+    VehicleSensorDescription(
+        key="lease_remaining",
+        device_class=SensorDeviceClass.DISTANCE,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        suggested_display_precision=0,
+        value_fn=_lease("remaining"),
+    ),
+    VehicleSensorDescription(
+        key="lease_balance",
+        device_class=SensorDeviceClass.DISTANCE,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        suggested_display_precision=0,
+        value_fn=_lease("balance"),
+    ),
+    VehicleSensorDescription(
+        key="lease_projected",
+        device_class=SensorDeviceClass.DISTANCE,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        suggested_display_precision=0,
+        value_fn=_lease("projected"),
+    ),
+    VehicleSensorDescription(
+        key="lease_overage_cost",
+        device_class=SensorDeviceClass.MONETARY,
+        suggested_display_precision=2,
+        value_fn=_lease("overage_cost"),
+    ),
+)
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: VehicleConsumptionConfigEntry,
@@ -192,6 +229,8 @@ async def async_setup_entry(
     entities: list[SensorEntity] = [ConsumptionSensor(tracker)]
     entities.extend(VehicleSensor(tracker, d) for d in SENSORS if d.kind is None or tracked[d.kind])
     entities.append(NextServiceSensor(tracker, NEXT_SERVICE))
+    if tracker.lease is not None:
+        entities.extend(VehicleSensor(tracker, d) for d in LEASE_SENSORS)
     if tracker.tracks_fuel:
         entities.append(LastRefillSensor(tracker, FUEL))
     if tracker.tracks_energy:
@@ -225,6 +264,7 @@ class ConsumptionSensor(VehicleConsumptionEntity, SensorEntity):
             "trip_count",
             "refuel_count",
             "charge_count",
+            "lease",
         }
     )
 
@@ -256,7 +296,7 @@ class VehicleSensor(VehicleConsumptionEntity, SensorEntity):
         self.entity_description = description
         # The unit of the figure in the units chosen when Home Assistant cannot convert to it (None: it can, or metric).
         self._imperial_unit: str | None = None
-        if description.key == "cost_month":
+        if description.key in ("cost_month", "lease_overage_cost"):
             self._attr_native_unit_of_measurement = tracker.currency
         elif description.key == "cost_per_km":
             self._attr_native_unit_of_measurement = f"{tracker.currency}/km"

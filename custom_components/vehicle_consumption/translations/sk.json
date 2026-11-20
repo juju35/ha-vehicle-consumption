@@ -124,6 +124,24 @@
           "co2_electricity": "Gramy CO₂ na nabitú kWh; 55 pre francúzsku sieť, približne 380 pre nemeckú.",
           "units": "Jednotky hodnôt na karte a vzdialeností a objemov jazdy a mesiaca. Snímače spotreby, nákladov a CO₂ na vzdialenosť si ponechávajú metrickú jednotku (ich štatistiky zostávajú platné) a imperiálnu hodnotu uvádzajú v atribútoch. Objem nádrže, pevná cena paliva a prah tankovania sa zadávajú v zobrazených jednotkách."
         }
+      },
+      "lease": {
+        "title": "Limit kilometrov lízingu",
+        "description": "Voliteľné: zadajte začiatok, dĺžku a limit kilometrov zmluvy (vzdialenosti v {unit}) na sledovanie kilometrov voči zmluve. Bez lízingu nechajte prázdne.",
+        "data": {
+          "lease_start": "Začiatok zmluvy",
+          "lease_months": "Dĺžka",
+          "lease_distance": "Limit",
+          "lease_start_odometer": "Stav tachometra pri odovzdaní",
+          "lease_extra_price": "Cena za jednotku navyše"
+        },
+        "data_description": {
+          "lease_start": "Deň odovzdania vozidla.",
+          "lease_months": "Dĺžka zmluvy v mesiacoch.",
+          "lease_distance": "Povolená vzdialenosť na celú zmluvu.",
+          "lease_start_odometer": "Stav tachometra na začiatku zmluvy (0 pre nové vozidlo).",
+          "lease_extra_price": "Koľko stojí každá jednotka nad limit na konci."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "Na použitie hladiny paliva je potrebný objem nádrže.",
       "battery_capacity_required": "Na použitie úrovne batérie je potrebná kapacita batérie.",
       "duplicate_sensor": "Tento senzor sa už používa pre iný zdroj.",
-      "charger_needs_battery": "Merač domácej nabíjačky vyžaduje senzor energie alebo úrovne batérie."
+      "charger_needs_battery": "Merač domácej nabíjačky vyžaduje senzor energie alebo úrovne batérie.",
+      "lease_incomplete": "Zadajte spolu začiatok, dĺžku a limit, alebo nechajte všetky tri prázdne."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Po termíne"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Zostávajúci limit lízingu"
+      },
+      "lease_balance": {
+        "name": "Odchýlka od limitu"
+      },
+      "lease_projected": {
+        "name": "Predpokladaná vzdialenosť na konci"
+      },
+      "lease_overage_cost": {
+        "name": "Cena prekročenia"
       }
     }
   },

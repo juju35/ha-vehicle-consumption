@@ -1477,3 +1477,46 @@ test('a tap elsewhere (pointer, iOS) folds the sections and the mini card back; 
   assert.doesNotMatch(html(card), /class="sheet"|section open|class="chart"/);
   card.disconnectedCallback();
 });
+
+const leaseAttrs = (lease) => fuelAttrs({ lease: { start: '2025-01-15', end: '2028-01-15', months: 36, month: 23, ended: false, allowance: 45000, prorata: 28000, pace: 1400, extra_price: 0.08, ...lease } });
+
+test('lease: within the allowance, the distance left and a month to stay within', () => {
+  const card = makeCard();
+  card.hass = hassWith(leaseAttrs({ driven: 30000, balance: 2000, remaining: 15000, per_month_left: 1154, projected: 48200, overage: 3200, overage_cost: 256 }));
+  card._toggle('lease');
+  card._render();
+  const out = html(card);
+  assert.match(out, /class="ltiles">/);
+  assert.match(out, /15,000<\/span><span class="lk">km left/);
+  assert.match(out, /1,154<\/span><span class="lk">km \/ month to stay within/);
+  assert.doesNotMatch(out, /over the allowance/);
+});
+
+test('lease: past the allowance, the distance over it in red, no negative distance left or pace to stay within', () => {
+  const card = makeCard();
+  card.hass = hassWith(leaseAttrs({ driven: 46200, balance: 18200, remaining: -1200, per_month_left: null, projected: 64400, overage: 19400, overage_cost: 1552 }));
+  card._toggle('lease');
+  card._render();
+  const out = html(card);
+  assert.match(out, /class="lease lt-bad/);
+  assert.match(out, /class="ltiles two">/);
+  assert.match(out, /class="ltile warn"><span class="lv">1,200<\/span><span class="lk">km over the allowance/);
+  assert.doesNotMatch(out, /km left|to stay within|-1,200|−1,200/);
+});
+
+test('lease: a tap on the gauge switches to the curve and back, listened once on the shadow root', () => {
+  const card = makeCard();
+  card.hass = hassWith(leaseAttrs({ driven: 30000, balance: 2000, remaining: 15000, per_month_left: 1154, projected: 48200, overage: 3200, overage_cost: 256 }));
+  const on = {};
+  card.shadowRoot.addEventListener = (type, fn) => (on[type] = fn);
+  card._listen();
+  card._toggle('lease');
+  card._render();
+  assert.doesNotMatch(html(card), /class="lease [^"]*curve/);
+  const swap = { matches: (sel) => sel === '.lswap', dataset: {} };
+  const tap = () => on.click({ target: { closest: (sel) => (sel.includes('.lswap') ? swap : null) } });
+  tap();
+  assert.match(html(card), /class="lease lt-[a-z]+ curve"/);
+  tap();
+  assert.doesNotMatch(html(card), /class="lease [^"]*curve/);
+});

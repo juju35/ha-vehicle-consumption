@@ -124,6 +124,24 @@
           "co2_electricity": "Gram CO₂ pr. opladet kWh; 55 for det franske net, omkring 380 for det tyske.",
           "units": "Enheder for tallene på kortet og for turens og månedens afstande og mængder. Sensorerne for forbrug, pris og CO₂ pr. afstand beholder deres metriske enhed (deres statistik forbliver gyldig) og angiver den imperiale værdi i deres attributter. Tankkapacitet, fast brændstofpris og tankningstærskel indtastes i de viste enheder."
         }
+      },
+      "lease": {
+        "title": "Kilometergrænse for leasing",
+        "description": "Valgfrit: angiv start, løbetid og kilometergrænse for en leasingaftale (afstande i {unit}) for at følge kilometerne mod aftalen. Lad stå tomt uden leasing.",
+        "data": {
+          "lease_start": "Aftalens start",
+          "lease_months": "Løbetid",
+          "lease_distance": "Kilometergrænse",
+          "lease_start_odometer": "Kilometertæller ved levering",
+          "lease_extra_price": "Pris pr. ekstra afstandsenhed"
+        },
+        "data_description": {
+          "lease_start": "Dagen bilen blev leveret.",
+          "lease_months": "Aftalens løbetid i måneder.",
+          "lease_distance": "Tilladt afstand for hele aftalen.",
+          "lease_start_odometer": "Kilometertæller ved aftalens start (0 for en ny bil).",
+          "lease_extra_price": "Hvad hver enhed over grænsen koster til sidst."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "Tankkapaciteten skal angives for at bruge brændstofniveauet.",
       "battery_capacity_required": "Batterikapaciteten skal angives for at bruge batteriniveauet.",
       "duplicate_sensor": "Denne sensor bruges allerede til en anden kilde.",
-      "charger_needs_battery": "En måler på hjemmeladeren kræver en sensor for batterienergi eller batteriniveau."
+      "charger_needs_battery": "En måler på hjemmeladeren kræver en sensor for batterienergi eller batteriniveau.",
+      "lease_incomplete": "Angiv start, løbetid og grænse sammen, eller lad alle tre stå tomme."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Forsinket"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Resterende leasingkilometer"
+      },
+      "lease_balance": {
+        "name": "Leasingafvigelse"
+      },
+      "lease_projected": {
+        "name": "Forventet leasingafstand"
+      },
+      "lease_overage_cost": {
+        "name": "Pris for overkørsel"
       }
     }
   },

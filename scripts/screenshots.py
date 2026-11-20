@@ -346,6 +346,39 @@ SHOTS = [
     ),
 ]
 
+# A lease of 36 months, 20 into it, ahead of the pro rata and heading over the allowance (mock figures).
+LEASE = {
+    "start": "2025-01-15",
+    "end": "2028-01-15",
+    "months": 36,
+    "month": 20,
+    "ended": False,
+    "allowance": 40000,
+    "driven": 23410,
+    "prorata": 22220,
+    "balance": 1190,
+    "remaining": 16590,
+    "per_month_left": 1037,
+    "pace": 1340,
+    "projected": 44850,
+    "overage": 4850,
+    "extra_price": 0.06,
+    "overage_cost": 291.0,
+}
+LEASE_SHOTS = [
+    {
+        "file": f"card-lease{curve}{suffix}",
+        "theme": theme,
+        "kind": "fuel",
+        "config": {"chart": False, "trips": False, "refuels": False},
+        "extra": {"lease": LEASE},
+        "open": ["lease", "lease-curve"] if curve else ["lease"],
+    }
+    for curve in ("", "-curve")
+    for theme, suffix in (("light", ""), ("dark", "-dark"))
+]
+SHOTS += LEASE_SHOTS
+
 # One GIF per animation, on a compact card. `names`: the animations stepped; the others are shown finished.
 # Every animation is recorded in both themes: each light GIF gets a -dark twin with the exact same setup.
 COMPACT = {"trips": False, "refuels": False}
@@ -453,6 +486,8 @@ MOUNT = """([hass, config, open, popup, tag, zoom]) => {
     document.getElementById("root").appendChild(el);
     // Several sections at once (a click on one folds the others back, like on a dashboard).
     if (open) {
+        // `lease-curve`: the lease section switched from its gauge to its curve.
+        el._leaseCurve = open.includes("lease-curve");
         el._open = new Set(open);
         el._render(true);
     }

@@ -124,6 +124,24 @@
           "co2_electricity": "Grams of CO₂ per kWh charged; 55 for the French grid, about 380 for the German one.",
           "units": "Units of the figures shown on the card, and of the trip and month distances and volumes. The consumption, cost and CO₂ per distance sensors keep their metric unit (their statistics stay valid) and give the imperial figure in their attributes. Tank capacity, fixed fuel price and refuel threshold are typed in the units shown."
         }
+      },
+      "lease": {
+        "title": "Lease mileage allowance",
+        "description": "Optional: fill in the start, length and allowance of a lease (distances in {unit}) to follow the kilometres against the contract. Leave empty for no lease.",
+        "data": {
+          "lease_start": "Contract start",
+          "lease_months": "Length",
+          "lease_distance": "Allowance",
+          "lease_start_odometer": "Odometer at delivery",
+          "lease_extra_price": "Price of an extra distance unit"
+        },
+        "data_description": {
+          "lease_start": "Day the vehicle was delivered.",
+          "lease_months": "Length of the contract in months.",
+          "lease_distance": "Distance allowed for the whole contract.",
+          "lease_start_odometer": "Odometer reading when the contract started (0 for a new vehicle).",
+          "lease_extra_price": "What each unit over the allowance costs at the end."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "The tank capacity is needed to use the fuel level.",
       "battery_capacity_required": "The battery capacity is needed to use the battery level.",
       "duplicate_sensor": "This sensor is already used for another source.",
-      "charger_needs_battery": "A home charger counter needs a battery energy or level sensor."
+      "charger_needs_battery": "A home charger counter needs a battery energy or level sensor.",
+      "lease_incomplete": "Fill in the start, the length and the allowance together, or leave all three empty."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Overdue"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Lease distance left"
+      },
+      "lease_balance": {
+        "name": "Lease balance"
+      },
+      "lease_projected": {
+        "name": "Lease projected distance"
+      },
+      "lease_overage_cost": {
+        "name": "Lease overage cost"
       }
     }
   },

@@ -124,6 +124,24 @@
           "co2_electricity": "Gramas de CO₂ por kWh carregado; 55 para a rede francesa, cerca de 380 para a alemã.",
           "units": "Unidades dos valores mostrados no cartão e das distâncias e volumes da viagem e do mês. Os sensores de consumo, custo e CO₂ por distância mantêm a sua unidade métrica (as suas estatísticas continuam válidas) e dão o valor imperial nos seus atributos. A capacidade do depósito, o preço fixo do combustível e o limiar de abastecimento são introduzidos nas unidades mostradas."
         }
+      },
+      "lease": {
+        "title": "Quilometragem do aluguer",
+        "description": "Opcional: indique o início, a duração e a quilometragem do contrato (distâncias em {unit}) para acompanhar os quilómetros face ao contrato. Deixe vazio se não houver contrato.",
+        "data": {
+          "lease_start": "Início do contrato",
+          "lease_months": "Duração",
+          "lease_distance": "Quilometragem contratada",
+          "lease_start_odometer": "Conta-quilómetros na entrega",
+          "lease_extra_price": "Preço por unidade de distância extra"
+        },
+        "data_description": {
+          "lease_start": "Dia de entrega do veículo.",
+          "lease_months": "Duração do contrato em meses.",
+          "lease_distance": "Distância permitida em todo o contrato.",
+          "lease_start_odometer": "Leitura do conta-quilómetros no início (0 para um veículo novo).",
+          "lease_extra_price": "Quanto custa cada unidade acima da quilometragem no fim."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "A capacidade do depósito é necessária para usar o nível de combustível.",
       "battery_capacity_required": "A capacidade da bateria é necessária para usar o nível da bateria.",
       "duplicate_sensor": "Este sensor já é usado para outra fonte.",
-      "charger_needs_battery": "Um contador do carregador doméstico requer um sensor de energia ou de nível da bateria."
+      "charger_needs_battery": "Um contador do carregador doméstico requer um sensor de energia ou de nível da bateria.",
+      "lease_incomplete": "Indique em conjunto o início, a duração e a quilometragem, ou deixe os três vazios."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Em atraso"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Distância restante do contrato"
+      },
+      "lease_balance": {
+        "name": "Desvio do contrato"
+      },
+      "lease_projected": {
+        "name": "Distância prevista no fim"
+      },
+      "lease_overage_cost": {
+        "name": "Custo do excesso"
       }
     }
   },

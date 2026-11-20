@@ -32,6 +32,7 @@ It comes with a **Lovelace card** showing the tank and battery gauges, the key f
 - **History** kept across restarts: the last 24 months, and every trip, refuel and charge of the last 365 days, rebuilt from the recorder for the days the tracking does not cover yet
 - **Actions** to log a refuel or a charge by hand (`add_refuel`, `add_charge`) to start over (`reset_statistics`) or to rebuild everything from the recorded history (`import_history`)
 - **Service reminder**: log a service with its interval (`log_service`), and the **Next service** sensor counts the distance left, negative once overdue
+- **Lease mileage allowance** (optional): give the start, length and allowance of a lease and follow the distance driven against the contract: ahead of or under the pro rata, distance left, distance a month to stay within, projection at the end at the recent pace and cost of the overage
 - **CSV export** of every trip, refuel and charge kept (`export`), for a spreadsheet
 - **Lovelace card bundled with the integration**, added automatically to the dashboard resources (nothing to add by hand): an animated illustrated header (fuel pump or charging station, day and night), fuel and battery gauges, trip / month / average / cost per km tiles, monthly chart (consumption, distance, cost or CO₂), CO₂ per km under the cost per km, recent trips and refuels or charges, a pulsing dot while driving, a popup to log a refuel or a charge; visual editor
 - UI setup, no YAML; English, French, German, Spanish, Italian, Dutch, Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian, Greek and Serbian (Cyrillic and Latin)
@@ -113,7 +114,7 @@ Remove each vehicle from **Settings → Devices & services**: its stored history
 2. Check the **sensors**: the odometer and the fuel and battery sensors found on the device are filled in; change or complete them if needed
 3. Set the **prices** (a price sensor, such as a station of [ha-carburants-france](https://github.com/juju35/ha-carburants-france), or a fixed price)
 
-Everything can be changed later with **Configure**, which also holds the trip and refuel/charge thresholds.
+Everything can be changed later with **Configure**, which also holds the trip and refuel/charge thresholds and, last, the optional **lease mileage allowance**.
 
 | Option | Default | Description |
 |---|---|---|
@@ -135,6 +136,11 @@ Everything can be changed later with **Configure**, which also holds the trip an
 | End of trip after | `30` min | Minutes without the odometer moving that end a trip |
 | Refuel threshold | `3` L | A rise of at least this much fuel is a refuel (in US gallons in imperial units) |
 | Charge threshold | `1` kWh | A rise of at least this much energy is a charge |
+| Contract start | — | Lease (Configure, last step): the day the vehicle was delivered. The start, length and allowance go together; leave all three empty for no lease |
+| Length | — | Length of the lease, in months |
+| Allowance | — | Distance allowed for the whole lease (km, or mi in imperial units) |
+| Odometer at delivery | `0` | Odometer reading when the lease started |
+| Price of an extra distance unit | — | What each km (mi) over the allowance costs at the end: gives the cost of the overage |
 
 At least one fuel or battery sensor is needed. A vehicle with only fuel sensors is tracked as **fuel**, with only battery sensors as **electric**, with both as **plug-in hybrid**.
 
@@ -155,6 +161,7 @@ One device per vehicle; the entities only exist when they make sense for it (`fu
 | `sensor.my_car_co2_of_the_trip`, `sensor.my_car_co2_this_month` | CO₂ of the last trip and of this month (kg) |
 | `sensor.my_car_co2_per_km` | CO₂ per kilometre, on average (g/km; g/mi in the `imperial_value` attribute in imperial units) |
 | `sensor.my_car_last_refuel` | Time of the last refuel; attributes `liters`, `cost`, `odometer`, `source` (`auto` or `manual`) |
+| `sensor.my_car_lease_distance_left`, `sensor.my_car_lease_balance`, `sensor.my_car_lease_projected_distance`, `sensor.my_car_lease_overage_cost` | Only with a lease: distance left in the allowance, distance ahead of the pro rata (negative under it), distance projected at the end of the contract at the pace of the last 3 complete months (else the average since the start), and the cost of the distance over the allowance at that pace. The main sensor's `lease` attribute carries them all for the card (`start`, `end`, `months`, `month`, `ended`, `allowance`, `driven`, `prorata`, `balance`, `remaining`, `per_month_left`, `pace`, `projected`, `overage`, `extra_price`, `overage_cost`) |
 | `sensor.my_car_last_charge` | Time of the last charge; attributes `energy`, `cost`, `odometer`, `source` (`auto`, `charger` or `manual`) |
 
 ### Actions
@@ -328,6 +335,7 @@ entity: sensor.my_car_consumption
 | `months` | both | `6` | Number of months in the chart (3–12) |
 | `trips` | both | `true` | **Recent trips** section |
 | `refuels` | both | `true` | **Refuels** / **Charges** section |
+| `lease` | both | `true` | **Lease allowance** section, when the vehicle has a lease: a gauge of the distance driven against the allowance with a mark at the pro rata (tap it for the curve of the allowance, the distance driven and the projection), the distance left, the distance a month to stay within and the cost of the overage |
 | `add_button` | both | `true` | **+** button in the header to log a refuel or a charge |
 | `language` | both | Auto | Force language: `en`, `fr`, `de`, `es`, `it`, `nl`, `pt`, `pl`, `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv`, `el`, `sr` (Serbian, Cyrillic) or `sr-Latn` (Serbian, Latin) |
 | `zoom` | mini | `true` | Detail button that opens the full card |
@@ -412,6 +420,13 @@ Recent trips and refuels unfolded:
 | Light | Dark |
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-sections.png" alt="sections" width="316"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-sections-dark.png" alt="sections dark" width="316"> |
+
+Lease allowance unfolded, as a gauge and as a curve (a tap on the gauge switches):
+
+| Light | Dark |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-lease.png" alt="lease gauge" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-lease-dark.png" alt="lease gauge dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-lease-curve.png" alt="lease curve" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-vehicle-consumption/main/screenshots/card-lease-curve-dark.png" alt="lease curve dark" width="400"> |
 
 ## How it works
 

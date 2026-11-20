@@ -124,6 +124,24 @@
           "co2_electricity": "Gramy CO₂ na naładowaną kWh; 55 dla sieci francuskiej, około 380 dla niemieckiej.",
           "units": "Jednostki wartości na karcie oraz odległości i objętości podróży i miesiąca. Czujniki zużycia, kosztu i CO₂ na odległość zachowują jednostkę metryczną (ich statystyki pozostają prawidłowe) i podają wartość imperialną w atrybutach. Pojemność zbiornika, stałą cenę paliwa i próg tankowania wpisuje się w pokazanych jednostkach."
         }
+      },
+      "lease": {
+        "title": "Limit kilometrów leasingu",
+        "description": "Opcjonalnie: podaj początek, okres i limit kilometrów umowy (odległości w {unit}), aby porównywać przebieg z umową. Pozostaw puste, jeśli nie ma leasingu.",
+        "data": {
+          "lease_start": "Początek umowy",
+          "lease_months": "Okres",
+          "lease_distance": "Limit",
+          "lease_start_odometer": "Przebieg przy odbiorze",
+          "lease_extra_price": "Cena jednostki ponad limit"
+        },
+        "data_description": {
+          "lease_start": "Dzień odbioru pojazdu.",
+          "lease_months": "Okres umowy w miesiącach.",
+          "lease_distance": "Odległość dozwolona na całą umowę.",
+          "lease_start_odometer": "Stan licznika na początku umowy (0 dla nowego pojazdu).",
+          "lease_extra_price": "Ile kosztuje każda jednostka ponad limit na koniec."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "Pojemność zbiornika jest potrzebna, aby użyć poziomu paliwa.",
       "battery_capacity_required": "Pojemność akumulatora jest potrzebna, aby użyć poziomu naładowania akumulatora.",
       "duplicate_sensor": "Ten sensor jest już używany dla innego źródła.",
-      "charger_needs_battery": "Licznik ładowarki domowej wymaga sensora energii lub poziomu naładowania akumulatora."
+      "charger_needs_battery": "Licznik ładowarki domowej wymaga sensora energii lub poziomu naładowania akumulatora.",
+      "lease_incomplete": "Podaj razem początek, okres i limit albo pozostaw wszystkie trzy puste."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Zaległy"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Pozostały limit leasingu"
+      },
+      "lease_balance": {
+        "name": "Odchylenie od limitu"
+      },
+      "lease_projected": {
+        "name": "Prognozowany przebieg na koniec"
+      },
+      "lease_overage_cost": {
+        "name": "Koszt przekroczenia"
       }
     }
   },
