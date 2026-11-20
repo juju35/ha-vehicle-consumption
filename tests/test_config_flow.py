@@ -284,6 +284,8 @@ async def test_options_flow(hass: HomeAssistant) -> None:
             CONF_CHARGE_THRESHOLD: 2,
         },
     )
+    assert result["step_id"] == "lease"
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {})
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert entry.options == {
         CONF_ODOMETER: "sensor.car_mileage",
@@ -347,6 +349,8 @@ async def test_options_flow_imperial(hass: HomeAssistant) -> None:
             CONF_CHARGE_THRESHOLD: 1,
         },
     )
+    assert result["step_id"] == "lease"
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {})
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert entry.options[CONF_TANK_CAPACITY] == pytest.approx(75.708, abs=1e-3)
     assert entry.options[CONF_FUEL_PRICE] == pytest.approx(1.0567, abs=1e-4)

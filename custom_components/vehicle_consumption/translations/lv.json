@@ -124,6 +124,24 @@
           "co2_electricity": "Grami CO₂ uz uzlādēto kWh; 55 Francijas tīklam, aptuveni 380 Vācijas tīklam.",
           "units": "Kartē rādīto vērtību, kā arī brauciena un mēneša attālumu un apjomu mērvienības. Patēriņa, izmaksu un CO₂ uz attālumu sensori saglabā metrisko mērvienību (to statistika paliek derīga) un imperiālo vērtību norāda atribūtos. Tvertnes tilpumu, fiksēto degvielas cenu un uzpildes slieksni ievada rādītajās mērvienībās."
         }
+      },
+      "lease": {
+        "title": "Līzinga nobraukuma limits",
+        "description": "Neobligāti: norādiet līguma sākumu, ilgumu un nobraukuma limitu (attālumi {unit}), lai salīdzinātu nobraukumu ar līgumu. Bez līzinga atstājiet tukšu.",
+        "data": {
+          "lease_start": "Līguma sākums",
+          "lease_months": "Ilgums",
+          "lease_distance": "Limits",
+          "lease_start_odometer": "Odometrs piegādes brīdī",
+          "lease_extra_price": "Cena par papildu attāluma vienību"
+        },
+        "data_description": {
+          "lease_start": "Transportlīdzekļa piegādes diena.",
+          "lease_months": "Līguma ilgums mēnešos.",
+          "lease_distance": "Atļautais attālums visam līgumam.",
+          "lease_start_odometer": "Odometra rādījums līguma sākumā (0 jaunam transportlīdzeklim).",
+          "lease_extra_price": "Cik maksā katra vienība virs limita beigās."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "Lai izmantotu degvielas līmeni, nepieciešams bākas tilpums.",
       "battery_capacity_required": "Lai izmantotu akumulatora līmeni, nepieciešama akumulatora ietilpība.",
       "duplicate_sensor": "Šis sensors jau tiek izmantots citam avotam.",
-      "charger_needs_battery": "Mājas uzlādes stacijas skaitītājam nepieciešams akumulatora enerģijas vai līmeņa sensors."
+      "charger_needs_battery": "Mājas uzlādes stacijas skaitītājam nepieciešams akumulatora enerģijas vai līmeņa sensors.",
+      "lease_incomplete": "Norādiet sākumu, ilgumu un limitu kopā vai atstājiet visus trīs tukšus."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Nokavēta"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Atlikušais līzinga nobraukums"
+      },
+      "lease_balance": {
+        "name": "Novirze no limita"
+      },
+      "lease_projected": {
+        "name": "Prognozētais nobraukums beigās"
+      },
+      "lease_overage_cost": {
+        "name": "Pārsnieguma izmaksas"
       }
     }
   },

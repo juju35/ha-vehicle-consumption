@@ -16,7 +16,11 @@
       "cost_month": { "default": "mdi:cash" },
       "cost_per_km": { "default": "mdi:cash-marker" },
       "last_refuel": { "default": "mdi:gas-station" },
-      "last_charge": { "default": "mdi:ev-station" }
+      "last_charge": { "default": "mdi:ev-station" },
+      "lease_remaining": { "default": "mdi:road-variant" },
+      "lease_balance": { "default": "mdi:scale-balance" },
+      "lease_projected": { "default": "mdi:chart-timeline-variant" },
+      "lease_overage_cost": { "default": "mdi:cash-clock" }
     }
   },
   "services": {

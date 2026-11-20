@@ -6,7 +6,7 @@ from datetime import timedelta
 from typing import Final
 
 DOMAIN: Final = "vehicle_consumption"
-VERSION: Final = "1.9.1"
+VERSION: Final = "1.10.0"
 
 # Entry data
 CONF_DEVICE_ID: Final = "device_id"
@@ -49,6 +49,23 @@ UNITS_METRIC: Final = "metric"
 UNITS_IMPERIAL: Final = "imperial"
 UNIT_SYSTEMS: Final = (UNITS_METRIC, UNITS_IMPERIAL)
 DEFAULT_UNITS: Final = UNITS_METRIC
+
+# Lease mileage allowance (options flow, `lease` step): start date, length (months), allowance for the whole contract
+# and odometer at delivery (km), price of a kilometre over the allowance. Start, length and allowance make a lease.
+CONF_LEASE_START: Final = "lease_start"
+CONF_LEASE_MONTHS: Final = "lease_months"
+CONF_LEASE_DISTANCE: Final = "lease_distance"
+CONF_LEASE_START_ODOMETER: Final = "lease_start_odometer"
+CONF_LEASE_EXTRA_PRICE: Final = "lease_extra_price"
+LEASE_KEYS: Final = (
+    CONF_LEASE_START,
+    CONF_LEASE_MONTHS,
+    CONF_LEASE_DISTANCE,
+    CONF_LEASE_START_ODOMETER,
+    CONF_LEASE_EXTRA_PRICE,
+)
+# The pace of the projection: the average of this many complete months since the start (else since the start).
+LEASE_PACE_MONTHS: Final = 3
 
 CONF_TRIP_GAP: Final = "trip_gap"
 CONF_REFUEL_THRESHOLD: Final = "refuel_threshold"

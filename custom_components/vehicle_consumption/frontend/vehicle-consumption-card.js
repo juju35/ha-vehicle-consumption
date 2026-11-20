@@ -6,7 +6,7 @@
  * Served and added to the dashboard resources by the integration.
  * https://github.com/juju35/ha-vehicle-consumption
  */
-var VEHICLE_CONSUMPTION_CARD_VERSION = '1.9.1';
+var VEHICLE_CONSUMPTION_CARD_VERSION = '1.10.0';
 
 const VC_I18N = {
   en: {
@@ -80,6 +80,23 @@ const VC_I18N = {
     zoom_out: 'Back to the compact view',
     ed_zoom: 'Details button (full view)',
     estimated: 'Estimated',
+    lease: 'Lease allowance',
+    lease_month: 'Month {n} / {m}',
+    lease_ahead: '+{v} {u} ahead',
+    lease_under: '{v} {u} under',
+    lease_left: '{u} left',
+    lease_per_month: '{u} / month to stay within',
+    lease_cost: 'if the pace holds',
+    lease_over_km: '{u} over at the end',
+    lease_projection: 'At the end: {v} {u}, at {p} {u} / month',
+    lease_mark: 'Mark: pro rata {v} {u}',
+    lease_driven: 'Driven',
+    lease_plan: 'Allowance',
+    lease_proj: 'Projection',
+    lease_ended: 'Contract ended',
+    lease_curve: 'Show the curve',
+    lease_gauge: 'Show the gauge',
+    ed_lease: 'Lease allowance',
   },
   fr: {
     title: 'Véhicule',
@@ -152,6 +169,23 @@ const VC_I18N = {
     zoom_out: 'Revenir à la vue compacte',
     ed_zoom: 'Bouton détails (vue complète)',
     estimated: 'Estimé',
+    lease: 'Forfait LOA',
+    lease_month: 'Mois {n} / {m}',
+    lease_ahead: '+{v} {u} d’avance',
+    lease_under: '{v} {u} de marge',
+    lease_left: '{u} restants',
+    lease_per_month: '{u} / mois pour tenir',
+    lease_cost: 'si le rythme continue',
+    lease_over_km: '{u} de dépassement',
+    lease_projection: 'En fin de contrat : {v} {u}, à {p} {u} / mois',
+    lease_mark: 'Repère : prorata {v} {u}',
+    lease_driven: 'Réel',
+    lease_plan: 'Forfait linéaire',
+    lease_proj: 'Projection',
+    lease_ended: 'Contrat terminé',
+    lease_curve: 'Afficher la courbe',
+    lease_gauge: 'Afficher la jauge',
+    ed_lease: 'Forfait LOA',
   },
   de: {
     title: 'Fahrzeug',
@@ -224,6 +258,23 @@ const VC_I18N = {
     zoom_out: 'Zurück zur kompakten Ansicht',
     ed_zoom: 'Detail-Schaltfläche (vollständige Ansicht)',
     estimated: 'Geschätzt',
+    lease: 'Leasing-Kontingent',
+    lease_month: 'Monat {n} / {m}',
+    lease_ahead: '+{v} {u} voraus',
+    lease_under: '{v} {u} darunter',
+    lease_left: '{u} übrig',
+    lease_per_month: '{u} / Monat, um im Rahmen zu bleiben',
+    lease_cost: 'bei gleichem Tempo',
+    lease_over_km: '{u} zu viel am Ende',
+    lease_projection: 'Am Ende: {v} {u}, bei {p} {u} / Monat',
+    lease_mark: 'Markierung: anteilig {v} {u}',
+    lease_driven: 'Gefahren',
+    lease_plan: 'Kontingent',
+    lease_proj: 'Prognose',
+    lease_ended: 'Vertrag beendet',
+    lease_curve: 'Kurve anzeigen',
+    lease_gauge: 'Anzeige zeigen',
+    ed_lease: 'Leasing-Kontingent',
   },
   es: {
     title: 'Vehículo',
@@ -296,6 +347,23 @@ const VC_I18N = {
     zoom_out: 'Volver a la vista compacta',
     ed_zoom: 'Botón de detalles (vista completa)',
     estimated: 'Estimado',
+    lease: 'Kilometraje del renting',
+    lease_month: 'Mes {n} / {m}',
+    lease_ahead: '+{v} {u} de adelanto',
+    lease_under: '{v} {u} de margen',
+    lease_left: '{u} restantes',
+    lease_per_month: '{u} / mes para cumplir',
+    lease_cost: 'si se mantiene el ritmo',
+    lease_over_km: '{u} de exceso al final',
+    lease_projection: 'Al final: {v} {u}, a {p} {u} / mes',
+    lease_mark: 'Marca: prorrata {v} {u}',
+    lease_driven: 'Recorrido',
+    lease_plan: 'Contratado',
+    lease_proj: 'Previsión',
+    lease_ended: 'Contrato finalizado',
+    lease_curve: 'Mostrar la curva',
+    lease_gauge: 'Mostrar el indicador',
+    ed_lease: 'Kilometraje del renting',
   },
   it: {
     title: 'Veicolo',
@@ -368,6 +436,23 @@ const VC_I18N = {
     zoom_out: 'Torna alla vista compatta',
     ed_zoom: 'Pulsante dettagli (vista completa)',
     estimated: 'Stimato',
+    lease: 'Chilometraggio noleggio',
+    lease_month: 'Mese {n} / {m}',
+    lease_ahead: '+{v} {u} in anticipo',
+    lease_under: '{v} {u} di margine',
+    lease_left: '{u} rimanenti',
+    lease_per_month: '{u} / mese per rientrare',
+    lease_cost: 'se il ritmo resta questo',
+    lease_over_km: '{u} in eccesso alla fine',
+    lease_projection: 'Alla fine: {v} {u}, a {p} {u} / mese',
+    lease_mark: 'Tacca: pro rata {v} {u}',
+    lease_driven: 'Percorsi',
+    lease_plan: 'Previsti',
+    lease_proj: 'Proiezione',
+    lease_ended: 'Contratto concluso',
+    lease_curve: 'Mostra la curva',
+    lease_gauge: 'Mostra l’indicatore',
+    ed_lease: 'Chilometraggio noleggio',
   },
   nl: {
     title: 'Voertuig',
@@ -440,6 +525,23 @@ const VC_I18N = {
     zoom_out: 'Terug naar de compacte weergave',
     ed_zoom: 'Detailknop (volledige weergave)',
     estimated: 'Geschat',
+    lease: 'Kilometerbundel lease',
+    lease_month: 'Maand {n} / {m}',
+    lease_ahead: '+{v} {u} voor',
+    lease_under: '{v} {u} eronder',
+    lease_left: '{u} over',
+    lease_per_month: '{u} / maand om binnen te blijven',
+    lease_cost: 'bij dit tempo',
+    lease_over_km: '{u} te veel aan het eind',
+    lease_projection: 'Aan het eind: {v} {u}, bij {p} {u} / maand',
+    lease_mark: 'Markering: naar rato {v} {u}',
+    lease_driven: 'Gereden',
+    lease_plan: 'Bundel',
+    lease_proj: 'Prognose',
+    lease_ended: 'Contract afgelopen',
+    lease_curve: 'Curve tonen',
+    lease_gauge: 'Meter tonen',
+    ed_lease: 'Kilometerbundel lease',
   },
   pt: {
     title: 'Veículo',
@@ -512,6 +614,23 @@ const VC_I18N = {
     zoom_out: 'Voltar à vista compacta',
     ed_zoom: 'Botão de detalhes (vista completa)',
     estimated: 'Estimado',
+    lease: 'Quilometragem do aluguer',
+    lease_month: 'Mês {n} / {m}',
+    lease_ahead: '+{v} {u} de avanço',
+    lease_under: '{v} {u} de margem',
+    lease_left: '{u} restantes',
+    lease_per_month: '{u} / mês para cumprir',
+    lease_cost: 'se o ritmo se mantiver',
+    lease_over_km: '{u} de excesso no fim',
+    lease_projection: 'No fim: {v} {u}, a {p} {u} / mês',
+    lease_mark: 'Marca: pro rata {v} {u}',
+    lease_driven: 'Percorrido',
+    lease_plan: 'Contratado',
+    lease_proj: 'Projeção',
+    lease_ended: 'Contrato terminado',
+    lease_curve: 'Mostrar a curva',
+    lease_gauge: 'Mostrar o indicador',
+    ed_lease: 'Quilometragem do aluguer',
   },
   pl: {
     title: 'Pojazd',
@@ -584,6 +703,23 @@ const VC_I18N = {
     zoom_out: 'Wróć do widoku kompaktowego',
     ed_zoom: 'Przycisk szczegółów (pełny widok)',
     estimated: 'Szacowany',
+    lease: 'Limit leasingu',
+    lease_month: 'Miesiąc {n} / {m}',
+    lease_ahead: '+{v} {u} ponad plan',
+    lease_under: '{v} {u} poniżej planu',
+    lease_left: '{u} pozostało',
+    lease_per_month: '{u} / mies., aby się zmieścić',
+    lease_cost: 'przy obecnym tempie',
+    lease_over_km: '{u} ponad limit na koniec',
+    lease_projection: 'Na koniec: {v} {u}, przy {p} {u} / mies.',
+    lease_mark: 'Znacznik: proporcjonalnie {v} {u}',
+    lease_driven: 'Przejechane',
+    lease_plan: 'Limit',
+    lease_proj: 'Prognoza',
+    lease_ended: 'Umowa zakończona',
+    lease_curve: 'Pokaż krzywą',
+    lease_gauge: 'Pokaż wskaźnik',
+    ed_lease: 'Limit leasingu',
   },
   ro: {
     title: 'Vehicul',
@@ -656,6 +792,23 @@ const VC_I18N = {
     zoom_out: 'Înapoi la vederea compactă',
     ed_zoom: 'Buton detalii (vedere completă)',
     estimated: 'Estimat',
+    lease: 'Kilometraj leasing',
+    lease_month: 'Luna {n} / {m}',
+    lease_ahead: '+{v} {u} în avans',
+    lease_under: '{v} {u} sub plan',
+    lease_left: '{u} rămași',
+    lease_per_month: '{u} / lună pentru încadrare',
+    lease_cost: 'dacă ritmul rămâne',
+    lease_over_km: '{u} depășire la final',
+    lease_projection: 'La final: {v} {u}, la {p} {u} / lună',
+    lease_mark: 'Reper: proporțional {v} {u}',
+    lease_driven: 'Parcurs',
+    lease_plan: 'Contractat',
+    lease_proj: 'Estimare',
+    lease_ended: 'Contract încheiat',
+    lease_curve: 'Afișează curba',
+    lease_gauge: 'Afișează indicatorul',
+    ed_lease: 'Kilometraj leasing',
   },
   da: {
     title: 'Køretøj',
@@ -728,6 +881,23 @@ const VC_I18N = {
     zoom_out: 'Tilbage til kompakt visning',
     ed_zoom: 'Detaljeknap (fuld visning)',
     estimated: 'Anslået',
+    lease: 'Leasing-kilometer',
+    lease_month: 'Måned {n} / {m}',
+    lease_ahead: '+{v} {u} foran',
+    lease_under: '{v} {u} under',
+    lease_left: '{u} tilbage',
+    lease_per_month: '{u} / måned for at holde grænsen',
+    lease_cost: 'hvis tempoet holder',
+    lease_over_km: '{u} over til sidst',
+    lease_projection: 'Til sidst: {v} {u}, ved {p} {u} / måned',
+    lease_mark: 'Markering: forholdsmæssigt {v} {u}',
+    lease_driven: 'Kørt',
+    lease_plan: 'Grænse',
+    lease_proj: 'Prognose',
+    lease_ended: 'Aftale udløbet',
+    lease_curve: 'Vis kurven',
+    lease_gauge: 'Vis måleren',
+    ed_lease: 'Leasing-kilometer',
   },
   sv: {
     title: 'Fordon',
@@ -800,6 +970,23 @@ const VC_I18N = {
     zoom_out: 'Tillbaka till kompakt vy',
     ed_zoom: 'Detaljknapp (fullständig vy)',
     estimated: 'Uppskattad',
+    lease: 'Leasingsträcka',
+    lease_month: 'Månad {n} / {m}',
+    lease_ahead: '+{v} {u} före',
+    lease_under: '{v} {u} under',
+    lease_left: '{u} kvar',
+    lease_per_month: '{u} / månad för att klara gränsen',
+    lease_cost: 'om takten håller',
+    lease_over_km: '{u} över i slutet',
+    lease_projection: 'I slutet: {v} {u}, med {p} {u} / månad',
+    lease_mark: 'Markering: proportionellt {v} {u}',
+    lease_driven: 'Kört',
+    lease_plan: 'Avtalat',
+    lease_proj: 'Prognos',
+    lease_ended: 'Avtalet slut',
+    lease_curve: 'Visa kurvan',
+    lease_gauge: 'Visa mätaren',
+    ed_lease: 'Leasingsträcka',
   },
   bg: {
     title: 'Автомобил',
@@ -872,6 +1059,23 @@ const VC_I18N = {
     zoom_out: 'Обратно към компактния изглед',
     ed_zoom: 'Бутон за подробности (пълен изглед)',
     estimated: 'Приблизително',
+    lease: 'Лимит по лизинг',
+    lease_month: 'Месец {n} / {m}',
+    lease_ahead: '+{v} {u} напред',
+    lease_under: '{v} {u} под плана',
+    lease_left: 'Остават {u}',
+    lease_per_month: '{u} / месец, за да се вместите',
+    lease_cost: 'при същото темпо',
+    lease_over_km: '{u} превишение в края',
+    lease_projection: 'В края: {v} {u}, при {p} {u} / месец',
+    lease_mark: 'Отметка: пропорционално {v} {u}',
+    lease_driven: 'Изминати',
+    lease_plan: 'Лимит',
+    lease_proj: 'Прогноза',
+    lease_ended: 'Договорът е приключил',
+    lease_curve: 'Покажи кривата',
+    lease_gauge: 'Покажи индикатора',
+    ed_lease: 'Лимит по лизинг',
   },
   ru: {
     title: 'Автомобиль',
@@ -944,6 +1148,23 @@ const VC_I18N = {
     zoom_out: 'Вернуться к компактному виду',
     ed_zoom: 'Кнопка подробностей (полный вид)',
     estimated: 'Оценка',
+    lease: 'Лимит лизинга',
+    lease_month: 'Месяц {n} / {m}',
+    lease_ahead: '+{v} {u} с опережением',
+    lease_under: '{v} {u} в запасе',
+    lease_left: 'Осталось {u}',
+    lease_per_month: '{u} / мес., чтобы уложиться',
+    lease_cost: 'если темп сохранится',
+    lease_over_km: '{u} перепробега в конце',
+    lease_projection: 'В конце: {v} {u}, при {p} {u} / мес.',
+    lease_mark: 'Метка: пропорционально {v} {u}',
+    lease_driven: 'Пройдено',
+    lease_plan: 'Лимит',
+    lease_proj: 'Прогноз',
+    lease_ended: 'Договор завершён',
+    lease_curve: 'Показать кривую',
+    lease_gauge: 'Показать шкалу',
+    ed_lease: 'Лимит лизинга',
   },
   uk: {
     title: 'Автомобіль',
@@ -1016,6 +1237,23 @@ const VC_I18N = {
     zoom_out: 'Повернутися до компактного вигляду',
     ed_zoom: 'Кнопка подробиць (повний вигляд)',
     estimated: 'Оцінка',
+    lease: 'Ліміт лізингу',
+    lease_month: 'Місяць {n} / {m}',
+    lease_ahead: '+{v} {u} з випередженням',
+    lease_under: '{v} {u} у запасі',
+    lease_left: 'Залишилось {u}',
+    lease_per_month: '{u} / міс., щоб вкластися',
+    lease_cost: 'якщо темп збережеться',
+    lease_over_km: '{u} перевищення наприкінці',
+    lease_projection: 'Наприкінці: {v} {u}, при {p} {u} / міс.',
+    lease_mark: 'Позначка: пропорційно {v} {u}',
+    lease_driven: 'Пройдено',
+    lease_plan: 'Ліміт',
+    lease_proj: 'Прогноз',
+    lease_ended: 'Договір завершено',
+    lease_curve: 'Показати криву',
+    lease_gauge: 'Показати шкалу',
+    ed_lease: 'Ліміт лізингу',
   },
   hu: {
     title: 'Jármű',
@@ -1088,6 +1326,23 @@ const VC_I18N = {
     zoom_out: 'Vissza a kompakt nézethez',
     ed_zoom: 'Részletek gomb (teljes nézet)',
     estimated: 'Becsült',
+    lease: 'Lízing kilométerkeret',
+    lease_month: '{n}. / {m} hónap',
+    lease_ahead: '+{v} {u} előnyben',
+    lease_under: '{v} {u} a terv alatt',
+    lease_left: '{u} maradt',
+    lease_per_month: '{u} / hónap a keretben maradáshoz',
+    lease_cost: 'ha a tempó marad',
+    lease_over_km: '{u} túlfutás a végén',
+    lease_projection: 'A végén: {v} {u}, havi {p} {u} mellett',
+    lease_mark: 'Jelölő: időarányos {v} {u}',
+    lease_driven: 'Megtett',
+    lease_plan: 'Keret',
+    lease_proj: 'Előrejelzés',
+    lease_ended: 'A szerződés lejárt',
+    lease_curve: 'Görbe mutatása',
+    lease_gauge: 'Mérő mutatása',
+    ed_lease: 'Lízing kilométerkeret',
   },
   sk: {
     title: 'Vozidlo',
@@ -1160,6 +1415,23 @@ const VC_I18N = {
     zoom_out: 'Späť na kompaktné zobrazenie',
     ed_zoom: 'Tlačidlo podrobností (úplné zobrazenie)',
     estimated: 'Odhad',
+    lease: 'Limit lízingu',
+    lease_month: 'Mesiac {n} / {m}',
+    lease_ahead: '+{v} {u} v predstihu',
+    lease_under: '{v} {u} pod plánom',
+    lease_left: 'Zostáva {u}',
+    lease_per_month: '{u} / mesiac na dodržanie',
+    lease_cost: 'ak tempo vydrží',
+    lease_over_km: '{u} prekročenie na konci',
+    lease_projection: 'Na konci: {v} {u}, pri {p} {u} / mesiac',
+    lease_mark: 'Značka: pomerne {v} {u}',
+    lease_driven: 'Najazdené',
+    lease_plan: 'Limit',
+    lease_proj: 'Odhad',
+    lease_ended: 'Zmluva skončila',
+    lease_curve: 'Zobraziť krivku',
+    lease_gauge: 'Zobraziť ukazovateľ',
+    ed_lease: 'Limit lízingu',
   },
   cs: {
     title: 'Vozidlo',
@@ -1232,6 +1504,23 @@ const VC_I18N = {
     zoom_out: 'Zpět na kompaktní zobrazení',
     ed_zoom: 'Tlačítko podrobností (úplné zobrazení)',
     estimated: 'Odhad',
+    lease: 'Limit leasingu',
+    lease_month: 'Měsíc {n} / {m}',
+    lease_ahead: '+{v} {u} v předstihu',
+    lease_under: '{v} {u} pod plánem',
+    lease_left: 'Zbývá {u}',
+    lease_per_month: '{u} / měsíc pro dodržení',
+    lease_cost: 'pokud tempo vydrží',
+    lease_over_km: '{u} překročení na konci',
+    lease_projection: 'Na konci: {v} {u}, při {p} {u} / měsíc',
+    lease_mark: 'Značka: poměrně {v} {u}',
+    lease_driven: 'Ujeto',
+    lease_plan: 'Limit',
+    lease_proj: 'Odhad',
+    lease_ended: 'Smlouva skončila',
+    lease_curve: 'Zobrazit křivku',
+    lease_gauge: 'Zobrazit ukazatel',
+    ed_lease: 'Limit leasingu',
   },
   sl: {
     title: 'Vozilo',
@@ -1304,6 +1593,23 @@ const VC_I18N = {
     zoom_out: 'Nazaj na strnjen prikaz',
     ed_zoom: 'Gumb za podrobnosti (celoten prikaz)',
     estimated: 'Ocena',
+    lease: 'Omejitev zakupa',
+    lease_month: 'Mesec {n} / {m}',
+    lease_ahead: '+{v} {u} pred načrtom',
+    lease_under: '{v} {u} pod načrtom',
+    lease_left: 'Ostane {u}',
+    lease_per_month: '{u} / mesec za omejitev',
+    lease_cost: 'če se tempo ohrani',
+    lease_over_km: '{u} prekoračitve ob koncu',
+    lease_projection: 'Ob koncu: {v} {u}, pri {p} {u} / mesec',
+    lease_mark: 'Oznaka: sorazmerno {v} {u}',
+    lease_driven: 'Prevoženo',
+    lease_plan: 'Omejitev',
+    lease_proj: 'Napoved',
+    lease_ended: 'Pogodba se je iztekla',
+    lease_curve: 'Pokaži krivuljo',
+    lease_gauge: 'Pokaži merilnik',
+    ed_lease: 'Omejitev zakupa',
   },
   lv: {
     title: 'Automašīna',
@@ -1376,6 +1682,23 @@ const VC_I18N = {
     zoom_out: 'Atpakaļ uz kompakto skatu',
     ed_zoom: 'Detaļu poga (pilns skats)',
     estimated: 'Aplēsts',
+    lease: 'Līzinga limits',
+    lease_month: 'Mēnesis {n} / {m}',
+    lease_ahead: '+{v} {u} pirms plāna',
+    lease_under: '{v} {u} zem plāna',
+    lease_left: 'Atlikuši {u}',
+    lease_per_month: '{u} / mēnesī, lai iekļautos',
+    lease_cost: 'ja temps saglabāsies',
+    lease_over_km: '{u} pārsniegums beigās',
+    lease_projection: 'Beigās: {v} {u}, ar {p} {u} / mēnesī',
+    lease_mark: 'Atzīme: proporcionāli {v} {u}',
+    lease_driven: 'Nobraukts',
+    lease_plan: 'Limits',
+    lease_proj: 'Prognoze',
+    lease_ended: 'Līgums beidzies',
+    lease_curve: 'Rādīt līkni',
+    lease_gauge: 'Rādīt rādītāju',
+    ed_lease: 'Līzinga limits',
   },
   el: {
     title: 'Όχημα',
@@ -1448,6 +1771,23 @@ const VC_I18N = {
     zoom_out: 'Επιστροφή στη συμπαγή προβολή',
     ed_zoom: 'Κουμπί λεπτομερειών (πλήρης προβολή)',
     estimated: 'Εκτίμηση',
+    lease: 'Όριο μίσθωσης',
+    lease_month: 'Μήνας {n} / {m}',
+    lease_ahead: '+{v} {u} μπροστά',
+    lease_under: '{v} {u} κάτω από το πλάνο',
+    lease_left: 'Απομένουν {u}',
+    lease_per_month: '{u} / μήνα για να μείνετε εντός',
+    lease_cost: 'αν διατηρηθεί ο ρυθμός',
+    lease_over_km: '{u} υπέρβαση στο τέλος',
+    lease_projection: 'Στο τέλος: {v} {u}, με {p} {u} / μήνα',
+    lease_mark: 'Σημάδι: αναλογικά {v} {u}',
+    lease_driven: 'Διανύθηκαν',
+    lease_plan: 'Όριο',
+    lease_proj: 'Πρόβλεψη',
+    lease_ended: 'Η σύμβαση έληξε',
+    lease_curve: 'Εμφάνιση καμπύλης',
+    lease_gauge: 'Εμφάνιση δείκτη',
+    ed_lease: 'Όριο μίσθωσης',
   },
   sr: {
     title: 'Возило',
@@ -1520,6 +1860,23 @@ const VC_I18N = {
     zoom_out: 'Назад на компактан приказ',
     ed_zoom: 'Дугме за детаље (пун приказ)',
     estimated: 'Процена',
+    lease: 'Ограничење лизинга',
+    lease_month: 'Месец {n} / {m}',
+    lease_ahead: '+{v} {u} испред плана',
+    lease_under: '{v} {u} испод плана',
+    lease_left: 'Преостало {u}',
+    lease_per_month: '{u} / месец да бисте се уклопили',
+    lease_cost: 'ако темпо остане',
+    lease_over_km: '{u} прекорачења на крају',
+    lease_projection: 'На крају: {v} {u}, при {p} {u} / месец',
+    lease_mark: 'Ознака: сразмерно {v} {u}',
+    lease_driven: 'Пређено',
+    lease_plan: 'Ограничење',
+    lease_proj: 'Пројекција',
+    lease_ended: 'Уговор је истекао',
+    lease_curve: 'Прикажи криву',
+    lease_gauge: 'Прикажи показивач',
+    ed_lease: 'Ограничење лизинга',
   },
   'sr-Latn': {
     title: 'Vozilo',
@@ -1592,6 +1949,23 @@ const VC_I18N = {
     zoom_out: 'Nazad na kompaktan prikaz',
     ed_zoom: 'Dugme za detalje (pun prikaz)',
     estimated: 'Procena',
+    lease: 'Ograničenje lizinga',
+    lease_month: 'Mesec {n} / {m}',
+    lease_ahead: '+{v} {u} ispred plana',
+    lease_under: '{v} {u} ispod plana',
+    lease_left: 'Preostalo {u}',
+    lease_per_month: '{u} / mesec da biste se uklopili',
+    lease_cost: 'ako tempo ostane',
+    lease_over_km: '{u} prekoračenja na kraju',
+    lease_projection: 'Na kraju: {v} {u}, pri {p} {u} / mesec',
+    lease_mark: 'Oznaka: srazmerno {v} {u}',
+    lease_driven: 'Pređeno',
+    lease_plan: 'Ograničenje',
+    lease_proj: 'Projekcija',
+    lease_ended: 'Ugovor je istekao',
+    lease_curve: 'Prikaži krivu',
+    lease_gauge: 'Prikaži pokazivač',
+    ed_lease: 'Ograničenje lizinga',
   },
 };
 
@@ -1619,6 +1993,8 @@ const VC_DEFAULTS = {
   months: 6,
   trips: true,
   refuels: true,
+  // The lease allowance section, shown when the vehicle has a lease (integration options).
+  lease: true,
   add_button: true,
   // Mini card: the detail button (top right) that opens the full view.
   zoom: true,
@@ -2262,6 +2638,10 @@ class VehicleConsumptionCard extends HTMLElement {
     root.querySelector('.add')?.addEventListener('click', () => this._openPopup());
     root.querySelector('.zoom')?.addEventListener('click', (ev) => this._zoomClick(ev));
     for (const el of root.querySelectorAll('.fold')) el.addEventListener('click', () => this._toggle(el.dataset.key));
+    root.querySelector('.lswap')?.addEventListener('click', () => {
+      this._leaseCurve = !this._leaseCurve;
+      this._render(true);
+    });
     if (!this._popup) return;
     for (const el of root.querySelectorAll('[data-act]')) {
       el.addEventListener('click', () => (el.dataset.act === 'save' ? this._save() : this._closePopup()));
@@ -2466,7 +2846,84 @@ class VehicleConsumptionCard extends HTMLElement {
       if (t.fuel) out.push(this._section('refuels', 'mdi:gas-station', this._t('refuels'), vcFinite(a.refuel_count) ? a.refuel_count : a.refuels?.length || 0, events(a.refuels, 'liters', u.vol), 'no_refuels'));
       if (t.energy) out.push(this._section('charges', 'mdi:ev-station', this._t('charges'), vcFinite(a.charge_count) ? a.charge_count : a.charges?.length || 0, events(a.charges, 'energy', 'kWh'), 'no_charges'));
     }
+    if (c.lease !== false && a.lease && typeof a.lease === 'object') out.push(this._leaseSection(a.lease, f, u));
     return out.length ? `<div class="sections">${out.join('')}</div>` : '';
+  }
+
+  // The lease allowance: a gauge (driven against the allowance, a mark at the pro rata), or the curve (allowance,
+  // driven, projection) once switched; then what is left, the pace to stay within and the cost of the overage.
+  _leaseSection(l, f, u) {
+    const n = (v) => (vcFinite(v) ? f.num(v, 0) : VC_DASH);
+    const allowance = Number(l.allowance) || 0;
+    const driven = vcFinite(l.driven) ? Number(l.driven) : null;
+    const balance = vcFinite(l.balance) ? Number(l.balance) : null;
+    const over = vcFinite(l.overage) && Number(l.overage) > 0;
+    // Green within the pro rata, amber ahead of it (or heading over), red past the allowance.
+    const tone = driven != null && driven > allowance ? 'bad' : (balance != null && balance > 0) || over ? 'warn' : 'ok';
+    const pill = l.ended
+      ? this._t('lease_ended')
+      : balance == null
+        ? ''
+        : balance > 0
+          ? this._t('lease_ahead', { v: n(balance), u: u.dist })
+          : this._t('lease_under', { v: n(-balance), u: u.dist });
+    const curve = !!this._leaseCurve;
+    const ratio = (v) => (allowance > 0 && vcFinite(v) ? Math.min(Math.max(Number(v) / allowance, 0), 1) : 0);
+    // Half circle from the left (0) to the right (allowance): r 50 around (60, 60).
+    const at = (r) => {
+      const a = Math.PI * (1 - r);
+      return [60 + 50 * Math.cos(a), 60 - 50 * Math.sin(a)];
+    };
+    const [ex, ey] = at(ratio(driven));
+    const fill = ratio(driven) > 0 ? `<path class="lfill" d="M10 60 A50 50 0 0 1 ${ex.toFixed(2)} ${ey.toFixed(2)}"></path>` : '';
+    const [m1x, m1y] = at(ratio(l.prorata));
+    const [m2x, m2y] = [60 + ((m1x - 60) * 62) / 50, 60 + ((m1y - 60) * 62) / 50];
+    const [m0x, m0y] = [60 + ((m1x - 60) * 38) / 50, 60 + ((m1y - 60) * 38) / 50];
+    const gauge = `
+            <svg class="lgauge" viewBox="0 0 120 70" role="img" aria-label="${vcEsc(`${n(driven)} / ${n(allowance)} ${u.dist}`)}">
+              <path class="ltrack" d="M10 60 A50 50 0 0 1 110 60"></path>${fill}
+              <line class="lmark" x1="${m0x.toFixed(2)}" y1="${m0y.toFixed(2)}" x2="${m2x.toFixed(2)}" y2="${m2y.toFixed(2)}"></line>
+              <text class="lval" x="60" y="52">${vcEsc(n(driven))}</text>
+              <text class="lunit" x="60" y="64">${vcEsc(`/ ${n(allowance)} ${u.dist}`)}</text>
+            </svg>`;
+    // The curve: elapsed time on x, distance on y (up to the allowance or the projection, whichever is higher).
+    const top = Math.max(allowance, Number(l.projected) || 0, driven || 0) || 1;
+    const elapsed = l.months ? Math.min(Math.max(((Number(l.month) || 0) - 0.5) / Number(l.months), 0), 1) : 0;
+    const X = (r) => (8 + r * 104).toFixed(2);
+    const Y = (v) => (62 - (Math.max(Number(v) || 0, 0) / top) * 54).toFixed(2);
+    const chart = `
+            <svg class="lcurve" viewBox="0 0 120 70" role="img" aria-label="${vcEsc(this._t('lease'))}">
+              <line class="laxis" x1="8" y1="62" x2="112" y2="62"></line>
+              <line class="lplan" x1="${X(0)}" y1="${Y(0)}" x2="${X(1)}" y2="${Y(allowance)}"></line>
+              ${driven != null ? `<line class="lreal" x1="${X(0)}" y1="${Y(0)}" x2="${X(elapsed)}" y2="${Y(driven)}"></line>` : ''}
+              ${driven != null && vcFinite(l.projected) && !l.ended ? `<line class="lproj" x1="${X(elapsed)}" y1="${Y(driven)}" x2="${X(1)}" y2="${Y(l.projected)}"></line>` : ''}
+              ${driven != null ? `<circle class="lnow" cx="${X(elapsed)}" cy="${Y(driven)}" r="2.4"></circle>` : ''}
+            </svg>
+            <div class="llegend"><span class="k-real">${vcEsc(this._t('lease_driven'))}</span><span class="k-plan">${vcEsc(this._t('lease_plan'))}</span><span class="k-proj">${vcEsc(this._t('lease_proj'))}</span></div>`;
+    const cost = vcFinite(l.overage_cost)
+      ? { v: f.money(l.overage_cost, 0), k: this._t('lease_cost') }
+      : { v: `${n(l.overage)}`, k: this._t('lease_over_km', { u: u.dist }) };
+    const tiles = [
+      { v: n(l.remaining), k: this._t('lease_left', { u: u.dist }) },
+      { v: n(l.per_month_left), k: this._t('lease_per_month', { u: u.dist }) },
+      { ...cost, warn: over },
+    ]
+      .map((t) => `<div class="ltile${t.warn ? ' warn' : ''}"><span class="lv">${vcEsc(t.v)}</span><span class="lk">${vcEsc(t.k)}</span></div>`)
+      .join('');
+    const foot = [
+      vcFinite(l.projected) && !l.ended ? this._t('lease_projection', { v: n(l.projected), u: u.dist, p: n(l.pace) }) : '',
+      !curve && vcFinite(l.prorata) ? this._t('lease_mark', { v: n(l.prorata), u: u.dist }) : '',
+    ]
+      .filter(Boolean)
+      .join(' · ');
+    const body = `
+            <div class="lease lt-${tone}${curve ? ' curve' : ''}">
+              <div class="lhead"><span class="lmonth">${vcEsc(this._t('lease_month', { n: l.month ?? 0, m: l.months ?? 0 }))}</span>${pill ? `<span class="lpill">${vcEsc(pill)}</span>` : ''}</div>
+              <button class="lswap" type="button" aria-pressed="${curve}">${gauge}${chart}<span class="lhint">${vcEsc(this._t(curve ? 'lease_gauge' : 'lease_curve'))}</span></button>
+              <div class="ltiles">${tiles}</div>
+              ${foot ? `<div class="lfoot">${vcEsc(foot)}</div>` : ''}
+            </div>`;
+    return this._section('lease', 'mdi:car-key', this._t('lease'), `${l.month ?? 0}/${l.months ?? 0}`, [body], 'lease');
   }
 
   // `value`: a text, or several (one a line).
@@ -2813,6 +3270,39 @@ class VehicleConsumptionCard extends HTMLElement {
       .sub { font-size: 11px; line-height: 1.25; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden;
              text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
       .row.manual .txt .sub { color: color-mix(in srgb, var(--primary-color) 40%, var(--primary-text-color)); }
+      .lease { --lt: #43a047; display: flex; flex-direction: column; gap: 8px; padding: 8px 0 4px; border-top: 1px solid var(--divider-color, rgba(127,127,127,.15)); }
+      .lease.lt-warn { --lt: #f59e0b; } .lease.lt-bad { --lt: var(--error-color, #db4437); }
+      .lhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .lmonth { font-size: 12px; color: var(--secondary-text-color); }
+      .lpill { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+               color: color-mix(in srgb, var(--lt) 70%, var(--primary-text-color)); background: color-mix(in srgb, var(--lt) 16%, transparent); }
+      .lswap { all: unset; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; border-radius: 10px; padding: 4px 0; }
+      .lswap:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+      .lswap svg { width: 100%; max-width: 240px; height: auto; display: block; }
+      .lease .lcurve, .lease .llegend, .lease.curve .lgauge { display: none; }
+      .lease.curve .lcurve { display: block; } .lease.curve .llegend { display: flex; }
+      .ltrack, .lfill { fill: none; stroke-width: 10; stroke-linecap: round; }
+      .ltrack { stroke: color-mix(in srgb, var(--secondary-text-color) 18%, transparent); }
+      .lfill { stroke: var(--lt); }
+      .lmark { stroke: var(--primary-text-color); stroke-width: 1.6; stroke-linecap: round; }
+      .lval { font-size: 15px; font-weight: 700; text-anchor: middle; fill: var(--primary-text-color); font-variant-numeric: tabular-nums; }
+      .lunit { font-size: 6.5px; text-anchor: middle; fill: var(--secondary-text-color); }
+      .laxis { stroke: var(--divider-color, rgba(127,127,127,.3)); stroke-width: .6; }
+      .lplan { stroke: var(--secondary-text-color); stroke-width: 1; stroke-dasharray: 3 2.5; }
+      .lreal { stroke: #43a047; stroke-width: 1.8; stroke-linecap: round; }
+      .lproj { stroke: var(--lt); stroke-width: 1.6; stroke-dasharray: 1 2.5; stroke-linecap: round; }
+      .lnow { fill: #43a047; }
+      .llegend { gap: 12px; font-size: 11px; color: var(--secondary-text-color); }
+      .llegend span::before { content: ''; display: inline-block; width: 12px; height: 2px; margin-right: 4px; vertical-align: middle; }
+      .k-real::before { background: #43a047; } .k-plan::before { background: var(--secondary-text-color); } .k-proj::before { background: var(--lt); }
+      .lhint { font-size: 11px; color: color-mix(in srgb, var(--primary-color) 40%, var(--primary-text-color)); }
+      .ltiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+      .ltile { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 6px 8px; border-radius: 8px;
+               background: color-mix(in srgb, var(--secondary-text-color) 8%, transparent); }
+      .ltile .lv { font-size: 14px; font-weight: 600; color: var(--primary-text-color); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .ltile.warn .lv { color: color-mix(in srgb, var(--lt) 75%, var(--primary-text-color)); }
+      .ltile .lk { font-size: 11px; line-height: 1.25; color: var(--secondary-text-color); }
+      .lfoot { font-size: 11px; color: var(--secondary-text-color); }
       .none { padding: 8px 0 4px; font-size: 12px; color: var(--secondary-text-color); border-top: 1px solid var(--divider-color, rgba(127,127,127,.15)); }
 
       /* The popup: anchored at the top of the card, over a smoked veil */
@@ -3013,6 +3503,7 @@ class VehicleConsumptionCardEditor extends HTMLElement {
           ]),
       { name: 'trips', selector: { boolean: {} } },
       { name: 'refuels', selector: { boolean: {} } },
+      { name: 'lease', selector: { boolean: {} } },
       { name: 'add_button', selector: { boolean: {} } },
       ...(this.constructor.mini ? [{ name: 'zoom', selector: { boolean: {} } }] : []),
       {

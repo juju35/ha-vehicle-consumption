@@ -124,6 +124,24 @@
           "co2_electricity": "Gram CO₂ per laddad kWh; 55 för det franska nätet, cirka 380 för det tyska.",
           "units": "Enheter för värdena på kortet och för resans och månadens sträckor och volymer. Sensorerna för förbrukning, kostnad och CO₂ per sträcka behåller sin metriska enhet (deras statistik förblir giltig) och anger det imperiska värdet i sina attribut. Tankvolym, fast bränslepris och tankningströskel anges i de visade enheterna."
         }
+      },
+      "lease": {
+        "title": "Körsträcka för leasing",
+        "description": "Valfritt: ange start, löptid och körsträcka för ett leasingavtal (avstånd i {unit}) för att följa kilometrarna mot avtalet. Lämna tomt utan leasing.",
+        "data": {
+          "lease_start": "Avtalets start",
+          "lease_months": "Löptid",
+          "lease_distance": "Avtalad körsträcka",
+          "lease_start_odometer": "Mätarställning vid leverans",
+          "lease_extra_price": "Pris per extra avståndsenhet"
+        },
+        "data_description": {
+          "lease_start": "Dagen bilen levererades.",
+          "lease_months": "Avtalets löptid i månader.",
+          "lease_distance": "Tillåtet avstånd för hela avtalet.",
+          "lease_start_odometer": "Mätarställning vid avtalets start (0 för en ny bil).",
+          "lease_extra_price": "Vad varje enhet över körsträckan kostar i slutet."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "Tankvolymen behövs för att använda bränslenivån.",
       "battery_capacity_required": "Batterikapaciteten behövs för att använda batterinivån.",
       "duplicate_sensor": "Den här sensorn används redan för en annan källa.",
-      "charger_needs_battery": "En mätare för hemmaladdaren kräver en sensor för batterienergi eller batterinivå."
+      "charger_needs_battery": "En mätare för hemmaladdaren kräver en sensor för batterienergi eller batterinivå.",
+      "lease_incomplete": "Ange start, löptid och körsträcka tillsammans, eller lämna alla tre tomma."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Försenad"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Återstående leasingsträcka"
+      },
+      "lease_balance": {
+        "name": "Leasingavvikelse"
+      },
+      "lease_projected": {
+        "name": "Beräknad leasingsträcka"
+      },
+      "lease_overage_cost": {
+        "name": "Kostnad för övermil"
       }
     }
   },

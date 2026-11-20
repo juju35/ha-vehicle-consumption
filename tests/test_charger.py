@@ -138,6 +138,8 @@ async def test_options_flow_charger(hass: HomeAssistant) -> None:
     result = await hass.config_entries.options.async_configure(
         result["flow_id"], {CONF_TRIP_GAP: 30, CONF_REFUEL_THRESHOLD: 3, CONF_CHARGE_THRESHOLD: 1}
     )
+    assert result["step_id"] == "lease"
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {})
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert entry.options[CONF_CHARGER_ENERGY] == CHARGER
 

@@ -124,6 +124,24 @@
           "co2_electricity": "Gramm CO₂ je geladener kWh; 55 für das französische Netz, etwa 380 für das deutsche.",
           "units": "Einheiten der Werte auf der Karte sowie der Strecken und Mengen von Fahrt und Monat. Die Sensoren für Verbrauch, Kosten und CO₂ pro Strecke behalten ihre metrische Einheit (ihre Statistiken bleiben gültig) und geben den imperialen Wert in ihren Attributen an. Tankinhalt, fester Kraftstoffpreis und Tankschwelle werden in den angezeigten Einheiten eingegeben."
         }
+      },
+      "lease": {
+        "title": "Leasing-Kilometerkontingent",
+        "description": "Optional: Beginn, Laufzeit und Kontingent eines Leasingvertrags angeben (Entfernungen in {unit}), um die Kilometer mit dem Vertrag zu vergleichen. Leer lassen, wenn kein Leasing.",
+        "data": {
+          "lease_start": "Vertragsbeginn",
+          "lease_months": "Laufzeit",
+          "lease_distance": "Kontingent",
+          "lease_start_odometer": "Kilometerstand bei Übergabe",
+          "lease_extra_price": "Preis je Mehreinheit"
+        },
+        "data_description": {
+          "lease_start": "Tag der Fahrzeugübergabe.",
+          "lease_months": "Laufzeit des Vertrags in Monaten.",
+          "lease_distance": "Erlaubte Strecke für den ganzen Vertrag.",
+          "lease_start_odometer": "Kilometerstand zu Vertragsbeginn (0 bei einem Neuwagen).",
+          "lease_extra_price": "Was jede Einheit über dem Kontingent am Ende kostet."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "Für den Kraftstoffstand wird der Tankinhalt benötigt.",
       "battery_capacity_required": "Für den Batteriestand wird die Batteriekapazität benötigt.",
       "duplicate_sensor": "Dieser Sensor wird bereits für eine andere Quelle verwendet.",
-      "charger_needs_battery": "Ein Wallbox-Zähler erfordert einen Sensor für Batterieenergie oder -ladestand."
+      "charger_needs_battery": "Ein Wallbox-Zähler erfordert einen Sensor für Batterieenergie oder -ladestand.",
+      "lease_incomplete": "Beginn, Laufzeit und Kontingent zusammen angeben oder alle drei leer lassen."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Überfällig"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Leasing-Restkilometer"
+      },
+      "lease_balance": {
+        "name": "Leasing-Abweichung"
+      },
+      "lease_projected": {
+        "name": "Leasing-Prognose"
+      },
+      "lease_overage_cost": {
+        "name": "Leasing-Mehrkosten"
       }
     }
   },

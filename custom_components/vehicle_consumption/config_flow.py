@@ -15,6 +15,7 @@ from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResu
 from homeassistant.core import callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.selector import (
+    DateSelector,
     DeviceSelector,
     DeviceSelectorConfig,
     EntityFilterSelectorConfig,
@@ -46,6 +47,11 @@ from .const import (
     CONF_FUEL_PRICE_ENTITY,
     CONF_FUEL_QUANTITY,
     CONF_FUEL_TYPE,
+    CONF_LEASE_DISTANCE,
+    CONF_LEASE_EXTRA_PRICE,
+    CONF_LEASE_MONTHS,
+    CONF_LEASE_START,
+    CONF_LEASE_START_ODOMETER,
     CONF_NAME,
     CONF_ODOMETER,
     CONF_REFUEL_THRESHOLD,
@@ -60,13 +66,14 @@ from .const import (
     DEFAULT_UNITS,
     DOMAIN,
     FUEL_TYPES,
+    LEASE_KEYS,
     SENSOR_KEYS,
     UNIT_SYSTEMS,
     UNITS_IMPERIAL,
     UNITS_METRIC,
 )
 from .detect import async_detect
-from .tracker import LITERS_PER_GALLON
+from .tracker import KM_PER_MILE, LITERS_PER_GALLON
 
 _SENSOR = EntitySelector(EntitySelectorConfig(domain="sensor"))
 _CHARGER = EntitySelector(EntitySelectorConfig(domain="sensor", device_class="energy"))
@@ -167,6 +174,58 @@ def _prices_schema(currency: str, tuning: bool, imperial: bool, units: str) -> v
             vol.Required(CONF_CHARGE_THRESHOLD): _number(0.1, 50, 0.1, "kWh"),
         }
     return vol.Schema(schema)
+
+
+# Lease distances are typed in miles with imperial units (the price per mile), stored in km (per km).
+_LEASE_MILE_FACTORS = {
+    CONF_LEASE_DISTANCE: KM_PER_MILE,
+    CONF_LEASE_START_ODOMETER: KM_PER_MILE,
+    CONF_LEASE_EXTRA_PRICE: 1 / KM_PER_MILE,
+}
+# The three fields that make a lease: all of them or none.
+_LEASE_REQUIRED = (CONF_LEASE_START, CONF_LEASE_MONTHS, CONF_LEASE_DISTANCE)
+
+
+def _lease_schema(currency: str, imperial: bool) -> vol.Schema:
+    """The lease mileage allowance; every field optional (no lease when the required three are left empty)."""
+    distance = "mi" if imperial else "km"
+    return vol.Schema(
+        {
+            vol.Optional(CONF_LEASE_START): DateSelector(),
+            vol.Optional(CONF_LEASE_MONTHS): _number(1, 120, 1, "months"),
+            vol.Optional(CONF_LEASE_DISTANCE): _number(1, 1_000_000, 1, distance),
+            vol.Optional(CONF_LEASE_START_ODOMETER): _number(0, 1_000_000, 1, distance),
+            vol.Optional(CONF_LEASE_EXTRA_PRICE): _number(0, 10, "any", f"{currency}/{distance}"),
+        }
+    )
+
+
+def _lease_options(user_input: dict[str, Any], imperial: bool) -> tuple[dict[str, Any], dict[str, str]]:
+    """The lease options as stored (km, per km) and the errors: the start, length and allowance go together."""
+    values = _clean(user_input, LEASE_KEYS)
+    given = [key for key in _LEASE_REQUIRED if key in values]
+    if given and len(given) < len(_LEASE_REQUIRED):
+        return {}, {"base": "lease_incomplete"}
+    if not given:
+        return {}, {}
+    if CONF_LEASE_MONTHS in values:
+        values[CONF_LEASE_MONTHS] = int(values[CONF_LEASE_MONTHS])
+    if imperial:
+        values = {k: v * _LEASE_MILE_FACTORS[k] if k in _LEASE_MILE_FACTORS else v for k, v in values.items()}
+    return values, {}
+
+
+def _lease_shown(options: dict[str, Any], imperial: bool) -> dict[str, Any]:
+    """The stored lease options as typed in the form (miles, per mile with imperial units)."""
+    values = {key: options[key] for key in LEASE_KEYS if options.get(key) is not None}
+    if not imperial:
+        return values
+    return {
+        k: round(v / _LEASE_MILE_FACTORS[k], 4 if k == CONF_LEASE_EXTRA_PRICE else 0)
+        if k in _LEASE_MILE_FACTORS and isinstance(v, int | float)
+        else v
+        for k, v in values.items()
+    }
 
 
 def _validate_sensors(user_input: dict[str, Any]) -> dict[str, str]:
@@ -329,7 +388,8 @@ class VehicleConsumptionOptionsFlow(OptionsFlow):
     async def async_step_prices(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
             tuning = _to_stored(_tuning(user_input), self.imperial)
-            return self.async_create_entry(data={**self._options, **_prices(user_input, self.imperial), **tuning})
+            self._options = {**self._options, **_prices(user_input, self.imperial), **tuning}
+            return await self.async_step_lease()
         current = {**_tuning(dict(self.config_entry.options)), **self.config_entry.options}
         units = str(self.config_entry.options.get(CONF_UNITS, DEFAULT_UNITS))
         return self.async_show_form(
@@ -337,4 +397,22 @@ class VehicleConsumptionOptionsFlow(OptionsFlow):
             data_schema=self.add_suggested_values_to_schema(
                 _prices_schema(self.hass.config.currency, True, self.imperial, units), _to_shown(current, self.imperial)
             ),
+        )
+
+    async def async_step_lease(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """The lease mileage allowance, optional: left empty, the vehicle has none (an existing one is removed)."""
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            lease, errors = _lease_options(user_input, self.imperial)
+            if not errors:
+                return self.async_create_entry(data={**self._options, **lease})
+        distance = "mi" if self.imperial else "km"
+        return self.async_show_form(
+            step_id="lease",
+            data_schema=self.add_suggested_values_to_schema(
+                _lease_schema(self.hass.config.currency, self.imperial),
+                user_input or _lease_shown(dict(self.config_entry.options), self.imperial),
+            ),
+            errors=errors,
+            description_placeholders={"unit": distance},
         )

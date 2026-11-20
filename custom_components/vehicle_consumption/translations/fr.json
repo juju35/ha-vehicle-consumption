@@ -124,6 +124,24 @@
           "co2_electricity": "Grammes de CO₂ par kWh chargé ; 55 pour le réseau français, environ 380 pour l'allemand.",
           "units": "Unités des valeurs affichées sur la carte, et des distances et volumes des trajets et du mois. Les capteurs de consommation, de coût et de CO₂ par distance gardent leur unité métrique (leurs statistiques restent valides) et donnent la valeur impériale dans leurs attributs. Capacité du réservoir, prix fixe du carburant et seuil de plein se saisissent dans les unités affichées."
         }
+      },
+      "lease": {
+        "title": "Forfait kilométrique (LOA / LLD)",
+        "description": "Facultatif : renseignez le début, la durée et le forfait du contrat (distances en {unit}) pour suivre les kilomètres par rapport au contrat. Laissez vide s'il n'y a pas de contrat.",
+        "data": {
+          "lease_start": "Début du contrat",
+          "lease_months": "Durée",
+          "lease_distance": "Forfait",
+          "lease_start_odometer": "Kilométrage à la livraison",
+          "lease_extra_price": "Prix d'une unité de distance en plus"
+        },
+        "data_description": {
+          "lease_start": "Jour de livraison du véhicule.",
+          "lease_months": "Durée du contrat en mois.",
+          "lease_distance": "Distance autorisée sur tout le contrat.",
+          "lease_start_odometer": "Compteur au début du contrat (0 pour un véhicule neuf).",
+          "lease_extra_price": "Ce que coûte chaque unité au-delà du forfait en fin de contrat."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "La capacité du réservoir est nécessaire pour utiliser le niveau de carburant.",
       "battery_capacity_required": "La capacité de la batterie est nécessaire pour utiliser le niveau de batterie.",
       "duplicate_sensor": "Ce capteur est déjà utilisé pour une autre source.",
-      "charger_needs_battery": "Le compteur d’une borne de recharge nécessite un capteur d’énergie ou de niveau de batterie."
+      "charger_needs_battery": "Le compteur d’une borne de recharge nécessite un capteur d’énergie ou de niveau de batterie.",
+      "lease_incomplete": "Renseignez ensemble le début, la durée et le forfait, ou laissez les trois vides."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "En retard"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Distance restante du forfait"
+      },
+      "lease_balance": {
+        "name": "Écart au forfait"
+      },
+      "lease_projected": {
+        "name": "Distance projetée en fin de contrat"
+      },
+      "lease_overage_cost": {
+        "name": "Coût du dépassement"
       }
     }
   },

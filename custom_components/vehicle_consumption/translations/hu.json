@@ -124,6 +124,24 @@
           "co2_electricity": "Gramm CO₂ töltött kWh-ként; 55 a francia hálózatnál, körülbelül 380 a németnél.",
           "units": "A kártyán mutatott értékek, valamint az út és a hónap távolságainak és mennyiségeinek mértékegységei. A fogyasztás, a költség és a távolságonkénti CO₂ érzékelői megtartják metrikus mértékegységüket (statisztikáik érvényesek maradnak), és attribútumaikban adják meg az angolszász értéket. A tank űrtartalmát, a fix üzemanyagárat és a tankolási küszöböt a mutatott mértékegységekben kell megadni."
         }
+      },
+      "lease": {
+        "title": "Lízing kilométerkerete",
+        "description": "Nem kötelező: adja meg a lízingszerződés kezdetét, időtartamát és kilométerkeretét (távolság: {unit}), hogy a futást a szerződéshez mérje. Lízing nélkül hagyja üresen.",
+        "data": {
+          "lease_start": "Szerződés kezdete",
+          "lease_months": "Időtartam",
+          "lease_distance": "Kilométerkeret",
+          "lease_start_odometer": "Kilométeróra átvételkor",
+          "lease_extra_price": "Többletegység ára"
+        },
+        "data_description": {
+          "lease_start": "A jármű átvételének napja.",
+          "lease_months": "A szerződés időtartama hónapban.",
+          "lease_distance": "A teljes szerződésre engedélyezett távolság.",
+          "lease_start_odometer": "Kilométeróra-állás a szerződés kezdetén (új járműnél 0).",
+          "lease_extra_price": "Mennyibe kerül a keret feletti egységenként a végén."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "Az üzemanyagszint használatához meg kell adni a tank térfogatát.",
       "battery_capacity_required": "Az akkumulátor töltöttségének használatához meg kell adni az akkumulátor kapacitását.",
       "duplicate_sensor": "Ez az érzékelő már egy másik forráshoz van használva.",
-      "charger_needs_battery": "Az otthoni töltő mérőjéhez akkumulátorenergia- vagy töltöttségérzékelő szükséges."
+      "charger_needs_battery": "Az otthoni töltő mérőjéhez akkumulátorenergia- vagy töltöttségérzékelő szükséges.",
+      "lease_incomplete": "A kezdetet, az időtartamot és a keretet együtt adja meg, vagy hagyja mindhármat üresen."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Késésben"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Hátralévő lízingkeret"
+      },
+      "lease_balance": {
+        "name": "Eltérés a kerettől"
+      },
+      "lease_projected": {
+        "name": "Várható futás a végén"
+      },
+      "lease_overage_cost": {
+        "name": "Túlfutás költsége"
       }
     }
   },

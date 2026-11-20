@@ -124,6 +124,24 @@
           "co2_electricity": "Grame de CO₂ pe kWh încărcat; 55 pentru rețeaua franceză, circa 380 pentru cea germană.",
           "units": "Unitățile valorilor afișate pe card și ale distanțelor și volumelor călătoriei și ale lunii. Senzorii de consum, cost și CO₂ pe distanță își păstrează unitatea metrică (statisticile lor rămân valide) și dau valoarea imperială în atributele lor. Capacitatea rezervorului, prețul fix al combustibilului și pragul de alimentare se introduc în unitățile afișate."
         }
+      },
+      "lease": {
+        "title": "Kilometraj contract leasing",
+        "description": "Opțional: completați începutul, durata și kilometrajul contractului (distanțe în {unit}) pentru a urmări kilometrii față de contract. Lăsați gol dacă nu există contract.",
+        "data": {
+          "lease_start": "Începutul contractului",
+          "lease_months": "Durată",
+          "lease_distance": "Kilometraj contractat",
+          "lease_start_odometer": "Kilometraj la livrare",
+          "lease_extra_price": "Preț pe unitate de distanță în plus"
+        },
+        "data_description": {
+          "lease_start": "Ziua livrării vehiculului.",
+          "lease_months": "Durata contractului în luni.",
+          "lease_distance": "Distanța permisă pentru tot contractul.",
+          "lease_start_odometer": "Kilometrajul la începutul contractului (0 pentru un vehicul nou).",
+          "lease_extra_price": "Cât costă fiecare unitate peste kilometraj la final."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "Capacitatea rezervorului este necesară pentru a folosi nivelul de combustibil.",
       "battery_capacity_required": "Capacitatea bateriei este necesară pentru a folosi nivelul bateriei.",
       "duplicate_sensor": "Acest senzor este deja folosit pentru o altă sursă.",
-      "charger_needs_battery": "Un contor al încărcătorului de acasă necesită un senzor de energie sau de nivel al bateriei."
+      "charger_needs_battery": "Un contor al încărcătorului de acasă necesită un senzor de energie sau de nivel al bateriei.",
+      "lease_incomplete": "Completați împreună începutul, durata și kilometrajul sau lăsați-le pe toate trei goale."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Întârziată"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Distanță rămasă din contract"
+      },
+      "lease_balance": {
+        "name": "Abatere de la contract"
+      },
+      "lease_projected": {
+        "name": "Distanță estimată la final"
+      },
+      "lease_overage_cost": {
+        "name": "Cost depășire"
       }
     }
   },

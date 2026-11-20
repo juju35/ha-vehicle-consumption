@@ -124,6 +124,24 @@
           "co2_electricity": "Gram CO₂ per geladen kWh; 55 voor het Franse net, ongeveer 380 voor het Duitse.",
           "units": "Eenheden van de waarden op de kaart en van de afstanden en volumes van rit en maand. De sensoren voor verbruik, kosten en CO₂ per afstand houden hun metrische eenheid (hun statistieken blijven geldig) en geven de imperiale waarde in hun attributen. Tankinhoud, vaste brandstofprijs en tankdrempel worden in de getoonde eenheden ingevoerd."
         }
+      },
+      "lease": {
+        "title": "Kilometerbundel lease",
+        "description": "Optioneel: vul begin, looptijd en kilometerbundel van een leasecontract in (afstanden in {unit}) om de kilometers met het contract te vergelijken. Laat leeg zonder lease.",
+        "data": {
+          "lease_start": "Begin van het contract",
+          "lease_months": "Looptijd",
+          "lease_distance": "Kilometerbundel",
+          "lease_start_odometer": "Kilometerstand bij levering",
+          "lease_extra_price": "Prijs per extra afstandseenheid"
+        },
+        "data_description": {
+          "lease_start": "Dag waarop het voertuig is geleverd.",
+          "lease_months": "Looptijd van het contract in maanden.",
+          "lease_distance": "Toegestane afstand voor het hele contract.",
+          "lease_start_odometer": "Kilometerstand bij het begin van het contract (0 voor een nieuw voertuig).",
+          "lease_extra_price": "Wat elke eenheid boven de bundel aan het eind kost."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "De tankinhoud is nodig om het brandstofniveau te gebruiken.",
       "battery_capacity_required": "De accucapaciteit is nodig om het accuniveau te gebruiken.",
       "duplicate_sensor": "Deze sensor wordt al voor een andere bron gebruikt.",
-      "charger_needs_battery": "Een meter van de laadpaal thuis vereist een sensor voor de accu-energie of het accuniveau."
+      "charger_needs_battery": "Een meter van de laadpaal thuis vereist een sensor voor de accu-energie of het accuniveau.",
+      "lease_incomplete": "Vul begin, looptijd en bundel samen in, of laat alle drie leeg."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Te laat"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Resterende leasekilometers"
+      },
+      "lease_balance": {
+        "name": "Leaseafwijking"
+      },
+      "lease_projected": {
+        "name": "Verwachte leaseafstand"
+      },
+      "lease_overage_cost": {
+        "name": "Kosten meerkilometers"
       }
     }
   },

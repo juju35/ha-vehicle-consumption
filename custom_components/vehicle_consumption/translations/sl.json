@@ -124,6 +124,24 @@
           "co2_electricity": "Gramov CO₂ na napolnjeno kWh; 55 za francosko omrežje, približno 380 za nemško.",
           "units": "Enote vrednosti na kartici ter razdalj in prostornin vožnje in meseca. Senzorji porabe, stroškov in CO₂ na razdaljo ohranijo metrično enoto (njihova statistika ostane veljavna) in imperialno vrednost podajo v atributih. Prostornino rezervoarja, stalno ceno goriva in prag točenja vnesete v prikazanih enotah."
         }
+      },
+      "lease": {
+        "title": "Omejitev kilometrov zakupa",
+        "description": "Neobvezno: vnesite začetek, trajanje in omejitev kilometrov pogodbe (razdalje v {unit}), da spremljate kilometre glede na pogodbo. Brez zakupa pustite prazno.",
+        "data": {
+          "lease_start": "Začetek pogodbe",
+          "lease_months": "Trajanje",
+          "lease_distance": "Omejitev",
+          "lease_start_odometer": "Stanje števca ob prevzemu",
+          "lease_extra_price": "Cena dodatne enote razdalje"
+        },
+        "data_description": {
+          "lease_start": "Dan prevzema vozila.",
+          "lease_months": "Trajanje pogodbe v mesecih.",
+          "lease_distance": "Dovoljena razdalja za celotno pogodbo.",
+          "lease_start_odometer": "Stanje števca ob začetku pogodbe (0 za novo vozilo).",
+          "lease_extra_price": "Koliko stane vsaka enota nad omejitvijo na koncu."
+        }
       }
     },
     "error": {
@@ -131,7 +149,8 @@
       "tank_capacity_required": "Za uporabo ravni goriva je potrebna prostornina rezervoarja.",
       "battery_capacity_required": "Za uporabo ravni baterije je potrebna zmogljivost baterije.",
       "duplicate_sensor": "Ta senzor se že uporablja za drug vir.",
-      "charger_needs_battery": "Števec domače polnilnice potrebuje senzor energije ali ravni baterije."
+      "charger_needs_battery": "Števec domače polnilnice potrebuje senzor energije ali ravni baterije.",
+      "lease_incomplete": "Začetek, trajanje in omejitev vnesite skupaj ali pa pustite vse tri prazne."
     }
   },
   "entity": {
@@ -313,6 +332,18 @@
             "name": "Zamuja"
           }
         }
+      },
+      "lease_remaining": {
+        "name": "Preostali kilometri zakupa"
+      },
+      "lease_balance": {
+        "name": "Odstopanje od omejitve"
+      },
+      "lease_projected": {
+        "name": "Predvidena razdalja ob koncu"
+      },
+      "lease_overage_cost": {
+        "name": "Strošek prekoračitve"
       }
     }
   },
