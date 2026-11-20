@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 
 import pytest
+import voluptuous as vol
 from homeassistant.auth.models import User
 from homeassistant.core import Context, HomeAssistant
 from homeassistant.exceptions import ServiceValidationError, Unauthorized
@@ -48,6 +49,14 @@ async def test_next_service_counts_down_from_the_service_logged(hass: HomeAssist
     await hass.services.async_call(DOMAIN, "log_service", {**data, "interval": 0}, blocking=True)
     await hass.async_block_till_done()
     assert state_of(hass, "next_service").state == "unknown"
+
+
+async def test_log_service_refuses_a_negative_interval(hass: HomeAssistant) -> None:
+    entry = await setup_vehicle(hass)
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN, "log_service", {"config_entry_id": entry.entry_id, "interval": -5}, blocking=True
+        )
 
 
 async def test_export_writes_the_trips_refuels_and_charges(hass: HomeAssistant, tmp_path) -> None:
