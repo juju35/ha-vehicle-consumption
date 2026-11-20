@@ -1781,6 +1781,8 @@ const vcParse = (s) => {
 };
 
 // A click inside a dialog opened from the card (more-info, a picker) is not a click outside it.
+// The sections (data-section) an event went through.
+const vcSections = (ev) => (ev?.composedPath?.() || []).map((n) => n?.dataset?.section).filter(Boolean);
 const vcInDialog = (ev) => ev.composedPath().some((n) => ['ha-more-info-dialog', 'ha-dialog', 'dialog'].includes(n?.localName));
 
 // The badge: the gauge of the projects site, coloured by the card's level.
@@ -1940,7 +1942,20 @@ class VehicleConsumptionCard extends HTMLElement {
     super();
     this._open = new Set();
     this._uid = ++vcUid;
-    this._onDocClick = (ev) => this._foldOutside(ev);
+    // "A click elsewhere" is caught on the pointer too: on iOS (Safari and the companion app) a tap on something
+    // that is not clickable (the background, an empty spot) sends no click to the page. A section stays open when
+    // the press or the release is in it (a scroll cancels the pointer); keyboard clicks (no click count) come as
+    // click events.
+    this._onDocDown = (ev) => {
+      this._downSections = vcSections(ev);
+    };
+    this._onDocUp = (ev) => {
+      this._foldOutside(ev, this._downSections);
+      this._downSections = null;
+    };
+    this._onDocClick = (ev) => {
+      if (!ev?.detail) this._foldOutside(ev);
+    };
     this._onKey = (ev) => {
       if (ev.key === 'Escape' && this._popup) this._closePopup();
       else if (ev.key === 'Tab' && this._popup) this._trapTab(ev);
@@ -1977,7 +1992,11 @@ class VehicleConsumptionCard extends HTMLElement {
   }
 
   connectedCallback() {
+    document.addEventListener('pointerdown', this._onDocDown, true);
+    document.addEventListener('pointerup', this._onDocUp, true);
     document.addEventListener('click', this._onDocClick);
+    // Back on the page after leaving it: drawn again in its default state (see disconnectedCallback).
+    if (this._sig === null) this._render();
     // The chart is drawn at the card's width (its labels keep their size); a few pixels do not re-render.
     if (typeof ResizeObserver === 'function') {
       this._ro ??= new ResizeObserver((entries) => {
@@ -2008,8 +2027,16 @@ class VehicleConsumptionCard extends HTMLElement {
     this._ro?.disconnect();
     if (this._frame) cancelAnimationFrame(this._frame);
     this._frame = 0;
+    document.removeEventListener('pointerdown', this._onDocDown, true);
+    document.removeEventListener('pointerup', this._onDocUp, true);
     document.removeEventListener('click', this._onDocClick);
     document.removeEventListener('keydown', this._onKey);
+    // Left (another view, a conditional card hidden): the popup closes without saving and the sections fold back,
+    // so that the card does not come back with them open.
+    this._popup = null;
+    this._refocus = false;
+    this._open.clear();
+    this._sig = null;
   }
 
   getCardSize() {
@@ -2503,10 +2530,9 @@ class VehicleConsumptionCard extends HTMLElement {
   }
 
   // A click anywhere outside an open section folds it back.
-  _foldOutside(ev) {
+  _foldOutside(ev, also) {
     if (!this._open.size) return;
-    const path = ev?.composedPath?.() || [];
-    const inside = new Set(path.map((n) => n?.dataset?.section).filter(Boolean));
+    const inside = new Set([...vcSections(ev), ...(also || [])]);
     let changed = false;
     for (const key of [...this._open]) {
       if (!inside.has(key)) {
@@ -2880,8 +2906,22 @@ class VehicleConsumptionMiniCard extends VehicleConsumptionCard {
   constructor() {
     super();
     this._zoomed = false;
+    const outside = (ev) => !ev.composedPath().includes(this) && !vcInDialog(ev);
     this._onOutside = (ev) => {
-      if (this._zoomed && !ev.composedPath().includes(this) && !vcInDialog(ev)) this._setZoom(false);
+      if (this._zoomed && outside(ev)) this._setZoom(false);
+    };
+    // A tap elsewhere on iOS sends no click: the press and the release outside the card count (see the full card);
+    // keyboard clicks (no click count) still come as click events.
+    let downOutside = false;
+    this._onOutsideDown = (ev) => {
+      downOutside = outside(ev);
+    };
+    this._onOutsideUp = (ev) => {
+      if (downOutside) this._onOutside(ev);
+      downOutside = false;
+    };
+    this._onOutsideClick = (ev) => {
+      if (!ev?.detail) this._onOutside(ev);
     };
   }
 
@@ -2892,13 +2932,19 @@ class VehicleConsumptionMiniCard extends VehicleConsumptionCard {
   }
 
   connectedCallback() {
+    document.addEventListener('pointerdown', this._onOutsideDown, true);
+    document.addEventListener('pointerup', this._onOutsideUp, true);
+    document.addEventListener('click', this._onOutsideClick, true);
     super.connectedCallback();
-    document.addEventListener('click', this._onOutside, true);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    document.removeEventListener('click', this._onOutside, true);
+    document.removeEventListener('pointerdown', this._onOutsideDown, true);
+    document.removeEventListener('pointerup', this._onOutsideUp, true);
+    document.removeEventListener('click', this._onOutsideClick, true);
+    // Back to the compact view once off the screen, as on the other cards.
+    this._zoomed = false;
   }
 
   getCardSize() {
