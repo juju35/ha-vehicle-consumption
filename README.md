@@ -323,21 +323,22 @@ type: custom:vehicle-consumption-card
 entity: sensor.my_car_consumption
 ```
 
-| Option | Default | Description |
-|---|---|---|
-| `entity` | Auto | The vehicle: its **Consumption** sensor. Leave empty for the first vehicle |
-| `title` | Vehicle name | Card title |
-| `show_title` | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
-| `illustration` | `true` | Illustrated header: a fuel pump (fuel, plug-in hybrid) or a charging station (electric) on a road, with the tracking beside it. `false` for the classic header |
-| `illustration_theme` | `auto` | Day or night picture: `auto` (follows the Home Assistant theme: night with a dark theme, day with a light theme), `day` or `night` |
-| `chart` | `true` | Monthly bar chart |
-| `chart_metric` | `consumption` | What the chart shows: `consumption`, `distance`, `cost` or `co2` (kg) |
-| `months` | `6` | Number of months in the chart (3–12) |
-| `trips` | `true` | **Recent trips** section |
-| `refuels` | `true` | **Refuels** / **Charges** section |
-| `lease` | `true` | **Lease allowance** section, when the vehicle has a lease: a gauge of the distance driven against the allowance with a mark at the pro rata (tap it for the curve of the allowance, the distance driven and the projection), the distance left, the distance a month to stay within and the cost of the overage |
-| `add_button` | `true` | **+** button in the header to log a refuel or a charge |
-| `language` | Auto | Force language: `en`, `fr`, `de`, `es`, `it`, `nl`, `pt`, `pl`, `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv`, `el`, `sr` (Serbian, Cyrillic) or `sr-Latn` (Serbian, Latin) |
+| Option | Card | Default | Description |
+|---|---|---|---|
+| `entity` | both | Auto | The vehicle: its **Consumption** sensor. Leave empty for the first vehicle |
+| `title` | both | Vehicle name | Card title |
+| `show_title` | both | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
+| `illustration` | both | `true` | Illustrated header: a fuel pump (fuel, plug-in hybrid) or a charging station (electric) on a road, with the tracking beside it. `false` for the classic header |
+| `illustration_theme` | both | `auto` | Day or night picture: `auto` (follows the Home Assistant theme: night with a dark theme, day with a light theme), `day` or `night` |
+| `chart` | both | `true` | Monthly bar chart |
+| `chart_metric` | both | `consumption` | What the chart shows: `consumption`, `distance`, `cost` or `co2` (kg) |
+| `months` | both | `6` | Number of months in the chart (3–12) |
+| `trips` | both | `true` | **Recent trips** section |
+| `refuels` | both | `true` | **Refuels** / **Charges** section |
+| `lease` | both | `true` | **Lease allowance** section, when the vehicle has a lease: a gauge of the distance driven against the allowance with a mark at the pro rata (tap it for the curve of the allowance, the distance driven and the projection), the distance left, the distance a month to stay within and the cost of the overage |
+| `add_button` | both | `true` | **+** button in the header to log a refuel or a charge |
+| `language` | both | Auto | Force language: `en`, `fr`, `de`, `es`, `it`, `nl`, `pt`, `pl`, `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv`, `el`, `sr` (Serbian, Cyrillic) or `sr-Latn` (Serbian, Latin) |
+| `zoom` | mini | `true` | Detail button that opens the full card |
 
 In the visual editor, **Vehicle** lists every vehicle set up in Vehicle Consumption, by name: nothing to look up, and a vehicle added later shows up in the list. The card picker previews the card with your first vehicle.
 
@@ -349,16 +350,12 @@ The **+** button opens a popup at the top of the card to log a refuel (litres) o
 
 #### Mini card
 
-A compact view of the vehicle (**Add card → Vehicle Consumption Mini Card**): the header with the average consumption, the fuel and battery gauges, the last trip and the average. Its detail button at the top right opens the full card in place; a tap outside the card brings the compact view back. It takes the options of the full card (used by the full view), plus:
+A compact view of the vehicle (**Add card → Vehicle Consumption Mini Card**): the header with the average consumption, the fuel and battery gauges, the last trip and the average. Its detail button at the top right opens the full card in place; a tap outside the card brings the compact view back. It takes the options of the full card (marked **both** above, used by the full view), plus `zoom` (**mini**):
 
 ```yaml
 type: custom:vehicle-consumption-mini-card
 entity: sensor.my_car_consumption
 ```
-
-| Option | Default | Description |
-|---|---|---|
-| `zoom` | `true` | Detail button that opens the full card |
 
 The card picker shows both cards with their name and description in Home Assistant's language.
 

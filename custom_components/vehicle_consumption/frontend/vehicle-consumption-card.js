@@ -2179,6 +2179,8 @@ const vcParse = (s) => {
 };
 
 // A click inside a dialog opened from the card (more-info, a picker) is not a click outside it.
+// The sections (data-section) an event went through.
+const vcSections = (ev) => (ev?.composedPath?.() || []).map((n) => n?.dataset?.section).filter(Boolean);
 const vcInDialog = (ev) => ev.composedPath().some((n) => ['ha-more-info-dialog', 'ha-dialog', 'dialog'].includes(n?.localName));
 
 // The badge: the gauge of the projects site, coloured by the card's level.
@@ -2323,6 +2325,72 @@ const VC_BANNER_STYLE = `
       }
 `;
 
+// Patches `cur` in place to the markup `html`: kept nodes keep their size, their running animations and the focus,
+// so a state update does not make the card jump (a stylesheet, a chart or a scene created again can leave the card
+// without its height for a frame, and the sections grid reflows). Children are matched by `data-section`, else by
+// position. A custom element with no markup inside (ha-icon) draws itself: it is kept as it is while its markup stays
+// the same, and replaced by the new one when that changes.
+function vcPatchAttrs(cur, next) {
+  for (const { name } of [...cur.attributes]) if (!next.hasAttribute(name)) cur.removeAttribute(name);
+  for (const { name, value } of next.attributes) if (cur.getAttribute(name) !== value) cur.setAttribute(name, value);
+  // A field typed in no longer follows its value attribute: it gets the value of the new markup.
+  if (cur.localName === 'input' && cur.value !== (next.getAttribute('value') ?? '')) cur.value = next.getAttribute('value') ?? '';
+}
+function vcKey(n) {
+  return n?.nodeType === 1 ? n.getAttribute('data-section') : null;
+}
+function vcLeaf(n) {
+  return n.nodeType === 1 && n.localName.includes('-') && !n.childNodes.length;
+}
+function vcSig(n) {
+  return [...n.attributes].map((a) => `${a.name}=${a.value}`).join(' ');
+}
+function vcMark(n) {
+  if (n.nodeType !== 1) return;
+  if (vcLeaf(n)) n._morphSig = vcSig(n);
+  else for (const c of n.childNodes) vcMark(c);
+}
+function vcPatchChildren(cur, next) {
+  const old = [...cur.childNodes];
+  const fresh = [...next.childNodes];
+  const byKey = new Map();
+  for (const o of old) {
+    const k = vcKey(o);
+    if (k !== null && !byKey.has(k)) byKey.set(k, o);
+  }
+  const used = new Set();
+  fresh.forEach((n, i) => {
+    const k = vcKey(n);
+    let o = k !== null ? byKey.get(k) : old[i];
+    if (!o || o.nodeType !== n.nodeType || o.nodeName !== n.nodeName || used.has(o) || (k === null && vcKey(o) !== null)) o = null;
+    const ref = cur.childNodes[i] ?? null;
+    if (o && vcLeaf(n) && o._morphSig !== vcSig(n)) o = null;
+    if (!o) {
+      vcMark(n);
+      cur.insertBefore(n, ref);
+      return;
+    }
+    used.add(o);
+    if (o !== ref) cur.insertBefore(o, ref);
+    if (n.nodeType === 1) {
+      if (vcLeaf(n)) return;
+      vcPatchAttrs(o, n);
+      vcPatchChildren(o, n);
+    } else if (o.nodeValue !== n.nodeValue) o.nodeValue = n.nodeValue;
+  });
+  while (cur.childNodes.length > fresh.length) cur.removeChild(cur.lastChild);
+}
+function vcMorph(cur, html) {
+  // Not a DOM node (a stand-in in the unit tests): written as a whole.
+  if (!cur.childNodes) {
+    cur.innerHTML = html;
+    return;
+  }
+  const tpl = document.createElement('template');
+  tpl.innerHTML = html;
+  vcPatchChildren(cur, tpl.content);
+}
+
 class VehicleConsumptionCard extends HTMLElement {
   static getConfigElement() {
     return document.createElement('vehicle-consumption-card-editor');
@@ -2338,7 +2406,20 @@ class VehicleConsumptionCard extends HTMLElement {
     super();
     this._open = new Set();
     this._uid = ++vcUid;
-    this._onDocClick = (ev) => this._foldOutside(ev);
+    // "A click elsewhere" is caught on the pointer too: on iOS (Safari and the companion app) a tap on something
+    // that is not clickable (the background, an empty spot) sends no click to the page. A section stays open when
+    // the press or the release is in it (a scroll cancels the pointer); keyboard clicks (no click count) come as
+    // click events.
+    this._onDocDown = (ev) => {
+      this._downSections = vcSections(ev);
+    };
+    this._onDocUp = (ev) => {
+      this._foldOutside(ev, this._downSections);
+      this._downSections = null;
+    };
+    this._onDocClick = (ev) => {
+      if (!ev?.detail) this._foldOutside(ev);
+    };
     this._onKey = (ev) => {
       if (ev.key === 'Escape' && this._popup) this._closePopup();
       else if (ev.key === 'Tab' && this._popup) this._trapTab(ev);
@@ -2375,7 +2456,11 @@ class VehicleConsumptionCard extends HTMLElement {
   }
 
   connectedCallback() {
+    document.addEventListener('pointerdown', this._onDocDown, true);
+    document.addEventListener('pointerup', this._onDocUp, true);
     document.addEventListener('click', this._onDocClick);
+    // Back on the page after leaving it: drawn again in its default state (see disconnectedCallback).
+    if (this._sig === null) this._render();
     // The chart is drawn at the card's width (its labels keep their size); a few pixels do not re-render.
     if (typeof ResizeObserver === 'function') {
       this._ro ??= new ResizeObserver((entries) => {
@@ -2406,8 +2491,16 @@ class VehicleConsumptionCard extends HTMLElement {
     this._ro?.disconnect();
     if (this._frame) cancelAnimationFrame(this._frame);
     this._frame = 0;
+    document.removeEventListener('pointerdown', this._onDocDown, true);
+    document.removeEventListener('pointerup', this._onDocUp, true);
     document.removeEventListener('click', this._onDocClick);
     document.removeEventListener('keydown', this._onKey);
+    // Left (another view, a conditional card hidden): the popup closes without saving and the sections fold back,
+    // so that the card does not come back with them open.
+    this._popup = null;
+    this._refocus = false;
+    this._open.clear();
+    this._sig = null;
   }
 
   getCardSize() {
@@ -2468,7 +2561,7 @@ class VehicleConsumptionCard extends HTMLElement {
       // No vehicle found at all: not set up. A configured sensor: unavailable (starting, reloading) or not found
       // (a typo, another sensor, a vehicle removed).
       const why = !entity ? 'not_loaded' : st && ['unavailable', 'unknown'].includes(st.state) ? 'unavailable' : 'not_found';
-      this.shadowRoot.innerHTML = `
+      vcMorph(this.shadowRoot, `
       <style>${VehicleConsumptionCard.styles}</style>
       <ha-card class="lvl-na${this.hasAttribute?.('mini') ? ' mini' : ''}">
         ${
@@ -2480,8 +2573,9 @@ class VehicleConsumptionCard extends HTMLElement {
         </div>`
         }
         <div class="empty">${vcEsc(this._t(`${why}_hint`, { entity }))}</div>
-      </ha-card>`;
+      </ha-card>`);
       this._fitPill();
+      this._fitWhenRendered();
       return;
     }
 
@@ -2513,7 +2607,9 @@ class VehicleConsumptionCard extends HTMLElement {
       ? `<span class="drive" title="${vcEsc(this._t('driving'))}" aria-label="${vcEsc(this._t('driving'))}"></span>`
       : '';
 
-    this.shadowRoot.innerHTML = `
+    // Patched in place, not written again: the scene, the chart and the gauges keep their nodes and the card its
+    // height on a state update (the page does not jump).
+    vcMorph(this.shadowRoot, `
       <style>${VehicleConsumptionCard.styles}</style>
       <ha-card class="lvl-${level}${this.hasAttribute?.('mini') ? ' mini' : ''}${this._popup ? ' has-popup' : ''}${anim}">
         ${
@@ -2531,14 +2627,24 @@ class VehicleConsumptionCard extends HTMLElement {
         ${!compact && c.chart !== false ? this._chart(a, kind, f) : ''}
         ${compact ? '' : this._sections(a, kind, f)}
         ${this._popup && !compact ? this._popupHtml(a, kind, f) : ''}
-      </ha-card>`;
+      </ha-card>`);
 
     this._bind();
     this._fitPill();
+    this._fitWhenRendered();
   }
 
   _illustrated() {
     return this._config?.illustration !== false;
+  }
+
+  // A new <ha-card> (first render) lays its content out only once it has rendered (a microtask later, Lit): the
+  // pill is measured then again, otherwise it keeps a place measured at 0 px.
+  _fitWhenRendered() {
+    const hc = this.shadowRoot?.querySelector?.('ha-card');
+    if (!hc?.updateComplete || hc._vcFitWait) return;
+    hc._vcFitWait = true;
+    hc.updateComplete.then(() => this._fitPill());
   }
 
   // The illustrated header: the round icon (fuel pump or charging station, coloured by the card's level) with the
@@ -2655,26 +2761,41 @@ class VehicleConsumptionCard extends HTMLElement {
     }
   }
 
+  // The card's buttons and fields, listened once on the shadow root: the patched nodes are kept from one render to
+  // the next, so listeners added to them at each render would pile up.
+  _listen() {
+    const root = this.shadowRoot;
+    if (!root?.addEventListener || root._vcListening) return;
+    root._vcListening = true;
+    root.addEventListener('click', (ev) => {
+      const el = ev.target?.closest?.('.add, .zoom, .fold, .lswap, [data-act], [data-mode]');
+      if (!el) return;
+      if (el.matches('.add')) this._openPopup();
+      else if (el.matches('.zoom')) this._zoomClick(ev);
+      else if (el.matches('.fold')) this._toggle(el.dataset.key);
+      else if (el.matches('.lswap')) {
+        // The lease allowance: the gauge or the curve.
+        this._leaseCurve = !this._leaseCurve;
+        this._render(true);
+      }
+      else if (!this._popup) return;
+      else if (el.dataset.act) (el.dataset.act === 'save' ? this._save() : this._closePopup());
+      else this._setMode(el.dataset.mode);
+    });
+    // In the capture phase: an input event that does not bubble (dispatched by a script) still reaches it.
+    root.addEventListener('input', (ev) => {
+      const el = ev.target;
+      if (this._popup && el?.localName === 'input') this._input(el.name, el.value);
+    }, true);
+    root.addEventListener('keydown', (ev) => {
+      if (this._popup && ev.target?.localName === 'input' && ev.key === 'Enter') this._save();
+    }, true);
+  }
+
   _bind() {
     const root = this.shadowRoot;
-    root.querySelector('.add')?.addEventListener('click', () => this._openPopup());
-    root.querySelector('.zoom')?.addEventListener('click', (ev) => this._zoomClick(ev));
-    for (const el of root.querySelectorAll('.fold')) el.addEventListener('click', () => this._toggle(el.dataset.key));
-    root.querySelector('.lswap')?.addEventListener('click', () => {
-      this._leaseCurve = !this._leaseCurve;
-      this._render(true);
-    });
+    this._listen();
     if (!this._popup) return;
-    for (const el of root.querySelectorAll('[data-act]')) {
-      el.addEventListener('click', () => (el.dataset.act === 'save' ? this._save() : this._closePopup()));
-    }
-    for (const el of root.querySelectorAll('[data-mode]')) el.addEventListener('click', () => this._setMode(el.dataset.mode));
-    for (const el of root.querySelectorAll('input')) {
-      el.addEventListener('input', () => this._input(el.name, el.value));
-      el.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter') this._save();
-      });
-    }
     // The amount, ready to type in, without scrolling the dashboard to the card (a re-render: mode, error); the
     // opening brings the popup into view itself (`_openPopup`).
     root.querySelector('input[name="amount"]')?.focus?.({ preventScroll: true });
@@ -2988,10 +3109,9 @@ class VehicleConsumptionCard extends HTMLElement {
   }
 
   // A click anywhere outside an open section folds it back.
-  _foldOutside(ev) {
+  _foldOutside(ev, also) {
     if (!this._open.size) return;
-    const path = ev?.composedPath?.() || [];
-    const inside = new Set(path.map((n) => n?.dataset?.section).filter(Boolean));
+    const inside = new Set([...vcSections(ev), ...(also || [])]);
     let changed = false;
     for (const key of [...this._open]) {
       if (!inside.has(key)) {
@@ -3399,8 +3519,22 @@ class VehicleConsumptionMiniCard extends VehicleConsumptionCard {
   constructor() {
     super();
     this._zoomed = false;
+    const outside = (ev) => !ev.composedPath().includes(this) && !vcInDialog(ev);
     this._onOutside = (ev) => {
-      if (this._zoomed && !ev.composedPath().includes(this) && !vcInDialog(ev)) this._setZoom(false);
+      if (this._zoomed && outside(ev)) this._setZoom(false);
+    };
+    // A tap elsewhere on iOS sends no click: the press and the release outside the card count (see the full card);
+    // keyboard clicks (no click count) still come as click events.
+    let downOutside = false;
+    this._onOutsideDown = (ev) => {
+      downOutside = outside(ev);
+    };
+    this._onOutsideUp = (ev) => {
+      if (downOutside) this._onOutside(ev);
+      downOutside = false;
+    };
+    this._onOutsideClick = (ev) => {
+      if (!ev?.detail) this._onOutside(ev);
     };
   }
 
@@ -3411,13 +3545,19 @@ class VehicleConsumptionMiniCard extends VehicleConsumptionCard {
   }
 
   connectedCallback() {
+    document.addEventListener('pointerdown', this._onOutsideDown, true);
+    document.addEventListener('pointerup', this._onOutsideUp, true);
+    document.addEventListener('click', this._onOutsideClick, true);
     super.connectedCallback();
-    document.addEventListener('click', this._onOutside, true);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    document.removeEventListener('click', this._onOutside, true);
+    document.removeEventListener('pointerdown', this._onOutsideDown, true);
+    document.removeEventListener('pointerup', this._onOutsideUp, true);
+    document.removeEventListener('click', this._onOutsideClick, true);
+    // Back to the compact view once off the screen, as on the other cards.
+    this._zoomed = false;
   }
 
   getCardSize() {

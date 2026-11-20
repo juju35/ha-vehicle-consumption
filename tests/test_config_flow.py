@@ -435,3 +435,39 @@ async def test_translation_key_only_ignores_lookalike_unique_ids(hass: HomeAssis
         unique_id="vin_realtime_total_mileage", translation_key="total_mileage",
     )  # fmt: skip
     assert async_detect(hass, device)[CONF_ODOMETER] == "sensor.seal_b"
+
+
+async def test_generic_detection_scores_and_distractors(hass: HomeAssistant) -> None:
+    """An unknown integration: each source by unit, device class and name; ranges, trips and counters left out."""
+    device = vehicle_device(hass, "Hybrid", platform="some_vehicle")
+
+    def sensor(object_id: str, attributes: dict, **kwargs) -> None:
+        add_sensor(hass, device, object_id, "1", attributes, platform="some_vehicle", **kwargs)
+
+    km = {"unit_of_measurement": "km", "device_class": "distance"}
+    sensor("hybrid_electric_range", km)
+    sensor("hybrid_trip_distance", {**km, "state_class": "total_increasing"})
+    sensor("hybrid_distance", {**km, "state_class": "total_increasing"})  # odometer by its state class alone
+    sensor("hybrid_wheel_distance", km)  # a distance, neither named nor counted: not the odometer
+    sensor("hybrid_fuel_used", {"unit_of_measurement": "L", "device_class": "volume"})
+    sensor("hybrid_fuel_tank", {"unit_of_measurement": "L", "device_class": "volume_storage"})
+    sensor("hybrid_windscreen_washer", {"unit_of_measurement": "L"})  # a volume, but not fuel
+    sensor("hybrid_tank_level", PERCENT)
+    sensor("hybrid_energy_charged", {"unit_of_measurement": "kWh", "device_class": "energy"})
+    sensor("hybrid_usable_battery", {"unit_of_measurement": "kWh", "device_class": "energy_storage"})
+    sensor("hybrid_charge_limit", PERCENT)
+    sensor("hybrid_hv_soc", PERCENT)
+    sensor("hybrid_power", {"unit_of_measurement": "kW", "device_class": "power"})
+    assert async_detect(hass, device) == {
+        CONF_ODOMETER: "sensor.hybrid_distance",
+        CONF_FUEL_QUANTITY: "sensor.hybrid_fuel_tank",
+        CONF_FUEL_LEVEL: "sensor.hybrid_tank_level",
+        CONF_BATTERY_ENERGY: "sensor.hybrid_usable_battery",
+        CONF_BATTERY_LEVEL: "sensor.hybrid_hv_soc",
+    }
+
+
+async def test_generic_detection_without_any_source(hass: HomeAssistant) -> None:
+    device = vehicle_device(hass, "Bare", platform="some_vehicle")
+    add_sensor(hass, device, "bare_power", "1", {"unit_of_measurement": "kW"}, platform="some_vehicle")
+    assert async_detect(hass, device) == {}

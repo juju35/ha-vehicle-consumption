@@ -1438,6 +1438,46 @@ test('illustration: the mini card has the same banner, its detail button on it; 
   }
 });
 
+test('a tap elsewhere (pointer, iOS) folds the sections and the mini card back; leaving the page resets them', () => {
+  const card = makeMini();
+  card.hass = hassWith(fuelAttrs());
+  card._setZoom(true);
+  card._toggle('trips');
+  const inside = { composedPath: () => [{ dataset: { section: 'trips' } }, card], detail: 1 };
+  const outside = { composedPath: () => [{ localName: 'div', dataset: {} }], detail: 1 };
+  // Pressed in the card, released outside (a drag): nothing folds.
+  card._onOutsideDown(inside);
+  card._onOutsideUp(outside);
+  card._onDocDown(inside);
+  card._onDocUp(outside);
+  assert.equal(card._zoomed, true);
+  assert.ok(card._open.has('trips'));
+  // A mouse click outside is handled on the pointer: its click event changes nothing more.
+  card._onOutsideClick(outside);
+  card._onDocClick(outside);
+  assert.equal(card._zoomed, true);
+  assert.ok(card._open.has('trips'));
+  // A tap outside (no click event on iOS).
+  card._onDocDown(outside);
+  card._onDocUp(outside);
+  card._onOutsideDown(outside);
+  card._onOutsideUp(outside);
+  assert.equal(card._open.size, 0);
+  assert.equal(card._zoomed, false);
+  // Leaving the page: the popup closes unsaved, the sections fold, the mini card is compact again.
+  card._setZoom(true);
+  card._toggle('trips');
+  card._openPopup();
+  assert.ok(card._popup);
+  card.disconnectedCallback();
+  assert.equal(card._popup, null);
+  assert.equal(card._open.size, 0);
+  assert.equal(card._zoomed, false);
+  card.connectedCallback();
+  assert.doesNotMatch(html(card), /class="sheet"|section open|class="chart"/);
+  card.disconnectedCallback();
+});
+
 const leaseAttrs = (lease) => fuelAttrs({ lease: { start: '2025-01-15', end: '2028-01-15', months: 36, month: 23, ended: false, allowance: 45000, prorata: 28000, pace: 1400, extra_price: 0.08, ...lease } });
 
 test('lease: within the allowance, the distance left and a month to stay within', () => {
@@ -1462,4 +1502,21 @@ test('lease: past the allowance, the distance over it in red, no negative distan
   assert.match(out, /class="ltiles two">/);
   assert.match(out, /class="ltile warn"><span class="lv">1,200<\/span><span class="lk">km over the allowance/);
   assert.doesNotMatch(out, /km left|to stay within|-1,200|−1,200/);
+});
+
+test('lease: a tap on the gauge switches to the curve and back, listened once on the shadow root', () => {
+  const card = makeCard();
+  card.hass = hassWith(leaseAttrs({ driven: 30000, balance: 2000, remaining: 15000, per_month_left: 1154, projected: 48200, overage: 3200, overage_cost: 256 }));
+  const on = {};
+  card.shadowRoot.addEventListener = (type, fn) => (on[type] = fn);
+  card._listen();
+  card._toggle('lease');
+  card._render();
+  assert.doesNotMatch(html(card), /class="lease [^"]*curve/);
+  const swap = { matches: (sel) => sel === '.lswap', dataset: {} };
+  const tap = () => on.click({ target: { closest: (sel) => (sel.includes('.lswap') ? swap : null) } });
+  tap();
+  assert.match(html(card), /class="lease lt-[a-z]+ curve"/);
+  tap();
+  assert.doesNotMatch(html(card), /class="lease [^"]*curve/);
 });
