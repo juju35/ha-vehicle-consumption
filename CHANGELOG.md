@@ -5,6 +5,7 @@
 ### Fixes
 - Card: a tap elsewhere on the page folds the open sections and the mini card's detail view back on iOS too (Safari and the companion app send no click for a tap on something that is not clickable): caught on the pointer, as on the other cards; keyboard clicks still count.
 - Card: leaving the page (another view, a conditional card hidden) closes the refuel / charge popup without saving, folds the sections and brings the mini card back to its compact view; the card is drawn again in that state when it comes back.
+- Card: a state update no longer makes the page jump. The card rewrote its whole content (stylesheet, scene, chart, gauges) on every change of its sensor, so its `<ha-card>` was created again and the status pill was measured before it had rendered (0 px), the banner animations restarted and the sections grid reflowed. The content is now patched in place, the buttons are listened once on the card, and the pill is measured again once a new `<ha-card>` has rendered.
 
 ### Maintenance
 - Tests for the detection of the sensors of an integration the card does not know (odometer, fuel, battery, with ranges, trip meters and counters left out).
