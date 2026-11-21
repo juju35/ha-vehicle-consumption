@@ -1706,7 +1706,7 @@ class ConsumptionTracker:
         if self.lease is None:
             return None
         months = [{"month": key, "distance": totals.distance} for key, totals in sorted(self.months.items())]
-        status = self.lease.status(self.odometer, months)
+        status = self.lease.status(self.odometer, months, tracked_from=dt_util.as_local(self.since).date())
         imperial = self.imperial if imperial is None else imperial
         return to_miles(status, KM_PER_MILE) if imperial else status
 
