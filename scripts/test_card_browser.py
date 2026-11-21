@@ -80,13 +80,13 @@ class Popup(unittest.TestCase):
         cls.browser.close()
         cls.pw.stop()
 
-    def page(self, kind):
+    def page(self, kind, **extra):
         page = self.browser.new_page(viewport={"width": 800, "height": 700})
         self.addCleanup(page.close)
         page.set_content(shots.page_html("light"))
         page.add_script_tag(content=shots.HA_ELEMENTS)
         page.add_script_tag(content=shots.CARD_JS)
-        page.evaluate(MOUNT, [shots.mock_hass(kind)])
+        page.evaluate(MOUNT, [shots.mock_hass(kind, **extra)])
         page.wait_for_timeout(100)
         return page
 
@@ -140,73 +140,44 @@ class Popup(unittest.TestCase):
         page.evaluate("() => window.card.shadowRoot.querySelector('.add').click()")
         self.assertEqual(page.evaluate("() => window.card.shadowRoot.querySelectorAll('.sheet').length"), 1)
 
-    def test_state_updates_patch_the_card_in_place_with_a_steady_height(self):
-        page = self.page("fuel")
-        page.wait_for_timeout(1500)  # past the first-render animations
-        result = page.evaluate(UPDATES, ["vehicle-consumption-card"])
+    def assert_patched(self, page, mode=None):
+        """UPDATES: nothing changes on other entities, the card's sensor patches in place, one height, no overflow."""
+        result = page.evaluate(UPDATES, ["vehicle-consumption-card", mode])
         self.assertEqual(result["unrelated"], 0, result)
         self.assertEqual(result["removed"], 0, result)
         self.assertTrue(result["sceneKept"], result)
         self.assertEqual(len(result["heights"]), 1, result)
-
-    def test_lease_section_patches_in_place_and_fits_a_narrow_card(self):
-        page = self.browser.new_page(viewport={"width": 800, "height": 700})
-        self.addCleanup(page.close)
-        page.set_content(shots.page_html("light"))
-        page.add_script_tag(content=shots.HA_ELEMENTS)
-        page.add_script_tag(content=shots.CARD_JS)
-        page.evaluate(MOUNT, [shots.mock_hass("fuel", lease=shots.LEASE)])
-        page.wait_for_timeout(1500)
-        result = page.evaluate(LEASE_UPDATES)
-        self.assertEqual(result["removed"], 0, result)
-        self.assertTrue(result["gaugeKept"], result)
-        self.assertEqual(len(result["heights"]), 1, result)
         self.assertEqual(result["overflow"], [], result)
 
+    def test_state_updates_patch_the_card_in_place_with_a_steady_height(self):
+        page = self.page("fuel")
+        page.wait_for_timeout(1500)  # past the first-render animations
+        self.assert_patched(page)
 
-# The lease section, unfolded in a 300 px card: the distance driven moves (same number of digits), the gauge and the
-# tiles are patched in place and the card keeps its height; no tile or the gauge overflows the card.
-LEASE_UPDATES = """async () => {
-    const frames = (n) => new Promise((r) => { const step = () => (n-- > 0 ? requestAnimationFrame(step) : r()); step(); });
-    const card = window.card;
+    def test_lease_section_patches_in_place_and_fits_a_narrow_card(self):
+        page = self.page("fuel", lease=shots.LEASE)
+        page.evaluate(LEASE_OPEN)
+        page.wait_for_timeout(1200)  # past the unfold animation
+        self.assert_patched(page, "lease")
+
+
+# The lease section, unfolded in a 300 px card (UPDATES then moves the distance driven, same number of digits).
+LEASE_OPEN = """() => {
     document.getElementById("root").style.width = "300px";
-    card._open = new Set(["lease"]);
-    card._render(true);
-    await new Promise((r) => setTimeout(r, 1200)); // past the unfold animation
-    const gauge = card.shadowRoot.querySelector(".lgauge");
-    const heights = new Set();
-    let run = true;
-    const tick = () => { if (!run) return; heights.add(Math.round(card.getBoundingClientRect().height)); requestAnimationFrame(tick); };
-    tick();
-    let removed = 0;
-    const obs = new MutationObserver((recs) => {
-        for (const r of recs) if (r.type === "childList") removed += [...r.removedNodes].filter((n) => n.nodeType === 1).length;
-    });
-    obs.observe(card.shadowRoot, { subtree: true, childList: true });
-    const id = Object.keys(card._hass.states).find((k) => k.endsWith("_consumption"));
-    for (let i = 1; i <= 5; i++) {
-        const st = structuredClone(card._hass.states[id]);
-        st.attributes.lease = { ...st.attributes.lease, driven: st.attributes.lease.driven + i * 11, remaining: st.attributes.lease.remaining - i * 11 };
-        card.hass = { ...card._hass, states: { ...card._hass.states, [id]: st } };
-        await frames(2);
-    }
-    run = false;
-    obs.disconnect();
-    const box = card.getBoundingClientRect();
-    const overflow = [...card.shadowRoot.querySelectorAll(".ltile, .lgauge, .lhead")]
-        .filter((el) => { const b = el.getBoundingClientRect(); return b.right > box.right + 0.5 || b.left < box.left - 0.5; })
-        .map((el) => el.className.baseVal ?? el.className);
-    return { removed, gaugeKept: !!gauge && card.shadowRoot.querySelector(".lgauge") === gauge, heights: [...heights], overflow };
+    window.card._open = new Set(["lease"]);
+    window.card._render(true);
 }"""
 
 
 # A state update must not make the page jump: an update of another entity changes nothing in the card, and an update
 # of its sensor patches the existing nodes (the scene, the chart, the gauges), the card keeping its height.
-UPDATES = """async ([tag]) => {
+UPDATES = """async ([tag, mode]) => {
     const frames = (n) => new Promise((r) => { const step = () => (n-- > 0 ? requestAnimationFrame(step) : r()); step(); });
     const card = window.card;
     await frames(4);
-    const scene = card.shadowRoot.querySelector("svg");
+    // `lease`: the lease gauge is kept and the lease figures move; else the scene, and the gauges' levels.
+    const kept = mode === "lease" ? ".lgauge" : "svg";
+    const scene = card.shadowRoot.querySelector(kept);
     const heights = new Set();
     let run = true;
     const tick = () => { if (!run) return; heights.add(Math.round(card.getBoundingClientRect().height)); requestAnimationFrame(tick); };
@@ -228,14 +199,24 @@ UPDATES = """async ([tag]) => {
     const id = Object.keys(card._hass.states).find((k) => k.endsWith("_consumption"));
     for (let i = 0; i < 5; i++) {
         const st = structuredClone(card._hass.states[id]);
-        st.attributes.fuel_level = 40 + i;
-        st.attributes.fuel_quantity = 20 + i / 10;
+        if (mode === "lease") {
+            const l = st.attributes.lease;
+            st.attributes.lease = { ...l, driven: l.driven + (i + 1) * 11, remaining: l.remaining - (i + 1) * 11 };
+        } else {
+            st.attributes.fuel_level = 40 + i;
+            st.attributes.fuel_quantity = 20 + i / 10;
+        }
         card.hass = { ...card._hass, states: { ...card._hass.states, [id]: st } };
         await frames(2);
     }
     run = false;
     obs.disconnect();
-    return { ...counts, sceneKept: !!scene && card.shadowRoot.querySelector("svg") === scene, heights: [...heights] };
+    // Nothing out of the card's sides (a 300 px card with the lease tiles, say).
+    const box = card.getBoundingClientRect();
+    const overflow = [...card.shadowRoot.querySelectorAll(".ltile, .lgauge, .lhead, .tile")]
+        .filter((el) => { const b = el.getBoundingClientRect(); return b.right > box.right + 0.5 || b.left < box.left - 0.5; })
+        .map((el) => el.className.baseVal ?? el.className);
+    return { ...counts, sceneKept: !!scene && card.shadowRoot.querySelector(kept) === scene, heights: [...heights], overflow };
 }"""
 
 
