@@ -3031,7 +3031,15 @@ class VehicleConsumptionCard extends HTMLElement {
             </svg>`;
     // The curve: elapsed time on x, distance on y (up to the allowance or the projection, whichever is higher).
     const top = Math.max(allowance, Number(l.projected) || 0, driven || 0) || 1;
-    const elapsed = l.months ? Math.min(Math.max(((Number(l.month) || 0) - 0.5) / Number(l.months), 0), 1) : 0;
+    // Time elapsed in the contract, from its dates (the month number only without them): the end of the line is today.
+    const t0 = Date.parse(l.start);
+    const t1 = Date.parse(l.end);
+    const elapsed =
+      t1 > t0
+        ? Math.min(Math.max((Date.now() - t0) / (t1 - t0), 0), 1)
+        : l.months
+          ? Math.min(Math.max(((Number(l.month) || 0) - 0.5) / Number(l.months), 0), 1)
+          : 0;
     const X = (r) => (8 + r * 104).toFixed(2);
     const Y = (v) => (62 - (Math.max(Number(v) || 0, 0) / top) * 54).toFixed(2);
     const chart = `

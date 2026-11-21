@@ -149,6 +149,56 @@ class Popup(unittest.TestCase):
         self.assertTrue(result["sceneKept"], result)
         self.assertEqual(len(result["heights"]), 1, result)
 
+    def test_lease_section_patches_in_place_and_fits_a_narrow_card(self):
+        page = self.browser.new_page(viewport={"width": 800, "height": 700})
+        self.addCleanup(page.close)
+        page.set_content(shots.page_html("light"))
+        page.add_script_tag(content=shots.HA_ELEMENTS)
+        page.add_script_tag(content=shots.CARD_JS)
+        page.evaluate(MOUNT, [shots.mock_hass("fuel", lease=shots.LEASE)])
+        page.wait_for_timeout(1500)
+        result = page.evaluate(LEASE_UPDATES)
+        self.assertEqual(result["removed"], 0, result)
+        self.assertTrue(result["gaugeKept"], result)
+        self.assertEqual(len(result["heights"]), 1, result)
+        self.assertEqual(result["overflow"], [], result)
+
+
+# The lease section, unfolded in a 300 px card: the distance driven moves (same number of digits), the gauge and the
+# tiles are patched in place and the card keeps its height; no tile or the gauge overflows the card.
+LEASE_UPDATES = """async () => {
+    const frames = (n) => new Promise((r) => { const step = () => (n-- > 0 ? requestAnimationFrame(step) : r()); step(); });
+    const card = window.card;
+    document.getElementById("root").style.width = "300px";
+    card._open = new Set(["lease"]);
+    card._render(true);
+    await new Promise((r) => setTimeout(r, 1200)); // past the unfold animation
+    const gauge = card.shadowRoot.querySelector(".lgauge");
+    const heights = new Set();
+    let run = true;
+    const tick = () => { if (!run) return; heights.add(Math.round(card.getBoundingClientRect().height)); requestAnimationFrame(tick); };
+    tick();
+    let removed = 0;
+    const obs = new MutationObserver((recs) => {
+        for (const r of recs) if (r.type === "childList") removed += [...r.removedNodes].filter((n) => n.nodeType === 1).length;
+    });
+    obs.observe(card.shadowRoot, { subtree: true, childList: true });
+    const id = Object.keys(card._hass.states).find((k) => k.endsWith("_consumption"));
+    for (let i = 1; i <= 5; i++) {
+        const st = structuredClone(card._hass.states[id]);
+        st.attributes.lease = { ...st.attributes.lease, driven: st.attributes.lease.driven + i * 11, remaining: st.attributes.lease.remaining - i * 11 };
+        card.hass = { ...card._hass, states: { ...card._hass.states, [id]: st } };
+        await frames(2);
+    }
+    run = false;
+    obs.disconnect();
+    const box = card.getBoundingClientRect();
+    const overflow = [...card.shadowRoot.querySelectorAll(".ltile, .lgauge, .lhead")]
+        .filter((el) => { const b = el.getBoundingClientRect(); return b.right > box.right + 0.5 || b.left < box.left - 0.5; })
+        .map((el) => el.className.baseVal ?? el.className);
+    return { removed, gaugeKept: !!gauge && card.shadowRoot.querySelector(".lgauge") === gauge, heights: [...heights], overflow };
+}"""
+
 
 # A state update must not make the page jump: an update of another entity changes nothing in the card, and an update
 # of its sensor patches the existing nodes (the scene, the chart, the gauges), the card keeping its height.
