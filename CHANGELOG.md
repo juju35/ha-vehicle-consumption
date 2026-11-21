@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.10.1 - 2026-11-21
+
+### Fixes
+
+- Lease: the pace of the projection no longer counts the month the tracking began in, which is partial (a vehicle added mid-contract got a projection too low for its first three months)
+- Lease: removed in the options, its four sensors are removed too instead of staying as unavailable entities
+- Card, lease curve: the point of today is placed from the contract's dates (it stood half a month back, and short of the end once the contract was over)
+
 ## 1.10.0 - 2026-11-20
 
 ### Features
