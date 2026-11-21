@@ -73,6 +73,22 @@ def test_status_halfway_ahead_of_the_allowance() -> None:
     assert status["overage_cost"] is None
 
 
+def test_status_pace_skips_the_month_the_tracking_began_in() -> None:
+    lease = Lease(date(2025, 1, 1), 24, 30000.0)
+    # Tracking began on 20 September: September is partial, so only October to December are complete months.
+    months = [{"month": "2025-09", "distance": 300.0}] + [
+        {"month": f"2025-{m:02d}", "distance": 1500.0} for m in range(10, 13)
+    ]
+    status = lease.status(16000.0, months, date(2026, 1, 1), tracked_from=date(2025, 9, 20))
+    assert status["pace"] == 1500
+    # Two complete months only since the tracking began: the average since the start of the contract.
+    status = lease.status(16000.0, months[:-1], date(2025, 12, 1), tracked_from=date(2025, 9, 20))
+    assert status["pace"] == pytest.approx(16000 / (334 / (365.25 / 12)), abs=5)
+    # Begun on the 1st, the month counts.
+    status = lease.status(16000.0, months[1:], date(2026, 1, 1), tracked_from=date(2025, 10, 1))
+    assert status["pace"] == 1500
+
+
 def test_status_pace_falls_back_to_the_average_and_counts_the_cost() -> None:
     lease = Lease(date(2025, 1, 15), 36, 40000.0, start_odometer=10.0, extra_price=0.06)
     # Two complete months only: the average since the start (23400 km over ~20 months).
@@ -171,6 +187,9 @@ async def test_options_lease_step(hass: HomeAssistant) -> None:
     result = await hass.config_entries.options.async_configure(result["flow_id"], {})
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert CONF_LEASE_START not in entry.options
+    await hass.async_block_till_done()
+    # Its sensors go with it, rather than stay as unavailable entities.
+    assert entity_id(hass, "lease_remaining") is None
 
 
 async def test_options_lease_step_in_miles(hass: HomeAssistant) -> None:

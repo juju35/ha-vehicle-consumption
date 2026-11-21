@@ -90,11 +90,18 @@ class Lease:
             extra_price=price or None,
         )
 
-    def status(self, odometer: float | None, months: list[dict[str, Any]], today: date | None = None) -> dict[str, Any]:
+    def status(
+        self,
+        odometer: float | None,
+        months: list[dict[str, Any]],
+        today: date | None = None,
+        tracked_from: date | None = None,
+    ) -> dict[str, Any]:
         """Where the contract stands today (km, metric): driven, pro rata, balance (+ = over), left, projection.
 
         `months` is the tracker's months summary (oldest first, `month` YYYY-MM and `distance` in km): the pace is the
         average of the last `LEASE_PACE_MONTHS` complete months since the start, else the average since the start.
+        `tracked_from` is the day the tracking began: the month it began in is partial (unless the 1st) and not counted.
         """
         today = today or dt_util.as_local(dt_util.utcnow()).date()
         end = self.end
@@ -104,7 +111,7 @@ class Lease:
         months_left = max((end - today).days, 0) / _DAYS_PER_MONTH
         driven = max(odometer - self.start_odometer, 0.0) if odometer is not None else None
         prorata = self.distance * elapsed_days / span
-        pace = self._pace(months, today, driven, months_elapsed)
+        pace = self._pace(months, today, driven, months_elapsed, tracked_from)
         projected = driven + pace * months_left if driven is not None and pace is not None else driven
         overage = max(projected - self.distance, 0.0) if projected is not None else None
         remaining = self.distance - driven if driven is not None else None
@@ -139,11 +146,18 @@ class Lease:
         return min(months + (1 if today.day >= self.start.day else 0), self.months)
 
     def _pace(
-        self, months: list[dict[str, Any]], today: date, driven: float | None, months_elapsed: float
+        self,
+        months: list[dict[str, Any]],
+        today: date,
+        driven: float | None,
+        months_elapsed: float,
+        tracked_from: date | None = None,
     ) -> float | None:
         """Kilometres a month: the last complete months tracked since the start, else the average since the start."""
         current = today.strftime("%Y-%m")
-        first_full = _add_months(self.start.replace(day=1), 1 if self.start.day > 1 else 0).strftime("%Y-%m")
+        # The first month both the contract and the tracking cover whole.
+        first = max(self.start, tracked_from) if tracked_from is not None else self.start
+        first_full = _add_months(first.replace(day=1), 1 if first.day > 1 else 0).strftime("%Y-%m")
         full = [
             float(m["distance"])
             for m in months

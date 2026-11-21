@@ -19,7 +19,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import VehicleConsumptionConfigEntry
-from .const import UNIT_ENERGY_CONSUMPTION, UNIT_FUEL_CONSUMPTION, UNIT_MI_PER_KWH, UNIT_MPG
+from .const import DOMAIN, UNIT_ENERGY_CONSUMPTION, UNIT_FUEL_CONSUMPTION, UNIT_MI_PER_KWH, UNIT_MPG
 from .entity import VehicleConsumptionEntity
 from .tracker import ENERGY, FUEL, KM_PER_MILE, ConsumptionTracker, Refill
 
@@ -231,6 +231,13 @@ async def async_setup_entry(
     entities.append(NextServiceSensor(tracker, NEXT_SERVICE))
     if tracker.lease is not None:
         entities.extend(VehicleSensor(tracker, d) for d in LEASE_SENSORS)
+    else:
+        # The lease was removed in the options: its sensors go too, rather than stay as unavailable entities.
+        registry = er.async_get(hass)
+        for description in LEASE_SENSORS:
+            entity_id = registry.async_get_entity_id("sensor", DOMAIN, f"{tracker.entry_id}_{description.key}")
+            if entity_id is not None:
+                registry.async_remove(entity_id)
     if tracker.tracks_fuel:
         entities.append(LastRefillSensor(tracker, FUEL))
     if tracker.tracks_energy:
