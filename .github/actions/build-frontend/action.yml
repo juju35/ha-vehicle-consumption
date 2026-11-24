@@ -1,0 +1,16 @@
+name: Build the frontend
+description: >-
+  Assembles the frontend files from their ES modules in src/ (scripts/build-frontend.mjs) into
+  custom_components/*/frontend/. They are build output, not committed: every job that loads them builds them first.
+runs:
+  using: composite
+  steps:
+    - name: Set up Node
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version: "22"
+    - name: Assemble the frontend files
+      shell: bash
+      run: |
+        npm install --no-save --no-package-lock acorn@8.19.0
+        node scripts/build-frontend.mjs

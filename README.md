@@ -446,7 +446,10 @@ When a vehicle is added, the last 365 days of its sensors are replayed once, in 
 
 ## Development
 
+The big frontend files are written as ES modules in `src/vehicle-consumption-card/` (entry `index.js`, translations one file per language in `i18n/`). `scripts/build-frontend.mjs` assembles them into `vehicle-consumption-card.js` in `custom_components/vehicle_consumption/frontend/`, which are not committed: build them before running Home Assistant, the tests or the screenshots. The modules share one scope once assembled, so top-level names stay unique; a new module must be listed in its `index.js`.
+
 ```bash
+npm install --no-save --no-package-lock acorn@8.19.0 && node scripts/build-frontend.mjs
 pip install -r requirements_test.txt && pytest
 node --test test/*.test.mjs   # card tests
 python scripts/screenshots.py  # renders the card with mock vehicles into screenshots/ (also makes the GIFs, needs ffmpeg)
@@ -454,7 +457,7 @@ python scripts/screenshots.py  # renders the card with mock vehicles into screen
 
 ### Releasing
 
-1. Bump the version in `custom_components/vehicle_consumption/manifest.json`, `const.py` (`VERSION`) and the card (`VEHICLE_CONSUMPTION_CARD_VERSION`)
+1. Bump the version in `custom_components/vehicle_consumption/manifest.json`, `const.py` (`VERSION`) and the card (`VEHICLE_CONSUMPTION_CARD_VERSION` in `src/vehicle-consumption-card/core.js`)
 2. Add a `## <version>` section at the top of [CHANGELOG.md](https://github.com/juju35/ha-vehicle-consumption/blob/main/CHANGELOG.md)
 3. Push to `main`: the **Release** workflow creates the tag and the GitHub release with the changelog section as notes, and attaches `vehicle_consumption.zip`
 

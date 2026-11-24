@@ -5,3 +5,5 @@ __pycache__/
 .venv/
 report/
 node_modules/
+# Assembled from their ES modules in src/ by scripts/build-frontend.mjs (build output, not committed)
+custom_components/vehicle_consumption/frontend/vehicle-consumption-card.js

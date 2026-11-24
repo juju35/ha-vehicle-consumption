@@ -17,6 +17,8 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
+# The frontend files are assembled from their ES modules in src/ (build output, not committed).
+subprocess.run(["node", "scripts/build-frontend.mjs"], cwd=ROOT, check=True)
 CARD_JS = (ROOT / "custom_components/vehicle_consumption/frontend/vehicle-consumption-card.js").read_text()
 NOW = "2026-10-30T18:00:00+01:00"
 WIDTH = 460
