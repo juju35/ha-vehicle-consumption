@@ -4,13 +4,14 @@
 // Those files are build output, not committed (.gitignore): run this before the tests, the screenshots,
 // scripts/split-frontend.mjs and the release zip. Needs acorn (npm install --no-save --no-package-lock acorn@8.19.0).
 // Usage: node scripts/build-frontend.mjs
-import { existsSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { bundle } from "./bundle.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const [domain] = readdirSync(`${root}custom_components`);
 const out = `${root}custom_components/${domain}/frontend`;
+mkdirSync(out, { recursive: true }); // a checkout has no frontend/ when every file there is assembled
 
 const stems = readdirSync(`${root}src`).filter((d) => existsSync(`${root}src/${d}/index.js`));
 if (!stems.length) throw new Error("no src/<stem>/index.js to assemble");
