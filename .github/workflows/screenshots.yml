@@ -84,11 +84,11 @@ jobs:
           [ -n "$ok" ] || { echo "::error::apt failed 3 times"; exit 1; }
           ffmpeg -version > /dev/null
       # The comparator that decides whether a capture is rewritten must see every channel, not only alpha.
-      - name: Test the screenshot comparator
-        run: python -m unittest discover -s scripts -p "test_*.py" -v
       # The frontend files are assembled from their ES modules in src/ (build output, not committed).
       - name: Build the frontend
         uses: ./.github/actions/build-frontend
+      - name: Test the screenshot comparator
+        run: python -m unittest discover -s scripts -p "test_*.py" -v
       - name: Render screenshots
         run: |
           set -o pipefail
