@@ -49,7 +49,7 @@ jobs:
         run: |
           VERSION="$(jq -r .version custom_components/vehicle_consumption/manifest.json)"
           grep -q "VERSION: Final = \"$VERSION\"" custom_components/vehicle_consumption/const.py
-          grep -q "VEHICLE_CONSUMPTION_CARD_VERSION = '$VERSION'" custom_components/vehicle_consumption/frontend/vehicle-consumption-card.js
+          grep -q "VEHICLE_CONSUMPTION_CARD_VERSION = '$VERSION'" src/vehicle-consumption-card/core.js
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
@@ -62,6 +62,11 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22"
+
+      # The frontend files are assembled from their ES modules in src/ (build output, not committed).
+      - name: Build the frontend
+        if: steps.version.outputs.exists == 'false'
+        uses: ./.github/actions/build-frontend
 
       # Only English stays in the frontend files of the zip; each other language is its own file next to them,
       # fetched when needed (scripts/split-frontend.mjs). The repository keeps every language in the sources.

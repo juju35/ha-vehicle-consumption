@@ -1,13 +1,11 @@
 // Unit tests for the card: the card file is evaluated with stubs, no browser needed.
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import vm from 'node:vm';
+// The frontend files as scripts/build-frontend.mjs assembles them from their ES modules in src/.
+import { bundle } from '../scripts/bundle.mjs';
 
-const source = readFileSync(
-  new URL('../custom_components/vehicle_consumption/frontend/vehicle-consumption-card.js', import.meta.url),
-  'utf8',
-);
+const source = bundle('src/vehicle-consumption-card/index.js');
 
 // An ha-form stand-in for the editor: what the user changes.
 const fakeNode = () => ({

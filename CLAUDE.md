@@ -19,6 +19,7 @@
 ## Before opening a PR — run the checks locally
 CI mirrors these; running them first avoids round-trips:
 ```sh
+npm install --no-save --no-package-lock acorn@8.19.0 && node scripts/build-frontend.mjs
 pre-commit run -a
 vulture custom_components .vulture_whitelist.py --min-confidence 60
 npx --yes jscpd@5.4.2 .
@@ -39,7 +40,7 @@ carries the new version, updated together in one commit:
 1. `CHANGELOG.md` → add a "## X.Y.Z - YYYY-MM-DD" section at the top (`### Features` | `Fixes` | `Performance` | `Maintenance`).
 2. `custom_components/vehicle_consumption/manifest.json` → `"version": "X.Y.Z"`.
 3. `custom_components/vehicle_consumption/const.py` → `VERSION: Final = "X.Y.Z"`.
-4. `custom_components/vehicle_consumption/frontend/vehicle-consumption-card.js` → `VEHICLE_CONSUMPTION_CARD_VERSION = 'X.Y.Z'`.
+4. `src/vehicle-consumption-card/core.js` → `VEHICLE_CONSUMPTION_CARD_VERSION = 'X.Y.Z'`.
 - Bump rule: `fix` → patch, `feat` → minor, breaking change → major.
 - The PR/commit title carries the version in parentheses, e.g. `feat: new option (X.Y.Z)`.
 
@@ -57,6 +58,14 @@ carries the new version, updated together in one commit:
 
 ## Supported integrations
 This builds on other Home Assistant integrations, so keep the `## Supported integrations` section (title verbatim) listing the HA integrations it works on top of, with a link to each.
+
+## Source layout
+- The big frontend files are written as ES modules in `src/vehicle-consumption-card/` (entry `index.js`, translations one file per
+  language in `i18n/` where the file has a table). `scripts/build-frontend.mjs` assembles each into
+  `custom_components/vehicle_consumption/frontend/<stem>.js` (scripts/bundle.mjs, needs acorn); those files are build output,
+  git-ignored and **not committed** — build before pytest, the screenshots or `scripts/split-frontend.mjs`.
+- The modules share one scope once assembled (a classic script): keep top-level names unique across them. A new module
+  must be listed in its `index.js`, in load order.
 
 ## Translations
 - English is the source. Keep every language in sync when a user-facing string changes.
