@@ -2,6 +2,7 @@
   "domain": "vehicle_consumption",
   "name": "Vehicle Consumption",
   "after_dependencies": ["recorder"],
+  "categories": ["vehicles_transport.cars_evs"],
   "codeowners": ["@juju35"],
   "config_flow": true,
   "dependencies": ["frontend", "http", "lovelace"],
