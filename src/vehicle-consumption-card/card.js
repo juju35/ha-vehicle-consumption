@@ -878,7 +878,7 @@ export class VehicleConsumptionCard extends HTMLElement {
       :host {
         display: block;
         min-width: 0;
-        --vc-ok: var(--primary-color, #03a9f4);
+        --vc-ok: var(--success-color, #43a047);
         --vc-drive: var(--success-color, #43a047);
         --vc-warn: var(--warning-color, #ffa600);
         --vc-na: var(--disabled-color, #9e9e9e);
