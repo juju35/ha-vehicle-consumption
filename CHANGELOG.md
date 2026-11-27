@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.10.5 - 2026-11-27
+
+### Fixes
+- The OK level uses the theme's success colour (green) instead of the primary colour, like on the other ha-* cards.
+
 ## 1.10.4 - 2026-11-24
 
 ### Maintenance

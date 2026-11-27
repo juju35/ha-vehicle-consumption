@@ -8,7 +8,7 @@
  */
 import { VC_I18N } from "./i18n/strings.js";
 
-export var VEHICLE_CONSUMPTION_CARD_VERSION = '1.10.4';
+export var VEHICLE_CONSUMPTION_CARD_VERSION = '1.10.5';
 
 
 export const vcLang = (hass, config) => {
